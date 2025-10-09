@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DataGridData>
+    <Structure>
+        <Column Name="colTemplateID" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
+        <Column Name="colTemplateName" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
+        <Column Name="colTemplateDescription" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="Fill" />
+        <Column Name="colTemplateDuration" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
+        <Column Name="colTemplateRepeat" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="colTemplateDDPData" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
+    </Structure>
+    <Data>
+        <Row>
+            <colTemplateID>1</colTemplateID>
+            <colTemplateName>T1</colTemplateName>
+            <colTemplateDescription>Template 1</colTemplateDescription>
+            <colTemplateDuration>90</colTemplateDuration>
+            <colTemplateRepeat>True</colTemplateRepeat>
+            <colTemplateDDPData></colTemplateDDPData>
+        </Row>
+    </Data>
+</DataGridData>

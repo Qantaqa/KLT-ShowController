@@ -20,90 +20,6 @@
             <colActionRowActor></colActionRowActor>
         </Row>
         <Row>
-            <colActionRowID>1</colActionRowID>
-            <colActionRowOrder>1</colActionRowOrder>
-            <colActionRowDescr>Achterdoek half open</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>1</colActionRowID>
-            <colActionRowOrder>2</colActionRowOrder>
-            <colActionRowDescr>Trappen op positie</colActionRowDescr>
-            <colActionRowActor>Sander</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>1</colActionRowID>
-            <colActionRowOrder>4</colActionRowOrder>
-            <colActionRowDescr>Voordoen dicht</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>1</colActionRowID>
-            <colActionRowOrder>5</colActionRowOrder>
-            <colActionRowDescr>Meerpaal plaatsen</colActionRowDescr>
-            <colActionRowActor>Sander</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>1</colActionRowID>
-            <colActionRowOrder>6</colActionRowOrder>
-            <colActionRowDescr>Boot plaatsen</colActionRowDescr>
-            <colActionRowActor>Sander</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>1</colActionRowID>
-            <colActionRowOrder>7</colActionRowOrder>
-            <colActionRowDescr>Projectie start</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>1</colActionRowID>
-            <colActionRowOrder>8</colActionRowOrder>
-            <colActionRowDescr>Rookmachines starten</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>1</colActionRowID>
-            <colActionRowOrder>9</colActionRowOrder>
-            <colActionRowDescr>Hekken voor zetten</colActionRowDescr>
-            <colActionRowActor>Sander</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>1</colActionRowID>
-            <colActionRowOrder>10</colActionRowOrder>
-            <colActionRowDescr>Portholes plaatsen</colActionRowDescr>
-            <colActionRowActor>Sander</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>2</colActionRowID>
-            <colActionRowOrder>1</colActionRowOrder>
-            <colActionRowDescr>Beamers uit</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>2</colActionRowID>
-            <colActionRowOrder>10</colActionRowOrder>
-            <colActionRowDescr>Doek even open, Frederik doorlaten en doek weer dicht</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>3</colActionRowID>
-            <colActionRowOrder>1</colActionRowOrder>
-            <colActionRowDescr>Doek volledig open (langzaam op muziek "Een waar mirakel")</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>3</colActionRowID>
-            <colActionRowOrder>2</colActionRowOrder>
-            <colActionRowDescr>Boot gaat af</colActionRowDescr>
-            <colActionRowActor>Jasper(jardin), Jundrich (cour)</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>8</colActionRowID>
-            <colActionRowOrder>10</colActionRowOrder>
-            <colActionRowDescr>Aannemen vracht op de brug</colActionRowDescr>
-            <colActionRowActor>Sander, Peter</colActionRowActor>
-        </Row>
-        <Row>
             <colActionRowID></colActionRowID>
             <colActionRowOrder></colActionRowOrder>
             <colActionRowDescr></colActionRowDescr>
@@ -126,66 +42,6 @@
             <colActionRowOrder>2</colActionRowOrder>
             <colActionRowDescr>Ballustrades op</colActionRowDescr>
             <colActionRowActor></colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>9</colActionRowID>
-            <colActionRowOrder>10</colActionRowOrder>
-            <colActionRowDescr>Touwen oprtekken</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>9</colActionRowID>
-            <colActionRowOrder>20</colActionRowOrder>
-            <colActionRowDescr>Opruimen meerpaal</colActionRowDescr>
-            <colActionRowActor>Sander</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>9</colActionRowID>
-            <colActionRowOrder>30</colActionRowOrder>
-            <colActionRowDescr>Ballusstrade neerzetten</colActionRowDescr>
-            <colActionRowActor>Rik (Jardin) Japer (Cour)</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>9</colActionRowID>
-            <colActionRowOrder>40</colActionRowOrder>
-            <colActionRowDescr>Achterdoek open</colActionRowDescr>
-            <colActionRowActor>Joeri en Sander</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>5</colActionRowID>
-            <colActionRowOrder>1</colActionRowOrder>
-            <colActionRowDescr>Doek langzaam dicht</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>5</colActionRowID>
-            <colActionRowOrder>2</colActionRowOrder>
-            <colActionRowDescr>Ballustrades afdragen</colActionRowDescr>
-            <colActionRowActor>Jasper, Arno</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>6</colActionRowID>
-            <colActionRowOrder>1</colActionRowOrder>
-            <colActionRowDescr>Portholes af</colActionRowDescr>
-            <colActionRowActor>Sander, Joeri</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>6</colActionRowID>
-            <colActionRowOrder>2</colActionRowOrder>
-            <colActionRowDescr>Roer plaatsen</colActionRowDescr>
-            <colActionRowActor>Jasper</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>6</colActionRowID>
-            <colActionRowOrder>3</colActionRowOrder>
-            <colActionRowDescr>Telefoon plaatsen brug</colActionRowDescr>
-            <colActionRowActor>Rik</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>7</colActionRowID>
-            <colActionRowOrder>1</colActionRowOrder>
-            <colActionRowDescr>Voordoek open</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
         </Row>
         <Row>
             <colActionRowID>11</colActionRowID>
@@ -234,54 +90,6 @@
             <colActionRowOrder>80</colActionRowOrder>
             <colActionRowDescr>Lampen oven uit</colActionRowDescr>
             <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>10</colActionRowID>
-            <colActionRowOrder>10</colActionRowOrder>
-            <colActionRowDescr>Achterdoek dicht</colActionRowDescr>
-            <colActionRowActor>Ellen, Nadia</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>10</colActionRowID>
-            <colActionRowOrder>20</colActionRowOrder>
-            <colActionRowDescr>Draaien trap (jardin)</colActionRowDescr>
-            <colActionRowActor>Jens, Wim, Fre</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>10</colActionRowID>
-            <colActionRowOrder>30</colActionRowOrder>
-            <colActionRowDescr>Draaien trap (cour)</colActionRowDescr>
-            <colActionRowActor>Jindrich, Peter, Sander</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>10</colActionRowID>
-            <colActionRowOrder>40</colActionRowOrder>
-            <colActionRowDescr>Oprijden oven (vanaf cour)</colActionRowDescr>
-            <colActionRowActor>Jan, Joeri</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>10</colActionRowID>
-            <colActionRowOrder>50</colActionRowOrder>
-            <colActionRowDescr>Openen luik</colActionRowDescr>
-            <colActionRowActor>Ilias</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>10</colActionRowID>
-            <colActionRowOrder>60</colActionRowOrder>
-            <colActionRowDescr>Aanzetten oven lampen</colActionRowDescr>
-            <colActionRowActor>Peter</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>10</colActionRowID>
-            <colActionRowOrder>70</colActionRowOrder>
-            <colActionRowDescr>Aanzetten verlichting</colActionRowDescr>
-            <colActionRowActor>Fre</colActionRowActor>
-        </Row>
-        <Row>
-            <colActionRowID>10</colActionRowID>
-            <colActionRowOrder>80</colActionRowOrder>
-            <colActionRowDescr>Rook</colActionRowDescr>
-            <colActionRowActor>Fre</colActionRowActor>
         </Row>
         <Row>
             <colActionRowID>12</colActionRowID>
@@ -1080,6 +888,264 @@
             <colActionRowOrder>50</colActionRowOrder>
             <colActionRowDescr>Sluiten voordoek</colActionRowDescr>
             <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID></colActionRowID>
+            <colActionRowOrder></colActionRowOrder>
+            <colActionRowDescr></colActionRowDescr>
+            <colActionRowActor></colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID></colActionRowID>
+            <colActionRowOrder></colActionRowOrder>
+            <colActionRowDescr></colActionRowDescr>
+            <colActionRowActor></colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID></colActionRowID>
+            <colActionRowOrder></colActionRowOrder>
+            <colActionRowDescr></colActionRowDescr>
+            <colActionRowActor></colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID></colActionRowID>
+            <colActionRowOrder></colActionRowOrder>
+            <colActionRowDescr></colActionRowDescr>
+            <colActionRowActor></colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID></colActionRowID>
+            <colActionRowOrder></colActionRowOrder>
+            <colActionRowDescr></colActionRowDescr>
+            <colActionRowActor></colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>1</colActionRowID>
+            <colActionRowOrder>1</colActionRowOrder>
+            <colActionRowDescr>Achterdoek half open</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>1</colActionRowID>
+            <colActionRowOrder>2</colActionRowOrder>
+            <colActionRowDescr>Trappen op positie</colActionRowDescr>
+            <colActionRowActor>Sander</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>1</colActionRowID>
+            <colActionRowOrder>4</colActionRowOrder>
+            <colActionRowDescr>Voordoen dicht</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>1</colActionRowID>
+            <colActionRowOrder>5</colActionRowOrder>
+            <colActionRowDescr>Meerpaal plaatsen</colActionRowDescr>
+            <colActionRowActor>Sander</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>1</colActionRowID>
+            <colActionRowOrder>6</colActionRowOrder>
+            <colActionRowDescr>Boot plaatsen</colActionRowDescr>
+            <colActionRowActor>Sander</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>1</colActionRowID>
+            <colActionRowOrder>7</colActionRowOrder>
+            <colActionRowDescr>Projectie start</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>1</colActionRowID>
+            <colActionRowOrder>8</colActionRowOrder>
+            <colActionRowDescr>Rookmachines starten</colActionRowDescr>
+            <colActionRowActor>Fre</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>1</colActionRowID>
+            <colActionRowOrder>9</colActionRowOrder>
+            <colActionRowDescr>Hekken voor zetten</colActionRowDescr>
+            <colActionRowActor>Sander</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>1</colActionRowID>
+            <colActionRowOrder>10</colActionRowOrder>
+            <colActionRowDescr>Portholes plaatsen</colActionRowDescr>
+            <colActionRowActor>Sander</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>2</colActionRowID>
+            <colActionRowOrder>1</colActionRowOrder>
+            <colActionRowDescr>Beamers uit</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>2</colActionRowID>
+            <colActionRowOrder>10</colActionRowOrder>
+            <colActionRowDescr>Doek even open, Frederik doorlaten en doek weer dicht</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>3</colActionRowID>
+            <colActionRowOrder>1</colActionRowOrder>
+            <colActionRowDescr>Doek TRAAG volledig open (langzaam op muziek "Een waar mirakel")</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>3</colActionRowID>
+            <colActionRowOrder>2</colActionRowOrder>
+            <colActionRowDescr>Boot gaat af</colActionRowDescr>
+            <colActionRowActor>Jasper(jardin), Jundrich (cour)</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>8</colActionRowID>
+            <colActionRowOrder>10</colActionRowOrder>
+            <colActionRowDescr>Aannemen vracht op de brug</colActionRowDescr>
+            <colActionRowActor>Sander, Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>9</colActionRowID>
+            <colActionRowOrder>10</colActionRowOrder>
+            <colActionRowDescr>Touwen oprtekken</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>9</colActionRowID>
+            <colActionRowOrder>20</colActionRowOrder>
+            <colActionRowDescr>Opruimen meerpaal</colActionRowDescr>
+            <colActionRowActor>Sander</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>9</colActionRowID>
+            <colActionRowOrder>30</colActionRowOrder>
+            <colActionRowDescr>Ballusstrade neerzetten</colActionRowDescr>
+            <colActionRowActor>Rik (Jardin) Japer (Cour)</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>9</colActionRowID>
+            <colActionRowOrder>40</colActionRowOrder>
+            <colActionRowDescr>Achterdoek open</colActionRowDescr>
+            <colActionRowActor>Joeri en Sander</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>52</colActionRowID>
+            <colActionRowOrder>10</colActionRowOrder>
+            <colActionRowDescr>Oven LED aanzetten</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>52</colActionRowID>
+            <colActionRowOrder>20</colActionRowOrder>
+            <colActionRowDescr>Lampen wand ovens aanzetten</colActionRowDescr>
+            <colActionRowActor>Fre</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>5</colActionRowID>
+            <colActionRowOrder>1</colActionRowOrder>
+            <colActionRowDescr>Doek langzaam dicht</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>5</colActionRowID>
+            <colActionRowOrder>2</colActionRowOrder>
+            <colActionRowDescr>Ballustrades afdragen</colActionRowDescr>
+            <colActionRowActor>Jasper, Arno</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>6</colActionRowID>
+            <colActionRowOrder>1</colActionRowOrder>
+            <colActionRowDescr>Portholes af</colActionRowDescr>
+            <colActionRowActor>Sander, Joeri</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>6</colActionRowID>
+            <colActionRowOrder>2</colActionRowOrder>
+            <colActionRowDescr>Roer plaatsen</colActionRowDescr>
+            <colActionRowActor>Jasper</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>6</colActionRowID>
+            <colActionRowOrder>3</colActionRowOrder>
+            <colActionRowDescr>Telefoon plaatsen brug</colActionRowDescr>
+            <colActionRowActor>Rik</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>7</colActionRowID>
+            <colActionRowOrder>1</colActionRowOrder>
+            <colActionRowDescr>Voordoek open</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>10</colActionRowID>
+            <colActionRowOrder>10</colActionRowOrder>
+            <colActionRowDescr>Achterdoek dicht</colActionRowDescr>
+            <colActionRowActor>Ellen, Nadia</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>10</colActionRowID>
+            <colActionRowOrder>20</colActionRowOrder>
+            <colActionRowDescr>Draaien trap (jardin)</colActionRowDescr>
+            <colActionRowActor>Jens, Wim, Fre</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>10</colActionRowID>
+            <colActionRowOrder>30</colActionRowOrder>
+            <colActionRowDescr>Draaien trap (cour)</colActionRowDescr>
+            <colActionRowActor>Jindrich, Peter, Sander</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>10</colActionRowID>
+            <colActionRowOrder>40</colActionRowOrder>
+            <colActionRowDescr>Oprijden oven (vanaf cour)</colActionRowDescr>
+            <colActionRowActor>Jan, Joeri</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>10</colActionRowID>
+            <colActionRowOrder>50</colActionRowOrder>
+            <colActionRowDescr>Openen luik</colActionRowDescr>
+            <colActionRowActor>Ilias</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>10</colActionRowID>
+            <colActionRowOrder>60</colActionRowOrder>
+            <colActionRowDescr>Aanzetten oven lampen</colActionRowDescr>
+            <colActionRowActor>Peter</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>10</colActionRowID>
+            <colActionRowOrder>70</colActionRowOrder>
+            <colActionRowDescr>Aanzetten verlichting</colActionRowDescr>
+            <colActionRowActor>Fre</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID>10</colActionRowID>
+            <colActionRowOrder>80</colActionRowOrder>
+            <colActionRowDescr>Rook</colActionRowDescr>
+            <colActionRowActor>Fre</colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID></colActionRowID>
+            <colActionRowOrder></colActionRowOrder>
+            <colActionRowDescr></colActionRowDescr>
+            <colActionRowActor></colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID></colActionRowID>
+            <colActionRowOrder></colActionRowOrder>
+            <colActionRowDescr></colActionRowDescr>
+            <colActionRowActor></colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID></colActionRowID>
+            <colActionRowOrder></colActionRowOrder>
+            <colActionRowDescr></colActionRowDescr>
+            <colActionRowActor></colActionRowActor>
+        </Row>
+        <Row>
+            <colActionRowID></colActionRowID>
+            <colActionRowOrder></colActionRowOrder>
+            <colActionRowDescr></colActionRowDescr>
+            <colActionRowActor></colActionRowActor>
         </Row>
         <Row>
             <colActionRowID></colActionRowID>

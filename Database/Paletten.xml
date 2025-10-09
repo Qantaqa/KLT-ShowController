@@ -3,506 +3,578 @@
     <Structure>
         <Column Name="PaletteName" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
         <Column Name="PaletteId" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
-        <Column Name="BEUK_LI" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="BEUK_RE" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="BEUK_LI" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="WLED_Bureau" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="colPaletteImage" Type="System.Windows.Forms.DataGridViewImageColumn" AutoSizeMode="Fill" />
     </Structure>
     <Data>
         <Row>
             <PaletteName>Default</PaletteName>
             <PaletteId>0</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>* Random Cycle</PaletteName>
             <PaletteId>1</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>* Color 1</PaletteName>
             <PaletteId>2</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>* Colors 1&amp;2</PaletteName>
             <PaletteId>3</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>* Color Gradient</PaletteName>
             <PaletteId>4</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>* Colors Only</PaletteName>
             <PaletteId>5</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Party</PaletteName>
             <PaletteId>6</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Cloud</PaletteName>
             <PaletteId>7</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Lava</PaletteName>
             <PaletteId>8</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Ocean</PaletteName>
             <PaletteId>9</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Forest</PaletteName>
             <PaletteId>10</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Rainbow</PaletteName>
             <PaletteId>11</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Rainbow Bands</PaletteName>
             <PaletteId>12</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Sunset</PaletteName>
             <PaletteId>13</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Rivendell</PaletteName>
             <PaletteId>14</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Breeze</PaletteName>
             <PaletteId>15</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Red &amp; Blue</PaletteName>
             <PaletteId>16</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Yellowout</PaletteName>
             <PaletteId>17</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Analogous</PaletteName>
             <PaletteId>18</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Splash</PaletteName>
             <PaletteId>19</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Pastel</PaletteName>
             <PaletteId>20</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Sunset 2</PaletteName>
             <PaletteId>21</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Beach</PaletteName>
             <PaletteId>22</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Vintage</PaletteName>
             <PaletteId>23</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Departure</PaletteName>
             <PaletteId>24</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Landscape</PaletteName>
             <PaletteId>25</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Beech</PaletteName>
             <PaletteId>26</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Sherbet</PaletteName>
             <PaletteId>27</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Hult</PaletteName>
             <PaletteId>28</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Hult 64</PaletteName>
             <PaletteId>29</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Drywet</PaletteName>
             <PaletteId>30</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Jul</PaletteName>
             <PaletteId>31</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Grintage</PaletteName>
             <PaletteId>32</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Rewhi</PaletteName>
             <PaletteId>33</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Tertiary</PaletteName>
             <PaletteId>34</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Fire</PaletteName>
             <PaletteId>35</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Icefire</PaletteName>
             <PaletteId>36</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Cyane</PaletteName>
             <PaletteId>37</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Light Pink</PaletteName>
             <PaletteId>38</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Autumn</PaletteName>
             <PaletteId>39</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Magenta</PaletteName>
             <PaletteId>40</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Magred</PaletteName>
             <PaletteId>41</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Yelmag</PaletteName>
             <PaletteId>42</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Yelblu</PaletteName>
             <PaletteId>43</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Orange &amp; Teal</PaletteName>
             <PaletteId>44</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Tiamat</PaletteName>
             <PaletteId>45</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>April Night</PaletteName>
             <PaletteId>46</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Orangery</PaletteName>
             <PaletteId>47</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>C9</PaletteName>
             <PaletteId>48</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Sakura</PaletteName>
             <PaletteId>49</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Aurora</PaletteName>
             <PaletteId>50</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Atlantica</PaletteName>
             <PaletteId>51</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>C9 2</PaletteName>
             <PaletteId>52</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>C9 New</PaletteName>
             <PaletteId>53</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Temperature</PaletteName>
             <PaletteId>54</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Aurora 2</PaletteName>
             <PaletteId>55</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Retro Clown</PaletteName>
             <PaletteId>56</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Candy</PaletteName>
             <PaletteId>57</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Toxy Reaf</PaletteName>
             <PaletteId>58</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Fairy Reaf</PaletteName>
             <PaletteId>59</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Semi Blue</PaletteName>
             <PaletteId>60</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Pink Candy</PaletteName>
             <PaletteId>61</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Red Reaf</PaletteName>
             <PaletteId>62</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Aqua Flash</PaletteName>
             <PaletteId>63</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Yelblu Hot</PaletteName>
             <PaletteId>64</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Lite Light</PaletteName>
             <PaletteId>65</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Red Flash</PaletteName>
             <PaletteId>66</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Blink Red</PaletteName>
             <PaletteId>67</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Red Shift</PaletteName>
             <PaletteId>68</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Red Tide</PaletteName>
             <PaletteId>69</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
             <PaletteName>Candy2</PaletteName>
             <PaletteId>70</PaletteId>
-            <BEUK_LI>True</BEUK_LI>
             <BEUK_RE>True</BEUK_RE>
+            <BEUK_LI>True</BEUK_LI>
+            <WLED_Bureau>True</WLED_Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
     </Data>

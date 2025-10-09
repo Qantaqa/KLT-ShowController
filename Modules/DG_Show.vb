@@ -840,7 +840,12 @@ Module DG_Show
         For Each row As DataGridViewRow In DG_Show.Rows
             If row.IsNewRow Then Continue For
             If Convert.ToString(row.Cells("btnApply").Value) = ">" AndAlso Convert.ToString(row.Cells("colSend").Value) = "False" Then
-                SendInstructionSetForDevice(DG_Show, row)
+
+                If row.Cells("colFixture").Value.ToString().ToLower().Contains("video") Then
+                    ApplyRowToBeamer(row)
+                Else
+                    SendInstructionSetForDevice(DG_Show, row)
+                End If
                 row.Cells("colSend").Value = "True"
             End If
         Next
@@ -918,12 +923,16 @@ Module DG_Show
     Sub Start_Show(DG_Show As DataGridView)
         Dim FoundRows As Integer = 0
         Dim LastRow As DataGridViewRow = Nothing
+        Dim FirstRow As Boolean = True
 
         ResetProcessedCheckboxes(DG_Show)
         ClearGroupsToBlack_WithBlackSolidEffect()
 
         For Each row In DG_Show.Rows
-            If row.cells("colAct").value = "Pre-Show" And row.cells("colSceneId").value = "1" And row.cells("colEventId").value = "1" Then
+            If (row.cells("colAct").value = "Pre-Show" And row.cells("colSceneId").value = "1" And row.cells("colEventId").value = "1") Or (FirstRow) Then
+                FirstRow = False
+                row.cells("btnApply").value = ">"
+                row.cells("colSend").value = "False"
                 FoundRows = FoundRows + 1
                 row.cells("btnApply").value = ">"
             Else

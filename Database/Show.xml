@@ -32,18 +32,18 @@
             <btnApply></btnApply>
             <colAct>Pre-Show</colAct>
             <colSceneId>0</colSceneId>
-            <colEventId>1</colEventId>
+            <colEventId>0</colEventId>
             <colTimer></colTimer>
             <colCue>Zaal open</colCue>
-            <colFixture>BEUK_RE/0</colFixture>
+            <colFixture>WLED Bureau/0</colFixture>
             <colStateOnOff>True</colStateOnOff>
-            <colEffectId>38</colEffectId>
-            <colEffect>Aurora</colEffect>
-            <colPaletteId>22</colPaletteId>
-            <colPalette>Beach</colPalette>
-            <colColor1>41215</colColor1>
-            <colColor2>0</colColor2>
-            <colColor3>0</colColor3>
+            <colEffectId>11</colEffectId>
+            <colEffect>Scan Dual</colEffect>
+            <colPaletteId>7</colPaletteId>
+            <colPalette>Cloud</colPalette>
+            <colColor1>#000000</colColor1>
+            <colColor2>#000000</colColor2>
+            <colColor3>#000000</colColor3>
             <colBrightness>255</colBrightness>
             <colSpeed>128</colSpeed>
             <colIntensity>128</colIntensity>
@@ -61,62 +61,8 @@
             <colSceneId>0</colSceneId>
             <colEventId>1</colEventId>
             <colTimer></colTimer>
-            <colCue></colCue>
-            <colFixture>BEUK_RE/1</colFixture>
-            <colStateOnOff>True</colStateOnOff>
-            <colEffectId>38</colEffectId>
-            <colEffect>Aurora</colEffect>
-            <colPaletteId>22</colPaletteId>
-            <colPalette>Beach</colPalette>
-            <colColor1>#80FFFF</colColor1>
-            <colColor2>Transparent</colColor2>
-            <colColor3>Transparent</colColor3>
-            <colBrightness>153</colBrightness>
-            <colSpeed>125</colSpeed>
-            <colIntensity>118</colIntensity>
-            <colTransition>130</colTransition>
-            <colBlend>False</colBlend>
-            <colRepeat>False</colRepeat>
-            <colSound>False</colSound>
-            <colFilename>1</colFilename>
-            <colSend>False</colSend>
-            <ScriptPg></ScriptPg>
-        </Row>
-        <Row>
-            <btnApply></btnApply>
-            <colAct>Pre-Show</colAct>
-            <colSceneId>0</colSceneId>
-            <colEventId>1</colEventId>
-            <colTimer></colTimer>
-            <colCue></colCue>
-            <colFixture>BEUK_RE/2</colFixture>
-            <colStateOnOff>True</colStateOnOff>
-            <colEffectId>38</colEffectId>
-            <colEffect>Aurora</colEffect>
-            <colPaletteId>22</colPaletteId>
-            <colPalette>Beach</colPalette>
-            <colColor1>Transparent</colColor1>
-            <colColor2>Transparent</colColor2>
-            <colColor3>Transparent</colColor3>
-            <colBrightness>67</colBrightness>
-            <colSpeed>81</colSpeed>
-            <colIntensity>54</colIntensity>
-            <colTransition>60</colTransition>
-            <colBlend>False</colBlend>
-            <colRepeat>False</colRepeat>
-            <colSound>False</colSound>
-            <colFilename>1</colFilename>
-            <colSend>False</colSend>
-            <ScriptPg></ScriptPg>
-        </Row>
-        <Row>
-            <btnApply></btnApply>
-            <colAct>Pre-Show</colAct>
-            <colSceneId>0</colSceneId>
-            <colEventId>1</colEventId>
-            <colTimer></colTimer>
             <colCue>Start sponsor videos</colCue>
-            <colFixture>** Video **/ Output 2</colFixture>
+            <colFixture>** Video **/ Primairy</colFixture>
             <colStateOnOff>True</colStateOnOff>
             <colEffectId></colEffectId>
             <colEffect>Unknown Effect</colEffect>
@@ -132,7 +78,7 @@
             <colBlend>False</colBlend>
             <colRepeat>True</colRepeat>
             <colSound>False</colSound>
-            <colFilename>C:\KKLT\2025. Titanic\Beamers\Preshow\Promo - Anastasia.mp4</colFilename>
+            <colFilename>C:\KKLT\2025. Titanic\Beamers\Preshow\PreShow v3.mp4</colFilename>
             <colSend>False</colSend>
             <ScriptPg></ScriptPg>
         </Row>
@@ -141,99 +87,18 @@
             <colAct>Pre-Show</colAct>
             <colSceneId>0</colSceneId>
             <colEventId>2</colEventId>
-            <colTimer>00:10</colTimer>
-            <colCue></colCue>
-            <colFixture>BEUK_LI/0</colFixture>
-            <colStateOnOff>True</colStateOnOff>
-            <colEffectId>0</colEffectId>
-            <colEffect>Solid</colEffect>
-            <colPaletteId>0</colPaletteId>
-            <colPalette>Default</colPalette>
-            <colColor1>41215</colColor1>
-            <colColor2>0</colColor2>
-            <colColor3>0</colColor3>
-            <colBrightness>255</colBrightness>
-            <colSpeed>128</colSpeed>
-            <colIntensity>128</colIntensity>
-            <colTransition>0</colTransition>
-            <colBlend>False</colBlend>
-            <colRepeat>False</colRepeat>
-            <colSound>False</colSound>
-            <colFilename>1</colFilename>
-            <colSend>False</colSend>
-            <ScriptPg>5</ScriptPg>
-        </Row>
-        <Row>
-            <btnApply></btnApply>
-            <colAct>Pre-Show</colAct>
-            <colSceneId>0</colSceneId>
-            <colEventId>2</colEventId>
-            <colTimer>00:10</colTimer>
-            <colCue></colCue>
-            <colFixture>BEUK_LI/1</colFixture>
-            <colStateOnOff>True</colStateOnOff>
-            <colEffectId>17</colEffectId>
-            <colEffect>Twinkle</colEffect>
-            <colPaletteId>7</colPaletteId>
-            <colPalette>Cloud</colPalette>
-            <colColor1>#00A0FF</colColor1>
-            <colColor2>#000000</colColor2>
-            <colColor3>#000000</colColor3>
-            <colBrightness>255</colBrightness>
-            <colSpeed>118</colSpeed>
-            <colIntensity>128</colIntensity>
-            <colTransition>0</colTransition>
-            <colBlend>False</colBlend>
-            <colRepeat>False</colRepeat>
-            <colSound>False</colSound>
-            <colFilename>1</colFilename>
-            <colSend>False</colSend>
-            <ScriptPg></ScriptPg>
-        </Row>
-        <Row>
-            <btnApply></btnApply>
-            <colAct>Pre-Show</colAct>
-            <colSceneId>0</colSceneId>
-            <colEventId>2</colEventId>
-            <colTimer>00:10</colTimer>
-            <colCue></colCue>
-            <colFixture>BEUK_LI/2</colFixture>
-            <colStateOnOff>True</colStateOnOff>
-            <colEffectId>17</colEffectId>
-            <colEffect>Twinkle</colEffect>
-            <colPaletteId>7</colPaletteId>
-            <colPalette>Cloud</colPalette>
-            <colColor1>#00A0FF</colColor1>
-            <colColor2>#000000</colColor2>
-            <colColor3>#000000</colColor3>
-            <colBrightness>255</colBrightness>
-            <colSpeed>118</colSpeed>
-            <colIntensity>128</colIntensity>
-            <colTransition>0</colTransition>
-            <colBlend>False</colBlend>
-            <colRepeat>False</colRepeat>
-            <colSound>False</colSound>
-            <colFilename>1</colFilename>
-            <colSend>False</colSend>
-            <ScriptPg></ScriptPg>
-        </Row>
-        <Row>
-            <btnApply></btnApply>
-            <colAct>Pre-Show</colAct>
-            <colSceneId>0</colSceneId>
-            <colEventId>3</colEventId>
             <colTimer></colTimer>
             <colCue>Start show</colCue>
-            <colFixture>BEUK_LI/0</colFixture>
+            <colFixture>WLED Bureau/0</colFixture>
             <colStateOnOff>True</colStateOnOff>
-            <colEffectId>103</colEffectId>
-            <colEffect>Solid Glitter</colEffect>
-            <colPaletteId>40</colPaletteId>
-            <colPalette>Magenta</colPalette>
-            <colColor1>#00A0FF</colColor1>
+            <colEffectId>8</colEffectId>
+            <colEffect>Colorloop</colEffect>
+            <colPaletteId>0</colPaletteId>
+            <colPalette>Default</colPalette>
+            <colColor1>#000000</colColor1>
             <colColor2>#000000</colColor2>
             <colColor3>#000000</colColor3>
-            <colBrightness>185</colBrightness>
+            <colBrightness>255</colBrightness>
             <colSpeed>128</colSpeed>
             <colIntensity>128</colIntensity>
             <colTransition>0</colTransition>
@@ -246,72 +111,18 @@
         </Row>
         <Row>
             <btnApply></btnApply>
-            <colAct>Pre-Show</colAct>
+            <colAct>Act 1</colAct>
             <colSceneId>0</colSceneId>
             <colEventId>3</colEventId>
             <colTimer></colTimer>
-            <colCue></colCue>
-            <colFixture>BEUK_LI/1</colFixture>
+            <colCue>Overture</colCue>
+            <colFixture>WLED Bureau/0</colFixture>
             <colStateOnOff>True</colStateOnOff>
-            <colEffectId>103</colEffectId>
-            <colEffect>Solid Glitter</colEffect>
-            <colPaletteId>40</colPaletteId>
-            <colPalette>Magenta</colPalette>
-            <colColor1>#00A0FF</colColor1>
-            <colColor2>#000000</colColor2>
-            <colColor3>#000000</colColor3>
-            <colBrightness>185</colBrightness>
-            <colSpeed>128</colSpeed>
-            <colIntensity>128</colIntensity>
-            <colTransition>0</colTransition>
-            <colBlend>False</colBlend>
-            <colRepeat>False</colRepeat>
-            <colSound>False</colSound>
-            <colFilename>1</colFilename>
-            <colSend>False</colSend>
-            <ScriptPg></ScriptPg>
-        </Row>
-        <Row>
-            <btnApply></btnApply>
-            <colAct>Pre-Show</colAct>
-            <colSceneId>0</colSceneId>
-            <colEventId>3</colEventId>
-            <colTimer></colTimer>
-            <colCue></colCue>
-            <colFixture>BEUK_LI/2</colFixture>
-            <colStateOnOff>True</colStateOnOff>
-            <colEffectId>103</colEffectId>
-            <colEffect>Solid Glitter</colEffect>
-            <colPaletteId>40</colPaletteId>
-            <colPalette>Magenta</colPalette>
-            <colColor1>#00A0FF</colColor1>
-            <colColor2>#000000</colColor2>
-            <colColor3>#000000</colColor3>
-            <colBrightness>185</colBrightness>
-            <colSpeed>128</colSpeed>
-            <colIntensity>128</colIntensity>
-            <colTransition>0</colTransition>
-            <colBlend>False</colBlend>
-            <colRepeat>False</colRepeat>
-            <colSound>False</colSound>
-            <colFilename>1</colFilename>
-            <colSend>False</colSend>
-            <ScriptPg></ScriptPg>
-        </Row>
-        <Row>
-            <btnApply></btnApply>
-            <colAct>Pre-Show</colAct>
-            <colSceneId>0</colSceneId>
-            <colEventId>3</colEventId>
-            <colTimer></colTimer>
-            <colCue></colCue>
-            <colFixture>BEUK_RE/0</colFixture>
-            <colStateOnOff>True</colStateOnOff>
-            <colEffectId>20</colEffectId>
-            <colEffect>Sparkle</colEffect>
-            <colPaletteId>11</colPaletteId>
-            <colPalette>Rainbow</colPalette>
-            <colColor1>#00A0FF</colColor1>
+            <colEffectId>0</colEffectId>
+            <colEffect>Solid</colEffect>
+            <colPaletteId>2</colPaletteId>
+            <colPalette>* Color 1</colPalette>
+            <colColor1>Black</colColor1>
             <colColor2>#000000</colColor2>
             <colColor3>#000000</colColor3>
             <colBrightness>255</colBrightness>
@@ -321,84 +132,30 @@
             <colBlend>False</colBlend>
             <colRepeat>False</colRepeat>
             <colSound>False</colSound>
-            <colFilename>1</colFilename>
+            <colFilename></colFilename>
             <colSend>False</colSend>
-            <ScriptPg></ScriptPg>
-        </Row>
-        <Row>
-            <btnApply></btnApply>
-            <colAct>Pre-Show</colAct>
-            <colSceneId>0</colSceneId>
-            <colEventId>3</colEventId>
-            <colTimer></colTimer>
-            <colCue></colCue>
-            <colFixture>BEUK_RE/1</colFixture>
-            <colStateOnOff>True</colStateOnOff>
-            <colEffectId>20</colEffectId>
-            <colEffect>Sparkle</colEffect>
-            <colPaletteId>11</colPaletteId>
-            <colPalette>Rainbow</colPalette>
-            <colColor1>#00A0FF</colColor1>
-            <colColor2>#000000</colColor2>
-            <colColor3>#000000</colColor3>
-            <colBrightness>255</colBrightness>
-            <colSpeed>128</colSpeed>
-            <colIntensity>128</colIntensity>
-            <colTransition>0</colTransition>
-            <colBlend>False</colBlend>
-            <colRepeat>False</colRepeat>
-            <colSound>False</colSound>
-            <colFilename>1</colFilename>
-            <colSend>False</colSend>
-            <ScriptPg></ScriptPg>
-        </Row>
-        <Row>
-            <btnApply></btnApply>
-            <colAct>Pre-Show</colAct>
-            <colSceneId>0</colSceneId>
-            <colEventId>3</colEventId>
-            <colTimer></colTimer>
-            <colCue></colCue>
-            <colFixture>BEUK_RE/2</colFixture>
-            <colStateOnOff>True</colStateOnOff>
-            <colEffectId>20</colEffectId>
-            <colEffect>Sparkle</colEffect>
-            <colPaletteId>11</colPaletteId>
-            <colPalette>Rainbow</colPalette>
-            <colColor1>#00A0FF</colColor1>
-            <colColor2>#000000</colColor2>
-            <colColor3>#000000</colColor3>
-            <colBrightness>255</colBrightness>
-            <colSpeed>128</colSpeed>
-            <colIntensity>128</colIntensity>
-            <colTransition>0</colTransition>
-            <colBlend>False</colBlend>
-            <colRepeat>False</colRepeat>
-            <colSound>False</colSound>
-            <colFilename>1</colFilename>
-            <colSend>False</colSend>
-            <ScriptPg></ScriptPg>
+            <ScriptPg>5</ScriptPg>
         </Row>
         <Row>
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>0</colSceneId>
-            <colEventId>0</colEventId>
+            <colEventId>4</colEventId>
             <colTimer></colTimer>
-            <colCue>Overture</colCue>
-            <colFixture></colFixture>
-            <colStateOnOff></colStateOnOff>
-            <colEffectId>Unknown Effect</colEffectId>
-            <colEffect>Unknown Effect</colEffect>
-            <colPaletteId>Unknown Palette</colPaletteId>
-            <colPalette>Unknown Palette</colPalette>
-            <colColor1></colColor1>
-            <colColor2></colColor2>
-            <colColor3></colColor3>
-            <colBrightness></colBrightness>
-            <colSpeed></colSpeed>
-            <colIntensity></colIntensity>
-            <colTransition></colTransition>
+            <colCue>1A "In elke tijd" [pag 5]</colCue>
+            <colFixture>WLED Bureau/0</colFixture>
+            <colStateOnOff>True</colStateOnOff>
+            <colEffectId>0</colEffectId>
+            <colEffect>Solid</colEffect>
+            <colPaletteId>2</colPaletteId>
+            <colPalette>* Color 1</colPalette>
+            <colColor1>Red</colColor1>
+            <colColor2>Red</colColor2>
+            <colColor3>Red</colColor3>
+            <colBrightness>255</colBrightness>
+            <colSpeed>128</colSpeed>
+            <colIntensity>128</colIntensity>
+            <colTransition>0</colTransition>
             <colBlend>False</colBlend>
             <colRepeat>False</colRepeat>
             <colSound>False</colSound>
@@ -408,33 +165,6 @@
         </Row>
         <Row>
             <btnApply>&gt;</btnApply>
-            <colAct>Act 1</colAct>
-            <colSceneId>0</colSceneId>
-            <colEventId>1</colEventId>
-            <colTimer></colTimer>
-            <colCue>1A "In elke tijd" [pag 5]</colCue>
-            <colFixture></colFixture>
-            <colStateOnOff></colStateOnOff>
-            <colEffectId>Unknown Effect</colEffectId>
-            <colEffect>Unknown Effect</colEffect>
-            <colPaletteId>Unknown Palette</colPaletteId>
-            <colPalette>Unknown Palette</colPalette>
-            <colColor1></colColor1>
-            <colColor2></colColor2>
-            <colColor3></colColor3>
-            <colBrightness></colBrightness>
-            <colSpeed></colSpeed>
-            <colIntensity></colIntensity>
-            <colTransition></colTransition>
-            <colBlend>False</colBlend>
-            <colRepeat>False</colRepeat>
-            <colSound>False</colSound>
-            <colFilename></colFilename>
-            <colSend>True</colSend>
-            <ScriptPg>5</ScriptPg>
-        </Row>
-        <Row>
-            <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
             <colEventId>2</colEventId>
@@ -457,7 +187,7 @@
             <colRepeat>False</colRepeat>
             <colSound>False</colSound>
             <colFilename></colFilename>
-            <colSend>False</colSend>
+            <colSend>True</colSend>
             <ScriptPg>7</ScriptPg>
         </Row>
         <Row>
@@ -1712,9 +1442,9 @@
             <colFixture></colFixture>
             <colStateOnOff></colStateOnOff>
             <colEffectId>Unknown Effect</colEffectId>
-            <colEffect></colEffect>
+            <colEffect>Unknown Effect</colEffect>
             <colPaletteId>Unknown Palette</colPaletteId>
-            <colPalette></colPalette>
+            <colPalette>Unknown Palette</colPalette>
             <colColor1></colColor1>
             <colColor2></colColor2>
             <colColor3></colColor3>
