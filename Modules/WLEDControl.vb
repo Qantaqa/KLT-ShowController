@@ -426,6 +426,281 @@ Module WLEDControl
         End If
     End Sub
 
+    Private Function GetColorJArray(ByVal colorString As String) As JArray
+        If String.IsNullOrWhiteSpace(colorString) Then Return Nothing
+        Try
+            ' ColorTranslator.FromHtml ondersteunt HTML codes, kleurnamen en RGB(A) strings (vaak)
+            Dim c As Color = ColorTranslator.FromHtml(colorString)
+
+            ' Retourneer een JArray [R, G, B]
+            Return New JArray() From {c.R, c.G, c.B}
+        Catch
+            ' Ongeldige kleurcode, retourneer Nothing
+            Return Nothing
+        End Try
+    End Function
+
+    ' ========================================================================================
+    ' GECORRIGEERDE SendInstructionSetForDevice SUB
+    ' Verstuurt een set segment-instellingen voor één WLED-apparaat.
+    ' ========================================================================================
+    Public Async Sub SendInstructionSetForDevice(DG_Show As DataGridView, primaryRow As DataGridViewRow)
+
+        If primaryRow Is Nothing OrElse primaryRow.IsNewRow Then Exit Sub
+
+        ' 1. Haal de sleutelwaarden op
+        Dim act = primaryRow.Cells("colAct").Value?.ToString()
+        Dim scene = primaryRow.Cells("colSceneId").Value?.ToString()
+        Dim eventNr = primaryRow.Cells("colEventId").Value?.ToString()
+        Dim fixture = primaryRow.Cells("colFixture").Value?.ToString()
+
+        If String.IsNullOrEmpty(fixture) OrElse fixture.StartsWith("**") Then Exit Sub
+
+        Dim wledName = fixture.Split("/"c)(0)
+        Dim wledIp As String = Nothing
+
+        ' 2. Zoek het IP-adres van het WLED-apparaat
+        ' Aanname: FrmMain.DG_Devices is beschikbaar
+        For Each devRow As DataGridViewRow In FrmMain.DG_Devices.Rows
+            If devRow.IsNewRow Then Continue For
+            If devRow.Cells("colInstance").Value?.ToString() = wledName Then
+                wledIp = devRow.Cells("colIPAddress").Value?.ToString()
+                Exit For
+            End If
+        Next
+        If String.IsNullOrEmpty(wledIp) Then Exit Sub
+
+        ' 3. Verzamel alle rijen voor dit apparaat en de huidige Act/Scene/Event
+        Dim segmentList As New List(Of JObject)
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+
+            Dim rowFixture = row.Cells("colFixture").Value?.ToString()
+            If String.IsNullOrEmpty(rowFixture) OrElse rowFixture.StartsWith("**") Then Continue For
+
+            Dim rowWledName = rowFixture.Split("/"c)(0)
+            If rowWledName <> wledName Then Continue For
+
+            ' Controleer of de rij overeenkomt met de huidige instructieset
+            If row.Cells("colAct").Value?.ToString() = act AndAlso
+               row.Cells("colSceneId").Value?.ToString() = scene AndAlso
+               row.Cells("colEventId").Value?.ToString() = eventNr Then
+
+                Dim segId As Integer
+                If Not Integer.TryParse(rowFixture.Split("/"c).ElementAtOrDefault(1), segId) Then Continue For
+
+                ' --- KLEUREN VERWERKING (GECORRIGEERD) ---
+                Dim C1 = row.Cells("colColor1").Value?.ToString()
+                Dim C2 = row.Cells("colColor2").Value?.ToString()
+                Dim C3 = row.Cells("colColor3").Value?.ToString()
+
+                Dim colorJArray As New JArray()
+
+                ' Gebruik de helperfunctie om de drie kleuren te parsen en toe te voegen
+                Dim parsedC1 = GetColorJArray(C1)
+                If parsedC1 IsNot Nothing Then colorJArray.Add(parsedC1)
+
+                Dim parsedC2 = GetColorJArray(C2)
+                If parsedC2 IsNot Nothing Then colorJArray.Add(parsedC2)
+
+                Dim parsedC3 = GetColorJArray(C3)
+                If parsedC3 IsNot Nothing Then colorJArray.Add(parsedC3)
+                ' ------------------------------------------
+
+                ' 4. Overige segment parameters ophalen
+                Dim stateOnOff = row.Cells("colStateOnOff").Value?.ToString()
+                stateOnOff = If(stateOnOff = "Uit", "false", "true")
+                Dim effectName = row.Cells("colEffect").Value?.ToString()
+                Dim effectId = GetEffectIdFromName(effectName, FrmMain.DG_Effecten)
+                Dim paletteName = row.Cells("colPalette").Value?.ToString()
+                Dim paletteId = GetPaletteIdFromName(paletteName, FrmMain.DG_Paletten)
+                Dim brightness = row.Cells("colBrightness").Value?.ToString()
+                Dim speed = row.Cells("colSpeed").Value?.ToString()
+                Dim intensity = row.Cells("colIntensity").Value?.ToString()
+
+                ' 5. Bouw het JSON-segment object
+                Dim segObj As New JObject From {
+                    {"id", segId},
+                    {"on", Boolean.Parse(stateOnOff)},
+                    {"fx", effectId},
+                    {"pal", paletteId},
+                    {"sel", True},
+                    {"bri", If(String.IsNullOrEmpty(brightness), 255, Integer.Parse(brightness))},
+                    {"sx", If(String.IsNullOrEmpty(speed), 127, Integer.Parse(speed))},
+                    {"ix", If(String.IsNullOrEmpty(intensity), 127, Integer.Parse(intensity))}
+                }
+
+                ' 6. Voeg de kleurarray correct toe als JArray
+                If colorJArray.Count > 0 Then
+                    ' Dit zorgt ervoor dat "col" een JSON array van arrays wordt, GEEN string.
+                    segObj.Add("col", colorJArray)
+                End If
+
+                segmentList.Add(segObj)
+
+                ' Markeer deze rij als verwerkt
+                If DG_Show.Columns.Contains("colSend") Then
+                    row.Cells("colSend").Value = True
+                End If
+            End If
+        Next
+
+        If segmentList.Count = 0 Then Exit Sub
+
+        ' 7. Bouw de uiteindelijke payload
+        Dim payload As New JObject From {
+            {"seg", New JArray(segmentList.ToArray())} ' Gebruik JArray.FromObject(segmentList) kan ook
+        }
+
+        ' 8. Verzend de instructieset
+        Try
+            Using client As New HttpClient()
+                client.Timeout = TimeSpan.FromSeconds(3)
+                Dim content As New StringContent(payload.ToString(Newtonsoft.Json.Formatting.None), Encoding.UTF8, "application/json")
+                Dim response = Await client.PostAsync($"http://{wledIp}/json/state", content)
+
+                If response.IsSuccessStatusCode Then
+                    ' ToonFlashBericht($"[WLED] Instructieset verzonden naar {wledName} ({wledIp})", 1)
+                Else
+                    ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {response.StatusCode}", 5, FlashSeverity.IsError)
+                End If
+            End Using
+        Catch ex As Exception
+            ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {ex.Message}", 5, FlashSeverity.IsError)
+        End Try
+    End Sub
+
+    Public Async Sub SendInstructionSetForDevice_OLD(DG_Show As DataGridView, primaryRow As DataGridViewRow)
+        'If DG_Show.CurrentCell Is Nothing OrElse DG_Show.CurrentRow Is Nothing OrElse DG_Show.CurrentRow.IsNewRow Then Exit Sub
+
+        ' Get primary row and its key values
+        Dim act = primaryRow.Cells("colAct").Value?.ToString()
+        Dim scene = primaryRow.Cells("colSceneId").Value?.ToString()
+        Dim eventNr = primaryRow.Cells("colEventId").Value?.ToString()
+        Dim fixture = primaryRow.Cells("colFixture").Value?.ToString()
+
+
+        If String.IsNullOrEmpty(fixture) OrElse fixture.StartsWith("**") Then Exit Sub
+
+        Dim wledName = fixture.Split("/"c)(0)
+        Dim wledIp As String = Nothing
+
+        ' Find the IP for this WLED device
+        For Each devRow As DataGridViewRow In FrmMain.DG_Devices.Rows
+            If devRow.IsNewRow Then Continue For
+            If devRow.Cells("colInstance").Value?.ToString() = wledName Then
+                wledIp = devRow.Cells("colIPAddress").Value?.ToString()
+                Exit For
+            End If
+        Next
+        If String.IsNullOrEmpty(wledIp) Then Exit Sub
+
+
+
+
+
+
+        ' Collect all rows for this device and matching act/scene/event
+        Dim segmentList As New List(Of JObject)
+        For Each row As DataGridViewRow In DG_Show.Rows
+
+
+
+            If row.IsNewRow Then Continue For
+
+
+            Dim rowFixture = row.Cells("colFixture").Value?.ToString()
+            If String.IsNullOrEmpty(rowFixture) OrElse rowFixture.StartsWith("**") Then Continue For
+
+
+
+
+            Dim rowWledName = rowFixture.Split("/"c)(0)
+            If rowWledName <> wledName Then Continue For
+            If row.Cells("colAct").Value?.ToString() = act AndAlso
+               row.Cells("colSceneId").Value?.ToString() = scene AndAlso
+               row.Cells("colEventId").Value?.ToString() = eventNr Then
+
+                Dim segId As Integer
+                If Not Integer.TryParse(rowFixture.Split("/"c).ElementAtOrDefault(1), segId) Then Continue For
+
+                Dim C1 = row.Cells("colColor1").Value?.ToString()
+                Dim C2 = row.Cells("colColor2").Value?.ToString()
+                Dim C3 = row.Cells("colColor3").Value?.ToString()
+
+                ' Convert HTML color to RGB array
+                Dim colorList As New List(Of String)
+                Dim colorKey
+                For i As Integer = 1 To 3
+                    If (i = 1) Then colorKey = C1
+                    If (i = 2) Then colorKey = C2
+                    If (i = 3) Then colorKey = C3
+
+                    If Not String.IsNullOrEmpty(colorKey) Then
+                        Try
+                            Dim c As Color = ColorTranslator.FromHtml(colorKey)
+                            colorList.Add($"[{c.R},{c.G},{c.B}]")
+                        Catch ex As Exception
+                            ' Ignore invalid color
+                        End Try
+                    End If
+                Next
+                Dim colorArray As String = String.Join(",", colorList)
+
+
+                Dim stateOnOff = row.Cells("colStateOnOff").Value?.ToString()
+                stateOnOff = If(stateOnOff = "Uit", "false", "true")
+                Dim effectName = row.Cells("colEffect").Value?.ToString()
+                Dim effectId = GetEffectIdFromName(effectName, FrmMain.DG_Effecten)
+                Dim paletteName = row.Cells("colPalette").Value?.ToString()
+                Dim paletteId = GetPaletteIdFromName(paletteName, FrmMain.DG_Paletten)
+                Dim brightness = row.Cells("colBrightness").Value?.ToString()
+                Dim speed = row.Cells("colSpeed").Value?.ToString()
+                Dim intensity = row.Cells("colIntensity").Value?.ToString()
+
+                Dim segObj As New JObject From {
+                    {"id", segId},
+                    {"on", Boolean.Parse(stateOnOff)},
+                    {"fx", effectId},
+                    {"pal", paletteId},
+                    {"sel", True},
+                    {"bri", If(String.IsNullOrEmpty(brightness), 255, Integer.Parse(brightness))},
+                    {"sx", If(String.IsNullOrEmpty(speed), 127, Integer.Parse(speed))},
+                    {"ix", If(String.IsNullOrEmpty(intensity), 127, Integer.Parse(intensity))},
+                    {"col", "" & colorArray & ""}
+                }
+
+                segmentList.Add(segObj)
+
+                ' Mark this row as processed (corrected)
+                If DG_Show.Columns.Contains("colSend") Then
+                    row.Cells("colSend").Value = True
+                End If
+            End If
+        Next
+
+        If segmentList.Count = 0 Then Exit Sub
+
+        ' Build the instruction set and send to WLED
+        Dim payload As New JObject From {
+            {"seg", JArray.FromObject(segmentList)}
+        }
+        Try
+            Using client As New HttpClient()
+                client.Timeout = TimeSpan.FromSeconds(3)
+                Dim content As New StringContent(payload.ToString(), Encoding.UTF8, "application/json")
+                Dim response = Await client.PostAsync($"http://{wledIp}/json/state", content)
+                If response.IsSuccessStatusCode Then
+                    'ToonFlashBericht($"[WLED] Instructieset verzonden naar {wledName} ({wledIp})", 1)
+                Else
+                    ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {response.StatusCode}", 5, FlashSeverity.IsError)
+                End If
+            End Using
+        Catch ex As Exception
+            ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {ex.Message}", 5, FlashSeverity.IsError)
+        End Try
+    End Sub
+
 
     Public Async Function SetSegmentsFromGridAsync(ByVal DG_Devices As DataGridView) As Task
 
@@ -492,94 +767,6 @@ Module WLEDControl
 
 
 
-    Public Async Sub SendInstructionSetForDevice(DG_Show As DataGridView, primaryRow As DataGridViewRow)
-        'If DG_Show.CurrentCell Is Nothing OrElse DG_Show.CurrentRow Is Nothing OrElse DG_Show.CurrentRow.IsNewRow Then Exit Sub
-
-        ' Get primary row and its key values
-        Dim act = primaryRow.Cells("colAct").Value?.ToString()
-        Dim scene = primaryRow.Cells("colSceneId").Value?.ToString()
-        Dim eventNr = primaryRow.Cells("colEventId").Value?.ToString()
-        Dim fixture = primaryRow.Cells("colFixture").Value?.ToString()
-        If String.IsNullOrEmpty(fixture) OrElse fixture.StartsWith("**") Then Exit Sub
-
-        Dim wledName = fixture.Split("/"c)(0)
-        Dim wledIp As String = Nothing
-
-        ' Find the IP for this WLED device
-        For Each devRow As DataGridViewRow In FrmMain.DG_Devices.Rows
-            If devRow.IsNewRow Then Continue For
-            If devRow.Cells("colInstance").Value?.ToString() = wledName Then
-                wledIp = devRow.Cells("colIPAddress").Value?.ToString()
-                Exit For
-            End If
-        Next
-        If String.IsNullOrEmpty(wledIp) Then Exit Sub
-
-        ' Collect all rows for this device and matching act/scene/event
-        Dim segmentList As New List(Of JObject)
-        For Each row As DataGridViewRow In DG_Show.Rows
-            If row.IsNewRow Then Continue For
-            Dim rowFixture = row.Cells("colFixture").Value?.ToString()
-            If String.IsNullOrEmpty(rowFixture) OrElse rowFixture.StartsWith("**") Then Continue For
-            Dim rowWledName = rowFixture.Split("/"c)(0)
-            If rowWledName <> wledName Then Continue For
-            If row.Cells("colAct").Value?.ToString() = act AndAlso
-               row.Cells("colSceneId").Value?.ToString() = scene AndAlso
-               row.Cells("colEventId").Value?.ToString() = eventNr Then
-
-                Dim segId As Integer
-                If Not Integer.TryParse(rowFixture.Split("/"c).ElementAtOrDefault(1), segId) Then Continue For
-
-                Dim stateOnOff = row.Cells("colStateOnOff").Value?.ToString()
-                stateOnOff = If(stateOnOff = "Uit", "false", "true")
-                Dim effectName = row.Cells("colEffect").Value?.ToString()
-                Dim effectId = GetEffectIdFromName(effectName, FrmMain.DG_Effecten)
-                Dim paletteName = row.Cells("colPalette").Value?.ToString()
-                Dim paletteId = GetPaletteIdFromName(paletteName, FrmMain.DG_Paletten)
-                Dim brightness = row.Cells("colBrightness").Value?.ToString()
-                Dim speed = row.Cells("colSpeed").Value?.ToString()
-                Dim intensity = row.Cells("colIntensity").Value?.ToString()
-
-                Dim segObj As New JObject From {
-                    {"id", segId},
-                    {"on", Boolean.Parse(stateOnOff)},
-                    {"fx", effectId},
-                    {"pal", paletteId},
-                    {"sel", True},
-                    {"bri", If(String.IsNullOrEmpty(brightness), 255, Integer.Parse(brightness))},
-                    {"sx", If(String.IsNullOrEmpty(speed), 127, Integer.Parse(speed))},
-                    {"ix", If(String.IsNullOrEmpty(intensity), 127, Integer.Parse(intensity))}
-                }
-                segmentList.Add(segObj)
-
-                ' Mark this row as processed (corrected)
-                If DG_Show.Columns.Contains("colSend") Then
-                    row.Cells("colSend").Value = True
-                End If
-            End If
-        Next
-
-        If segmentList.Count = 0 Then Exit Sub
-
-        ' Build the instruction set and send to WLED
-        Dim payload As New JObject From {
-            {"seg", JArray.FromObject(segmentList)}
-        }
-        Try
-            Using client As New HttpClient()
-                client.Timeout = TimeSpan.FromSeconds(3)
-                Dim content As New StringContent(payload.ToString(), Encoding.UTF8, "application/json")
-                Dim response = Await client.PostAsync($"http://{wledIp}/json/state", content)
-                If response.IsSuccessStatusCode Then
-                    'ToonFlashBericht($"[WLED] Instructieset verzonden naar {wledName} ({wledIp})", 1)
-                Else
-                    ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {response.StatusCode}", 5, FlashSeverity.IsError)
-                End If
-            End Using
-        Catch ex As Exception
-            ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {ex.Message}", 5, FlashSeverity.IsError)
-        End Try
-    End Sub
 
 
 End Module

@@ -49,7 +49,7 @@ Partial Class Beamer_Secondairy
         FormBorderStyle = FormBorderStyle.None
         Name = "Beamer_Secondairy"
         StartPosition = FormStartPosition.CenterScreen
-        Text = "Beamer_Secondairy"
+        Text = "Beamer_2"
         CType(WMP_SecondairyPlayer_Live, ComponentModel.ISupportInitialize).EndInit()
         ResumeLayout(False)
     End Sub

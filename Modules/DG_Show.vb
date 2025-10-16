@@ -726,10 +726,10 @@ Module DG_Show
         ' NextEventOrScene: 0 = Scene, 1 = Event
 
         ' First stop any playing video's
-        Beamer_Primary.WMP_PrimaryPlayer_Live.Ctlcontrols.stop()
-        Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.stop()
-        FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
-        FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
+        'Beamer_Primary.WMP_PrimaryPlayer_Live.Ctlcontrols.stop()
+        'Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.stop()
+        'FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
+        'FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
 
         If DG_Show.SelectedRows.Count = 0 Then Exit Sub
 
@@ -1040,134 +1040,134 @@ Module DG_Show
     End Sub
 
     ' New: go to next act, optionally apply a filter combobox
-    Public Sub Next_Act(DG_Show As DataGridView, Optional filterAct As ToolStripComboBox = Nothing)
-        ' Stop any playing videos
-        Beamer_Primary.WMP_PrimaryPlayer_Live.Ctlcontrols.stop()
-        Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.stop()
-        FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
-        FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
+    'Public Sub Next_Act(DG_Show As DataGridView, Optional filterAct As ToolStripComboBox = Nothing)
+    '    '' Stop any playing videos
+    '    'Beamer_Primary.WMP_PrimaryPlayer_Live.Ctlcontrols.stop()
+    '    'Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.stop()
+    '    'FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
+    '    'FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
 
-        If DG_Show.SelectedRows.Count = 0 Then Exit Sub
+    '    If DG_Show.SelectedRows.Count = 0 Then Exit Sub
 
-        Dim currentRow As DataGridViewRow = DG_Show.SelectedRows(0)
-        Dim currentAct As String = Convert.ToString(currentRow.Cells("colAct").Value)
-        Dim currentIndex As Integer = currentRow.Index
+    '    Dim currentRow As DataGridViewRow = DG_Show.SelectedRows(0)
+    '    Dim currentAct As String = Convert.ToString(currentRow.Cells("colAct").Value)
+    '    Dim currentIndex As Integer = currentRow.Index
 
-        ' Find first row of the next act
-        Dim nextAct As String = Nothing
-        Dim firstScene As Integer = -1
-        Dim firstEvent As Integer = -1
-        Dim found As Boolean = False
+    '    ' Find first row of the next act
+    '    Dim nextAct As String = Nothing
+    '    Dim firstScene As Integer = -1
+    '    Dim firstEvent As Integer = -1
+    '    Dim found As Boolean = False
 
-        Dim leftCurrentAct As Boolean = False
-        For Each row As DataGridViewRow In DG_Show.Rows
-            If row.IsNewRow Then Continue For
-            If row.Index <= currentIndex Then Continue For
+    '    Dim leftCurrentAct As Boolean = False
+    '    For Each row As DataGridViewRow In DG_Show.Rows
+    '        If row.IsNewRow Then Continue For
+    '        If row.Index <= currentIndex Then Continue For
 
-            Dim act = Convert.ToString(row.Cells("colAct").Value)
-            Dim sceneId = Convert.ToInt32(row.Cells("colSceneId").Value)
-            Dim eventId = Convert.ToInt32(row.Cells("colEventId").Value)
+    '        Dim act = Convert.ToString(row.Cells("colAct").Value)
+    '        Dim sceneId = Convert.ToInt32(row.Cells("colSceneId").Value)
+    '        Dim eventId = Convert.ToInt32(row.Cells("colEventId").Value)
 
-            If Not leftCurrentAct AndAlso act = currentAct Then
-                Continue For
-            End If
+    '        If Not leftCurrentAct AndAlso act = currentAct Then
+    '            Continue For
+    '        End If
 
-            If Not leftCurrentAct AndAlso act <> currentAct Then
-                ' We hit the next act for the first time
-                leftCurrentAct = True
-                nextAct = act
-                firstScene = sceneId
-                firstEvent = eventId
-                found = True
-                Exit For
-            End If
-        Next
+    '        If Not leftCurrentAct AndAlso act <> currentAct Then
+    '            ' We hit the next act for the first time
+    '            leftCurrentAct = True
+    '            nextAct = act
+    '            firstScene = sceneId
+    '            firstEvent = eventId
+    '            found = True
+    '            Exit For
+    '        End If
+    '    Next
 
-        If Not found Then Exit Sub
+    '    If Not found Then Exit Sub
 
-        ' Mark all rows that belong to nextAct + firstScene + firstEvent
-        Dim activeIndex As Integer = -1
-        Dim firstTargetRow As DataGridViewRow = Nothing
-        For Each row As DataGridViewRow In DG_Show.Rows
-            If row.IsNewRow Then Continue For
-            Dim act = Convert.ToString(row.Cells("colAct").Value)
-            Dim sceneId = Convert.ToInt32(row.Cells("colSceneId").Value)
-            Dim eventId = Convert.ToInt32(row.Cells("colEventId").Value)
+    '    ' Mark all rows that belong to nextAct + firstScene + firstEvent
+    '    Dim activeIndex As Integer = -1
+    '    Dim firstTargetRow As DataGridViewRow = Nothing
+    '    For Each row As DataGridViewRow In DG_Show.Rows
+    '        If row.IsNewRow Then Continue For
+    '        Dim act = Convert.ToString(row.Cells("colAct").Value)
+    '        Dim sceneId = Convert.ToInt32(row.Cells("colSceneId").Value)
+    '        Dim eventId = Convert.ToInt32(row.Cells("colEventId").Value)
 
-            If act = nextAct AndAlso sceneId = firstScene AndAlso eventId = firstEvent Then
-                row.Cells("btnApply").Value = ">"
-                row.Cells("colSend").Value = "False"
-                activeIndex = Math.Max(activeIndex, row.Index)
-                If firstTargetRow Is Nothing Then firstTargetRow = row
-            Else
-                row.Cells("btnApply").Value = ""
-                row.Cells("colSend").Value = "False"
-            End If
-        Next
+    '        If act = nextAct AndAlso sceneId = firstScene AndAlso eventId = firstEvent Then
+    '            row.Cells("btnApply").Value = ">"
+    '            row.Cells("colSend").Value = "False"
+    '            activeIndex = Math.Max(activeIndex, row.Index)
+    '            If firstTargetRow Is Nothing Then firstTargetRow = row
+    '        Else
+    '            row.Cells("btnApply").Value = ""
+    '            row.Cells("colSend").Value = "False"
+    '        End If
+    '    Next
 
-        ' Auto goto PDF page if available and enabled
-        AutoGotoPdfIfEnabled(firstTargetRow)
+    '    ' Auto goto PDF page if available and enabled
+    '    AutoGotoPdfIfEnabled(firstTargetRow)
 
-        ' Send instructions
-        For Each row As DataGridViewRow In DG_Show.Rows
-            If row.IsNewRow Then Continue For
-            If Convert.ToString(row.Cells("btnApply").Value) = ">" AndAlso Convert.ToString(row.Cells("colSend").Value) = "False" Then
-                SendInstructionSetForDevice(DG_Show, row)
-                row.Cells("colSend").Value = "True"
-            End If
-        Next
+    '    ' Send instructions
+    '    For Each row As DataGridViewRow In DG_Show.Rows
+    '        If row.IsNewRow Then Continue For
+    '        If Convert.ToString(row.Cells("btnApply").Value) = ">" AndAlso Convert.ToString(row.Cells("colSend").Value) = "False" Then
+    '            SendInstructionSetForDevice(DG_Show, row)
+    '            row.Cells("colSend").Value = "True"
+    '        End If
+    '    Next
 
-        ' Update filter (optional)
-        If filterAct IsNot Nothing Then
-            ' Ensure the item exists in combobox
-            Dim exists As Boolean = False
-            For Each it In filterAct.Items
-                If String.Equals(Convert.ToString(it), nextAct, StringComparison.OrdinalIgnoreCase) Then
-                    exists = True
-                    Exit For
-                End If
-            Next
-            If Not exists Then filterAct.Items.Add(nextAct)
-            filterAct.SelectedItem = nextAct
-            FilterDG_Show(DG_Show, filterAct)
-        End If
+    '    ' Update filter (optional)
+    '    If filterAct IsNot Nothing Then
+    '        ' Ensure the item exists in combobox
+    '        Dim exists As Boolean = False
+    '        For Each it In filterAct.Items
+    '            If String.Equals(Convert.ToString(it), nextAct, StringComparison.OrdinalIgnoreCase) Then
+    '                exists = True
+    '                Exit For
+    '            End If
+    '        Next
+    '        If Not exists Then filterAct.Items.Add(nextAct)
+    '        filterAct.SelectedItem = nextAct
+    '        FilterDG_Show(DG_Show, filterAct)
+    '    End If
 
-        ' Update blinking and timer
-        booleanBlinkStart = False
-        booleanBlinkTimer = False
-        booleanBlinkNextEvent = False
-        booleanBlinkNextScene = False
-        booleanBlinkNextAct = False
-        booleanBlinkStop = False
+    '    ' Update blinking and timer
+    '    booleanBlinkStart = False
+    '    booleanBlinkTimer = False
+    '    booleanBlinkNextEvent = False
+    '    booleanBlinkNextScene = False
+    '    booleanBlinkNextAct = False
+    '    booleanBlinkStop = False
 
-        Dim timerValue As String = ""
-        ' Find the first row after the active block to read its timer (if any)
-        Dim followUpRow As DataGridViewRow = Nothing
-        For Each row As DataGridViewRow In DG_Show.Rows
-            If row.IsNewRow Then Continue For
-            If row.Index > activeIndex Then
-                followUpRow = row
-                Exit For
-            End If
-        Next
+    '    Dim timerValue As String = ""
+    '    ' Find the first row after the active block to read its timer (if any)
+    '    Dim followUpRow As DataGridViewRow = Nothing
+    '    For Each row As DataGridViewRow In DG_Show.Rows
+    '        If row.IsNewRow Then Continue For
+    '        If row.Index > activeIndex Then
+    '            followUpRow = row
+    '            Exit For
+    '        End If
+    '    Next
 
-        If followUpRow IsNot Nothing Then
-            timerValue = Convert.ToString(followUpRow.Cells("colTimer").Value)
-        End If
+    '    If followUpRow IsNot Nothing Then
+    '        timerValue = Convert.ToString(followUpRow.Cells("colTimer").Value)
+    '    End If
 
-        FrmMain.lblControl_TimeLeft.Text = timerValue
-        If timerValue <> "" Then
-            FrmMain.TimerNextEvent.Interval = TimeStringToMilliseconds(timerValue)
-            FrmMain.TimerNextEvent.Start()
-            colorBlinkTimer = Color.Green
-            booleanBlinkTimer = True
-        Else
-            ' Decide next blinking from the new active state
-            DecideNextBlinking(DG_Show, activeIndex, nextAct, firstScene, firstEvent)
-        End If
+    '    FrmMain.lblControl_TimeLeft.Text = timerValue
+    '    If timerValue <> "" Then
+    '        FrmMain.TimerNextEvent.Interval = TimeStringToMilliseconds(timerValue)
+    '        FrmMain.TimerNextEvent.Start()
+    '        colorBlinkTimer = Color.Green
+    '        booleanBlinkTimer = True
+    '    Else
+    '        ' Decide next blinking from the new active state
+    '        DecideNextBlinking(DG_Show, activeIndex, nextAct, firstScene, firstEvent)
+    '    End If
 
-        Reselect_Rows(DG_Show)
-    End Sub
+    '    Reselect_Rows(DG_Show)
+    'End Sub
 
     ' Hulpfunctie: ga naar PDF-pagina als auto-goto aan staat en waarde geldig is
     Private Sub AutoGotoPdfIfEnabled(targetRow As DataGridViewRow)

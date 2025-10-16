@@ -61,7 +61,34 @@
             <colSceneId>0</colSceneId>
             <colEventId>1</colEventId>
             <colTimer></colTimer>
-            <colCue>Start sponsor videos</colCue>
+            <colCue>Start sponsor videos - SIDEBEAMERs</colCue>
+            <colFixture>** Video **/ Secondairy</colFixture>
+            <colStateOnOff>True</colStateOnOff>
+            <colEffectId></colEffectId>
+            <colEffect>Unknown Effect</colEffect>
+            <colPaletteId></colPaletteId>
+            <colPalette>Unknown Palette</colPalette>
+            <colColor1></colColor1>
+            <colColor2></colColor2>
+            <colColor3></colColor3>
+            <colBrightness></colBrightness>
+            <colSpeed></colSpeed>
+            <colIntensity></colIntensity>
+            <colTransition></colTransition>
+            <colBlend>False</colBlend>
+            <colRepeat>True</colRepeat>
+            <colSound>False</colSound>
+            <colFilename>C:\KKLT\2025. Titanic\Beamers\Preshow\PreShow v4.mp4</colFilename>
+            <colSend>False</colSend>
+            <ScriptPg></ScriptPg>
+        </Row>
+        <Row>
+            <btnApply></btnApply>
+            <colAct>Pre-Show</colAct>
+            <colSceneId>0</colSceneId>
+            <colEventId>1</colEventId>
+            <colTimer></colTimer>
+            <colCue>Start titanic inloop video - HOOFDBEAMER</colCue>
             <colFixture>** Video **/ Primairy</colFixture>
             <colStateOnOff>True</colStateOnOff>
             <colEffectId></colEffectId>
@@ -78,7 +105,7 @@
             <colBlend>False</colBlend>
             <colRepeat>True</colRepeat>
             <colSound>False</colSound>
-            <colFilename>C:\KKLT\2025. Titanic\Beamers\Preshow\PreShow v3.mp4</colFilename>
+            <colFilename>C:\KKLT\2025. Titanic\Beamers\Show\Final - Dark\Titinic zaal-inloop.mp4</colFilename>
             <colSend>False</colSend>
             <ScriptPg></ScriptPg>
         </Row>
@@ -86,11 +113,65 @@
             <btnApply></btnApply>
             <colAct>Pre-Show</colAct>
             <colSceneId>0</colSceneId>
-            <colEventId>2</colEventId>
+            <colEventId>1</colEventId>
             <colTimer></colTimer>
-            <colCue>Start show</colCue>
+            <colCue>Beuk Jardin</colCue>
             <colFixture>WLED Bureau/0</colFixture>
             <colStateOnOff>True</colStateOnOff>
+            <colEffectId>38</colEffectId>
+            <colEffect>Aurora</colEffect>
+            <colPaletteId>50</colPaletteId>
+            <colPalette>Aurora</colPalette>
+            <colColor1>#0000A0</colColor1>
+            <colColor2>#000000</colColor2>
+            <colColor3>#000000</colColor3>
+            <colBrightness>255</colBrightness>
+            <colSpeed>128</colSpeed>
+            <colIntensity>128</colIntensity>
+            <colTransition>0</colTransition>
+            <colBlend>False</colBlend>
+            <colRepeat>False</colRepeat>
+            <colSound>False</colSound>
+            <colFilename></colFilename>
+            <colSend>False</colSend>
+            <ScriptPg></ScriptPg>
+        </Row>
+        <Row>
+            <btnApply></btnApply>
+            <colAct>Pre-Show</colAct>
+            <colSceneId>0</colSceneId>
+            <colEventId>1</colEventId>
+            <colTimer></colTimer>
+            <colCue>Beuk Cour</colCue>
+            <colFixture>WLED Bureau/0</colFixture>
+            <colStateOnOff>True</colStateOnOff>
+            <colEffectId>38</colEffectId>
+            <colEffect>Aurora</colEffect>
+            <colPaletteId>50</colPaletteId>
+            <colPalette>Aurora</colPalette>
+            <colColor1>#0000A0</colColor1>
+            <colColor2>#000000</colColor2>
+            <colColor3>#000000</colColor3>
+            <colBrightness>255</colBrightness>
+            <colSpeed>128</colSpeed>
+            <colIntensity>128</colIntensity>
+            <colTransition>0</colTransition>
+            <colBlend>False</colBlend>
+            <colRepeat>False</colRepeat>
+            <colSound>False</colSound>
+            <colFilename></colFilename>
+            <colSend>False</colSend>
+            <ScriptPg></ScriptPg>
+        </Row>
+        <Row>
+            <btnApply></btnApply>
+            <colAct>Act 1</colAct>
+            <colSceneId>0</colSceneId>
+            <colEventId>0</colEventId>
+            <colTimer></colTimer>
+            <colCue>**** START SHOW ****  SPONSOR UIT</colCue>
+            <colFixture>** Video **/ Secondairy</colFixture>
+            <colStateOnOff>Uit</colStateOnOff>
             <colEffectId>8</colEffectId>
             <colEffect>Colorloop</colEffect>
             <colPaletteId>0</colPaletteId>
@@ -105,7 +186,7 @@
             <colBlend>False</colBlend>
             <colRepeat>False</colRepeat>
             <colSound>False</colSound>
-            <colFilename>1</colFilename>
+            <colFilename>C:\KKLT\2025. Titanic\Beamers\Show\Final - Dark\Titinic start show.mp4</colFilename>
             <colSend>False</colSend>
             <ScriptPg>6</ScriptPg>
         </Row>
@@ -113,19 +194,46 @@
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>0</colSceneId>
-            <colEventId>3</colEventId>
+            <colEventId>0</colEventId>
             <colTimer></colTimer>
-            <colCue>Overture</colCue>
+            <colCue>Beuk Cour UIT</colCue>
             <colFixture>WLED Bureau/0</colFixture>
             <colStateOnOff>True</colStateOnOff>
             <colEffectId>0</colEffectId>
             <colEffect>Solid</colEffect>
             <colPaletteId>2</colPaletteId>
             <colPalette>* Color 1</colPalette>
-            <colColor1>Black</colColor1>
+            <colColor1>#000000</colColor1>
             <colColor2>#000000</colColor2>
             <colColor3>#000000</colColor3>
-            <colBrightness>255</colBrightness>
+            <colBrightness>0</colBrightness>
+            <colSpeed>128</colSpeed>
+            <colIntensity>128</colIntensity>
+            <colTransition>0</colTransition>
+            <colBlend>False</colBlend>
+            <colRepeat>False</colRepeat>
+            <colSound>False</colSound>
+            <colFilename></colFilename>
+            <colSend>False</colSend>
+            <ScriptPg></ScriptPg>
+        </Row>
+        <Row>
+            <btnApply></btnApply>
+            <colAct>Act 1</colAct>
+            <colSceneId>0</colSceneId>
+            <colEventId>0</colEventId>
+            <colTimer></colTimer>
+            <colCue>Beuk Jardin UIT</colCue>
+            <colFixture>WLED Bureau/0</colFixture>
+            <colStateOnOff>True</colStateOnOff>
+            <colEffectId>0</colEffectId>
+            <colEffect>Solid</colEffect>
+            <colPaletteId>2</colPaletteId>
+            <colPalette>* Color 1</colPalette>
+            <colColor1>#000000</colColor1>
+            <colColor2>#000000</colColor2>
+            <colColor3>#000000</colColor3>
+            <colBrightness>0</colBrightness>
             <colSpeed>128</colSpeed>
             <colIntensity>128</colIntensity>
             <colTransition>0</colTransition>
@@ -140,19 +248,46 @@
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>0</colSceneId>
-            <colEventId>4</colEventId>
+            <colEventId>1</colEventId>
             <colTimer></colTimer>
-            <colCue>1A "In elke tijd" [pag 5]</colCue>
-            <colFixture>WLED Bureau/0</colFixture>
+            <colCue>HOOFDBEAMER OVERLOOP</colCue>
+            <colFixture>** Video **/ Primairy</colFixture>
             <colStateOnOff>True</colStateOnOff>
             <colEffectId>0</colEffectId>
             <colEffect>Solid</colEffect>
             <colPaletteId>2</colPaletteId>
             <colPalette>* Color 1</colPalette>
-            <colColor1>Red</colColor1>
-            <colColor2>Red</colColor2>
-            <colColor3>Red</colColor3>
-            <colBrightness>255</colBrightness>
+            <colColor1>#000000</colColor1>
+            <colColor2>#000000</colColor2>
+            <colColor3>#000000</colColor3>
+            <colBrightness>0</colBrightness>
+            <colSpeed>128</colSpeed>
+            <colIntensity>128</colIntensity>
+            <colTransition>0</colTransition>
+            <colBlend>False</colBlend>
+            <colRepeat>False</colRepeat>
+            <colSound>False</colSound>
+            <colFilename>C:\KKLT\2025. Titanic\Beamers\Show\Final - Dark\Titinic start show.mp4</colFilename>
+            <colSend>False</colSend>
+            <ScriptPg></ScriptPg>
+        </Row>
+        <Row>
+            <btnApply></btnApply>
+            <colAct>Act 1</colAct>
+            <colSceneId>0</colSceneId>
+            <colEventId>2</colEventId>
+            <colTimer></colTimer>
+            <colCue>1A "In elke tijd" [pag 5]</colCue>
+            <colFixture>** Video **/ Primairy</colFixture>
+            <colStateOnOff>Uit</colStateOnOff>
+            <colEffectId>0</colEffectId>
+            <colEffect>Solid</colEffect>
+            <colPaletteId>2</colPaletteId>
+            <colPalette>* Color 1</colPalette>
+            <colColor1>#000000</colColor1>
+            <colColor2>#000000</colColor2>
+            <colColor3>#000000</colColor3>
+            <colBrightness>0</colBrightness>
             <colSpeed>128</colSpeed>
             <colIntensity>128</colIntensity>
             <colTransition>0</colTransition>
@@ -164,7 +299,7 @@
             <ScriptPg>5</ScriptPg>
         </Row>
         <Row>
-            <btnApply>&gt;</btnApply>
+            <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
             <colEventId>2</colEventId>
@@ -187,14 +322,14 @@
             <colRepeat>False</colRepeat>
             <colSound>False</colSound>
             <colFilename></colFilename>
-            <colSend>True</colSend>
+            <colSend>False</colSend>
             <ScriptPg>7</ScriptPg>
         </Row>
         <Row>
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
-            <colEventId>3</colEventId>
+            <colEventId>2</colEventId>
             <colTimer></colTimer>
             <colCue>2B "Kijk haar daar" [pag 8]</colCue>
             <colFixture></colFixture>
@@ -221,7 +356,7 @@
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
-            <colEventId>4</colEventId>
+            <colEventId>2</colEventId>
             <colTimer></colTimer>
             <colCue>2C "Vrachtinventaris" [pag 9]</colCue>
             <colFixture></colFixture>
@@ -248,7 +383,7 @@
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
-            <colEventId>5</colEventId>
+            <colEventId>2</colEventId>
             <colTimer></colTimer>
             <colCue>2D "Het grootste bewegend voorwerp" [pag 11]</colCue>
             <colFixture></colFixture>
@@ -275,7 +410,7 @@
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
-            <colEventId>6</colEventId>
+            <colEventId>2</colEventId>
             <colTimer></colTimer>
             <colCue>2E "Pitmans instructies #1" [pag 12]</colCue>
             <colFixture></colFixture>
@@ -302,7 +437,7 @@
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
-            <colEventId>7</colEventId>
+            <colEventId>2</colEventId>
             <colTimer></colTimer>
             <colCue>2F "Laat me nu aan boord #1" [pag 13]</colCue>
             <colFixture></colFixture>
@@ -329,7 +464,7 @@
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
-            <colEventId>8</colEventId>
+            <colEventId>2</colEventId>
             <colTimer></colTimer>
             <colCue>2G "Pitmans instructies #2" [pag 13]</colCue>
             <colFixture></colFixture>
@@ -356,7 +491,7 @@
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
-            <colEventId>9</colEventId>
+            <colEventId>2</colEventId>
             <colTimer></colTimer>
             <colCue>2H "Laat me nu aan boord #2" [pag 14]</colCue>
             <colFixture></colFixture>
@@ -383,22 +518,22 @@
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
-            <colEventId>10</colEventId>
+            <colEventId>2</colEventId>
             <colTimer></colTimer>
             <colCue>2I "Mevrouw Baene"  [pag 15]</colCue>
             <colFixture></colFixture>
-            <colStateOnOff></colStateOnOff>
+            <colStateOnOff>True</colStateOnOff>
             <colEffectId>Unknown Effect</colEffectId>
             <colEffect>Unknown Effect</colEffect>
             <colPaletteId>Unknown Palette</colPaletteId>
             <colPalette>Unknown Palette</colPalette>
-            <colColor1></colColor1>
-            <colColor2></colColor2>
-            <colColor3></colColor3>
-            <colBrightness></colBrightness>
-            <colSpeed></colSpeed>
-            <colIntensity></colIntensity>
-            <colTransition></colTransition>
+            <colColor1>Black</colColor1>
+            <colColor2>Black</colColor2>
+            <colColor3>Black</colColor3>
+            <colBrightness>0</colBrightness>
+            <colSpeed>0</colSpeed>
+            <colIntensity>0</colIntensity>
+            <colTransition>0</colTransition>
             <colBlend>False</colBlend>
             <colRepeat>False</colRepeat>
             <colSound>False</colSound>
@@ -410,7 +545,7 @@
             <btnApply></btnApply>
             <colAct>Act 1</colAct>
             <colSceneId>1</colSceneId>
-            <colEventId>11</colEventId>
+            <colEventId>2</colEventId>
             <colTimer></colTimer>
             <colCue>2J "Finale Vaar Door Titanic" [pag 17]</colCue>
             <colFixture></colFixture>
@@ -486,6 +621,141 @@
             <colFilename></colFilename>
             <colSend>False</colSend>
             <ScriptPg>20</ScriptPg>
+        </Row>
+        <Row>
+            <btnApply></btnApply>
+            <colAct>Act 1</colAct>
+            <colSceneId>2</colSceneId>
+            <colEventId>1</colEventId>
+            <colTimer></colTimer>
+            <colCue>OVEN COUR AAN</colCue>
+            <colFixture>WLED Bureau/0</colFixture>
+            <colStateOnOff>True</colStateOnOff>
+            <colEffectId>54</colEffectId>
+            <colEffect>Chase 3</colEffect>
+            <colPaletteId>3</colPaletteId>
+            <colPalette>* Colors 1&amp;2</colPalette>
+            <colColor1>Red</colColor1>
+            <colColor2>Yellow</colColor2>
+            <colColor3>#FF8000</colColor3>
+            <colBrightness>255</colBrightness>
+            <colSpeed>255</colSpeed>
+            <colIntensity>115</colIntensity>
+            <colTransition>92</colTransition>
+            <colBlend>False</colBlend>
+            <colRepeat>False</colRepeat>
+            <colSound>False</colSound>
+            <colFilename></colFilename>
+            <colSend>False</colSend>
+            <ScriptPg></ScriptPg>
+        </Row>
+        <Row>
+            <btnApply></btnApply>
+            <colAct>Act 1</colAct>
+            <colSceneId>2</colSceneId>
+            <colEventId>1</colEventId>
+            <colTimer></colTimer>
+            <colCue>OVEN JARDIN AAN</colCue>
+            <colFixture>WLED Bureau/0</colFixture>
+            <colStateOnOff>True</colStateOnOff>
+            <colEffectId>54</colEffectId>
+            <colEffect>Chase 3</colEffect>
+            <colPaletteId>3</colPaletteId>
+            <colPalette>* Colors 1&amp;2</colPalette>
+            <colColor1>Red</colColor1>
+            <colColor2>Yellow</colColor2>
+            <colColor3>#FF8000</colColor3>
+            <colBrightness>255</colBrightness>
+            <colSpeed>255</colSpeed>
+            <colIntensity>115</colIntensity>
+            <colTransition>92</colTransition>
+            <colBlend>False</colBlend>
+            <colRepeat>False</colRepeat>
+            <colSound>False</colSound>
+            <colFilename></colFilename>
+            <colSend>False</colSend>
+            <ScriptPg></ScriptPg>
+        </Row>
+        <Row>
+            <btnApply></btnApply>
+            <colAct>Act 1</colAct>
+            <colSceneId>2</colSceneId>
+            <colEventId>1</colEventId>
+            <colTimer></colTimer>
+            <colCue>OVEN CENTER AAN</colCue>
+            <colFixture>WLED Bureau/0</colFixture>
+            <colStateOnOff>True</colStateOnOff>
+            <colEffectId>54</colEffectId>
+            <colEffect>Chase 3</colEffect>
+            <colPaletteId>3</colPaletteId>
+            <colPalette>* Colors 1&amp;2</colPalette>
+            <colColor1>Red</colColor1>
+            <colColor2>Yellow</colColor2>
+            <colColor3>#FF8000</colColor3>
+            <colBrightness>255</colBrightness>
+            <colSpeed>255</colSpeed>
+            <colIntensity>115</colIntensity>
+            <colTransition>92</colTransition>
+            <colBlend>False</colBlend>
+            <colRepeat>False</colRepeat>
+            <colSound>False</colSound>
+            <colFilename></colFilename>
+            <colSend>False</colSend>
+            <ScriptPg></ScriptPg>
+        </Row>
+        <Row>
+            <btnApply></btnApply>
+            <colAct>Act 1</colAct>
+            <colSceneId>2</colSceneId>
+            <colEventId>2</colEventId>
+            <colTimer></colTimer>
+            <colCue>BEUK COUR ROOD</colCue>
+            <colFixture>WLED Bureau/0</colFixture>
+            <colStateOnOff>True</colStateOnOff>
+            <colEffectId>0</colEffectId>
+            <colEffect>Solid</colEffect>
+            <colPaletteId>2</colPaletteId>
+            <colPalette>* Color 1</colPalette>
+            <colColor1>Red</colColor1>
+            <colColor2>Red</colColor2>
+            <colColor3>#FF8000</colColor3>
+            <colBrightness>140</colBrightness>
+            <colSpeed>255</colSpeed>
+            <colIntensity>32</colIntensity>
+            <colTransition>92</colTransition>
+            <colBlend>False</colBlend>
+            <colRepeat>False</colRepeat>
+            <colSound>False</colSound>
+            <colFilename></colFilename>
+            <colSend>False</colSend>
+            <ScriptPg></ScriptPg>
+        </Row>
+        <Row>
+            <btnApply>&gt;</btnApply>
+            <colAct>Act 1</colAct>
+            <colSceneId>2</colSceneId>
+            <colEventId>3</colEventId>
+            <colTimer></colTimer>
+            <colCue>BEUK JARDIN ROOD</colCue>
+            <colFixture>WLED Bureau/0</colFixture>
+            <colStateOnOff>True</colStateOnOff>
+            <colEffectId>0</colEffectId>
+            <colEffect>Solid</colEffect>
+            <colPaletteId>2</colPaletteId>
+            <colPalette>* Color 1</colPalette>
+            <colColor1>Lime</colColor1>
+            <colColor2>Red</colColor2>
+            <colColor3>#FF8000</colColor3>
+            <colBrightness>255</colBrightness>
+            <colSpeed>255</colSpeed>
+            <colIntensity>32</colIntensity>
+            <colTransition>92</colTransition>
+            <colBlend>False</colBlend>
+            <colRepeat>False</colRepeat>
+            <colSound>False</colSound>
+            <colFilename></colFilename>
+            <colSend>True</colSend>
+            <ScriptPg></ScriptPg>
         </Row>
         <Row>
             <btnApply></btnApply>

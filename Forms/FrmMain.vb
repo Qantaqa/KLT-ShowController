@@ -1006,7 +1006,11 @@ Public Class FrmMain
             rowData(col.Name) = row.Cells(col.Index).Value
         Next
 
-        Dim FixtureString As String = rowData("colFixture").ToString().Substring(0, 2)
+        Dim FixtureString As String = rowData("colFixture").ToString
+        If (FixtureString <> "") Then
+            FixtureString = rowData("colFixture").ToString().Substring(0, 2)
+        End If
+
         If (FixtureString = "**") Then
             ' Show the details form FOR VIDEO
             Using detailsForm As New DetailShowVideo(rowData)
@@ -1036,6 +1040,11 @@ Public Class FrmMain
     End Sub
 
     Private Sub btnControl_NextScene_Click(sender As Object, e As EventArgs) Handles btnControl_NextScene.Click
+        Next_EventOrScene(DG_Show, nextScene)
+    End Sub
+
+    Private Sub btnControl_NextAct_Click(sender As Object, e As EventArgs) Handles btnControl_NextAct.Click
+        'Next_Act(DG_Show, filterAct)
         Next_EventOrScene(DG_Show, nextScene)
     End Sub
 
@@ -1124,9 +1133,7 @@ Public Class FrmMain
         TurnOnBlinkOfStopLooping()
     End Sub
 
-    Private Sub btnControl_NextAct_Click(sender As Object, e As EventArgs) Handles btnControl_NextAct.Click
-        Next_Act(DG_Show, filterAct)
-    End Sub
+
 
     Private Sub btnEditTemplate_Click(sender As Object, e As EventArgs) Handles btnEditTemplate.Click
         Template.EditSelectedTemplate()
@@ -1346,18 +1353,5 @@ Public Class FrmMain
 
     End Sub
 
-    Private Sub btnRemoteControl_Click(sender As Object, e As EventArgs) Handles btnRemoteControl.Click
-        If (btnRemoteControl.Text = "on") Then
-            btnRemoteControl.Text = "off"
-            btnRemoteControl.Checked = False
-            btnRemoteControl.Image = My.Resources.icon_toggle_off
-            Mobile.Stop()
-        Else
-            btnRemoteControl.Text = "on"
-            btnRemoteControl.Checked = True
-            btnRemoteControl.Image = My.Resources.icon_toggle_on
-            Mobile.Start()
 
-        End If
-    End Sub
 End Class

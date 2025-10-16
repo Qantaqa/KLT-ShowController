@@ -118,8 +118,6 @@ Partial Class FrmMain
         lblPDFPage = New ToolStripLabel()
         btnAutoGotoPDFPage = New ToolStripButton()
         ToolStripSeparator11 = New ToolStripSeparator()
-        ToolStripLabel9 = New ToolStripLabel()
-        btnRemoteControl = New ToolStripButton()
         TabStage = New TabPage()
         SplitContainerStage = New SplitContainer()
         SplitContainer1 = New SplitContainer()
@@ -1172,7 +1170,7 @@ Partial Class FrmMain
         ' 
         ToolStip_Show.BackColor = Color.MidnightBlue
         ToolStip_Show.GripStyle = ToolStripGripStyle.Hidden
-        ToolStip_Show.Items.AddRange(New ToolStripItem() {lblFilter, filterAct, btn_DGGrid_RemoveCurrentRow, btn_DGGrid_AddNewRowAfter, btn_DGGrid_AddNewRowBefore, ToolStripSeparator2, btnLockUnlocked, ToolStripSeparator10, ToolStripLabel7, lblPDFPage, btnAutoGotoPDFPage, ToolStripSeparator11, ToolStripLabel9, btnRemoteControl})
+        ToolStip_Show.Items.AddRange(New ToolStripItem() {lblFilter, filterAct, btn_DGGrid_RemoveCurrentRow, btn_DGGrid_AddNewRowAfter, btn_DGGrid_AddNewRowBefore, ToolStripSeparator2, btnLockUnlocked, ToolStripSeparator10, ToolStripLabel7, lblPDFPage, btnAutoGotoPDFPage, ToolStripSeparator11})
         ToolStip_Show.Location = New Point(0, 0)
         ToolStip_Show.Name = "ToolStip_Show"
         ToolStip_Show.Size = New Size(1836, 25)
@@ -1277,22 +1275,6 @@ Partial Class FrmMain
         ' 
         ToolStripSeparator11.Name = "ToolStripSeparator11"
         ToolStripSeparator11.Size = New Size(6, 25)
-        ' 
-        ' ToolStripLabel9
-        ' 
-        ToolStripLabel9.ForeColor = SystemColors.ActiveCaption
-        ToolStripLabel9.Name = "ToolStripLabel9"
-        ToolStripLabel9.Size = New Size(49, 22)
-        ToolStripLabel9.Text = "Website"
-        ' 
-        ' btnRemoteControl
-        ' 
-        btnRemoteControl.ForeColor = SystemColors.ButtonFace
-        btnRemoteControl.Image = My.Resources.Resources.icon_toggle_off
-        btnRemoteControl.ImageTransparentColor = Color.Magenta
-        btnRemoteControl.Name = "btnRemoteControl"
-        btnRemoteControl.Size = New Size(42, 22)
-        btnRemoteControl.Text = "off"
         ' 
         ' TabStage
         ' 
@@ -3456,8 +3438,6 @@ Partial Class FrmMain
     Friend WithEvents colActionPosX As DataGridViewTextBoxColumn
     Friend WithEvents colActionPosY As DataGridViewTextBoxColumn
     Friend WithEvents colActionImage As DataGridViewTextBoxColumn
-    Friend WithEvents ToolStripLabel9 As ToolStripLabel
-    Friend WithEvents btnRemoteControl As ToolStripButton
     Friend WithEvents TabButtons As TabPage
     Friend WithEvents DataGridView1 As DataGridView
     Friend WithEvents colButtonsId As DataGridViewTextBoxColumn

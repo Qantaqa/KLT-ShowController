@@ -23,6 +23,36 @@ Module BeamerHandler
     Public Sub ApplyRowToBeamer(CurrentRow As DataGridViewRow)
         If CurrentRow Is Nothing Then Exit Sub
 
+
+        ' Determine which beamer to use based on fixture/device info
+        Dim fixtureValue As String = ""
+        If CurrentRow.Cells("colFixture").Value IsNot Nothing Then
+            fixtureValue = CurrentRow.Cells("colFixture").Value.ToString()
+        End If
+        Dim usePrimary As Boolean = Not (fixtureValue.ToLower.Contains("secondairy"))
+
+        If usePrimary Then
+            ' turn primary video stream off
+            Beamer_Primary.WMP_PrimaryPlayer_Live.Ctlcontrols.stop()
+            FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
+        Else
+            ' Turn secondaire video stream off
+            Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.stop()
+            FrmMain.WMP_SecondairyPlayer_Preview.Ctlcontrols.stop()
+        End If
+
+        ' Check state of beamer
+        Dim stateBeamer As Boolean = False
+        If CurrentRow.Cells("colStateOnOff").Value IsNot Nothing Then
+            Boolean.TryParse(CurrentRow.Cells("colStateOnOff").Value.ToString(), stateBeamer)
+        End If
+
+        If stateBeamer = False Then
+            ' do not start anything else. We already stopped the previous stream
+            Exit Sub
+        End If
+
+
         ' Get video file
         Dim videoFile As String = ""
         If CurrentRow.Cells("colFilename").Value IsNot Nothing Then
@@ -33,13 +63,6 @@ Module BeamerHandler
             Exit Sub
         End If
 
-        ' Determine which beamer to use based on fixture/device info
-        Dim fixtureValue As String = ""
-        If CurrentRow.Cells("colFixture").Value IsNot Nothing Then
-            fixtureValue = CurrentRow.Cells("colFixture").Value.ToString()
-        End If
-
-        Dim usePrimary As Boolean = Not (fixtureValue.ToLower.Contains("secondairy"))
 
         ' Check repeat option
         Dim repeatEnabled As Boolean = False
@@ -61,7 +84,6 @@ Module BeamerHandler
             Beamer_Primary.Location = New Point(PrimaryBeamer_PositionX, PrimaryBeamer_PositionY)
             Beamer_Primary.Size = New Size(PrimaryBeamer_Width, PrimaryBeamer_Height)
 
-            ' Ensure the WMP control is set to fill the form
             Beamer_Primary.WMP_PrimaryPlayer_Live.Dock = DockStyle.Fill
             Beamer_Primary.WMP_PrimaryPlayer_Live.uiMode = "None"
             Beamer_Primary.WMP_PrimaryPlayer_Live.stretchToFit = True
@@ -87,6 +109,7 @@ Module BeamerHandler
             FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.play()
         Else
             Beamer_Secondairy.WindowState = FormWindowState.Normal
+
             Beamer_Secondairy.Location = New Point(SecondairyBeamer_PositionX, SecondairyBeamer_PositionY)
             Beamer_Secondairy.Size = New Size(SecondairyBeamer_Width, SecondairyBeamer_Height)
 
@@ -98,14 +121,22 @@ Module BeamerHandler
             Beamer_Secondairy.WMP_SecondairyPlayer_Live.settings.setMode("loop", repeatEnabled)
             FrmMain.WMP_SecondairyPlayer_Preview.settings.setMode("loop", repeatEnabled)
 
+            ' Set volume
+            If volumeEnabled Then
+                Beamer_Secondairy.WMP_SecondairyPlayer_Live.settings.volume = 100
+            Else
+                Beamer_Secondairy.WMP_SecondairyPlayer_Live.settings.volume = 0
+            End If
+
             ' Load and play video
-            Beamer_Secondairy.WMP_SecondairyPlayer_Live.URL = videoFile
-            FrmMain.WMP_SecondairyPlayer_Preview.URL = videoFile
+
 
             Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.stop()
+            Beamer_Secondairy.WMP_SecondairyPlayer_Live.URL = videoFile
             Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.play()
 
             FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
+            FrmMain.WMP_SecondairyPlayer_Preview.URL = videoFile
             FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.play()
         End If
 
@@ -138,11 +169,10 @@ Module BeamerHandler
         Beamer_Primary.Size = New Size(PrimaryBeamer_Width, PrimaryBeamer_Height)
 
         Beamer_Primary.WMP_PrimaryPlayer_Live.uiMode = "None"
-        Beamer_Secondairy.WMP_SecondairyPlayer_Live.uiMode = "None"
+
 
         ' Turn of the sound for both preview players
         FrmMain.WMP_PrimaryPlayer_Preview.settings.mute = True
-        FrmMain.WMP_SecondairyPlayer_Preview.settings.mute = True
 
     End Sub
 
@@ -165,9 +195,13 @@ Module BeamerHandler
         SecondairyBeamer_PositionX = Screen.AllScreens(ScreenNr).Bounds.X
         SecondairyBeamer_PositionY = Screen.AllScreens(ScreenNr).Bounds.Y
 
-        ' Set the size and position of the Secondairy beamer
+        ' Set the size and position of the primary beamer
         Beamer_Secondairy.Location = New Point(SecondairyBeamer_PositionX, SecondairyBeamer_PositionY)
         Beamer_Secondairy.Size = New Size(SecondairyBeamer_Width, SecondairyBeamer_Height)
+
+        Beamer_Secondairy.WMP_SecondairyPlayer_Live.uiMode = "None"
+        FrmMain.WMP_SecondairyPlayer_Preview.settings.mute = True
+
     End Sub
 
 

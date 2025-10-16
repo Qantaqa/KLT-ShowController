@@ -17,7 +17,7 @@
     </Structure>
     <Data>
         <Row>
-            <colIPAddress>192.168.86.76</colIPAddress>
+            <colIPAddress>192.168.86.75</colIPAddress>
             <colInstance>WLED Bureau</colInstance>
             <colLayout>Y10,X10,R191</colLayout>
             <colLedCount>191</colLedCount>
