@@ -23,6 +23,11 @@ Module DG_Show
     Dim booleanBlinkStopLooping As Boolean = False
     Dim booleanBlinkNextAct As Boolean = False
 
+    ' Confirmation flags for "wrong" button clicks
+    Dim booleanConfirmNextEvent As Boolean = False
+    Dim booleanConfirmNextScene As Boolean = False
+    Dim booleanConfirmNextAct As Boolean = False
+
     Dim colorBlinkTimer As Color = Color.Green
 
     ' Variabelen voor het afspelen van GIF-afbeeldingen
@@ -45,7 +50,7 @@ Module DG_Show
     End Sub
 
     ' *********************************************************
-    ' Deze sub werkt het fixure pulldown veld bij, met beschikbare fixured
+    ' Deze sub werkt het fixure pulldown veld bij, met beschikbare fixures
     ' *********************************************************
     Public Sub UpdateFixuresPulldown_ForShow(ByVal DG_Show As DataGridView)
         Dim currentRow As DataGridViewRow
@@ -60,7 +65,7 @@ Module DG_Show
         If fixtureColumn IsNot Nothing Then
             ' Clear de vorige items
             fixtureColumn.Items.Clear()
-
+            fixtureColumn.Items.Add("")
             fixtureColumn.Items.Add("** Video **/ Primairy")
             fixtureColumn.Items.Add("** Video **/ Secondairy")
 
@@ -70,6 +75,8 @@ Module DG_Show
                 If devRow.IsNewRow Then Continue For
 
                 Dim wledName As String = Convert.ToString(devRow.Cells("colInstance").Value)
+                fixtureColumn.Items.Add($"{wledName}")
+
                 Dim segmentsValue As String = Convert.ToString(devRow.Cells("colSegments").Value)
 
                 If Not String.IsNullOrWhiteSpace(wledName) AndAlso Not String.IsNullOrWhiteSpace(segmentsValue) Then
@@ -368,9 +375,9 @@ Module DG_Show
 
         Select Case changedColName
             Case "colFixture"
-                UpdateEffectenPulldown_ForCurrentFixure(DG_Show)
-                UpdatePalettePulldown_ForCurrentFixure(DG_Show)
-                UpdateOtherFields_ForCurrentFixure(DG_Show, e.RowIndex)
+                'UpdateEffectenPulldown_ForCurrentFixure(DG_Show)
+                'UpdatePalettePulldown_ForCurrentFixure(DG_Show)
+                'UpdateOtherFields_ForCurrentFixure(DG_Show, e.RowIndex)
                 AfterUpdateEffectOrPaletteId_UpdateEffectAndPaletteName(DG_Show, DG_Effecten, DG_Paletten)
 
             Case "colEffect"
@@ -385,8 +392,6 @@ Module DG_Show
 
 
     Sub Update_DGGRid_Details(DG_Show As DataGridView, RowId As Integer)
-
-
         Dim PaletteImagesPath As String = My.Settings.PaletteImagesPath
         Dim EffectsImagesPath As String = My.Settings.EffectsImagePath
 
@@ -414,86 +419,60 @@ Module DG_Show
                     Dim PaletteName As String = CurrentRow.Cells("colPalette").Value
                     Dim EffectName As String = CurrentRow.Cells("colEffect").Value
 
-                    FrmMain.detailWLed_Brightness.Value = CurrentRow.Cells("colBrightness").Value
-                    FrmMain.detailWLed_Intensity.Value = CurrentRow.Cells("colIntensity").Value
-                    FrmMain.detailWLed_Speed.Value = CurrentRow.Cells("colSpeed").Value
-                    If CurrentRow.Cells("colColor1").Value IsNot Nothing Then
-                        FrmMain.detailWLed_Color1.BackColor = ColorTranslator.FromHtml(CurrentRow.Cells("colColor1").Value.ToString())
-                    End If
-                    If CurrentRow.Cells("colColor2").Value IsNot Nothing Then
-                        FrmMain.detailWLed_Color2.BackColor = ColorTranslator.FromHtml(CurrentRow.Cells("colColor2").Value.ToString())
-                    End If
-                    If CurrentRow.Cells("colColor3").Value IsNot Nothing Then
-                        FrmMain.detailWLed_Color3.BackColor = ColorTranslator.FromHtml(CurrentRow.Cells("colColor3").Value.ToString())
-                    End If
-
-                    ' Toonplaatje van palette
-                    If PaletteName IsNot Nothing Then
-                        PaletteName = PaletteName.ToString().Replace(" ", "_") & ".png"
-                        PaletteName = PaletteName.ToString().Replace("*_", "")
-                        imagePath = Path.Combine(PaletteImagesPath, PaletteName)
-                    End If
-
-                    ' Controleer of het bestand bestaat voordat je het laadt.
-                    If File.Exists(imagePath) Then
-                        Try
-                            ' Laad de afbeelding en wijs deze toe aan de cel.
-                            Dim image As Image = Image.FromFile(imagePath)
-
-                            FrmMain.detailWLed_Palette.Image = image
-                        Catch ex As Exception
-                            ' Foutafhandeling: Log de fout en toon een bericht.
-                            Console.WriteLine($"Fout bij het laden van afbeelding: {imagePath}. Fout: {ex.Message}")
-                            ' Je kunt er ook voor kiezen om een standaardafbeelding in te stellen of de cel leeg te laten.
-
-                        End Try
+                    If (CurrentRow.Cells("colBrightness").Value IsNot Nothing) Then
+                        If (CurrentRow.Cells("colBrightness").Value.ToString = "") Then
+                            FrmMain.detailWLed_Brightness.Value = "255"
+                        Else
+                            FrmMain.detailWLed_Brightness.Value = CurrentRow.Cells("colBrightness").Value
+                        End If
                     Else
-                        ' Als het bestand niet bestaat, laat de cel dan leeg en log een waarschuwing.
-                        Console.WriteLine($"Afbeelding niet gevonden: {imagePath}")
+                        FrmMain.detailWLed_Brightness.Value = "255"
                     End If
 
+                    If (CurrentRow.Cells("colIntensity").Value IsNot Nothing) Then
+                        If (CurrentRow.Cells("colIntensity").Value.ToString = "") Then
+                            FrmMain.detailWLed_Intensity.Value = 255
+                        Else
+                            FrmMain.detailWLed_Intensity.Value = CurrentRow.Cells("colIntensity").Value
+                        End If
+                    Else
+                        FrmMain.detailWLed_Intensity.Value = 255
+                    End If
 
+                    If (CurrentRow.Cells("colSpeed").Value IsNot Nothing) Then
+                        If (CurrentRow.Cells("colSpeed").Value.ToString = "") Then
+                            FrmMain.detailWLed_Speed.Value = 255
+                        Else
+                            FrmMain.detailWLed_Speed.Value = CurrentRow.Cells("colSpeed").Value
+                        End If
+                    Else
+                        FrmMain.detailWLed_Speed.Value = 255
+                    End If
 
-                    ' Toon plaatje van effect
-                    If EffectName IsNot Nothing Then
-                        EffectName = EffectName.ToString().Replace(" ", "_") & ".gif"
-                        EffectName = EffectName.ToString().Replace("*_", "")
-                        imagePath = Path.Combine(EffectsImagesPath, EffectName)
+                    If CurrentRow.Cells("colColor1").Value IsNot Nothing Then
+                            FrmMain.detailWLed_Color1.BackColor = ColorTranslator.FromHtml(CurrentRow.Cells("colColor1").Value.ToString())
+                        End If
+                        If CurrentRow.Cells("colColor2").Value IsNot Nothing Then
+                            FrmMain.detailWLed_Color2.BackColor = ColorTranslator.FromHtml(CurrentRow.Cells("colColor2").Value.ToString())
+                        End If
+                        If CurrentRow.Cells("colColor3").Value IsNot Nothing Then
+                            FrmMain.detailWLed_Color3.BackColor = ColorTranslator.FromHtml(CurrentRow.Cells("colColor3").Value.ToString())
+                        End If
+
+                        ' Toonplaatje van palette
+                        If PaletteName IsNot Nothing Then
+                            PaletteName = PaletteName.ToString().Replace(" ", "_") & ".png"
+                            PaletteName = PaletteName.ToString().Replace("*_", "")
+                            imagePath = Path.Combine(PaletteImagesPath, PaletteName)
+                        End If
 
                         ' Controleer of het bestand bestaat voordat je het laadt.
                         If File.Exists(imagePath) Then
                             Try
                                 ' Laad de afbeelding en wijs deze toe aan de cel.
                                 Dim image As Image = Image.FromFile(imagePath)
-                                gifImage = image
 
-                                ' Initialiseert de timer voor de animatie
-                                frameTimer = New Timer()
-                                frameTimer.Interval = 100  ' Standaard interval, wordt later overschreven door de GIF's frame delays.
-                                AddHandler frameTimer.Tick, AddressOf FrameTimer_Tick
-                                frameTimer.Start()
-
-                                FrmMain.detailWLed_Effect.Image = image
-
-                                ' Haal de frame delays op en sla ze op in een array
-                                If gifImage IsNot Nothing Then
-                                    Dim frameDimension As New FrameDimension(gifImage.FrameDimensionsList(0))
-                                    Dim frameCount As Integer = gifImage.GetFrameCount(FrameDimension.Time)
-                                    ReDim frameDelayList(frameCount - 1) ' Array initialiseren met de juiste grootte
-
-                                    For i As Integer = 0 To frameCount - 1
-                                        gifImage.SelectActiveFrame(frameDimension, i)
-                                        Dim frameDelayBytes() As Byte = gifImage.GetPropertyItem(207).Value ' Property ID 207 bevat de frame delays
-                                        frameDelayList(i) = BitConverter.ToInt32(frameDelayBytes, i * 4) * 10 ' Omzetten naar milliseconden
-                                    Next
-
-                                    ' Start de animatie met de eerste frame delay
-                                    If frameDelayList.Length > 0 Then
-                                        frameTimer.Interval = frameDelayList(0)
-                                    End If
-                                End If
-
-
+                                FrmMain.detailWLed_Palette.Image = image
                             Catch ex As Exception
                                 ' Foutafhandeling: Log de fout en toon een bericht.
                                 Console.WriteLine($"Fout bij het laden van afbeelding: {imagePath}. Fout: {ex.Message}")
@@ -504,12 +483,65 @@ Module DG_Show
                             ' Als het bestand niet bestaat, laat de cel dan leeg en log een waarschuwing.
                             Console.WriteLine($"Afbeelding niet gevonden: {imagePath}")
                         End If
+
+
+
+                        ' Toon plaatje van effect
+                        If EffectName IsNot Nothing Then
+                            EffectName = EffectName.ToString().Replace(" ", "_") & ".gif"
+                            EffectName = EffectName.ToString().Replace("*_", "")
+                            imagePath = Path.Combine(EffectsImagesPath, EffectName)
+
+                            ' Controleer of het bestand bestaat voordat je het laadt.
+                            If File.Exists(imagePath) Then
+                                Try
+                                    ' Laad de afbeelding en wijs deze toe aan de cel.
+                                    Dim image As Image = Image.FromFile(imagePath)
+                                    gifImage = image
+
+                                    ' Initialiseert de timer voor de animatie
+                                    frameTimer = New Timer()
+                                    frameTimer.Interval = 100  ' Standaard interval, wordt later overschreven door de GIF's frame delays.
+                                    AddHandler frameTimer.Tick, AddressOf FrameTimer_Tick
+                                    frameTimer.Start()
+
+                                    FrmMain.detailWLed_Effect.Image = image
+
+                                    ' Haal de frame delays op en sla ze op in een array
+                                    If gifImage IsNot Nothing Then
+                                        Dim frameDimension As New FrameDimension(gifImage.FrameDimensionsList(0))
+                                        Dim frameCount As Integer = gifImage.GetFrameCount(FrameDimension.Time)
+                                        ReDim frameDelayList(frameCount - 1) ' Array initialiseren met de juiste grootte
+
+                                        For i As Integer = 0 To frameCount - 1
+                                            gifImage.SelectActiveFrame(frameDimension, i)
+                                            Dim frameDelayBytes() As Byte = gifImage.GetPropertyItem(207).Value ' Property ID 207 bevat de frame delays
+                                            frameDelayList(i) = BitConverter.ToInt32(frameDelayBytes, i * 4) * 10 ' Omzetten naar milliseconden
+                                        Next
+
+                                        ' Start de animatie met de eerste frame delay
+                                        If frameDelayList.Length > 0 Then
+                                            frameTimer.Interval = frameDelayList(0)
+                                        End If
+                                    End If
+
+
+                                Catch ex As Exception
+                                    ' Foutafhandeling: Log de fout en toon een bericht.
+                                    Console.WriteLine($"Fout bij het laden van afbeelding: {imagePath}. Fout: {ex.Message}")
+                                    ' Je kunt er ook voor kiezen om een standaardafbeelding in te stellen of de cel leeg te laten.
+
+                                End Try
+                            Else
+                                ' Als het bestand niet bestaat, laat de cel dan leeg en log een waarschuwing.
+                                Console.WriteLine($"Afbeelding niet gevonden: {imagePath}")
+                            End If
+                        End If
+
+
+                        FrmMain.detailWLed__EffectName.Text = CurrentRow.Cells("colEffect").Value
                     End If
-
-
-                    FrmMain.detailWLed__EffectName.Text = CurrentRow.Cells("colEffect").Value
-                End If
-            Else
+                    Else
                 ' Meerdere regels geselecterd
                 FrmMain.gb_DetailWLed.Visible = False
             End If
@@ -552,9 +584,6 @@ Module DG_Show
         If My.Settings.Locked Then
             FrmMain.gb_Controls.Enabled = True
 
-            ' Anchor location for the "single" next button (use Next Event's position)
-            Dim primaryLoc As Point = FrmMain.btnControl_NextEvent.Location
-
             ' Start button (unchanged, still blinks)
             If booleanBlinkStart Then
                 If FrmMain.btnControl_Start.BackColor = Color.Black Then
@@ -566,27 +595,19 @@ Module DG_Show
                 FrmMain.btnControl_Start.BackColor = Color.Black
             End If
 
-            ' Decide which of the Next buttons is the active one
-            Dim showEvent As Boolean = booleanBlinkNextEvent
-            Dim showScene As Boolean = booleanBlinkNextScene
-            Dim showAct As Boolean = booleanBlinkNextAct
+            ' Blink priority:
+            ' 1) Pending confirmation => orange
+            ' 2) Recommended next => green
+            ' 3) Otherwise => black
 
-            ' If none are active, default to showing Next Event (non-blinking)
-            If Not showEvent AndAlso Not showScene AndAlso Not showAct Then
-                showEvent = True
-            End If
-
-            ' Show only the active Next button and move it to the primary location
-            FrmMain.btnControl_NextEvent.Visible = showEvent
-            FrmMain.btnControl_NextScene.Visible = showScene
-            FrmMain.btnControl_NextAct.Visible = showAct
-
-            If showEvent Then FrmMain.btnControl_NextEvent.Location = primaryLoc
-            If showScene Then FrmMain.btnControl_NextScene.Location = primaryLoc
-            If showAct Then FrmMain.btnControl_NextAct.Location = primaryLoc
-
-            ' Blink the active Next button only
-            If booleanBlinkNextEvent AndAlso FrmMain.btnControl_NextEvent.Visible Then
+            ' Next Event
+            If booleanConfirmNextEvent Then
+                If FrmMain.btnControl_NextEvent.BackColor = Color.Black Then
+                    FrmMain.btnControl_NextEvent.BackColor = Color.Orange
+                Else
+                    FrmMain.btnControl_NextEvent.BackColor = Color.Black
+                End If
+            ElseIf booleanBlinkNextEvent AndAlso FrmMain.btnControl_NextEvent.Visible Then
                 If FrmMain.btnControl_NextEvent.BackColor = Color.Black Then
                     FrmMain.btnControl_NextEvent.BackColor = Color.Green
                 Else
@@ -596,7 +617,14 @@ Module DG_Show
                 FrmMain.btnControl_NextEvent.BackColor = Color.Black
             End If
 
-            If booleanBlinkNextScene AndAlso FrmMain.btnControl_NextScene.Visible Then
+            ' Next Scene
+            If booleanConfirmNextScene Then
+                If FrmMain.btnControl_NextScene.BackColor = Color.Black Then
+                    FrmMain.btnControl_NextScene.BackColor = Color.Orange
+                Else
+                    FrmMain.btnControl_NextScene.BackColor = Color.Black
+                End If
+            ElseIf booleanBlinkNextScene AndAlso FrmMain.btnControl_NextScene.Visible Then
                 If FrmMain.btnControl_NextScene.BackColor = Color.Black Then
                     FrmMain.btnControl_NextScene.BackColor = Color.Green
                 Else
@@ -606,7 +634,14 @@ Module DG_Show
                 FrmMain.btnControl_NextScene.BackColor = Color.Black
             End If
 
-            If booleanBlinkNextAct AndAlso FrmMain.btnControl_NextAct.Visible Then
+            ' Next Act (optional: same behavior)
+            If booleanConfirmNextAct Then
+                If FrmMain.btnControl_NextAct.BackColor = Color.Black Then
+                    FrmMain.btnControl_NextAct.BackColor = Color.Orange
+                Else
+                    FrmMain.btnControl_NextAct.BackColor = Color.Black
+                End If
+            ElseIf booleanBlinkNextAct AndAlso FrmMain.btnControl_NextAct.Visible Then
                 If FrmMain.btnControl_NextAct.BackColor = Color.Black Then
                     FrmMain.btnControl_NextAct.BackColor = Color.Green
                 Else
@@ -627,7 +662,7 @@ Module DG_Show
                 FrmMain.btnControl_StopAll.BackColor = Color.Black
             End If
 
-            ' Timer: blink when active, otherwise hide entirely
+            ' Timer
             FrmMain.lblControl_TimeLeft.Visible = booleanBlinkTimer
             If booleanBlinkTimer Then
                 If FrmMain.lblControl_TimeLeft.BackColor = Color.Black Then
@@ -651,26 +686,20 @@ Module DG_Show
             End If
 
         Else
-            ' Unlocked (edit) mode: disable controls and present a single Next button view
+            ' Unlocked (edit) mode
             FrmMain.gb_Controls.Enabled = False
             FrmMain.btnControl_Start.BackColor = Color.DarkRed
             FrmMain.btnControl_NextEvent.BackColor = Color.DarkRed
             FrmMain.btnControl_NextScene.BackColor = Color.DarkRed
             FrmMain.btnControl_NextAct.BackColor = Color.DarkRed
             FrmMain.btnControl_StopAll.BackColor = Color.DarkRed
-            FrmMain.btnStopLoopingAtEndOfVideo.BackColor = Color.Black
+            FrmMain.btnStopLoopingAtEndOfVideo.BackColor = Color.DarkRed
 
-            ' Show one next button at the primary location, hide others, hide timer
-            Dim primaryLoc As Point = FrmMain.btnControl_NextEvent.Location
-            FrmMain.btnControl_NextEvent.Visible = True : FrmMain.btnControl_NextEvent.Location = primaryLoc
-            FrmMain.btnControl_NextScene.Visible = False
-            FrmMain.btnControl_NextAct.Visible = False
             FrmMain.lblControl_TimeLeft.BackColor = Color.Black
             FrmMain.lblControl_TimeLeft.Visible = False
         End If
 
     End Sub
-
     Sub EndEventTimer()
         colorBlinkTimer = Color.DarkRed
         FrmMain.TimerNextEvent.Stop()
@@ -719,10 +748,489 @@ Module DG_Show
             booleanBlinkNextScene = True
         ElseIf hasNextAct Then
             booleanBlinkNextAct = True
+        Else
+            ' Fall back
+            booleanBlinkNextEvent = True
+        End If
+    End Sub
+    ' Call this from btnControl_NextEvent.Click
+    Public Sub HandleNextEventClick(DG_Show As DataGridView)
+        If Not My.Settings.Locked Then
+            ' In edit mode we don't gate actions; proceed directly
+            Next_EventOrScene(DG_Show, 1)
+            Exit Sub
+        End If
+
+        Dim hasRecommendation As Boolean = (booleanBlinkNextEvent OrElse booleanBlinkNextScene OrElse booleanBlinkNextAct)
+
+        If booleanConfirmNextEvent Then
+            ' Second click confirms
+            booleanConfirmNextEvent = False
+            booleanConfirmNextScene = False
+            booleanConfirmNextAct = False
+            Next_EventOrScene(DG_Show, 1)
+        ElseIf hasRecommendation AndAlso Not booleanBlinkNextEvent Then
+            ' Wrong button compared to recommendation -> request confirmation
+            booleanConfirmNextEvent = True
+            booleanConfirmNextScene = False
+            booleanConfirmNextAct = False
+            UpdateBlinkingButton()
+        Else
+            ' Correct button (or no recommendation) -> proceed
+            booleanConfirmNextEvent = False
+            booleanConfirmNextScene = False
+            booleanConfirmNextAct = False
+            Next_EventOrScene(DG_Show, 1)
         End If
     End Sub
 
+
+    ' Call this from btnControl_NextScene.Click
+    Public Sub HandleNextSceneClick(DG_Show As DataGridView)
+        If Not My.Settings.Locked Then
+            Next_EventOrScene(DG_Show, 0)
+            Exit Sub
+        End If
+
+        Dim hasRecommendation As Boolean = (booleanBlinkNextEvent OrElse booleanBlinkNextScene OrElse booleanBlinkNextAct)
+
+        If booleanConfirmNextScene Then
+            booleanConfirmNextScene = False
+            booleanConfirmNextEvent = False
+            booleanConfirmNextAct = False
+            Next_EventOrScene(DG_Show, 0)
+        ElseIf hasRecommendation AndAlso Not booleanBlinkNextScene Then
+            booleanConfirmNextScene = True
+            booleanConfirmNextEvent = False
+            booleanConfirmNextAct = False
+            UpdateBlinkingButton()
+        Else
+            booleanConfirmNextScene = False
+            booleanConfirmNextEvent = False
+            booleanConfirmNextAct = False
+            Next_EventOrScene(DG_Show, 0)
+        End If
+    End Sub
+
+    ' Optional: same safety for Next Act
+    ' Optional: same safety for Next Act
+    Public Sub HandleNextActClick(DG_Show As DataGridView)
+        If Not My.Settings.Locked Then
+            Next_Act(DG_Show)
+            Exit Sub
+        End If
+
+        Dim hasRecommendation As Boolean = (booleanBlinkNextEvent OrElse booleanBlinkNextScene OrElse booleanBlinkNextAct)
+
+        If booleanConfirmNextAct Then
+            ' Second click confirms
+            booleanConfirmNextAct = False
+            booleanConfirmNextEvent = False
+            booleanConfirmNextScene = False
+            Next_Act(DG_Show)
+        ElseIf hasRecommendation AndAlso Not booleanBlinkNextAct Then
+            ' Wrong button compared to recommendation -> request confirmation
+            booleanConfirmNextAct = True
+            booleanConfirmNextEvent = False
+            booleanConfirmNextScene = False
+            UpdateBlinkingButton()
+        Else
+            ' Correct button (or no recommendation) -> proceed
+            booleanConfirmNextAct = False
+            booleanConfirmNextEvent = False
+            booleanConfirmNextScene = False
+            Next_Act(DG_Show)
+        End If
+    End Sub
+
+    Sub Next_Act(DG_Show As DataGridView)
+        ' Clear confirmations
+        booleanConfirmNextEvent = False
+        booleanConfirmNextScene = False
+        booleanConfirmNextAct = False
+
+        If DG_Show.SelectedRows.Count = 0 Then Exit Sub
+
+        Dim currentRow As DataGridViewRow = DG_Show.SelectedRows(0)
+        Dim currentAct As String = Convert.ToString(currentRow.Cells("colAct").Value)
+        Dim currentIndex As Integer = currentRow.Index
+
+        ' Zoek de eerste rij van de volgende act
+        Dim nextAct As String = Nothing
+        Dim firstScene As Integer = -1
+        Dim firstEvent As Integer = -1
+        Dim found As Boolean = False
+        Dim leftCurrentAct As Boolean = False
+
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+            If row.Index <= currentIndex Then Continue For
+
+            Dim act = Convert.ToString(row.Cells("colAct").Value)
+            Dim sceneId = Convert.ToInt32(row.Cells("colSceneId").Value)
+            Dim eventId = Convert.ToInt32(row.Cells("colEventId").Value)
+
+            If Not leftCurrentAct AndAlso act = currentAct Then
+                Continue For
+            End If
+
+            If Not leftCurrentAct AndAlso act <> currentAct Then
+                leftCurrentAct = True
+                nextAct = act
+                firstScene = sceneId
+                firstEvent = eventId
+                found = True
+                Exit For
+            End If
+        Next
+
+        If Not found Then Exit Sub
+
+        ' Markeer nieuwe groep
+        Dim activeIndex As Integer = -1
+        Dim firstTargetRow As DataGridViewRow = Nothing
+        Dim followUpRow As DataGridViewRow = Nothing
+        Dim inActiveBlock As Boolean = False
+
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+
+            Dim act = Convert.ToString(row.Cells("colAct").Value)
+            Dim sceneId = Convert.ToInt32(row.Cells("colSceneId").Value)
+            Dim eventId = Convert.ToInt32(row.Cells("colEventId").Value)
+
+            If act = nextAct AndAlso sceneId = firstScene AndAlso eventId = firstEvent Then
+                row.Cells("btnApply").Value = ">"
+                row.Cells("colSend").Value = "False"
+                inActiveBlock = True
+                activeIndex = row.Index
+                If firstTargetRow Is Nothing Then firstTargetRow = row
+            Else
+                If inActiveBlock AndAlso followUpRow Is Nothing Then
+                    followUpRow = row
+                End If
+                row.Cells("btnApply").Value = ""
+                row.Cells("colSend").Value = "False"
+            End If
+        Next
+
+        AutoGotoPdfIfEnabled(firstTargetRow)
+
+        ' Stuur instructies
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+            If Convert.ToString(row.Cells("btnApply").Value) = ">" AndAlso Convert.ToString(row.Cells("colSend").Value) = "False" Then
+                If (row.Cells("colFixture").Value IsNot Nothing) Then
+                    If row.Cells("colFixture").Value.ToString().ToLower().Contains("video") Then
+                        ApplyRowToBeamer(row)
+                    Else
+                        SendInstructionSetForDevice(DG_Show, row)
+                    End If
+                    row.Cells("colSend").Value = "True"
+                End If
+            End If
+        Next
+
+        ' UI
+        booleanBlinkStart = False
+        booleanBlinkTimer = False
+        booleanBlinkNextEvent = False
+        booleanBlinkNextScene = False
+        booleanBlinkNextAct = False
+        booleanBlinkStop = False
+
+        Dim timerValue As String = ""
+        If followUpRow IsNot Nothing Then
+            timerValue = Convert.ToString(followUpRow.Cells("colTimer").Value)
+        End If
+
+        FrmMain.lblControl_TimeLeft.Text = timerValue
+        If (timerValue <> "") AndAlso (timerValue <> "00:00:00") Then
+            FrmMain.TimerNextEvent.Interval = TimeStringToMilliseconds(timerValue)
+            FrmMain.TimerNextEvent.Start()
+            colorBlinkTimer = Color.Green
+            booleanBlinkTimer = True
+        Else
+            DecideNextBlinking(DG_Show, activeIndex, nextAct, firstScene, firstEvent)
+        End If
+
+        Reselect_Rows(DG_Show)
+        ' Nieuw: highlight volgende groep
+        UpdateNextGroupHighlight(DG_Show)
+        UpdateBlinkingButton()
+    End Sub
+
+    Sub Next_Act_OLD(DG_Show As DataGridView)
+        ' Clear any pending confirmations because we are proceeding
+        booleanConfirmNextEvent = False
+        booleanConfirmNextScene = False
+        booleanConfirmNextAct = False
+
+        ' First stop any playing video's (left as-is)
+        'Beamer_Primary.WMP_PrimaryPlayer_Live.Ctlcontrols.stop()
+        'Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.stop()
+        'FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
+        'FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
+
+        If DG_Show.SelectedRows.Count = 0 Then Exit Sub
+
+        Dim currentRow As DataGridViewRow = DG_Show.SelectedRows(0)
+        Dim currentAct As String = Convert.ToString(currentRow.Cells("colAct").Value)
+        Dim currentIndex As Integer = currentRow.Index
+
+        ' Find first row of the next act (first row after current act block)
+        Dim nextAct As String = Nothing
+        Dim firstScene As Integer = -1
+        Dim firstEvent As Integer = -1
+        Dim found As Boolean = False
+        Dim leftCurrentAct As Boolean = False
+
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+            If row.Index <= currentIndex Then Continue For
+
+            Dim act = Convert.ToString(row.Cells("colAct").Value)
+            Dim sceneId = Convert.ToInt32(row.Cells("colSceneId").Value)
+            Dim eventId = Convert.ToInt32(row.Cells("colEventId").Value)
+
+            If Not leftCurrentAct AndAlso act = currentAct Then
+                Continue For
+            End If
+
+            If Not leftCurrentAct AndAlso act <> currentAct Then
+                ' first row of next act
+                leftCurrentAct = True
+                nextAct = act
+                firstScene = sceneId
+                firstEvent = eventId
+                found = True
+                Exit For
+            End If
+        Next
+
+        If Not found Then Exit Sub
+
+        ' Mark the group for the next act's first scene+event; clear others
+        Dim activeIndex As Integer = -1
+        Dim firstTargetRow As DataGridViewRow = Nothing
+        Dim followUpRow As DataGridViewRow = Nothing
+        Dim inActiveBlock As Boolean = False
+
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+
+            Dim act = Convert.ToString(row.Cells("colAct").Value)
+            Dim sceneId = Convert.ToInt32(row.Cells("colSceneId").Value)
+            Dim eventId = Convert.ToInt32(row.Cells("colEventId").Value)
+
+            If act = nextAct AndAlso sceneId = firstScene AndAlso eventId = firstEvent Then
+                row.Cells("btnApply").Value = ">"
+                row.Cells("colSend").Value = "False"
+                inActiveBlock = True
+                activeIndex = row.Index
+                If firstTargetRow Is Nothing Then firstTargetRow = row
+            Else
+                If inActiveBlock AndAlso followUpRow Is Nothing Then
+                    followUpRow = row
+                End If
+                row.Cells("btnApply").Value = ""
+                row.Cells("colSend").Value = "False"
+            End If
+        Next
+
+        ' Auto goto PDF page if available and enabled
+        AutoGotoPdfIfEnabled(firstTargetRow)
+
+        ' Send instructions
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+            If Convert.ToString(row.Cells("btnApply").Value) = ">" AndAlso Convert.ToString(row.Cells("colSend").Value) = "False" Then
+                If (row.Cells("colFixture").Value IsNot Nothing) Then
+                    If row.Cells("colFixture").Value.ToString().ToLower().Contains("video") Then
+                        ApplyRowToBeamer(row)
+                    Else
+                        SendInstructionSetForDevice(DG_Show, row)
+                    End If
+                    row.Cells("colSend").Value = "True"
+                End If
+            End If
+        Next
+
+        ' Update blinking and timer
+        booleanBlinkStart = False
+        booleanBlinkTimer = False
+        booleanBlinkNextEvent = False
+        booleanBlinkNextScene = False
+        booleanBlinkNextAct = False
+        booleanBlinkStop = False
+
+        Dim timerValue As String = ""
+        If followUpRow IsNot Nothing Then
+            timerValue = Convert.ToString(followUpRow.Cells("colTimer").Value)
+        End If
+
+        FrmMain.lblControl_TimeLeft.Text = timerValue
+        If (timerValue <> "") AndAlso (timerValue <> "00:00:00") Then
+            FrmMain.TimerNextEvent.Interval = TimeStringToMilliseconds(timerValue)
+            FrmMain.TimerNextEvent.Start()
+            colorBlinkTimer = Color.Green
+            booleanBlinkTimer = True
+        Else
+            ' Decide next recommendation from the new position
+            DecideNextBlinking(DG_Show, activeIndex, nextAct, firstScene, firstEvent)
+        End If
+
+        Reselect_Rows(DG_Show)
+        ' Optional immediate visual update
+        UpdateBlinkingButton()
+    End Sub
+
     Sub Next_EventOrScene(DG_Show As DataGridView, NextEventOrScene As Integer)
+        ' NextEventOrScene: 0 = Scene, 1 = Event
+
+        booleanConfirmNextEvent = False
+        booleanConfirmNextScene = False
+        booleanConfirmNextAct = False
+
+        If DG_Show.SelectedRows.Count = 0 Then Exit Sub
+
+        ' 1. Huidige positie
+        Dim currentRow As DataGridViewRow = DG_Show.SelectedRows(0)
+        Dim currentAct As String = Convert.ToString(currentRow.Cells("colAct").Value)
+        Dim currentSceneId As Integer = Convert.ToInt32(currentRow.Cells("colSceneId").Value)
+        Dim currentEventId As Integer = Convert.ToInt32(currentRow.Cells("colEventId").Value)
+        Dim currentRowId As Integer = Convert.ToInt32(currentRow.Index)
+
+        ' 2. Zoek volgende doel
+        Dim nextAct As String = ""
+        Dim nextSceneId As Integer = -1
+        Dim nextEventId As Integer = -1
+        Dim found As Boolean = False
+
+        Dim matches As Func(Of DataGridViewRow, Boolean)
+        If NextEventOrScene = 1 Then
+            matches = Function(r As DataGridViewRow)
+                          Dim act = Convert.ToString(r.Cells("colAct").Value)
+                          Dim sceneId = Convert.ToInt32(r.Cells("colSceneId").Value)
+                          Dim eventId = Convert.ToInt32(r.Cells("colEventId").Value)
+                          Return act = currentAct AndAlso sceneId = currentSceneId AndAlso eventId > currentEventId
+                      End Function
+        Else
+            matches = Function(r As DataGridViewRow)
+                          Dim act = Convert.ToString(r.Cells("colAct").Value)
+                          Dim sceneId = Convert.ToInt32(r.Cells("colSceneId").Value)
+                          Return act = currentAct AndAlso sceneId > currentSceneId
+                      End Function
+        End If
+
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.Index <= currentRowId OrElse row.IsNewRow Then Continue For
+            If matches(row) Then
+                nextAct = Convert.ToString(row.Cells("colAct").Value)
+                nextSceneId = Convert.ToInt32(row.Cells("colSceneId").Value)
+                nextEventId = Convert.ToInt32(row.Cells("colEventId").Value)
+                found = True
+                Exit For
+            End If
+        Next
+
+        If Not found Then
+            Dim currentActFound As Boolean = False
+            For Each row As DataGridViewRow In DG_Show.Rows
+                If row.IsNewRow Then Continue For
+                Dim act = Convert.ToString(row.Cells("colAct").Value)
+                Dim sceneId = Convert.ToInt32(row.Cells("colSceneId").Value)
+                Dim eventId = Convert.ToInt32(row.Cells("colEventId").Value)
+
+                If act = currentAct Then
+                    currentActFound = True
+                    Continue For
+                End If
+
+                If currentActFound Then
+                    nextAct = act
+                    nextSceneId = sceneId
+                    nextEventId = eventId
+                    found = True
+                    Exit For
+                End If
+            Next
+        End If
+
+        If Not found Then Exit Sub
+
+        ' 3. Markeer nieuwe groep
+        Dim active As Boolean = False
+        Dim FollowUpRow As DataGridViewRow = Nothing
+        Dim activeIndex As Integer = -1
+        Dim firstTargetRow As DataGridViewRow = Nothing
+
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+
+            If Convert.ToString(row.Cells("colAct").Value) = nextAct AndAlso
+           Convert.ToInt32(row.Cells("colSceneId").Value) = nextSceneId AndAlso
+           Convert.ToInt32(row.Cells("colEventId").Value) = nextEventId Then
+                row.Cells("btnApply").Value = ">"
+                row.Cells("colSend").Value = "False"
+                active = True
+                activeIndex = row.Index
+                If firstTargetRow Is Nothing Then firstTargetRow = row
+            Else
+                If (active AndAlso FollowUpRow Is Nothing) Then
+                    FollowUpRow = row
+                End If
+                row.Cells("btnApply").Value = ""
+                row.Cells("colSend").Value = "False"
+            End If
+        Next
+
+        AutoGotoPdfIfEnabled(firstTargetRow)
+
+        ' 4. Verstuur instructies
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+            If Convert.ToString(row.Cells("btnApply").Value) = ">" AndAlso Convert.ToString(row.Cells("colSend").Value) = "False" Then
+                If (row.Cells("colFixture").Value IsNot Nothing) Then
+                    If row.Cells("colFixture").Value.ToString().ToLower().Contains("video") Then
+                        ApplyRowToBeamer(row)
+                    Else
+                        SendInstructionSetForDevice(DG_Show, row)
+                    End If
+                    row.Cells("colSend").Value = "True"
+                End If
+            End If
+        Next
+
+        ' 5. UI-updates
+        booleanBlinkStart = False
+        booleanBlinkTimer = False
+        booleanBlinkNextEvent = False
+        booleanBlinkNextScene = False
+        booleanBlinkNextAct = False
+        booleanBlinkStop = False
+
+        Dim timerValue As String = ""
+        If FollowUpRow IsNot Nothing Then
+            timerValue = Convert.ToString(FollowUpRow.Cells("colTimer").Value)
+        End If
+        FrmMain.lblControl_TimeLeft.Text = timerValue
+
+        If (timerValue <> "") AndAlso (timerValue <> "00:00:00") Then
+            FrmMain.TimerNextEvent.Interval = TimeStringToMilliseconds(timerValue)
+            FrmMain.TimerNextEvent.Start()
+            FrmMain.lblControl_TimeLeft.Text = timerValue
+            colorBlinkTimer = Color.Green
+            booleanBlinkTimer = True
+        Else
+            DecideNextBlinking(DG_Show, activeIndex, nextAct, nextSceneId, nextEventId)
+        End If
+
+        Reselect_Rows(DG_Show)
+        ' Nieuw: highlight volgende groep
+        UpdateNextGroupHighlight(DG_Show)
+    End Sub
+    Sub Next_EventOrScene_OLD(DG_Show As DataGridView, NextEventOrScene As Integer)
         ' NextEventOrScene: 0 = Scene, 1 = Event
 
         ' First stop any playing video's
@@ -730,6 +1238,11 @@ Module DG_Show
         'Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.stop()
         'FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
         'FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
+
+        ' Clear any pending confirmations because we are proceeding
+        booleanConfirmNextEvent = False
+        booleanConfirmNextScene = False
+        booleanConfirmNextAct = False
 
         If DG_Show.SelectedRows.Count = 0 Then Exit Sub
 
@@ -840,13 +1353,14 @@ Module DG_Show
         For Each row As DataGridViewRow In DG_Show.Rows
             If row.IsNewRow Then Continue For
             If Convert.ToString(row.Cells("btnApply").Value) = ">" AndAlso Convert.ToString(row.Cells("colSend").Value) = "False" Then
-
-                If row.Cells("colFixture").Value.ToString().ToLower().Contains("video") Then
-                    ApplyRowToBeamer(row)
-                Else
-                    SendInstructionSetForDevice(DG_Show, row)
+                If (row.Cells("colFixture").Value IsNot Nothing) Then
+                    If row.Cells("colFixture").Value.ToString().ToLower().Contains("video") Then
+                        ApplyRowToBeamer(row)
+                    Else
+                        SendInstructionSetForDevice(DG_Show, row)
+                    End If
+                    row.Cells("colSend").Value = "True"
                 End If
-                row.Cells("colSend").Value = "True"
             End If
         Next
 
@@ -864,7 +1378,7 @@ Module DG_Show
         End If
         FrmMain.lblControl_TimeLeft.Text = timerValue
 
-        If timerValue <> "" Then
+        If (timerValue <> "") AndAlso (timerValue <> "00:00:00") Then
             FrmMain.TimerNextEvent.Interval = TimeStringToMilliseconds(timerValue)
             FrmMain.TimerNextEvent.Start()
             FrmMain.lblControl_TimeLeft.Text = timerValue
@@ -919,14 +1433,93 @@ Module DG_Show
         Next
     End Sub
 
-
     Sub Start_Show(DG_Show As DataGridView)
         Dim FoundRows As Integer = 0
         Dim LastRow As DataGridViewRow = Nothing
         Dim FirstRow As Boolean = True
 
+        booleanConfirmNextEvent = False
+        booleanConfirmNextScene = False
+        booleanConfirmNextAct = False
+
         ResetProcessedCheckboxes(DG_Show)
-        ClearGroupsToBlack_WithBlackSolidEffect()
+        'ClearGroupsToBlack_WithBlackSolidEffect()
+
+        For Each row In DG_Show.Rows
+            If (row.cells("colAct").value = "Pre-Show" And row.cells("colSceneId").value = "1" And row.cells("colEventId").value = "1") Or (FirstRow) Then
+                FirstRow = False
+                row.cells("btnApply").value = ">"
+                row.cells("colSend").value = "False"
+                FoundRows = FoundRows + 1
+                row.cells("btnApply").value = ">"
+            Else
+                If LastRow Is Nothing Then LastRow = row
+                row.cells("btnApply").value = ""
+            End If
+        Next
+
+        For Each row In DG_Show.Rows
+            If row.cells("btnApply").value = ">" And row.cells("colSend").value = "False" Then
+                If row.Cells("colFixture").Value.ToString().ToLower().Contains("video") Then
+                    ApplyRowToBeamer(row)
+                Else
+                    SendInstructionSetForDevice(DG_Show, row)
+                End If
+            End If
+        Next
+
+        booleanBlinkStart = False
+        booleanBlinkTimer = False
+        booleanBlinkNextEvent = False
+        booleanBlinkNextScene = False
+        booleanBlinkNextAct = False
+        booleanBlinkStop = False
+        booleanBlinkStopLooping = False
+        FrmMain.lblControl_TimeLeft.Text = ""
+
+        ' Timer heeft prioriteit
+        If (LastRow IsNot Nothing) AndAlso (LastRow.Cells("colTimer").Value <> "") AndAlso (LastRow.Cells("colTimer").Value <> "00:00:00") Then
+            booleanBlinkTimer = True
+            colorBlinkTimer = Color.Green
+            FrmMain.TimerNextEvent.Interval = TimeStringToMilliseconds(LastRow.Cells("colTimer").Value)
+            FrmMain.TimerNextEvent.Start()
+            FrmMain.lblControl_TimeLeft.Text = LastRow.Cells("colTimer").Value
+        Else
+            ' Vind laatste actieve index en bepaal blinking
+            Dim activeIdx As Integer = -1
+            Dim activeAct As String = ""
+            Dim activeScene As Integer = -1
+            Dim activeEvent As Integer = -1
+            For Each r As DataGridViewRow In DG_Show.Rows
+                If r.IsNewRow Then Continue For
+                If Convert.ToString(r.Cells("btnApply").Value) = ">" Then
+                    activeIdx = r.Index
+                    activeAct = Convert.ToString(r.Cells("colAct").Value)
+                    activeScene = Convert.ToInt32(r.Cells("colSceneId").Value)
+                    activeEvent = Convert.ToInt32(r.Cells("colEventId").Value)
+                End If
+            Next
+            If activeIdx >= 0 Then
+                DecideNextBlinking(DG_Show, activeIdx, activeAct, activeScene, activeEvent)
+            End If
+        End If
+
+        Reselect_Rows(DG_Show)
+        ' Nieuw: highlight volgende groep
+        UpdateNextGroupHighlight(DG_Show)
+    End Sub
+
+    Sub Start_Show_old(DG_Show As DataGridView)
+        Dim FoundRows As Integer = 0
+        Dim LastRow As DataGridViewRow = Nothing
+        Dim FirstRow As Boolean = True
+
+        booleanConfirmNextEvent = False
+        booleanConfirmNextScene = False
+        booleanConfirmNextAct = False
+
+        ResetProcessedCheckboxes(DG_Show)
+        'ClearGroupsToBlack_WithBlackSolidEffect()
 
         For Each row In DG_Show.Rows
             If (row.cells("colAct").value = "Pre-Show" And row.cells("colSceneId").value = "1" And row.cells("colEventId").value = "1") Or (FirstRow) Then
@@ -961,7 +1554,7 @@ Module DG_Show
         FrmMain.lblControl_TimeLeft.Text = ""
 
         ' Timer has priority
-        If (LastRow IsNot Nothing) AndAlso (LastRow.Cells("colTimer").Value <> "") Then
+        If (LastRow IsNot Nothing) AndAlso (LastRow.Cells("colTimer").Value <> "") AndAlso (LastRow.Cells("colTimer").Value <> "00:00:00") Then
             booleanBlinkTimer = True
             colorBlinkTimer = Color.Green
             FrmMain.TimerNextEvent.Interval = TimeStringToMilliseconds(LastRow.Cells("colTimer").Value)
@@ -990,7 +1583,6 @@ Module DG_Show
         Reselect_Rows(DG_Show)
     End Sub
 
-    ' Make sure new flag is reset in StopAll
     Public Sub StopAll()
         If Not booleanBlinkStop Then
             booleanBlinkStop = True
@@ -1005,6 +1597,42 @@ Module DG_Show
             booleanBlinkNextScene = False
             booleanBlinkNextAct = False
             booleanBlinkTimer = False
+            booleanConfirmNextEvent = False
+            booleanConfirmNextScene = False
+            booleanConfirmNextAct = False
+
+            ClearGroupsToBlack_WithBlackSolidEffect()
+
+            Beamer_Primary.WMP_PrimaryPlayer_Live.Ctlcontrols.stop()
+            FrmMain.WMP_PrimaryPlayer_Preview.Ctlcontrols.stop()
+            Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.stop()
+            FrmMain.WMP_SecondairyPlayer_Preview.Ctlcontrols.stop()
+
+            ' Nieuw: verwijder groene highlight
+            ClearNextGroupHighlight(FrmMain.DG_Show)
+
+            DeselectAllRowsOfDGShow()
+        End If
+    End Sub
+
+    ' Make sure new flag is reset in StopAll
+    Public Sub StopAll_OLD()
+        If Not booleanBlinkStop Then
+            booleanBlinkStop = True
+            ToonFlashBericht("Druk nogmaals op show te stoppen!", 1, FlashSeverity.IsWarning)
+        Else
+            ToonFlashBericht("Show " & My.Settings.ProjectName & " gestopt.", 30, FlashSeverity.IsInfo)
+
+            FrmMain.btnControl_StopAll.BackColor = Color.DarkRed
+            booleanBlinkStop = False
+            booleanBlinkStart = False
+            booleanBlinkNextEvent = False
+            booleanBlinkNextScene = False
+            booleanBlinkNextAct = False
+            booleanBlinkTimer = False
+            booleanConfirmNextEvent = False
+            booleanConfirmNextScene = False
+            booleanConfirmNextAct = False
 
             ClearGroupsToBlack_WithBlackSolidEffect()
 
@@ -1182,5 +1810,193 @@ Module DG_Show
         If val IsNot Nothing AndAlso Integer.TryParse(val.ToString(), page) AndAlso page >= 1 Then
             FrmMain.NavigatePdfToPage(page)
         End If
+    End Sub
+
+    Public Sub RefreshBlinkForSelection(DG_Show As DataGridView, selectedRow As DataGridViewRow)
+        On Error Resume Next
+        If DG_Show Is Nothing OrElse selectedRow Is Nothing OrElse selectedRow.IsNewRow Then Exit Sub
+        If Not My.Settings.Locked Then Exit Sub
+
+        FrmMain.TimerNextEvent.Stop()
+        booleanBlinkTimer = False
+        FrmMain.lblControl_TimeLeft.Text = ""
+
+        booleanBlinkStart = False
+        booleanBlinkStop = False
+        booleanBlinkNextEvent = False
+        booleanBlinkNextScene = False
+        booleanBlinkNextAct = False
+        booleanConfirmNextEvent = False
+        booleanConfirmNextScene = False
+        booleanConfirmNextAct = False
+
+        Dim act As String = Convert.ToString(selectedRow.Cells("colAct").Value)
+        Dim sceneId As Integer = 0
+        Dim eventId As Integer = 0
+        Integer.TryParse(Convert.ToString(selectedRow.Cells("colSceneId").Value), sceneId)
+        Integer.TryParse(Convert.ToString(selectedRow.Cells("colEventId").Value), eventId)
+
+        DecideNextBlinking(DG_Show, selectedRow.Index, act, sceneId, eventId)
+
+        UpdateBlinkingButton()
+
+        ' Nieuw: highlight volgende groep
+        UpdateNextGroupHighlight(DG_Show)
+    End Sub
+
+    ' Add this public helper inside Module DG_Show (e.g., below DecideNextBlinking)
+    Public Sub RefreshBlinkForSelection_OLD(DG_Show As DataGridView, selectedRow As DataGridViewRow)
+        On Error Resume Next
+        If DG_Show Is Nothing OrElse selectedRow Is Nothing OrElse selectedRow.IsNewRow Then Exit Sub
+        If Not My.Settings.Locked Then Exit Sub
+
+        ' Stop any pending timer because we are jumping to a new position
+        FrmMain.TimerNextEvent.Stop()
+        booleanBlinkTimer = False
+        FrmMain.lblControl_TimeLeft.Text = ""
+
+        ' Reset baseline blink states
+        booleanBlinkStart = False
+        booleanBlinkStop = False
+        booleanBlinkNextEvent = False
+        booleanBlinkNextScene = False
+        booleanBlinkNextAct = False
+        booleanConfirmNextEvent = False
+        booleanConfirmNextScene = False
+        booleanConfirmNextAct = False
+
+        ' Read current context from the selected row
+        Dim act As String = Convert.ToString(selectedRow.Cells("colAct").Value)
+        Dim sceneId As Integer = 0
+        Dim eventId As Integer = 0
+        Integer.TryParse(Convert.ToString(selectedRow.Cells("colSceneId").Value), sceneId)
+        Integer.TryParse(Convert.ToString(selectedRow.Cells("colEventId").Value), eventId)
+
+        ' Decide which "Next" button should blink from this position
+        DecideNextBlinking(DG_Show, selectedRow.Index, act, sceneId, eventId)
+
+        ' Update visuals immediately (the timer also keeps it refreshed)
+        UpdateBlinkingButton()
+    End Sub
+
+    ' =====================================================================
+    ' Nieuw: bereken en highlight de "volgende" groep in DG_Show
+    ' =====================================================================
+
+    ' Haalt de huidige actieve groep (waar btnApply=">") op
+    Private Function TryGetCurrentActiveTriple(DG_Show As DataGridView, ByRef act As String, ByRef sceneId As Integer, ByRef eventId As Integer, ByRef activeIndex As Integer) As Boolean
+        act = ""
+        sceneId = -1
+        eventId = -1
+        activeIndex = -1
+
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+            If Convert.ToString(row.Cells("btnApply").Value) = ">" Then
+                act = Convert.ToString(row.Cells("colAct").Value)
+                Integer.TryParse(Convert.ToString(row.Cells("colSceneId").Value), sceneId)
+                Integer.TryParse(Convert.ToString(row.Cells("colEventId").Value), eventId)
+                activeIndex = row.Index
+                Return True
+            End If
+        Next
+
+        Return False
+    End Function
+
+    ' Bepaalt de volgende groep (eerst: volgend event in dezelfde scene; dan: volgende scene in dezelfde act; anders: eerste rij van volgende act)
+    Private Function FindNextGroupFromCurrent(DG_Show As DataGridView, ByRef nextAct As String, ByRef nextSceneId As Integer, ByRef nextEventId As Integer) As Boolean
+        nextAct = ""
+        nextSceneId = -1
+        nextEventId = -1
+
+        Dim curAct As String = ""
+        Dim curScene As Integer = -1
+        Dim curEvent As Integer = -1
+        Dim curIndex As Integer = -1
+
+        If Not TryGetCurrentActiveTriple(DG_Show, curAct, curScene, curEvent, curIndex) Then
+            Return False
+        End If
+
+        ' 1) Volgend event in dezelfde scene
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow OrElse row.Index <= curIndex Then Continue For
+            Dim act = Convert.ToString(row.Cells("colAct").Value)
+            Dim sceneId = Convert.ToInt32(If(row.Cells("colSceneId").Value, 0))
+            Dim eventId = Convert.ToInt32(If(row.Cells("colEventId").Value, 0))
+            If act = curAct AndAlso sceneId = curScene AndAlso eventId > curEvent Then
+                nextAct = act : nextSceneId = sceneId : nextEventId = eventId
+                Return True
+            End If
+        Next
+
+        ' 2) Volgende scene in dezelfde act (eerste rij van die scene)
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow OrElse row.Index <= curIndex Then Continue For
+            Dim act = Convert.ToString(row.Cells("colAct").Value)
+            Dim sceneId = Convert.ToInt32(If(row.Cells("colSceneId").Value, 0))
+            Dim eventId = Convert.ToInt32(If(row.Cells("colEventId").Value, 0))
+            If act = curAct AndAlso sceneId > curScene Then
+                nextAct = act : nextSceneId = sceneId : nextEventId = eventId
+                Return True
+            End If
+        Next
+
+        ' 3) Eerste rij na het verlaten van de huidige act (= volgende act)
+        Dim leftCurrentAct As Boolean = False
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+            Dim act = Convert.ToString(row.Cells("colAct").Value)
+            If row.Index <= curIndex Then Continue For
+            If Not leftCurrentAct AndAlso act = curAct Then
+                Continue For
+            End If
+            If Not leftCurrentAct AndAlso act <> curAct Then
+                Dim sceneId = Convert.ToInt32(If(row.Cells("colSceneId").Value, 0))
+                Dim eventId = Convert.ToInt32(If(row.Cells("colEventId").Value, 0))
+                nextAct = act : nextSceneId = sceneId : nextEventId = eventId
+                Return True
+            End If
+        Next
+
+        Return False
+    End Function
+
+    ' Verwijdert alle groene highlight
+    Private Sub ClearNextGroupHighlight(DG_Show As DataGridView)
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+            row.DefaultCellStyle.BackColor = DG_Show.DefaultCellStyle.BackColor
+        Next
+    End Sub
+
+    ' Kleurt de rijen van de "volgende" groep lichtgroen, selectie van huidige groep blijft gewoon selectie
+    Public Sub UpdateNextGroupHighlight(DG_Show As DataGridView)
+        On Error Resume Next
+
+        Dim nextAct As String = ""
+        Dim nextScene As Integer = -1
+        Dim nextEvent As Integer = -1
+
+        Dim hasNext As Boolean = FindNextGroupFromCurrent(DG_Show, nextAct, nextScene, nextEvent)
+
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+
+            If hasNext Then
+                Dim act = Convert.ToString(row.Cells("colAct").Value)
+                Dim sceneId = Convert.ToInt32(If(row.Cells("colSceneId").Value, 0))
+                Dim eventId = Convert.ToInt32(If(row.Cells("colEventId").Value, 0))
+
+                If act = nextAct AndAlso sceneId = nextScene AndAlso eventId = nextEvent Then
+                    row.DefaultCellStyle.BackColor = Color.Green
+                Else
+                    row.DefaultCellStyle.BackColor = DG_Show.DefaultCellStyle.BackColor
+                End If
+            Else
+                row.DefaultCellStyle.BackColor = DG_Show.DefaultCellStyle.BackColor
+            End If
+        Next
     End Sub
 End Module

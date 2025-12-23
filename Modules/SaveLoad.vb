@@ -203,8 +203,8 @@ Module SaveLoad
 
         LoadXmlToDataGridView(FrmMain.DG_Tracks, Folder + "\Tracks.xml", False)
         LoadXmlToDataGridView(FrmMain.DG_Templates, Folder + "\MyEffects.xml", False)
-        LoadXmlToDataGridView(FrmMain.DG_Frames, Folder + "\Frames.xml", False)
-        LoadXmlToDataGridView(FrmMain.DG_LightSources, Folder + "\Lights.xml", False)
+        'LoadXmlToDataGridView(FrmMain.DG_Frames, Folder + "\Frames.xml", False)
+        'LoadXmlToDataGridView(FrmMain.DG_LightSources, Folder + "\Lights.xml", False)
 
         LoadXmlToDataGridView(FrmMain.DG_Actions, Folder + "\Actions.xml", False)
         LoadXmlToDataGridView(FrmMain.DG_ActionsDetail, Folder + "\ActionsDetail.xml", False)

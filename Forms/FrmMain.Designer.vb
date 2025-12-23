@@ -802,7 +802,7 @@ Partial Class FrmMain
         btnControl_NextAct.ForeColor = Color.White
         btnControl_NextAct.Image = CType(resources.GetObject("btnControl_NextAct.Image"), Image)
         btnControl_NextAct.ImageAlign = ContentAlignment.MiddleRight
-        btnControl_NextAct.Location = New Point(111, 119)
+        btnControl_NextAct.Location = New Point(111, 73)
         btnControl_NextAct.Name = "btnControl_NextAct"
         btnControl_NextAct.Size = New Size(368, 41)
         btnControl_NextAct.TabIndex = 8
@@ -854,7 +854,7 @@ Partial Class FrmMain
         btnControl_StopAll.ForeColor = Color.White
         btnControl_StopAll.Image = My.Resources.Resources.iconCancel
         btnControl_StopAll.ImageAlign = ContentAlignment.MiddleRight
-        btnControl_StopAll.Location = New Point(485, 118)
+        btnControl_StopAll.Location = New Point(485, 119)
         btnControl_StopAll.Name = "btnControl_StopAll"
         btnControl_StopAll.Size = New Size(153, 41)
         btnControl_StopAll.TabIndex = 4
@@ -882,9 +882,9 @@ Partial Class FrmMain
         btnControl_NextScene.ForeColor = Color.White
         btnControl_NextScene.Image = My.Resources.Resources.iconFastForward
         btnControl_NextScene.ImageAlign = ContentAlignment.MiddleRight
-        btnControl_NextScene.Location = New Point(111, 70)
+        btnControl_NextScene.Location = New Point(111, 23)
         btnControl_NextScene.Name = "btnControl_NextScene"
-        btnControl_NextScene.Size = New Size(368, 41)
+        btnControl_NextScene.Size = New Size(176, 41)
         btnControl_NextScene.TabIndex = 2
         btnControl_NextScene.Text = "Volgende scene"
         btnControl_NextScene.UseVisualStyleBackColor = False
@@ -895,9 +895,9 @@ Partial Class FrmMain
         btnControl_NextEvent.ForeColor = Color.White
         btnControl_NextEvent.Image = My.Resources.Resources.iconPlay
         btnControl_NextEvent.ImageAlign = ContentAlignment.MiddleRight
-        btnControl_NextEvent.Location = New Point(111, 23)
+        btnControl_NextEvent.Location = New Point(293, 23)
         btnControl_NextEvent.Name = "btnControl_NextEvent"
-        btnControl_NextEvent.Size = New Size(368, 41)
+        btnControl_NextEvent.Size = New Size(186, 41)
         btnControl_NextEvent.TabIndex = 1
         btnControl_NextEvent.Text = "Volgende event"
         btnControl_NextEvent.UseVisualStyleBackColor = False
@@ -2310,7 +2310,7 @@ Partial Class FrmMain
         TabGroups.Padding = New Padding(3)
         TabGroups.Size = New Size(1836, 849)
         TabGroups.TabIndex = 8
-        TabGroups.Text = "Groups"
+        TabGroups.Text = "Segments"
         TabGroups.UseVisualStyleBackColor = True
         ' 
         ' RichTextBox4
@@ -2814,7 +2814,7 @@ Partial Class FrmMain
         ' cbMonitorSecond
         ' 
         cbMonitorSecond.FormattingEnabled = True
-        cbMonitorSecond.Items.AddRange(New Object() {"Output 1", "Output 2", "Output 3"})
+        cbMonitorSecond.Items.AddRange(New Object() {"Output 1", "Output 2", "Output 3", "Disabled"})
         cbMonitorSecond.Location = New Point(133, 102)
         cbMonitorSecond.Name = "cbMonitorSecond"
         cbMonitorSecond.Size = New Size(177, 23)
@@ -2832,7 +2832,7 @@ Partial Class FrmMain
         ' cbMonitorPrime
         ' 
         cbMonitorPrime.FormattingEnabled = True
-        cbMonitorPrime.Items.AddRange(New Object() {"Output 1", "Output 2", "Output 3"})
+        cbMonitorPrime.Items.AddRange(New Object() {"Output 1", "Output 2", "Output 3", "Disabled"})
         cbMonitorPrime.Location = New Point(133, 74)
         cbMonitorPrime.Name = "cbMonitorPrime"
         cbMonitorPrime.Size = New Size(177, 23)
@@ -3003,11 +3003,9 @@ Partial Class FrmMain
         ' 
         ' ddpTimer
         ' 
-        ddpTimer.Enabled = True
         ' 
         ' stageTimer
         ' 
-        stageTimer.Enabled = True
         stageTimer.Interval = 500
         ' 
         ' FrmMain

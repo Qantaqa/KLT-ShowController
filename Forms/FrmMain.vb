@@ -35,6 +35,19 @@ Public Class FrmMain
     Private Shared Function GetEnhMetaFilePixelFormat(ByVal hEmf As IntPtr) As UInteger
     End Function
 
+    Private _hotkeys As HotkeyControl
+
+    Private Sub FrmMain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        _hotkeys = New HotkeyControl(Me, cbMonitorControl)
+    End Sub
+
+    Private Sub FrmMain_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
+        If _hotkeys IsNot Nothing Then
+            _hotkeys.Dispose()
+            _hotkeys = Nothing
+        End If
+    End Sub
+
 
     ' **************************************************************************************************************************
     ' MAIN FORM LOAD
@@ -99,10 +112,10 @@ Public Class FrmMain
             End If
 
             ' Init sound buttons hover bar on right side of SplitContainer2.Panel2
-            Try
-                SoundButtons.Initialize(SplitContainer2, Me)
-            Catch
-            End Try
+            'Try
+            '    SoundButtons.Initialize(SplitContainer2, Me)
+            'Catch
+            'End Try
 
             ' Definieer de kolommen voor de DataGridView
             Dim ipColumn As New DataGridViewTextBoxColumn
@@ -156,11 +169,11 @@ Public Class FrmMain
             If (c > 0) Then
                 Select Case c
                     Case 0
-                        ToonFlashBericht("Alle WLED-apparaten online.", 3, FlashSeverity.IsInfo)
+                        ToonFlashBericht("Alle WLED-apparaten online.", 1, FlashSeverity.IsInfo)
                     Case 1
-                        ToonFlashBericht("Er is 1 WLED-apparaat offline op het netwerk.", 10, FlashSeverity.IsWarning)
+                        ToonFlashBericht("Er is 1 WLED-apparaat offline op het netwerk.", 5, FlashSeverity.IsWarning)
                     Case Else
-                        ToonFlashBericht("Er zijn " + c.ToString + " WLED-apparaten offline op het netwerk.", 10, FlashSeverity.IsWarning)
+                        ToonFlashBericht("Er zijn " + c.ToString + " WLED-apparaten offline op het netwerk.", 5, FlashSeverity.IsWarning)
                 End Select
             End If
 
@@ -169,13 +182,13 @@ Public Class FrmMain
 
             Dim ZoomFactor As Double = 60
 
-            EffectBuilder.Initialize(PanelTracks, DG_Tracks, DG_LightSources, ZoomFactor)
-            Tracks.Initialize()
-            AddHandler EffectBuilder.TrackClicked, AddressOf EffectBuilder.OnTrackClicked
-            AddHandler EffectBuilder.LightSourceClicked, AddressOf EffectBuilder.OnLightSourceClicked
-            AddHandler pb_Stage.MouseClick, AddressOf Stage.OnStageClick
+            'EffectBuilder.Initialize(PanelTracks, DG_Tracks, DG_LightSources, ZoomFactor)
+            'Tracks.Initialize()
+            'AddHandler EffectBuilder.TrackClicked, AddressOf EffectBuilder.OnTrackClicked
+            'AddHandler EffectBuilder.LightSourceClicked, AddressOf EffectBuilder.OnLightSourceClicked
+            'AddHandler pb_Stage.MouseClick, AddressOf Stage.OnStageClick
 
-            SetZoom(ZoomFactor)
+            'SetZoom(ZoomFactor)
 
             ' Zorg dat kolom ScriptPg bestaat in DG_Show
             If DG_Show IsNot Nothing AndAlso Not DG_Show.Columns.Contains("ScriptPg") Then
@@ -213,24 +226,34 @@ Public Class FrmMain
             UpdateMonitorStatusIndicators(cbMonitorControl, cbMonitorPrime, cbMonitorSecond)
 
             If (ImagesAreEqual(pbPrimaryStatus.Image, My.Resources.iconGreenBullet1)) Then
-                SetPrimaryBeamerToCorrectOutput()
-                Beamer_Primary.Show()
-                Beamer_Primary.FormBorderStyle = FormBorderStyle.None
-                Beamer_Primary.BringToFront()
+                If Not String.Equals(My.Settings.MonitorPrimary, "Disabled", StringComparison.OrdinalIgnoreCase) Then
+                    SetPrimaryBeamerToCorrectOutput()
+                    Beamer_Primary.Show()
+                    Beamer_Primary.FormBorderStyle = FormBorderStyle.None
+                    Beamer_Primary.BringToFront()
+                Else
+                    Beamer_Primary.Hide()
+                End If
             Else
-                ToonFlashBericht("Primary beamer is niet verbonden of ingesteld.", 20, FlashSeverity.IsWarning)
+                If Not String.Equals(My.Settings.MonitorPrimary, "Disabled", StringComparison.OrdinalIgnoreCase) Then
+                    ToonFlashBericht("Primary beamer is niet verbonden of ingesteld.", 5, FlashSeverity.IsWarning)
+                End If
             End If
 
             If (ImagesAreEqual(pbSecondaryStatus.Image, My.Resources.iconGreenBullet1)) Then
-                SetSecondairyBeamerToCorrectOutput()
-                Beamer_Secondairy.Show()
-                Beamer_Secondairy.FormBorderStyle = FormBorderStyle.None
-                Beamer_Secondairy.BringToFront()
+                If Not String.Equals(My.Settings.MonitorSecond, "Disabled", StringComparison.OrdinalIgnoreCase) Then
+                    SetSecondairyBeamerToCorrectOutput()
+                    Beamer_Secondairy.Show()
+                    Beamer_Secondairy.FormBorderStyle = FormBorderStyle.None
+                    Beamer_Secondairy.BringToFront()
+                Else
+                    Beamer_Secondairy.Hide()
+                End If
             Else
-                ToonFlashBericht("Secondary beamer is niet verbonden of ingesteld.", 20, FlashSeverity.IsWarning)
+                If Not String.Equals(My.Settings.MonitorSecond, "Disabled", StringComparison.OrdinalIgnoreCase) Then
+                    ToonFlashBericht("Secondary beamer is niet verbonden of ingesteld.", 5, FlashSeverity.IsWarning)
+                End If
             End If
-
-
 
         Catch ex As Exception
             MessageBox.Show($"Fout tijdens laden van form: {ex.Message}", "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -336,15 +359,15 @@ Public Class FrmMain
         MoveAndMaximizeForm(cbMonitorControl.Text)
     End Sub
 
-    Private Sub cbMonitorPrime_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbMonitorPrime.SelectedIndexChanged
-        My.Settings.MonitorPrimary = cbMonitorPrime.Text
-        My.Settings.Save()
-    End Sub
+    'Private Sub cbMonitorPrime_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbMonitorPrime.SelectedIndexChanged
+    '    My.Settings.MonitorPrimary = cbMonitorPrime.Text
+    '    My.Settings.Save()
+    'End Sub
 
-    Private Sub cbMonitorSecond_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbMonitorSecond.SelectedIndexChanged
-        My.Settings.MonitorSecond = cbMonitorSecond.Text
-        My.Settings.Save()
-    End Sub
+    'Private Sub cbMonitorSecond_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbMonitorSecond.SelectedIndexChanged
+    '    My.Settings.MonitorSecond = cbMonitorSecond.Text
+    '    My.Settings.Save()
+    'End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles TimerEverySecond.Tick
         UpdateMonitorStatusIndicators(cbMonitorControl, cbMonitorPrime, cbMonitorSecond)
@@ -418,6 +441,8 @@ Public Class FrmMain
                 FixtureValue = DG_Show.CurrentRow.Cells("colFixture").Value.ToString()
             End If
 
+            If (FixtureValue = "") Then Exit Sub
+
             If (FixtureValue.Substring(0, 2) = "**") Then
                 ' VIDEO
                 ApplyRowToBeamer(DG_Show.CurrentRow)
@@ -432,6 +457,16 @@ Public Class FrmMain
 
     Private Sub DG_Show_RowEnter(sender As Object, e As DataGridViewCellEventArgs) Handles DG_Show.RowEnter
         Update_DGGRid_Details(DG_Show, e.RowIndex)
+
+        ' New: when locked, selecting a row should update which Next button blinks
+        Try
+            If e.RowIndex >= 0 AndAlso My.Settings.Locked Then
+                Dim r = DG_Show.Rows(e.RowIndex)
+                KLT_LedShow.RefreshBlinkForSelection(DG_Show, r)
+            End If
+        Catch
+        End Try
+
     End Sub
 
     Private Sub detailWLed_Brightness_Scroll(sender As Object, e As EventArgs) Handles detailWLed_Brightness.Scroll
@@ -555,34 +590,34 @@ Public Class FrmMain
 
 
 
-    Sub ControlOneLed(DeviceRow As DataGridViewRow, lednr As Integer, redvalue As Integer, greenvalue As Integer, bluevalue As Integer)
-        Dim r As Integer = redvalue
-        Dim g As Integer = greenvalue
-        Dim b As Integer = bluevalue
+    'Sub ControlOneLed(DeviceRow As DataGridViewRow, lednr As Integer, redvalue As Integer, greenvalue As Integer, bluevalue As Integer)
+    '    Dim r As Integer = redvalue
+    '    Dim g As Integer = greenvalue
+    '    Dim b As Integer = bluevalue
 
-        ' Segment voor LED 0 instellen (start 0, stop 1)
-        Dim json As String = JsonConvert.SerializeObject(New With {
-        .seg = New Object() {
-            New With {
-                .id = 0,
-                .start = lednr - 1,
-                .stop = lednr,
-                .col = New Integer()() {New Integer() {r, g, b}}
-            }
-        }
-    })
+    '    ' Segment voor LED 0 instellen (start 0, stop 1)
+    '    Dim json As String = JsonConvert.SerializeObject(New With {
+    '    .seg = New Object() {
+    '        New With {
+    '            .id = 0,
+    '            .start = lednr - 1,
+    '            .stop = lednr,
+    '            .col = New Integer()() {New Integer() {r, g, b}}
+    '        }
+    '    }
+    '})
 
-        Dim client As New WebClient()
-        client.Headers(HttpRequestHeader.ContentType) = "application/json"
+    '    Dim client As New WebClient()
+    '    client.Headers(HttpRequestHeader.ContentType) = "application/json"
 
-        Dim MyUrl = "http://" + DeviceRow.Cells("colIPAddress").Value + "/json/state"
-        Try
-            client.UploadString(MyUrl, "POST", json)
-        Catch ex As Exception
-            MessageBox.Show("Fout bij verzenden naar WLED: " & ex.Message)
-        End Try
+    '    Dim MyUrl = "http://" + DeviceRow.Cells("colIPAddress").Value + "/json/state"
+    '    Try
+    '        client.UploadString(MyUrl, "POST", json)
+    '    Catch ex As Exception
+    '        MessageBox.Show("Fout bij verzenden naar WLED: " & ex.Message)
+    '    End Try
 
-    End Sub
+    'End Sub
 
     Private Sub btnGenerateSlider_Click(sender As Object, e As EventArgs) Handles btnGenerateSliders.Click
 
@@ -1036,16 +1071,16 @@ Public Class FrmMain
     End Sub
 
     Private Sub btnControl_NextEvent_Click(sender As Object, e As EventArgs) Handles btnControl_NextEvent.Click
-        Next_EventOrScene(DG_Show, nextEvent)
+        HandleNextEventClick(Me.DG_Show)
     End Sub
 
     Private Sub btnControl_NextScene_Click(sender As Object, e As EventArgs) Handles btnControl_NextScene.Click
-        Next_EventOrScene(DG_Show, nextScene)
+        HandleNextSceneClick(Me.DG_Show)
     End Sub
 
+    ' Optional
     Private Sub btnControl_NextAct_Click(sender As Object, e As EventArgs) Handles btnControl_NextAct.Click
-        'Next_Act(DG_Show, filterAct)
-        Next_EventOrScene(DG_Show, nextScene)
+        HandleNextActClick(Me.DG_Show)
     End Sub
 
     Private Sub WMP_PrimaryPlayer_Preview_PositionChange(sender As Object, e As AxWMPLib._WMPOCXEvents_PositionChangeEvent) Handles WMP_PrimaryPlayer_Preview.PositionChange
@@ -1354,4 +1389,66 @@ Public Class FrmMain
     End Sub
 
 
+    Private Sub cbMonitorPrime_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbMonitorPrime.SelectedIndexChanged
+        My.Settings.MonitorPrimary = cbMonitorPrime.Text
+        My.Settings.Save()
+
+        If String.Equals(cbMonitorPrime.Text, "Disabled", StringComparison.OrdinalIgnoreCase) Then
+            Try
+                Beamer_Primary.WMP_PrimaryPlayer_Live.Ctlcontrols.stop()
+            Catch
+            End Try
+            Beamer_Primary.Hide()
+        Else
+            SetPrimaryBeamerToCorrectOutput()
+            Beamer_Primary.FormBorderStyle = FormBorderStyle.None
+            Beamer_Primary.Show()
+            Beamer_Primary.BringToFront()
+        End If
+    End Sub
+
+    Private Sub cbMonitorSecond_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbMonitorSecond.SelectedIndexChanged
+        My.Settings.MonitorSecond = cbMonitorSecond.Text
+        My.Settings.Save()
+
+        If String.Equals(cbMonitorSecond.Text, "Disabled", StringComparison.OrdinalIgnoreCase) Then
+            Try
+                Beamer_Secondairy.WMP_SecondairyPlayer_Live.Ctlcontrols.stop()
+            Catch
+            End Try
+            Beamer_Secondairy.Hide()
+        Else
+            SetSecondairyBeamerToCorrectOutput()
+            Beamer_Secondairy.FormBorderStyle = FormBorderStyle.None
+            Beamer_Secondairy.Show()
+            Beamer_Secondairy.BringToFront()
+        End If
+    End Sub
+
+    Private Sub btn_ScriptPDF_Click(sender As Object, e As EventArgs) Handles btn_ScriptPDF.Click
+        Try
+            Using dlg As New OpenFileDialog()
+                dlg.Title = "Select script PDF"
+                dlg.Filter = "PDF Files (*.pdf)|*.pdf|All Files (*.*)|*.*"
+                dlg.CheckFileExists = True
+                dlg.Multiselect = False
+
+                If dlg.ShowDialog() = DialogResult.OK Then
+                    Dim selectedPath As String = dlg.FileName
+                    ' Update UI and settings
+                    settings_ScriptPDF.Text = selectedPath
+                    My.Settings.ScriptPDF = selectedPath
+                    My.Settings.Save()
+
+                    ' Load the PDF into the viewer (existing helper handles validation and rendering)
+                    LoadPdfFromSettings()
+
+                    ' Inform user
+                    ToonFlashBericht("PDF geladen: " & Path.GetFileName(selectedPath), 3, FlashSeverity.IsInfo)
+                End If
+            End Using
+        Catch ex As Exception
+            ToonFlashBericht("Fout bij laden PDF: " & ex.Message, 8, FlashSeverity.IsError)
+        End Try
+    End Sub
 End Class

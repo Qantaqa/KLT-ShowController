@@ -429,7 +429,7 @@ Public Class DetailShowWLED
         CopiedRowData("colColor2") = ColorTranslator.ToHtml(btnColor2.BackColor)
         CopiedRowData("colColor3") = ColorTranslator.ToHtml(btnColor3.BackColor)
 
-        ToonFlashBericht("Copied settings to clipboard.", 2)
+        ToonFlashBericht("Copied settings to clipboard.", 1)
     End Sub
 
     Private Sub btnPaste_Click(sender As Object, e As EventArgs) Handles btnPaste.Click
@@ -447,7 +447,7 @@ Public Class DetailShowWLED
         If CopiedRowData.ContainsKey("colColor1") Then btnColor1.BackColor = ColorTranslator.FromHtml(CopiedRowData("colColor1").ToString())
         If CopiedRowData.ContainsKey("colColor2") Then btnColor2.BackColor = ColorTranslator.FromHtml(CopiedRowData("colColor2").ToString())
         If CopiedRowData.ContainsKey("colColor3") Then btnColor3.BackColor = ColorTranslator.FromHtml(CopiedRowData("colColor3").ToString())
-        ToonFlashBericht("Pasted settings from clipboard.", 2)
+        ToonFlashBericht("Pasted settings from clipboard.", 1)
     End Sub
 
 

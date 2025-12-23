@@ -56,7 +56,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("192.168.86.0/24")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("192.168.0.0/24")>  _
         Public Property IPRange() As String
             Get
                 Return CType(Me("IPRange"),String)

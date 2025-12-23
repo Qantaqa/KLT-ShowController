@@ -13,7 +13,7 @@
         End Using
     End Function
 
-    Public Sub MoveAndMaximizeForm(outputValue As String)
+    Public Sub MoveAndMaximizeForm_OLD(outputValue As String)
         Dim screenToUse As Screen = Nothing
 
         Select Case outputValue.ToLower()

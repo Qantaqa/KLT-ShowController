@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="IPRange" Type="System.String" Scope="User">
-      <Value Profile="(Default)">192.168.86.0/24</Value>
+      <Value Profile="(Default)">192.168.0.0/24</Value>
     </Setting>
     <Setting Name="DatabaseFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)">E:\KLT\LedShow\KKLT Led Show v2\KLT LedShow\Database</Value>

@@ -13,7 +13,7 @@
             <colActionPage>1</colActionPage>
             <colActionPosX>71</colActionPosX>
             <colActionPosY>92</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide1.jpg</colActionImage>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide1.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId></colActionId>
@@ -25,22 +25,22 @@
         <Row>
             <colActionId>2</colActionId>
             <colActionPage>5</colActionPage>
-            <colActionPosX>47</colActionPosX>
-            <colActionPosY>189</colActionPosY>
+            <colActionPosX>40</colActionPosX>
+            <colActionPosY>173</colActionPosY>
             <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide2.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>3</colActionId>
             <colActionPage>6</colActionPage>
-            <colActionPosX>44</colActionPosX>
-            <colActionPosY>124</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide3.jpg</colActionImage>
+            <colActionPosX>70</colActionPosX>
+            <colActionPosY>123</colActionPosY>
+            <colActionImage></colActionImage>
         </Row>
         <Row>
             <colActionId>5</colActionId>
             <colActionPage>19</colActionPage>
             <colActionPosX>53</colActionPosX>
-            <colActionPosY>309</colActionPosY>
+            <colActionPosY>296</colActionPosY>
             <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide5.jpg</colActionImage>
         </Row>
         <Row>
@@ -48,13 +48,13 @@
             <colActionPage>19</colActionPage>
             <colActionPosX>49</colActionPosX>
             <colActionPosY>493</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide6.jpg</colActionImage>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide2.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>7</colActionId>
             <colActionPage>20</colActionPage>
-            <colActionPosX>42</colActionPosX>
-            <colActionPosY>153</colActionPosY>
+            <colActionPosX>56</colActionPosX>
+            <colActionPosY>139</colActionPosY>
             <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide7.jpg</colActionImage>
         </Row>
         <Row>
@@ -67,15 +67,15 @@
         <Row>
             <colActionId>8</colActionId>
             <colActionPage>8</colActionPage>
-            <colActionPosX>48</colActionPosX>
-            <colActionPosY>664</colActionPosY>
+            <colActionPosX>36</colActionPosX>
+            <colActionPosY>662</colActionPosY>
             <colActionImage></colActionImage>
         </Row>
         <Row>
             <colActionId>9</colActionId>
             <colActionPage>18</colActionPage>
-            <colActionPosX>59</colActionPosX>
-            <colActionPosY>110</colActionPosY>
+            <colActionPosX>46</colActionPosX>
+            <colActionPosY>422</colActionPosY>
             <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide4.jpg</colActionImage>
         </Row>
         <Row>
@@ -96,232 +96,162 @@
             <colActionId>10</colActionId>
             <colActionPage>23</colActionPage>
             <colActionPosX>56</colActionPosX>
-            <colActionPosY>352</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide8.jpg</colActionImage>
+            <colActionPosY>394</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide3.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>11</colActionId>
             <colActionPage>24</colActionPage>
-            <colActionPosX>56</colActionPosX>
-            <colActionPosY>562</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide9.jpg</colActionImage>
+            <colActionPosX>79</colActionPosX>
+            <colActionPosY>523</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide4.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>12</colActionId>
             <colActionPage>25</colActionPage>
             <colActionPosX>50</colActionPosX>
-            <colActionPosY>231</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide10.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>13</colActionId>
-            <colActionPage>25</colActionPage>
-            <colActionPosX>51</colActionPosX>
-            <colActionPosY>284</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide11.jpg</colActionImage>
+            <colActionPosY>229</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide5.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>14</colActionId>
             <colActionPage>27</colActionPage>
-            <colActionPosX>50</colActionPosX>
-            <colActionPosY>476</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide12.jpg</colActionImage>
+            <colActionPosX>54</colActionPosX>
+            <colActionPosY>475</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide6.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>15</colActionId>
             <colActionPage>35</colActionPage>
-            <colActionPosX>54</colActionPosX>
-            <colActionPosY>367</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide13.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>16</colActionId>
-            <colActionPage>37</colActionPage>
-            <colActionPosX>55</colActionPosX>
-            <colActionPosY>75</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide14.jpg</colActionImage>
+            <colActionPosX>62</colActionPosX>
+            <colActionPosY>374</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide7.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>17</colActionId>
             <colActionPage>39</colActionPage>
-            <colActionPosX>40</colActionPosX>
-            <colActionPosY>277</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide15.jpg</colActionImage>
+            <colActionPosX>56</colActionPosX>
+            <colActionPosY>246</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide9.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>18</colActionId>
             <colActionPage>44</colActionPage>
-            <colActionPosX>51</colActionPosX>
-            <colActionPosY>186</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide16.jpg</colActionImage>
+            <colActionPosX>55</colActionPosX>
+            <colActionPosY>182</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide10.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>19</colActionId>
-            <colActionPage>45</colActionPage>
-            <colActionPosX>56</colActionPosX>
-            <colActionPosY>86</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide17.jpg</colActionImage>
+            <colActionPage>44</colActionPage>
+            <colActionPosX>55</colActionPosX>
+            <colActionPosY>220</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide11.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>20</colActionId>
             <colActionPage>46</colActionPage>
-            <colActionPosX>50</colActionPosX>
-            <colActionPosY>535</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide18.jpg</colActionImage>
+            <colActionPosX>47</colActionPosX>
+            <colActionPosY>520</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide12.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>21</colActionId>
             <colActionPage>51</colActionPage>
-            <colActionPosX>42</colActionPosX>
-            <colActionPosY>273</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide21.jpg</colActionImage>
+            <colActionPosX>63</colActionPosX>
+            <colActionPosY>290</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide13.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>22</colActionId>
             <colActionPage>52</colActionPage>
-            <colActionPosX>41</colActionPosX>
-            <colActionPosY>369</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide22.jpg</colActionImage>
+            <colActionPosX>58</colActionPosX>
+            <colActionPosY>381</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide14.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>23</colActionId>
             <colActionPage>56</colActionPage>
             <colActionPosX>60</colActionPosX>
-            <colActionPosY>322</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide23.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>24</colActionId>
-            <colActionPage>58</colActionPage>
-            <colActionPosX>49</colActionPosX>
-            <colActionPosY>407</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide24.jpg</colActionImage>
+            <colActionPosY>341</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide15.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>25</colActionId>
             <colActionPage>60</colActionPage>
-            <colActionPosX>53</colActionPosX>
-            <colActionPosY>305</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide25.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>26</colActionId>
-            <colActionPage>66</colActionPage>
-            <colActionPosX>51</colActionPosX>
-            <colActionPosY>447</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide26.jpg</colActionImage>
+            <colActionPosX>65</colActionPosX>
+            <colActionPosY>315</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide16.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>27</colActionId>
             <colActionPage>67</colActionPage>
-            <colActionPosX>53</colActionPosX>
-            <colActionPosY>63</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide27.jpg</colActionImage>
+            <colActionPosX>68</colActionPosX>
+            <colActionPosY>77</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide18.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>28</colActionId>
             <colActionPage>70</colActionPage>
-            <colActionPosX>35</colActionPosX>
-            <colActionPosY>510</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide28.jpg</colActionImage>
+            <colActionPosX>61</colActionPosX>
+            <colActionPosY>528</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide19.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>29</colActionId>
             <colActionPage>71</colActionPage>
-            <colActionPosX>55</colActionPosX>
-            <colActionPosY>489</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide29.jpg</colActionImage>
+            <colActionPosX>50</colActionPosX>
+            <colActionPosY>490</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide20.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>30</colActionId>
             <colActionPage>75</colActionPage>
-            <colActionPosX>54</colActionPosX>
-            <colActionPosY>278</colActionPosY>
+            <colActionPosX>57</colActionPosX>
+            <colActionPosY>274</colActionPosY>
             <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide30.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>31</colActionId>
             <colActionPage>76</colActionPage>
-            <colActionPosX>60</colActionPosX>
-            <colActionPosY>340</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide32.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>32</colActionId>
-            <colActionPage>77</colActionPage>
-            <colActionPosX>54</colActionPosX>
-            <colActionPosY>164</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide33.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>33</colActionId>
-            <colActionPage>81</colActionPage>
-            <colActionPosX>57</colActionPosX>
-            <colActionPosY>595</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide34.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>34</colActionId>
-            <colActionPage>85</colActionPage>
-            <colActionPosX>62</colActionPosX>
-            <colActionPosY>129</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide35.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>35</colActionId>
-            <colActionPage>87</colActionPage>
-            <colActionPosX>50</colActionPosX>
-            <colActionPosY>622</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide36.jpg</colActionImage>
+            <colActionPosX>71</colActionPosX>
+            <colActionPosY>274</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide21.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>36</colActionId>
             <colActionPage>87</colActionPage>
-            <colActionPosX>51</colActionPosX>
-            <colActionPosY>660</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide37.jpg</colActionImage>
+            <colActionPosX>59</colActionPosX>
+            <colActionPosY>627</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide22.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>37</colActionId>
             <colActionPage>91</colActionPage>
-            <colActionPosX>57</colActionPosX>
-            <colActionPosY>488</colActionPosY>
+            <colActionPosX>58</colActionPosX>
+            <colActionPosY>484</colActionPosY>
             <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide38.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>38</colActionId>
             <colActionPage>92</colActionPage>
-            <colActionPosX>66</colActionPosX>
-            <colActionPosY>544</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide39.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>39</colActionId>
-            <colActionPage>95</colActionPage>
-            <colActionPosX>56</colActionPosX>
-            <colActionPosY>499</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide40.jpg</colActionImage>
+            <colActionPosX>57</colActionPosX>
+            <colActionPosY>638</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide23.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>40</colActionId>
             <colActionPage>95</colActionPage>
-            <colActionPosX>56</colActionPosX>
-            <colActionPosY>531</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide41.jpg</colActionImage>
+            <colActionPosX>50</colActionPosX>
+            <colActionPosY>501</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide25.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>41</colActionId>
             <colActionPage>100</colActionPage>
-            <colActionPosX>55</colActionPosX>
-            <colActionPosY>288</colActionPosY>
+            <colActionPosX>59</colActionPosX>
+            <colActionPosY>290</colActionPosY>
             <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide42.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>42</colActionId>
-            <colActionPage>107</colActionPage>
-            <colActionPosX>51</colActionPosX>
-            <colActionPosY>330</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide43.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId></colActionId>
@@ -333,64 +263,85 @@
         <Row>
             <colActionId>43</colActionId>
             <colActionPage>107</colActionPage>
-            <colActionPosX>52</colActionPosX>
-            <colActionPosY>365</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide44.jpg</colActionImage>
+            <colActionPosX>60</colActionPosX>
+            <colActionPosY>316</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide26.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>44</colActionId>
             <colActionPage>113</colActionPage>
-            <colActionPosX>60</colActionPosX>
-            <colActionPosY>317</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide45.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>45</colActionId>
-            <colActionPage>118</colActionPage>
-            <colActionPosX>49</colActionPosX>
-            <colActionPosY>114</colActionPosY>
-            <colActionImage></colActionImage>
+            <colActionPosX>61</colActionPosX>
+            <colActionPosY>364</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide28.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>46</colActionId>
             <colActionPage>118</colActionPage>
-            <colActionPosX>50</colActionPosX>
-            <colActionPosY>181</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide46.jpg</colActionImage>
+            <colActionPosX>68</colActionPosX>
+            <colActionPosY>158</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide29.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>47</colActionId>
             <colActionPage>121</colActionPage>
-            <colActionPosX>51</colActionPosX>
-            <colActionPosY>583</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide47.jpg</colActionImage>
-        </Row>
-        <Row>
-            <colActionId>48</colActionId>
-            <colActionPage>122</colActionPage>
-            <colActionPosX>56</colActionPosX>
-            <colActionPosY>627</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide48.jpg</colActionImage>
+            <colActionPosX>62</colActionPosX>
+            <colActionPosY>585</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide30.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>49</colActionId>
             <colActionPage>124</colActionPage>
-            <colActionPosX>55</colActionPosX>
-            <colActionPosY>449</colActionPosY>
-            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide49.jpg</colActionImage>
+            <colActionPosX>54</colActionPosX>
+            <colActionPosY>374</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide31.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>50</colActionId>
             <colActionPage>129</colActionPage>
-            <colActionPosX>48</colActionPosX>
-            <colActionPosY>230</colActionPosY>
+            <colActionPosX>55</colActionPosX>
+            <colActionPosY>148</colActionPosY>
             <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides\Slide50.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId>51</colActionId>
             <colActionPage>129</colActionPage>
-            <colActionPosX>49</colActionPosX>
-            <colActionPosY>515</colActionPosY>
+            <colActionPosX>54</colActionPosX>
+            <colActionPosY>594</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide32.jpg</colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
             <colActionImage></colActionImage>
         </Row>
         <Row>
@@ -429,11 +380,452 @@
             <colActionImage></colActionImage>
         </Row>
         <Row>
-            <colActionId>52</colActionId>
-            <colActionPage>22</colActionPage>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId>53</colActionId>
+            <colActionPage>7</colActionPage>
+            <colActionPosX>50</colActionPosX>
+            <colActionPosY>254</colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId>54</colActionId>
+            <colActionPage>18</colActionPage>
             <colActionPosX>48</colActionPosX>
-            <colActionPosY>603</colActionPosY>
+            <colActionPosY>569</colActionPosY>
             <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId>55</colActionId>
+            <colActionPage>38</colActionPage>
+            <colActionPosX>63</colActionPosX>
+            <colActionPosY>587</colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId>56</colActionId>
+            <colActionPage>88</colActionPage>
+            <colActionPosX>61</colActionPosX>
+            <colActionPosY>293</colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId></colActionId>
+            <colActionPage></colActionPage>
+            <colActionPosX></colActionPosX>
+            <colActionPosY></colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId>58</colActionId>
+            <colActionPage>107</colActionPage>
+            <colActionPosX>60</colActionPosX>
+            <colActionPosY>353</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide27.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId></colActionId>
@@ -457,11 +849,32 @@
             <colActionImage></colActionImage>
         </Row>
         <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
+            <colActionId>59</colActionId>
+            <colActionPage>6</colActionPage>
+            <colActionPosX>74</colActionPosX>
+            <colActionPosY>254</colActionPosY>
             <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId>60</colActionId>
+            <colActionPage>9</colActionPage>
+            <colActionPosX>46</colActionPosX>
+            <colActionPosY>307</colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId>61</colActionId>
+            <colActionPage>20</colActionPage>
+            <colActionPosX>52</colActionPosX>
+            <colActionPosY>280</colActionPosY>
+            <colActionImage></colActionImage>
+        </Row>
+        <Row>
+            <colActionId>62</colActionId>
+            <colActionPage>35</colActionPage>
+            <colActionPosX>64</colActionPosX>
+            <colActionPosY>411</colActionPosY>
+            <colActionImage>C:\KKLT\2025. Titanic\00. Documenten\decorovergang visueel\Slides 24-10\Slide8.jpg</colActionImage>
         </Row>
         <Row>
             <colActionId></colActionId>
@@ -478,10 +891,10 @@
             <colActionImage></colActionImage>
         </Row>
         <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
+            <colActionId>63</colActionId>
+            <colActionPage>58</colActionPage>
+            <colActionPosX>53</colActionPosX>
+            <colActionPosY>336</colActionPosY>
             <colActionImage></colActionImage>
         </Row>
         <Row>
@@ -492,73 +905,24 @@
             <colActionImage></colActionImage>
         </Row>
         <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
+            <colActionId>65</colActionId>
+            <colActionPage>95</colActionPage>
+            <colActionPosX>45</colActionPosX>
+            <colActionPosY>60</colActionPosY>
             <colActionImage></colActionImage>
         </Row>
         <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
+            <colActionId>67</colActionId>
+            <colActionPage>124</colActionPage>
+            <colActionPosX>54</colActionPosX>
+            <colActionPosY>141</colActionPosY>
             <colActionImage></colActionImage>
         </Row>
         <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
-            <colActionImage></colActionImage>
-        </Row>
-        <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
-            <colActionImage></colActionImage>
-        </Row>
-        <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
-            <colActionImage></colActionImage>
-        </Row>
-        <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
-            <colActionImage></colActionImage>
-        </Row>
-        <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
-            <colActionImage></colActionImage>
-        </Row>
-        <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
-            <colActionImage></colActionImage>
-        </Row>
-        <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
-            <colActionImage></colActionImage>
-        </Row>
-        <Row>
-            <colActionId></colActionId>
-            <colActionPage></colActionPage>
-            <colActionPosX></colActionPosX>
-            <colActionPosY></colActionPosY>
+            <colActionId>68</colActionId>
+            <colActionPage>128</colActionPage>
+            <colActionPosX>60</colActionPosX>
+            <colActionPosY>120</colActionPosY>
             <colActionImage></colActionImage>
         </Row>
         <Row>

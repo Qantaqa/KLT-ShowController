@@ -3,1277 +3,1641 @@
     <Structure>
         <Column Name="EffectName" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
         <Column Name="EffectId" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
-        <Column Name="BEUK_RE" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
-        <Column Name="BEUK_LI" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
-        <Column Name="WLED_Bureau" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="Beuk_Cour" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="Beuk_Jardin" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="Over_Cour" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="Oven_Center" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="Oven_Jardin" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
     </Structure>
     <Data>
         <Row>
             <EffectName>Akemi</EffectName>
             <EffectId>180</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Android</EffectName>
             <EffectId>27</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Aurora</EffectName>
             <EffectId>38</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Black Hole</EffectName>
             <EffectId>177</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Blends</EffectName>
             <EffectId>115</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Blink</EffectName>
             <EffectId>1</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Blink Rainbow</EffectName>
             <EffectId>26</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Blobs</EffectName>
             <EffectId>121</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Blurz</EffectName>
             <EffectId>160</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Bouncing Balls</EffectName>
             <EffectId>91</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Bpm</EffectName>
             <EffectId>68</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Breathe</EffectName>
             <EffectId>2</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Candle</EffectName>
             <EffectId>88</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Candle Multi</EffectName>
             <EffectId>102</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Chase</EffectName>
             <EffectId>28</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Chase 2</EffectName>
             <EffectId>37</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Chase 3</EffectName>
             <EffectId>54</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Chase Flash</EffectName>
             <EffectId>31</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Chase Flash Rnd</EffectName>
             <EffectId>32</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Chase Rainbow</EffectName>
             <EffectId>30</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Chase Random</EffectName>
             <EffectId>29</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Chunchun</EffectName>
             <EffectId>111</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Colored Bursts</EffectName>
             <EffectId>164</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Colorful</EffectName>
             <EffectId>34</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Colorloop</EffectName>
             <EffectId>8</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Colortwinkles</EffectName>
             <EffectId>74</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Colorwaves</EffectName>
             <EffectId>67</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Crazy Bees</EffectName>
             <EffectId>119</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Dancing Shadows</EffectName>
             <EffectId>112</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Dissolve</EffectName>
             <EffectId>18</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Dissolve Rnd</EffectName>
             <EffectId>19</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Distortion Waves</EffectName>
             <EffectId>124</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>DJ Light</EffectName>
             <EffectId>157</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>DNA</EffectName>
             <EffectId>150</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>DNA Spiral</EffectName>
             <EffectId>176</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Drift</EffectName>
             <EffectId>161</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Drift Rose</EffectName>
             <EffectId>123</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Drip</EffectName>
             <EffectId>96</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Dynamic</EffectName>
             <EffectId>7</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Dynamic Smooth</EffectName>
             <EffectId>117</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Fade</EffectName>
             <EffectId>12</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Fairy</EffectName>
             <EffectId>49</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Fairytwinkle</EffectName>
             <EffectId>51</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Fill Noise</EffectName>
             <EffectId>69</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Fire 2012</EffectName>
             <EffectId>66</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Fire Flicker</EffectName>
             <EffectId>45</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Firenoise</EffectName>
             <EffectId>148</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Fireworks</EffectName>
             <EffectId>42</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Fireworks 1D</EffectName>
             <EffectId>90</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Fireworks Starburst</EffectName>
             <EffectId>89</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Flow</EffectName>
             <EffectId>110</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Flow Stripe</EffectName>
             <EffectId>173</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Freqmap</EffectName>
             <EffectId>153</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Freqmatrix</EffectName>
             <EffectId>138</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Freqpixels</EffectName>
             <EffectId>141</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Freqwave</EffectName>
             <EffectId>137</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Frizzles</EffectName>
             <EffectId>171</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Funky Plank</EffectName>
             <EffectId>158</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Game Of Life</EffectName>
             <EffectId>166</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>GEQ</EffectName>
             <EffectId>139</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Ghost Rider</EffectName>
             <EffectId>120</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Glitter</EffectName>
             <EffectId>87</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Gradient</EffectName>
             <EffectId>46</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Gravcenter</EffectName>
             <EffectId>154</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Gravcentric</EffectName>
             <EffectId>155</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Gravfreq</EffectName>
             <EffectId>156</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Gravimeter</EffectName>
             <EffectId>132</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Halloween Eyes</EffectName>
             <EffectId>82</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Heartbeat</EffectName>
             <EffectId>100</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Hiphotic</EffectName>
             <EffectId>174</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>ICU</EffectName>
             <EffectId>58</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Juggle</EffectName>
             <EffectId>64</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Juggles</EffectName>
             <EffectId>130</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Julia</EffectName>
             <EffectId>165</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Lake</EffectName>
             <EffectId>75</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Lighthouse</EffectName>
             <EffectId>41</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Lightning</EffectName>
             <EffectId>57</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Lissajous</EffectName>
             <EffectId>170</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Loading</EffectName>
             <EffectId>47</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Matripix</EffectName>
             <EffectId>131</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Matrix</EffectName>
             <EffectId>151</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Metaballs</EffectName>
             <EffectId>152</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Meteor</EffectName>
             <EffectId>76</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Meteor Smooth</EffectName>
             <EffectId>77</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Midnoise</EffectName>
             <EffectId>135</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Multi Comet</EffectName>
             <EffectId>59</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Noise 1</EffectName>
             <EffectId>70</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Noise 2</EffectName>
             <EffectId>71</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Noise 3</EffectName>
             <EffectId>72</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Noise 4</EffectName>
             <EffectId>73</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Noise Pal</EffectName>
             <EffectId>107</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Noise2D</EffectName>
             <EffectId>145</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Noisefire</EffectName>
             <EffectId>142</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Noisemeter</EffectName>
             <EffectId>136</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Noisemove</EffectName>
             <EffectId>144</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Octopus</EffectName>
             <EffectId>126</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Oscillate</EffectName>
             <EffectId>62</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Pacifica</EffectName>
             <EffectId>101</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Palette</EffectName>
             <EffectId>65</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Percent</EffectName>
             <EffectId>98</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Perlin Move</EffectName>
             <EffectId>146</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Phased</EffectName>
             <EffectId>105</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Phased Noise</EffectName>
             <EffectId>109</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Pixels</EffectName>
             <EffectId>128</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Pixelwave</EffectName>
             <EffectId>129</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Plasma</EffectName>
             <EffectId>97</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Plasma Ball</EffectName>
             <EffectId>172</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Plasmoid</EffectName>
             <EffectId>133</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Polar Lights</EffectName>
             <EffectId>168</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Popcorn</EffectName>
             <EffectId>95</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Pride 2015</EffectName>
             <EffectId>63</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Puddlepeak</EffectName>
             <EffectId>143</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Puddles</EffectName>
             <EffectId>134</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Pulser</EffectName>
             <EffectId>159</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Railway</EffectName>
             <EffectId>78</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Rain</EffectName>
             <EffectId>43</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Rainbow</EffectName>
             <EffectId>9</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Rainbow Runner</EffectName>
             <EffectId>33</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Random Colors</EffectName>
             <EffectId>5</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Ripple</EffectName>
             <EffectId>79</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Ripple Peak</EffectName>
             <EffectId>147</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Ripple Rainbow</EffectName>
             <EffectId>99</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Rocktaves</EffectName>
             <EffectId>179</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Rolling Balls</EffectName>
             <EffectId>48</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Rotozoomer</EffectName>
             <EffectId>114</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>RSVD</EffectName>
             <EffectId>53</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Running</EffectName>
             <EffectId>15</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Running Dual</EffectName>
             <EffectId>52</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Saw</EffectName>
             <EffectId>16</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Scan</EffectName>
             <EffectId>10</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Scan Dual</EffectName>
             <EffectId>11</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Scanner</EffectName>
             <EffectId>40</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Scanner Dual</EffectName>
             <EffectId>60</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Scrolling Text</EffectName>
             <EffectId>122</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sindots</EffectName>
             <EffectId>175</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sine</EffectName>
             <EffectId>108</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sinelon</EffectName>
             <EffectId>92</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sinelon Dual</EffectName>
             <EffectId>93</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sinelon Rainbow</EffectName>
             <EffectId>94</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Soap</EffectName>
             <EffectId>125</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Solid</EffectName>
             <EffectId>0</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Solid Glitter</EffectName>
             <EffectId>103</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Solid Pattern</EffectName>
             <EffectId>83</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Solid Pattern Tri</EffectName>
             <EffectId>84</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Spaceships</EffectName>
             <EffectId>118</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sparkle</EffectName>
             <EffectId>20</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sparkle Dark</EffectName>
             <EffectId>21</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sparkle+</EffectName>
             <EffectId>22</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Spots</EffectName>
             <EffectId>85</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Spots Fade</EffectName>
             <EffectId>86</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Squared Swirl</EffectName>
             <EffectId>149</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Stream</EffectName>
             <EffectId>39</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Stream 2</EffectName>
             <EffectId>61</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Strobe</EffectName>
             <EffectId>23</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Strobe Mega</EffectName>
             <EffectId>25</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Strobe Rainbow</EffectName>
             <EffectId>24</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sun Radiation</EffectName>
             <EffectId>163</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sunrise</EffectName>
             <EffectId>104</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sweep</EffectName>
             <EffectId>6</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Sweep Random</EffectName>
             <EffectId>36</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Swirl</EffectName>
             <EffectId>169</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Tartan</EffectName>
             <EffectId>167</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Tetrix</EffectName>
             <EffectId>44</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Theater</EffectName>
             <EffectId>13</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Theater Rainbow</EffectName>
             <EffectId>14</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Traffic Light</EffectName>
             <EffectId>35</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Tri Fade</EffectName>
             <EffectId>56</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Tri Wipe</EffectName>
             <EffectId>55</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>TV Simulator</EffectName>
             <EffectId>116</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Twinkle</EffectName>
             <EffectId>17</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Twinklecat</EffectName>
             <EffectId>81</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Twinklefox</EffectName>
             <EffectId>80</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Twinkleup</EffectName>
             <EffectId>106</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Two Dots</EffectName>
             <EffectId>50</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Washing Machine</EffectName>
             <EffectId>113</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Waterfall</EffectName>
             <EffectId>140</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Waverly</EffectName>
             <EffectId>162</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Wavesins</EffectName>
             <EffectId>178</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Waving Cell</EffectName>
             <EffectId>127</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Wipe</EffectName>
             <EffectId>3</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
         <Row>
             <EffectName>Wipe Random</EffectName>
             <EffectId>4</EffectId>
-            <BEUK_RE>True</BEUK_RE>
-            <BEUK_LI>True</BEUK_LI>
-            <WLED_Bureau>True</WLED_Bureau>
+            <Beuk_Cour>True</Beuk_Cour>
+            <Beuk_Jardin>True</Beuk_Jardin>
+            <Over_Cour>True</Over_Cour>
+            <Oven_Center>True</Oven_Center>
+            <Oven_Jardin>True</Oven_Jardin>
         </Row>
     </Data>
 </DataGridData>
