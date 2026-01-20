@@ -5,9 +5,12 @@
         <Column Name="EffectId" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
         <Column Name="Beuk_Cour" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="Beuk_Jardin" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="Test_strip" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="Over_Cour" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="Oven_Center" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="Oven_Jardin" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="Bureau" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="colExists" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
     </Structure>
     <Data>
         <Row>
@@ -15,1629 +18,2172 @@
             <EffectId>180</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Android</EffectName>
             <EffectId>27</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Aurora</EffectName>
             <EffectId>38</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Black Hole</EffectName>
             <EffectId>177</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Blends</EffectName>
             <EffectId>115</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Blink</EffectName>
             <EffectId>1</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Blink Rainbow</EffectName>
             <EffectId>26</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Blobs</EffectName>
             <EffectId>121</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Blurz</EffectName>
             <EffectId>160</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Bouncing Balls</EffectName>
             <EffectId>91</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Bpm</EffectName>
             <EffectId>68</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Breathe</EffectName>
             <EffectId>2</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Candle</EffectName>
             <EffectId>88</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Candle Multi</EffectName>
             <EffectId>102</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Chase</EffectName>
             <EffectId>28</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Chase 2</EffectName>
             <EffectId>37</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Chase 3</EffectName>
             <EffectId>54</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Chase Flash</EffectName>
             <EffectId>31</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Chase Flash Rnd</EffectName>
             <EffectId>32</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Chase Rainbow</EffectName>
             <EffectId>30</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Chase Random</EffectName>
             <EffectId>29</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Chunchun</EffectName>
             <EffectId>111</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Colored Bursts</EffectName>
             <EffectId>164</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Colorful</EffectName>
             <EffectId>34</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Colorloop</EffectName>
             <EffectId>8</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Colortwinkles</EffectName>
             <EffectId>74</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Colorwaves</EffectName>
             <EffectId>67</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Crazy Bees</EffectName>
             <EffectId>119</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Dancing Shadows</EffectName>
             <EffectId>112</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Dissolve</EffectName>
             <EffectId>18</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Dissolve Rnd</EffectName>
             <EffectId>19</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Distortion Waves</EffectName>
             <EffectId>124</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>DJ Light</EffectName>
             <EffectId>157</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>DNA</EffectName>
             <EffectId>150</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>DNA Spiral</EffectName>
             <EffectId>176</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Drift</EffectName>
             <EffectId>161</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Drift Rose</EffectName>
             <EffectId>123</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Drip</EffectName>
             <EffectId>96</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Dynamic</EffectName>
             <EffectId>7</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Dynamic Smooth</EffectName>
             <EffectId>117</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Fade</EffectName>
             <EffectId>12</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Fairy</EffectName>
             <EffectId>49</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Fairytwinkle</EffectName>
             <EffectId>51</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Fill Noise</EffectName>
             <EffectId>69</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Fire 2012</EffectName>
             <EffectId>66</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Fire Flicker</EffectName>
             <EffectId>45</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Firenoise</EffectName>
             <EffectId>148</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Fireworks</EffectName>
             <EffectId>42</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Fireworks 1D</EffectName>
             <EffectId>90</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Fireworks Starburst</EffectName>
             <EffectId>89</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Flow</EffectName>
             <EffectId>110</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Flow Stripe</EffectName>
             <EffectId>173</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Freqmap</EffectName>
             <EffectId>153</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Freqmatrix</EffectName>
             <EffectId>138</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Freqpixels</EffectName>
             <EffectId>141</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Freqwave</EffectName>
             <EffectId>137</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Frizzles</EffectName>
             <EffectId>171</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Funky Plank</EffectName>
             <EffectId>158</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Game Of Life</EffectName>
             <EffectId>166</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>GEQ</EffectName>
             <EffectId>139</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Ghost Rider</EffectName>
             <EffectId>120</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Glitter</EffectName>
             <EffectId>87</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Gradient</EffectName>
             <EffectId>46</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Gravcenter</EffectName>
             <EffectId>154</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Gravcentric</EffectName>
             <EffectId>155</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Gravfreq</EffectName>
             <EffectId>156</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Gravimeter</EffectName>
             <EffectId>132</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Halloween Eyes</EffectName>
             <EffectId>82</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Heartbeat</EffectName>
             <EffectId>100</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Hiphotic</EffectName>
             <EffectId>174</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>ICU</EffectName>
             <EffectId>58</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Juggle</EffectName>
             <EffectId>64</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Juggles</EffectName>
             <EffectId>130</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Julia</EffectName>
             <EffectId>165</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Lake</EffectName>
             <EffectId>75</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Lighthouse</EffectName>
             <EffectId>41</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Lightning</EffectName>
             <EffectId>57</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Lissajous</EffectName>
             <EffectId>170</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Loading</EffectName>
             <EffectId>47</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Matripix</EffectName>
             <EffectId>131</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Matrix</EffectName>
             <EffectId>151</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Metaballs</EffectName>
             <EffectId>152</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Meteor</EffectName>
             <EffectId>76</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Meteor Smooth</EffectName>
             <EffectId>77</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Midnoise</EffectName>
             <EffectId>135</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Multi Comet</EffectName>
             <EffectId>59</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Noise 1</EffectName>
             <EffectId>70</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Noise 2</EffectName>
             <EffectId>71</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Noise 3</EffectName>
             <EffectId>72</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Noise 4</EffectName>
             <EffectId>73</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Noise Pal</EffectName>
             <EffectId>107</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Noise2D</EffectName>
             <EffectId>145</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Noisefire</EffectName>
             <EffectId>142</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Noisemeter</EffectName>
             <EffectId>136</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Noisemove</EffectName>
             <EffectId>144</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Octopus</EffectName>
             <EffectId>126</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Oscillate</EffectName>
             <EffectId>62</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Pacifica</EffectName>
             <EffectId>101</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Palette</EffectName>
             <EffectId>65</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Percent</EffectName>
             <EffectId>98</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Perlin Move</EffectName>
             <EffectId>146</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Phased</EffectName>
             <EffectId>105</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Phased Noise</EffectName>
             <EffectId>109</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Pixels</EffectName>
             <EffectId>128</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Pixelwave</EffectName>
             <EffectId>129</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Plasma</EffectName>
             <EffectId>97</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Plasma Ball</EffectName>
             <EffectId>172</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Plasmoid</EffectName>
             <EffectId>133</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Polar Lights</EffectName>
             <EffectId>168</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Popcorn</EffectName>
             <EffectId>95</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Pride 2015</EffectName>
             <EffectId>63</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Puddlepeak</EffectName>
             <EffectId>143</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Puddles</EffectName>
             <EffectId>134</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Pulser</EffectName>
             <EffectId>159</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Railway</EffectName>
             <EffectId>78</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Rain</EffectName>
             <EffectId>43</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Rainbow</EffectName>
             <EffectId>9</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Rainbow Runner</EffectName>
             <EffectId>33</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Random Colors</EffectName>
             <EffectId>5</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Ripple</EffectName>
             <EffectId>79</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Ripple Peak</EffectName>
             <EffectId>147</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Ripple Rainbow</EffectName>
             <EffectId>99</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Rocktaves</EffectName>
             <EffectId>179</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Rolling Balls</EffectName>
             <EffectId>48</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Rotozoomer</EffectName>
             <EffectId>114</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>RSVD</EffectName>
             <EffectId>53</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Running</EffectName>
             <EffectId>15</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Running Dual</EffectName>
             <EffectId>52</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Saw</EffectName>
             <EffectId>16</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Scan</EffectName>
             <EffectId>10</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Scan Dual</EffectName>
             <EffectId>11</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Scanner</EffectName>
             <EffectId>40</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Scanner Dual</EffectName>
             <EffectId>60</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Scrolling Text</EffectName>
             <EffectId>122</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sindots</EffectName>
             <EffectId>175</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sine</EffectName>
             <EffectId>108</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sinelon</EffectName>
             <EffectId>92</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sinelon Dual</EffectName>
             <EffectId>93</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sinelon Rainbow</EffectName>
             <EffectId>94</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Soap</EffectName>
             <EffectId>125</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Solid</EffectName>
             <EffectId>0</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Solid Glitter</EffectName>
             <EffectId>103</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Solid Pattern</EffectName>
             <EffectId>83</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Solid Pattern Tri</EffectName>
             <EffectId>84</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Spaceships</EffectName>
             <EffectId>118</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sparkle</EffectName>
             <EffectId>20</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sparkle Dark</EffectName>
             <EffectId>21</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sparkle+</EffectName>
             <EffectId>22</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Spots</EffectName>
             <EffectId>85</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Spots Fade</EffectName>
             <EffectId>86</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Squared Swirl</EffectName>
             <EffectId>149</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Stream</EffectName>
             <EffectId>39</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Stream 2</EffectName>
             <EffectId>61</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Strobe</EffectName>
             <EffectId>23</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Strobe Mega</EffectName>
             <EffectId>25</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Strobe Rainbow</EffectName>
             <EffectId>24</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sun Radiation</EffectName>
             <EffectId>163</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sunrise</EffectName>
             <EffectId>104</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sweep</EffectName>
             <EffectId>6</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Sweep Random</EffectName>
             <EffectId>36</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Swirl</EffectName>
             <EffectId>169</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Tartan</EffectName>
             <EffectId>167</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Tetrix</EffectName>
             <EffectId>44</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Theater</EffectName>
             <EffectId>13</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Theater Rainbow</EffectName>
             <EffectId>14</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Traffic Light</EffectName>
             <EffectId>35</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Tri Fade</EffectName>
             <EffectId>56</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Tri Wipe</EffectName>
             <EffectId>55</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>TV Simulator</EffectName>
             <EffectId>116</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Twinkle</EffectName>
             <EffectId>17</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Twinklecat</EffectName>
             <EffectId>81</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Twinklefox</EffectName>
             <EffectId>80</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Twinkleup</EffectName>
             <EffectId>106</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Two Dots</EffectName>
             <EffectId>50</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Washing Machine</EffectName>
             <EffectId>113</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Waterfall</EffectName>
             <EffectId>140</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Waverly</EffectName>
             <EffectId>162</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Wavesins</EffectName>
             <EffectId>178</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Waving Cell</EffectName>
             <EffectId>127</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Wipe</EffectName>
             <EffectId>3</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
         <Row>
             <EffectName>Wipe Random</EffectName>
             <EffectId>4</EffectId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
+            <colExists></colExists>
         </Row>
     </Data>
 </DataGridData>

@@ -340,6 +340,105 @@ Module DG_Show
 
         Dim changedColName As String = DG_Show.Columns(e.ColumnIndex).Name
 
+        ' Handle state on/off changes: update row values to "solid black" OR allow power-off
+        If changedColName = "colStateOnOff" Then
+            Try
+                ' Only act when turning OFF
+                Dim newValObj = row.Cells("colStateOnOff").Value
+                Dim isOn As Boolean = True
+                If newValObj Is Nothing Then
+                    isOn = True
+                Else
+                    If TypeOf newValObj Is Boolean Then
+                        isOn = CBool(newValObj)
+                    Else
+                        Dim s = newValObj.ToString().Trim().ToLower()
+                        If s = "false" OrElse s = "uit" OrElse s = "0" OrElse s = "no" Then
+                            isOn = False
+                        Else
+                            isOn = True
+                        End If
+                    End If
+                End If
+
+                If Not isOn Then
+                    ' If fixture is not a WLED (video), skip
+                    Dim fValue As String = TryCast(row.Cells("colFixture").Value, String)
+                    If String.IsNullOrWhiteSpace(fValue) OrElse fValue.StartsWith("**") Then
+                        Return
+                    End If
+
+                    ' Ask user: preferred action is solid black
+                    Dim msg = "You switched the device off. What do you want to do?" & Environment.NewLine &
+                          "Yes = Set row to Solid black (preferred)." & Environment.NewLine &
+                          "No = Power off device (keeps row values unchanged)." & Environment.NewLine &
+                          "Cancel = Revert change (keep device ON)."
+                    Dim dr = MessageBox.Show(msg, "WLED off", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1)
+
+                    If dr = DialogResult.Cancel Then
+                        ' revert change
+                        row.Cells("colStateOnOff").Value = False
+                        Return
+                    End If
+
+                    ' Determine device name (we don't need IP here)
+                    Dim fixtureParts = fValue.Split("/"c)
+                    Dim thiswledName = fixtureParts(0)
+
+                    If dr = DialogResult.Yes Then
+                        ' DO NOT send network commands here.
+                        ' Instead update the row so other code (the normal sender) will apply it.
+                        ' Set effect -> Solid (fx = 0), palette cleared, colors -> black, brightness -> 255, sensible defaults.
+                        Try
+                            row.Cells("colStateOnOff").Value = True
+
+                            ' Effect id 0 conventionally solid; try to map name if available
+                            Dim solidName As String = GetEffectNameFromId(0, DG_Effecten)
+                            If String.IsNullOrWhiteSpace(solidName) Then solidName = "Solid"
+
+                            Dim effectName As String = GetPaletteNameFromId(0, DG_Paletten)
+                            If String.IsNullOrWhiteSpace(effectName) Then effectName = "* Color 1"
+
+                            If row.Cells("colEffectId") IsNot Nothing Then row.Cells("colEffectId").Value = 0
+                            If row.Cells("colEffect") IsNot Nothing Then row.Cells("colEffect").Value = solidName
+
+                            ' Clear palette
+                            If row.Cells("colPaletteId") IsNot Nothing Then row.Cells("colPaletteId").Value = ""
+                            If row.Cells("colPalette") IsNot Nothing Then row.Cells("colPalette").Value = effectName
+
+                            ' Set three colors to black (use HTML form so other modules that use FromHtml work)
+                            Dim blackHtml = ColorTranslator.ToHtml(Color.Black)
+                            If row.Cells("colColor1") IsNot Nothing Then row.Cells("colColor1").Value = blackHtml
+                            If row.Cells("colColor2") IsNot Nothing Then row.Cells("colColor2").Value = blackHtml
+                            If row.Cells("colColor3") IsNot Nothing Then row.Cells("colColor3").Value = blackHtml
+
+                            ' Set brightness / speed / intensity / transition to safe defaults
+                            If row.Cells("colBrightness") IsNot Nothing Then row.Cells("colBrightness").Value = 255
+                            If row.Cells("colSpeed") IsNot Nothing Then row.Cells("colSpeed").Value = 127
+                            If row.Cells("colIntensity") IsNot Nothing Then row.Cells("colIntensity").Value = 127
+                            If row.Cells("colTransition") IsNot Nothing Then row.Cells("colTransition").Value = 0
+
+                            ' Provide feedback to user
+                            ToonFlashBericht($"Row for {thiswledName} updated to Solid black (no network send).", 3, FlashSeverity.IsInfo)
+                        Catch ex As Exception
+                            ToonFlashBericht($"Failed to update row for Solid black: {ex.Message}", 5, FlashSeverity.IsError)
+                        End Try
+                    ElseIf dr = DialogResult.No Then
+                        ' Power off chosen: don't change other row values here.
+                        ' The actual power-off network send is handled elsewhere if desired.
+                        ToonFlashBericht($"Marked {thiswledName} as power-off in row (no network send).", 3, FlashSeverity.IsWarning)
+                    End If
+                End If
+            Catch ex As Exception
+                Console.WriteLine("Error handling colStateOnOff change: " & ex.Message)
+            End Try
+
+            ' Continue but do not send network commands here.
+        End If
+
+
+
+
         ' Alleen reageren op relevante kolommen
         If changedColName <> "colFixture" AndAlso changedColName <> "colEffect" AndAlso changedColName <> "colPalette" Then
             Return
@@ -1457,6 +1556,7 @@ Module DG_Show
                 row.cells("btnApply").value = ""
             End If
         Next
+
 
         For Each row In DG_Show.Rows
             If row.cells("btnApply").value = ">" And row.cells("colSend").value = "False" Then

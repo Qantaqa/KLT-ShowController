@@ -1,4 +1,6 @@
-﻿Imports System.Runtime.InteropServices.Marshalling
+﻿Imports System.IO
+Imports System.Xml.Serialization
+Imports System.Runtime.InteropServices.Marshalling
 
 Public Class DetailShowWLED
     Public Property RowData As Dictionary(Of String, Object)
@@ -8,6 +10,7 @@ Public Class DetailShowWLED
         Me.RowData = rowData
         PopulatePulldownLists()
         InitializeFieldsFromRowData()
+        InitializeBankUI() ' Added initialization of bank UI
     End Sub
 
     Private Sub DetailShowWLED_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -177,30 +180,30 @@ Public Class DetailShowWLED
     End Sub
 
     Private Sub btnColor1_Click(sender As Object, e As EventArgs) Handles btnColor1.Click
-        Using dlg As New ColorDialog()
-            dlg.Color = btnColor1.BackColor
+        Using dlg As New ColorPickerExtented()
+            dlg.SelectedColor = btnColor1.BackColor
             If dlg.ShowDialog() = DialogResult.OK Then
-                btnColor1.BackColor = dlg.Color
+                btnColor1.BackColor = dlg.SelectedColor
                 SendPreviewIfAuto()
             End If
         End Using
     End Sub
 
     Private Sub btnColor2_Click(sender As Object, e As EventArgs) Handles btnColor2.Click
-        Using dlg As New ColorDialog()
-            dlg.Color = btnColor2.BackColor
+        Using dlg As New ColorPickerExtented()
+            dlg.SelectedColor = btnColor2.BackColor
             If dlg.ShowDialog() = DialogResult.OK Then
-                btnColor2.BackColor = dlg.Color
+                btnColor2.BackColor = dlg.SelectedColor
                 SendPreviewIfAuto()
             End If
         End Using
     End Sub
 
     Private Sub btnColor3_Click(sender As Object, e As EventArgs) Handles btnColor3.Click
-        Using dlg As New ColorDialog()
-            dlg.Color = btnColor3.BackColor
+        Using dlg As New ColorPickerExtented()
+            dlg.SelectedColor = btnColor3.BackColor
             If dlg.ShowDialog() = DialogResult.OK Then
-                btnColor3.BackColor = dlg.Color
+                btnColor3.BackColor = dlg.SelectedColor
                 SendPreviewIfAuto()
             End If
         End Using
@@ -450,5 +453,319 @@ Public Class DetailShowWLED
         ToonFlashBericht("Pasted settings from clipboard.", 1)
     End Sub
 
+    ' --- Add these fields to the DetailShowWLED class ---
+    Private BankSlots As List(Of BankSlotData) = New List(Of BankSlotData)()
+    Private Const BankSlotCount As Integer = 8
+    Private ReadOnly Property BankFilePath As String
+        Get
+            Return Path.Combine(Application.UserAppDataPath, "bankslots.xml")
+        End Get
+    End Property
 
+    ' --- Call this method after InitializeFieldsFromRowData() in the constructor ----
+    Private Sub InitializeBankUI()
+        ' Ensure flow panel exists in designer: flpBankSlots
+        If flpBankSlots Is Nothing Then Return
+
+        LoadBankFromFile()
+
+        flpBankSlots.Controls.Clear()
+        For i As Integer = 1 To BankSlotCount
+            Dim slotControl As New BankSlotControl()
+            slotControl.SetData(i, If(BankSlots.Count >= i, BankSlots(i - 1), Nothing))
+            AddHandler slotControl.SlotClicked, AddressOf BankSlot_Clicked
+            flpBankSlots.Controls.Add(slotControl)
+        Next
+
+        ' Highlight selected if txtSelectedSlot set
+        HighlightSelectedSlot()
+    End Sub
+
+    Private Sub LoadBankFromFile()
+        Try
+            If File.Exists(BankFilePath) Then
+                Dim ser As New XmlSerializer(GetType(List(Of BankSlotData)))
+                Using fs As New FileStream(BankFilePath, FileMode.Open)
+                    BankSlots = CType(ser.Deserialize(fs), List(Of BankSlotData))
+                End Using
+            End If
+        Catch
+            BankSlots = New List(Of BankSlotData)()
+        End Try
+
+        ' Ensure list has default empty entries
+        While BankSlots.Count < BankSlotCount
+            BankSlots.Add(New BankSlotData())
+        End While
+    End Sub
+
+    Private Sub SaveBankToFile()
+        Try
+            Dim dir = Path.GetDirectoryName(BankFilePath)
+            If Not Directory.Exists(dir) Then Directory.CreateDirectory(dir)
+            Dim ser As New XmlSerializer(GetType(List(Of BankSlotData)))
+            Using fs As New FileStream(BankFilePath, FileMode.Create)
+                ser.Serialize(fs, BankSlots)
+            End Using
+        Catch
+            ' ignore persistence errors for now
+        End Try
+    End Sub
+
+    Private Sub BankSlot_Clicked(sender As BankSlotControl)
+        txtSelectedSlot.Text = sender.SlotIndex.ToString()
+        HighlightSelectedSlot()
+    End Sub
+
+    Private Sub HighlightSelectedSlot()
+        Dim selIndex As Integer
+        If Integer.TryParse(txtSelectedSlot.Text, selIndex) Then
+            For Each c As Control In flpBankSlots.Controls
+                Dim b As BankSlotControl = TryCast(c, BankSlotControl)
+                If b IsNot Nothing Then
+                    b.Highlight(b.SlotIndex = selIndex)
+                End If
+            Next
+        Else
+            For Each c As Control In flpBankSlots.Controls
+                Dim b As BankSlotControl = TryCast(c, BankSlotControl)
+                If b IsNot Nothing Then b.Highlight(False)
+            Next
+        End If
+    End Sub
+
+    ' --- Replace empty btnCopyToBank_Click / btnCopyFromBank_Click bodies with these implementations ---
+
+    Private Sub btnCopyToBank_Click(sender As Object, e As EventArgs) Handles btnCopyToBank.Click
+        Dim idx As Integer
+        If Not Integer.TryParse(txtSelectedSlot.Text, idx) OrElse idx < 1 OrElse idx > BankSlotCount Then
+            ToonFlashBericht("Select a valid bank slot first.", 1)
+            Return
+        End If
+
+        Dim data As New BankSlotData()
+        data.Effect = cbEffect.Text
+        data.Palette = cbPalette.Text
+        data.StateOnOff = cbPower.Checked
+        data.Sound = cbSound.Checked
+        data.Blend = cbBlend.Checked
+        data.Brightness = tbBrightness.Value
+        data.Intensity = tbIntensity.Value
+        data.Speed = tbSpeed.Value
+        data.Transition = tbTransition.Value
+        data.Color1 = ColorTranslator.ToHtml(btnColor1.BackColor)
+        data.Color2 = ColorTranslator.ToHtml(btnColor2.BackColor)
+        data.Color3 = ColorTranslator.ToHtml(btnColor3.BackColor)
+
+        BankSlots(idx - 1) = data
+        SaveBankToFile()
+
+        ' Update visual slot
+        Dim slotControl = TryCast(flpBankSlots.Controls(idx - 1), BankSlotControl)
+        If slotControl IsNot Nothing Then
+            slotControl.SetData(idx, data)
+        End If
+
+        ToonFlashBericht($"Saved settings to bank slot {idx}.", 1)
+    End Sub
+
+    Private Sub btnCopyFromBank_Click(sender As Object, e As EventArgs) Handles btnCopyFromBank.Click
+        Dim idx As Integer
+        If Not Integer.TryParse(txtSelectedSlot.Text, idx) OrElse idx < 1 OrElse idx > BankSlotCount Then
+            ToonFlashBericht("Select a valid bank slot first.", 1)
+            Return
+        End If
+
+        Dim data = BankSlots(idx - 1)
+        If data Is Nothing Then
+            ToonFlashBericht("Selected bank slot is empty.", 1)
+            Return
+        End If
+
+        ' Restore values to controls
+        cbEffect.Text = data.Effect
+        cbPalette.Text = data.Palette
+        cbPower.Checked = data.StateOnOff
+        cbSound.Checked = data.Sound
+        cbBlend.Checked = data.Blend
+        tbBrightness.Value = Math.Max(tbBrightness.Minimum, Math.Min(tbBrightness.Maximum, data.Brightness))
+        tbIntensity.Value = Math.Max(tbIntensity.Minimum, Math.Min(tbIntensity.Maximum, data.Intensity))
+        tbSpeed.Value = Math.Max(tbSpeed.Minimum, Math.Min(tbSpeed.Maximum, data.Speed))
+        tbTransition.Value = Math.Max(tbTransition.Minimum, Math.Min(tbTransition.Maximum, data.Transition))
+        Try
+            btnColor1.BackColor = If(String.IsNullOrWhiteSpace(data.Color1), Color.Black, ColorTranslator.FromHtml(data.Color1))
+        Catch
+        End Try
+        Try
+            btnColor2.BackColor = If(String.IsNullOrWhiteSpace(data.Color2), Color.Black, ColorTranslator.FromHtml(data.Color2))
+        Catch
+        End Try
+        Try
+            btnColor3.BackColor = If(String.IsNullOrWhiteSpace(data.Color3), Color.Black, ColorTranslator.FromHtml(data.Color3))
+        Catch
+        End Try
+
+        SendPreviewIfAuto()
+        ToonFlashBericht($"Loaded settings from bank slot {idx}.", 1)
+    End Sub
+
+    Private Async Sub btnRetrieveFromWLED_Click(sender As Object, e As EventArgs) Handles btnRetrieveFromWLED.Click
+        Try
+            ' Determine selected fixture/segment from the form
+            Dim fixtureValue = cbDevice.Text
+            If String.IsNullOrWhiteSpace(fixtureValue) Then
+                ToonFlashBericht("No device/segment selected.", 1)
+                Return
+            End If
+            If fixtureValue.StartsWith("**") Then
+                ToonFlashBericht("Selected fixture is not a WLED device.", 1)
+                Return
+            End If
+
+            Dim parts = fixtureValue.Split("/"c)
+            Dim wledName = parts(0).Trim()
+            Dim segmentIndex As Integer = 0
+            If parts.Length > 1 Then Integer.TryParse(parts(1), segmentIndex)
+
+            ' Find device row & IP in FrmMain
+            Dim devRow As DataGridViewRow = Nothing
+            For Each row As DataGridViewRow In FrmMain.DG_Devices.Rows
+                If row.IsNewRow Then Continue For
+                If String.Equals(Convert.ToString(row.Cells("colInstance").Value), wledName, StringComparison.OrdinalIgnoreCase) Then
+                    devRow = row
+                    Exit For
+                End If
+            Next
+            If devRow Is Nothing Then
+                ToonFlashBericht($"Device '{wledName}' not found in device list.", 1)
+                Return
+            End If
+
+            Dim wledIp = Convert.ToString(devRow.Cells("colIPAddress").Value)
+            If String.IsNullOrWhiteSpace(wledIp) Then
+                ToonFlashBericht($"No IP configured for device '{wledName}'.", 1)
+                Return
+            End If
+
+            ' Request /json from device
+            Using client As New Net.Http.HttpClient()
+                client.Timeout = TimeSpan.FromSeconds(4)
+                Dim resp = Await client.GetAsync($"http://{wledIp}/json")
+                If Not resp.IsSuccessStatusCode Then
+                    ToonFlashBericht($"Failed to contact WLED at {wledIp} (HTTP {resp.StatusCode}).", 2)
+                    Return
+                End If
+                Dim jsonString = Await resp.Content.ReadAsStringAsync()
+                Dim jobj = Newtonsoft.Json.Linq.JObject.Parse(jsonString)
+
+                ' Find segments array
+                Dim segArrayToken = jobj.SelectToken("state.seg")
+                If segArrayToken Is Nothing Then
+                    ToonFlashBericht("WLED returned no segment data.", 2)
+                    Return
+                End If
+                Dim segArray = CType(segArrayToken, Newtonsoft.Json.Linq.JArray)
+                If segmentIndex < 0 OrElse segmentIndex >= segArray.Count Then
+                    ToonFlashBericht($"Segment index {segmentIndex} invalid for device '{wledName}'.", 1)
+                    Return
+                End If
+
+                Dim seg = CType(segArray(segmentIndex), Newtonsoft.Json.Linq.JObject)
+
+                ' Effect id -> map to name via DG_Effecten (cell(1) holds id, cell(0) name)
+                If seg("fx") IsNot Nothing Then
+                    Dim fxId As Integer = seg("fx").ToObject(Of Integer)()
+                    Dim effectName As String = ""
+                    For Each r As DataGridViewRow In FrmMain.DG_Effecten.Rows
+                        If r.IsNewRow Then Continue For
+                        If r.Cells.Count > 1 AndAlso r.Cells(1).Value IsNot Nothing AndAlso
+                       String.Equals(Convert.ToString(r.Cells(1).Value), fxId.ToString(), StringComparison.OrdinalIgnoreCase) Then
+                            effectName = Convert.ToString(r.Cells(0).Value)
+                            Exit For
+                        End If
+                    Next
+                    cbEffect.Text = effectName
+                End If
+
+                ' Palette id -> map to name via DG_Paletten (cell(1) id, cell(0) name)
+                If seg("pal") IsNot Nothing Then
+                    Dim palId As Integer = seg("pal").ToObject(Of Integer)()
+                    Dim palName As String = ""
+                    For Each r As DataGridViewRow In FrmMain.DG_Paletten.Rows
+                        If r.IsNewRow Then Continue For
+                        If r.Cells.Count > 1 AndAlso r.Cells(1).Value IsNot Nothing AndAlso
+                       String.Equals(Convert.ToString(r.Cells(1).Value), palId.ToString(), StringComparison.OrdinalIgnoreCase) Then
+                            palName = Convert.ToString(r.Cells(0).Value)
+                            Exit For
+                        End If
+                    Next
+                    cbPalette.Text = palName
+                End If
+
+                ' Colors (col) - array of [R,G,B] arrays
+                If seg("col") IsNot Nothing Then
+                    Dim cols = TryCast(seg("col"), Newtonsoft.Json.Linq.JArray)
+                    If cols IsNot Nothing Then
+                        If cols.Count > 0 AndAlso cols(0) IsNot Nothing AndAlso cols(0).Type = Newtonsoft.Json.Linq.JTokenType.Array Then
+                            Dim c0 = cols(0)
+                            Try
+                                btnColor1.BackColor = Color.FromArgb(c0(0).ToObject(Of Integer)(), c0(1).ToObject(Of Integer)(), c0(2).ToObject(Of Integer)())
+                            Catch
+                            End Try
+                        End If
+                        If cols.Count > 1 AndAlso cols(1) IsNot Nothing AndAlso cols(1).Type = Newtonsoft.Json.Linq.JTokenType.Array Then
+                            Dim c1 = cols(1)
+                            Try
+                                btnColor2.BackColor = Color.FromArgb(c1(0).ToObject(Of Integer)(), c1(1).ToObject(Of Integer)(), c1(2).ToObject(Of Integer)())
+                            Catch
+                            End Try
+                        End If
+                        If cols.Count > 2 AndAlso cols(2) IsNot Nothing AndAlso cols(2).Type = Newtonsoft.Json.Linq.JTokenType.Array Then
+                            Dim c2 = cols(2)
+                            Try
+                                btnColor3.BackColor = Color.FromArgb(c2(0).ToObject(Of Integer)(), c2(1).ToObject(Of Integer)(), c2(2).ToObject(Of Integer)())
+                            Catch
+                            End Try
+                        End If
+                    End If
+                End If
+
+                ' Speed (sx), Intensity (ix), Brightness (bri), Transition (transition)
+                If seg("sx") IsNot Nothing Then
+                    Integer.TryParse(seg("sx").ToString(), tbSpeed.Value)
+                End If
+                If seg("ix") IsNot Nothing Then
+                    Integer.TryParse(seg("ix").ToString(), tbIntensity.Value)
+                End If
+                If seg("bri") IsNot Nothing Then
+                    Integer.TryParse(seg("bri").ToString(), tbBrightness.Value)
+                End If
+                If seg("transition") IsNot Nothing Then
+                    Integer.TryParse(seg("transition").ToString(), tbTransition.Value)
+                End If
+
+                ' On/off state (segment or global state)
+                Dim onVal As Nullable(Of Boolean) = Nothing
+                If seg("on") IsNot Nothing Then
+                    onVal = seg("on").ToObject(Of Boolean)()
+                ElseIf jobj.SelectToken("state.on") IsNot Nothing Then
+                    onVal = jobj.SelectToken("state.on").ToObject(Of Boolean)()
+                End If
+                If onVal.HasValue Then
+                    cbPower.Checked = onVal.Value
+                End If
+
+                ' Update preview images (effect/palette thumbnails)
+                UpdateEffectPreviewImage()
+                UpdatePalettePreviewImage()
+
+                SendPreviewIfAuto()
+
+                ToonFlashBericht("Retrieved settings from device.", 1)
+            End Using
+
+        Catch ex As Exception
+            ToonFlashBericht($"Error retrieving from WLED: {ex.Message}", 3)
+        End Try
+    End Sub
 End Class

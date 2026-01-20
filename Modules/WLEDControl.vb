@@ -7,6 +7,8 @@ Imports System.Text.RegularExpressions
 Imports System.Threading.Tasks.Dataflow
 Imports System.Windows.Forms.AxHost
 Imports Newtonsoft.Json.Linq
+Imports UglyToad.PdfPig.Graphics.Colors
+Imports WMPLib
 
 Module WLEDControl
 
@@ -278,6 +280,8 @@ Module WLEDControl
         For Each devRow As DataGridViewRow In DG_Devices.Rows
             If devRow.IsNewRow Then Continue For
 
+            If devRow.Cells("colEnabled").Value = False Then Continue For
+
             Dim ip = Convert.ToString(devRow.Cells("colIPAddress").Value)
             Dim segmentsStr = Convert.ToString(devRow.Cells("colSegments").Value)
             If String.IsNullOrWhiteSpace(ip) OrElse String.IsNullOrWhiteSpace(segmentsStr) Then Continue For
@@ -443,6 +447,40 @@ Module WLEDControl
         End Try
     End Function
 
+    ' Helper: convert stored color representation to Nullable(Of Color)
+    Private Function ParseColorValue(colorObj As Object) As Nullable(Of Color)
+        Try
+            If colorObj Is Nothing Then Return Nothing
+
+            If TypeOf colorObj Is Color Then
+                Return CType(colorObj, Color)
+            End If
+
+            Dim s = colorObj.ToString().Trim()
+
+            ' If stored as OLE integer (e.g., produced by ColorTranslator.ToOle)
+            Dim asInt As Integer
+            If Integer.TryParse(s, asInt) Then
+                Try
+                    Return ColorTranslator.FromOle(asInt)
+                Catch
+                    ' fall through
+                End Try
+            End If
+
+            ' try HTML color / name
+            Try
+                Return ColorTranslator.FromHtml(s)
+            Catch
+                ' ignore
+            End Try
+
+            Return Nothing
+        Catch
+            Return Nothing
+        End Try
+    End Function
+
     ' ========================================================================================
     ' GECORRIGEERDE SendInstructionSetForDevice SUB
     ' Verstuurt een set segment-instellingen voor één WLED-apparaat.
@@ -461,6 +499,8 @@ Module WLEDControl
 
         Dim wledName = fixture.Split("/"c)(0)
         Dim wledIp As String = Nothing
+        Dim Brand As String = "WLED"
+        Dim DevEnabled As Boolean = True
 
         ' 2. Zoek het IP-adres van het WLED-apparaat
         ' Aanname: FrmMain.DG_Devices is beschikbaar
@@ -468,6 +508,8 @@ Module WLEDControl
             If devRow.IsNewRow Then Continue For
             If devRow.Cells("colInstance").Value?.ToString() = wledName Then
                 wledIp = devRow.Cells("colIPAddress").Value?.ToString()
+                Brand = devRow.Cells("colBrand").Value?.ToString()
+                DevEnabled = devRow.Cells("colEnabled").Value?.ToString() = "True"
                 Exit For
             End If
         Next
@@ -480,56 +522,60 @@ Module WLEDControl
         Dim masterBrightness As Integer = If(String.IsNullOrEmpty(masterBrightnessValue), -1, Integer.Parse(masterBrightnessValue)) ' -1 om aan te geven dat deze niet gezet is als de cel leeg is
         ' ----------------------------------------------------
 
-        ' 3. Verzamel alle rijen voor dit apparaat en de huidige Act/Scene/Event
-        Dim segmentList As New List(Of JObject)
-        For Each row As DataGridViewRow In DG_Show.Rows
-            If row.IsNewRow Then Continue For
+        If (Brand = "WLED") Then
+            '----------------------------------------------------------------------------------------
+            ' Aansturing voor WLED devices
+            '----------------------------------------------------------------------------------------
+            ' 3. Verzamel alle rijen voor dit apparaat en de huidige Act/Scene/Event
+            Dim segmentList As New List(Of JObject)
+            For Each row As DataGridViewRow In DG_Show.Rows
+                If row.IsNewRow Then Continue For
 
-            Dim rowFixture = row.Cells("colFixture").Value?.ToString()
-            If String.IsNullOrEmpty(rowFixture) OrElse rowFixture.StartsWith("**") Then Continue For
+                Dim rowFixture = row.Cells("colFixture").Value?.ToString()
+                If String.IsNullOrEmpty(rowFixture) OrElse rowFixture.StartsWith("**") Then Continue For
 
-            Dim rowWledName = rowFixture.Split("/"c)(0)
-            If rowWledName <> wledName Then Continue For
+                Dim rowWledName = rowFixture.Split("/"c)(0)
+                If rowWledName <> wledName Then Continue For
 
-            ' Controleer of de rij overeenkomt met de huidige instructieset
-            If row.Cells("colAct").Value?.ToString() = act AndAlso
+                ' Controleer of de rij overeenkomt met de huidige instructieset
+                If row.Cells("colAct").Value?.ToString() = act AndAlso
                row.Cells("colSceneId").Value?.ToString() = scene AndAlso
                row.Cells("colEventId").Value?.ToString() = eventNr Then
 
-                Dim segId As Integer
-                If Not Integer.TryParse(rowFixture.Split("/"c).ElementAtOrDefault(1), segId) Then Continue For
+                    Dim segId As Integer
+                    If Not Integer.TryParse(rowFixture.Split("/"c).ElementAtOrDefault(1), segId) Then Continue For
 
-                ' --- KLEUREN VERWERKING (GECORRIGEERD) ---
-                Dim C1 = row.Cells("colColor1").Value?.ToString()
-                Dim C2 = row.Cells("colColor2").Value?.ToString()
-                Dim C3 = row.Cells("colColor3").Value?.ToString()
+                    ' --- KLEUREN VERWERKING (GECORRIGEERD) ---
+                    Dim C1 = row.Cells("colColor1").Value?.ToString()
+                    Dim C2 = row.Cells("colColor2").Value?.ToString()
+                    Dim C3 = row.Cells("colColor3").Value?.ToString()
 
-                Dim colorJArray As New JArray()
+                    Dim colorJArray As New JArray()
 
-                ' Gebruik de helperfunctie om de drie kleuren te parsen en toe te voegen
-                Dim parsedC1 = GetColorJArray(C1)
-                If parsedC1 IsNot Nothing Then colorJArray.Add(parsedC1)
+                    ' Gebruik de helperfunctie om de drie kleuren te parsen en toe te voegen
+                    Dim parsedC1 = GetColorJArray(C1)
+                    If parsedC1 IsNot Nothing Then colorJArray.Add(parsedC1)
 
-                Dim parsedC2 = GetColorJArray(C2)
-                If parsedC2 IsNot Nothing Then colorJArray.Add(parsedC2)
+                    Dim parsedC2 = GetColorJArray(C2)
+                    If parsedC2 IsNot Nothing Then colorJArray.Add(parsedC2)
 
-                Dim parsedC3 = GetColorJArray(C3)
-                If parsedC3 IsNot Nothing Then colorJArray.Add(parsedC3)
-                ' ------------------------------------------
+                    Dim parsedC3 = GetColorJArray(C3)
+                    If parsedC3 IsNot Nothing Then colorJArray.Add(parsedC3)
+                    ' ------------------------------------------
 
-                ' 4. Overige segment parameters ophalen
-                Dim stateOnOff = row.Cells("colStateOnOff").Value?.ToString()
-                stateOnOff = If(stateOnOff = "Uit", "false", "true")
-                Dim effectName = row.Cells("colEffect").Value?.ToString()
-                Dim effectId = GetEffectIdFromName(effectName, FrmMain.DG_Effecten)
-                Dim paletteName = row.Cells("colPalette").Value?.ToString()
-                Dim paletteId = GetPaletteIdFromName(paletteName, FrmMain.DG_Paletten)
-                Dim brightness = row.Cells("colBrightness").Value?.ToString() ' Dit is de segmenthelderheid
-                Dim speed = row.Cells("colSpeed").Value?.ToString()
-                Dim intensity = row.Cells("colIntensity").Value?.ToString()
+                    ' 4. Overige segment parameters ophalen
+                    Dim stateOnOff = row.Cells("colStateOnOff").Value?.ToString()
+                    stateOnOff = If(stateOnOff = "Uit", "false", "true")
+                    Dim effectName = row.Cells("colEffect").Value?.ToString()
+                    Dim effectId = GetEffectIdFromName(effectName, FrmMain.DG_Effecten)
+                    Dim paletteName = row.Cells("colPalette").Value?.ToString()
+                    Dim paletteId = GetPaletteIdFromName(paletteName, FrmMain.DG_Paletten)
+                    Dim brightness = row.Cells("colBrightness").Value?.ToString() ' Dit is de segmenthelderheid
+                    Dim speed = row.Cells("colSpeed").Value?.ToString()
+                    Dim intensity = row.Cells("colIntensity").Value?.ToString()
 
-                ' 5. Bouw het JSON-segment object
-                Dim segObj As New JObject From {
+                    ' 5. Bouw het JSON-segment object
+                    Dim segObj As New JObject From {
                     {"id", segId},
                     {"on", Boolean.Parse(stateOnOff)},
                     {"fx", effectId},
@@ -539,52 +585,109 @@ Module WLEDControl
                     {"ix", If(String.IsNullOrEmpty(intensity), 127, Integer.Parse(intensity))}
                 }
 
-                ' 6. Voeg de kleurarray correct toe als JArray
-                If colorJArray.Count > 0 Then
-                    segObj.Add("col", colorJArray)
-                End If
+                    ' 6. Voeg de kleurarray correct toe als JArray
+                    If colorJArray.Count > 0 Then
+                        segObj.Add("col", colorJArray)
+                    End If
 
-                segmentList.Add(segObj)
+                    segmentList.Add(segObj)
 
-                ' Markeer deze rij als verwerkt
-                If DG_Show.Columns.Contains("colSend") Then
-                    row.Cells("colSend").Value = True
+                    ' Markeer deze rij als verwerkt
+                    If DG_Show.Columns.Contains("colSend") Then
+                        row.Cells("colSend").Value = True
+                    End If
                 End If
+            Next
+
+            If segmentList.Count = 0 Then Exit Sub
+
+            ' 7. Bouw de uiteindelijke payload
+            Dim payload As New JObject()
+
+            ' -----------------------------------------------------------------------------------------
+            ' AANPASSING: Voeg de Hoofd Helderheid (Master Brightness) toe aan de hoofd-payload indien gezet
+            ' -----------------------------------------------------------------------------------------
+            If masterBrightness >= 0 Then
+                payload.Add("bri", masterBrightness)
             End If
-        Next
 
-        If segmentList.Count = 0 Then Exit Sub
+            ' Voeg de segmenten toe
+            payload.Add("seg", New JArray(segmentList.ToArray()))
+            ' -----------------------------------------------------------------------------------------
 
-        ' 7. Bouw de uiteindelijke payload
-        Dim payload As New JObject()
+            ' 8. Verzend de instructieset
+            Try
+                Using client As New HttpClient()
+                    client.Timeout = TimeSpan.FromSeconds(3)
+                    Dim content As New StringContent(payload.ToString(Newtonsoft.Json.Formatting.None), Encoding.UTF8, "application/json")
+                    Dim response = Await client.PostAsync($"http://{wledIp}/json/state", content)
 
-        ' -----------------------------------------------------------------------------------------
-        ' AANPASSING: Voeg de Hoofd Helderheid (Master Brightness) toe aan de hoofd-payload indien gezet
-        ' -----------------------------------------------------------------------------------------
-        If masterBrightness >= 0 Then
-            payload.Add("bri", masterBrightness)
-        End If
+                    If response.IsSuccessStatusCode Then
+                        ' ToonFlashBericht($"[WLED] Instructieset verzonden naar {wledName} ({wledIp})", 1)
+                    Else
+                        ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {response.StatusCode}", 5, FlashSeverity.IsError)
+                    End If
+                End Using
+            Catch ex As Exception
+                ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {ex.Message}", 5, FlashSeverity.IsError)
+            End Try
 
-        ' Voeg de segmenten toe
-        payload.Add("seg", New JArray(segmentList.ToArray()))
-        ' -----------------------------------------------------------------------------------------
 
-        ' 8. Verzend de instructieset
-        Try
-            Using client As New HttpClient()
-                client.Timeout = TimeSpan.FromSeconds(3)
-                Dim content As New StringContent(payload.ToString(Newtonsoft.Json.Formatting.None), Encoding.UTF8, "application/json")
-                Dim response = Await client.PostAsync($"http://{wledIp}/json/state", content)
-
-                If response.IsSuccessStatusCode Then
-                    ' ToonFlashBericht($"[WLED] Instructieset verzonden naar {wledName} ({wledIp})", 1)
-                Else
-                    ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {response.StatusCode}", 5, FlashSeverity.IsError)
+        ElseIf Brand = "WIZ" Then
+            '----------------------------------------------------------------------------------------
+            ' Aansturing voor WIZ devices
+            '----------------------------------------------------------------------------------------
+            '----------------------------------------------------------------------------------------
+            ' Aansturing voor WIZ devices
+            ' - WIZ devices are single-unit lights (no segments).
+            ' - Use primaryRow (the row that triggered the action) for state/color/brightness.
+            ' - Use WizControl functions (WizZetAan / WizZetUit / WizStelKleurIn).
+            '----------------------------------------------------------------------------------------
+            If DevEnabled = False Then
+                Exit Sub
+            End If
+            Try
+                Dim stateObj = primaryRow.Cells("colStateOnOff").Value
+                Dim isOn As Boolean = True
+                If stateObj IsNot Nothing Then
+                    If TypeOf stateObj Is Boolean Then
+                        isOn = CBool(stateObj)
+                    Else
+                        Dim ss = stateObj.ToString().Trim().ToLower()
+                        isOn = Not (ss = "false" OrElse ss = "uit" OrElse ss = "0")
+                    End If
                 End If
-            End Using
-        Catch ex As Exception
-            ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {ex.Message}", 5, FlashSeverity.IsError)
-        End Try
+
+                If Not isOn Then
+                    ' Turn off the WIZ device
+                    WizZetUit(wledIp)
+                    ToonFlashBericht($"WIZ {wledName} ({wledIp}) power off command queued.", 2)
+                Else
+                    ' Determine color (prefer colColor1), fallback to colColor2/3 or white
+                    Dim color As Nullable(Of Color) = Nothing
+                    color = ParseColorValue(primaryRow.Cells("colColor1").Value)
+                    If Not color.HasValue Then color = ParseColorValue(primaryRow.Cells("colColor2").Value)
+                    If Not color.HasValue Then color = ParseColorValue(primaryRow.Cells("colColor3").Value)
+                    ' If Not color.HasValue Then color = White
+
+                    ' Determine dimming (map 0-255 -> 10-100)
+                    Dim briVal As Integer = 255
+                    If primaryRow.Cells("colBrightness").Value IsNot Nothing Then
+                        Integer.TryParse(primaryRow.Cells("colBrightness").Value.ToString(), briVal)
+                    End If
+                    Dim dimming As Integer = CInt(Math.Round((briVal / 255.0) * 100.0))
+                    If dimming < 10 Then dimming = 10
+                    If dimming > 100 Then dimming = 100
+
+                    ' Send color command (non-awaited async subs are used)
+                    WizStelKleurIn(wledIp, color.Value.R, color.Value.G, color.Value.B, dimming)
+                    WizZetAan(wledIp) ' ensure the lamp is on
+                    'ToonFlashBericht($"WIZ {wledName} ({wledIp}) set to RGB({color.Value.R},{color.Value.G},{color.Value.B}) dim={dimming}.", 2)
+                End If
+            Catch ex As Exception
+                ToonFlashBericht($"Fout bij aansturen WIZ {wledName}: {ex.Message}", 5, FlashSeverity.IsError)
+            End Try
+        End If
     End Sub
 
 
@@ -592,6 +695,7 @@ Module WLEDControl
 
         For Each devRow As DataGridViewRow In DG_Devices.Rows
             If devRow.IsNewRow Then Continue For
+            If devRow.Cells("colEnabled").Value = False Then Continue For
 
             Dim ip = Convert.ToString(devRow.Cells("colIPAddress").Value)
             Dim segmentsStr = Convert.ToString(devRow.Cells("colSegments").Value)

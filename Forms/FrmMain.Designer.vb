@@ -27,19 +27,6 @@ Partial Class FrmMain
         Dim DataGridViewCellStyle2 As DataGridViewCellStyle = New DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FrmMain))
         DG_Devices = New DataGridView()
-        colIPAddress = New DataGridViewTextBoxColumn()
-        colInstance = New DataGridViewTextBoxColumn()
-        colLayout = New DataGridViewTextBoxColumn()
-        colLedCount = New DataGridViewTextBoxColumn()
-        colSegments = New DataGridViewTextBoxColumn()
-        colEffects = New DataGridViewTextBoxColumn()
-        colPalettes = New DataGridViewTextBoxColumn()
-        colEnabled = New DataGridViewCheckBoxColumn()
-        colOnline = New DataGridViewImageColumn()
-        colDDPData = New DataGridViewTextBoxColumn()
-        colDDPOffset = New DataGridViewTextBoxColumn()
-        colSegmentsData = New DataGridViewTextBoxColumn()
-        colDataProvider = New DataGridViewComboBoxColumn()
         DG_Effecten = New DataGridView()
         TabControl = New TabControl()
         TabShow = New TabPage()
@@ -225,27 +212,19 @@ Partial Class FrmMain
         colActionRowOrder = New DataGridViewTextBoxColumn()
         colActionRowDescr = New DataGridViewTextBoxColumn()
         colActionRowActor = New DataGridViewTextBoxColumn()
-        TabButtons = New TabPage()
-        DG_SoundButtons = New DataGridView()
-        colButtonsId = New DataGridViewTextBoxColumn()
-        colButtonsSoundFile = New DataGridViewTextBoxColumn()
-        colButtonsName = New DataGridViewTextBoxColumn()
-        colButtonsIcon = New DataGridViewTextBoxColumn()
-        colButtonsRepeat = New DataGridViewTextBoxColumn()
         TabDevices = New TabPage()
-        SplitContainer_Devices = New SplitContainer()
         RichTextBox1 = New RichTextBox()
         ToolStrip_Devices = New ToolStrip()
         LblDeviceStatus = New ToolStripLabel()
         btnScanNetworkForWLed = New ToolStripButton()
         btnDevicesRefreshIPs = New ToolStripButton()
+        ToolStripSeparator13 = New ToolStripSeparator()
+        btnDownloadSegmentDataFromWLED = New ToolStripButton()
         btnSendUpdatedSegmentsToWLED = New ToolStripButton()
-        btnPingDevice = New ToolStripButton()
         btnDeleteDevice = New ToolStripButton()
         btnAddDevice = New ToolStripButton()
         ToolStripSeparator4 = New ToolStripSeparator()
         btnGenerateStage = New ToolStripButton()
-        btnGenerateSliders = New ToolStripButton()
         ToolStripSeparator12 = New ToolStripSeparator()
         ToolStripLabel8 = New ToolStripLabel()
         btnAutoPing = New ToolStripButton()
@@ -256,7 +235,6 @@ Partial Class FrmMain
         btnGroupAddRowBefore = New ToolStripButton()
         btnGroupAddRowAfter = New ToolStripButton()
         btnGroupsAutoSplit = New ToolStripButton()
-        btnGroupDMXSlider = New ToolStripButton()
         DG_Groups = New DataGridView()
         colGroupId = New DataGridViewTextBoxColumn()
         colGroupParentId = New DataGridViewTextBoxColumn()
@@ -324,9 +302,22 @@ Partial Class FrmMain
         lblCurrentTime = New Label()
         TimerNextEvent = New Timer(components)
         TimerPingDevices = New Timer(components)
-        ddpTimer = New Timer(components)
         stageTimer = New Timer(components)
         Timer_LoadBuffer = New Timer(components)
+        colIPAddress = New DataGridViewTextBoxColumn()
+        colInstance = New DataGridViewTextBoxColumn()
+        colLayout = New DataGridViewTextBoxColumn()
+        colLedCount = New DataGridViewTextBoxColumn()
+        colSegments = New DataGridViewTextBoxColumn()
+        colEffects = New DataGridViewTextBoxColumn()
+        colPalettes = New DataGridViewTextBoxColumn()
+        colEnabled = New DataGridViewCheckBoxColumn()
+        colOnline = New DataGridViewImageColumn()
+        colDDPData = New DataGridViewTextBoxColumn()
+        colDDPOffset = New DataGridViewTextBoxColumn()
+        colSegmentsData = New DataGridViewTextBoxColumn()
+        colDataProvider = New DataGridViewComboBoxColumn()
+        colBrand = New DataGridViewComboBoxColumn()
         CType(DG_Devices, ComponentModel.ISupportInitialize).BeginInit()
         CType(DG_Effecten, ComponentModel.ISupportInitialize).BeginInit()
         TabControl.SuspendLayout()
@@ -384,12 +375,7 @@ Partial Class FrmMain
         SplitContainer3.SuspendLayout()
         CType(DG_Actions, ComponentModel.ISupportInitialize).BeginInit()
         CType(DG_ActionsDetail, ComponentModel.ISupportInitialize).BeginInit()
-        TabButtons.SuspendLayout()
-        CType(DG_SoundButtons, ComponentModel.ISupportInitialize).BeginInit()
         TabDevices.SuspendLayout()
-        CType(SplitContainer_Devices, ComponentModel.ISupportInitialize).BeginInit()
-        SplitContainer_Devices.Panel1.SuspendLayout()
-        SplitContainer_Devices.SuspendLayout()
         ToolStrip_Devices.SuspendLayout()
         TabGroups.SuspendLayout()
         ToolStripGroups.SuspendLayout()
@@ -414,93 +400,14 @@ Partial Class FrmMain
         ' DG_Devices
         ' 
         DG_Devices.BackgroundColor = Color.DimGray
-        DG_Devices.Columns.AddRange(New DataGridViewColumn() {colIPAddress, colInstance, colLayout, colLedCount, colSegments, colEffects, colPalettes, colEnabled, colOnline, colDDPData, colDDPOffset, colSegmentsData, colDataProvider})
+        DG_Devices.Columns.AddRange(New DataGridViewColumn() {colIPAddress, colInstance, colLayout, colLedCount, colSegments, colEffects, colPalettes, colEnabled, colOnline, colDDPData, colDDPOffset, colSegmentsData, colDataProvider, colBrand})
         DG_Devices.Dock = DockStyle.Fill
-        DG_Devices.Location = New Point(0, 0)
+        DG_Devices.Location = New Point(3, 28)
         DG_Devices.MultiSelect = False
         DG_Devices.Name = "DG_Devices"
         DG_Devices.RowHeadersWidth = 10
-        DG_Devices.Size = New Size(1827, 393)
+        DG_Devices.Size = New Size(1830, 818)
         DG_Devices.TabIndex = 1
-        ' 
-        ' colIPAddress
-        ' 
-        colIPAddress.HeaderText = "IP"
-        colIPAddress.Name = "colIPAddress"
-        colIPAddress.Width = 200
-        ' 
-        ' colInstance
-        ' 
-        colInstance.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        colInstance.HeaderText = "WLed Instantie"
-        colInstance.Name = "colInstance"
-        ' 
-        ' colLayout
-        ' 
-        colLayout.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        colLayout.HeaderText = "Layout"
-        colLayout.Name = "colLayout"
-        colLayout.Resizable = DataGridViewTriState.True
-        colLayout.SortMode = DataGridViewColumnSortMode.NotSortable
-        ' 
-        ' colLedCount
-        ' 
-        colLedCount.HeaderText = "#Leds"
-        colLedCount.Name = "colLedCount"
-        colLedCount.Width = 63
-        ' 
-        ' colSegments
-        ' 
-        colSegments.HeaderText = "Segments"
-        colSegments.Name = "colSegments"
-        ' 
-        ' colEffects
-        ' 
-        colEffects.HeaderText = "Effects"
-        colEffects.MaxInputLength = 65535
-        colEffects.Name = "colEffects"
-        ' 
-        ' colPalettes
-        ' 
-        colPalettes.HeaderText = "Palettes"
-        colPalettes.MaxInputLength = 65535
-        colPalettes.Name = "colPalettes"
-        ' 
-        ' colEnabled
-        ' 
-        colEnabled.HeaderText = "Enabled"
-        colEnabled.Name = "colEnabled"
-        colEnabled.Width = 55
-        ' 
-        ' colOnline
-        ' 
-        colOnline.HeaderText = "Online"
-        colOnline.Name = "colOnline"
-        colOnline.Width = 48
-        ' 
-        ' colDDPData
-        ' 
-        colDDPData.HeaderText = "Data"
-        colDDPData.Name = "colDDPData"
-        ' 
-        ' colDDPOffset
-        ' 
-        colDDPOffset.HeaderText = "Offset"
-        colDDPOffset.Name = "colDDPOffset"
-        ' 
-        ' colSegmentsData
-        ' 
-        colSegmentsData.HeaderText = "SegmentData"
-        colSegmentsData.Name = "colSegmentsData"
-        ' 
-        ' colDataProvider
-        ' 
-        colDataProvider.HeaderText = "Source"
-        colDataProvider.Items.AddRange(New Object() {"DMX", "Effects", "Show"})
-        colDataProvider.MaxDropDownItems = 3
-        colDataProvider.Name = "colDataProvider"
-        colDataProvider.Resizable = DataGridViewTriState.True
-        colDataProvider.SortMode = DataGridViewColumnSortMode.Automatic
         ' 
         ' DG_Effecten
         ' 
@@ -1180,7 +1087,7 @@ Partial Class FrmMain
         ' lblFilter
         ' 
         lblFilter.ForeColor = SystemColors.ControlLightLight
-        lblFilter.Image = My.Resources.Resources.iconFilter2
+        lblFilter.Image = My.Resources.Resources.filter
         lblFilter.Name = "lblFilter"
         lblFilter.Size = New Size(88, 22)
         lblFilter.Text = "Filter op act:"
@@ -1697,7 +1604,6 @@ Partial Class FrmMain
         TabControlTables.Controls.Add(TabLightSources)
         TabControlTables.Controls.Add(TabFrames)
         TabControlTables.Controls.Add(TabStageActions)
-        TabControlTables.Controls.Add(TabButtons)
         TabControlTables.Dock = DockStyle.Bottom
         TabControlTables.Location = New Point(0, 32)
         TabControlTables.Name = "TabControlTables"
@@ -2089,58 +1995,10 @@ Partial Class FrmMain
         colActionRowActor.Name = "colActionRowActor"
         colActionRowActor.Width = 400
         ' 
-        ' TabButtons
-        ' 
-        TabButtons.Controls.Add(DG_SoundButtons)
-        TabButtons.Location = New Point(4, 24)
-        TabButtons.Name = "TabButtons"
-        TabButtons.Padding = New Padding(3)
-        TabButtons.Size = New Size(1828, 789)
-        TabButtons.TabIndex = 5
-        TabButtons.Text = "Sound Buttons"
-        TabButtons.UseVisualStyleBackColor = True
-        ' 
-        ' DG_SoundButtons
-        ' 
-        DG_SoundButtons.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DG_SoundButtons.Columns.AddRange(New DataGridViewColumn() {colButtonsId, colButtonsSoundFile, colButtonsName, colButtonsIcon, colButtonsRepeat})
-        DG_SoundButtons.Dock = DockStyle.Fill
-        DG_SoundButtons.Location = New Point(3, 3)
-        DG_SoundButtons.Name = "DG_SoundButtons"
-        DG_SoundButtons.Size = New Size(1822, 783)
-        DG_SoundButtons.TabIndex = 0
-        ' 
-        ' colButtonsId
-        ' 
-        colButtonsId.HeaderText = "ID"
-        colButtonsId.Name = "colButtonsId"
-        ' 
-        ' colButtonsSoundFile
-        ' 
-        colButtonsSoundFile.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        colButtonsSoundFile.HeaderText = "File"
-        colButtonsSoundFile.Name = "colButtonsSoundFile"
-        ' 
-        ' colButtonsName
-        ' 
-        colButtonsName.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        colButtonsName.HeaderText = "Name"
-        colButtonsName.Name = "colButtonsName"
-        ' 
-        ' colButtonsIcon
-        ' 
-        colButtonsIcon.HeaderText = "Icon"
-        colButtonsIcon.Name = "colButtonsIcon"
-        ' 
-        ' colButtonsRepeat
-        ' 
-        colButtonsRepeat.HeaderText = "Repeat"
-        colButtonsRepeat.Name = "colButtonsRepeat"
-        ' 
         ' TabDevices
         ' 
         TabDevices.BackColor = Color.DimGray
-        TabDevices.Controls.Add(SplitContainer_Devices)
+        TabDevices.Controls.Add(DG_Devices)
         TabDevices.Controls.Add(RichTextBox1)
         TabDevices.Controls.Add(ToolStrip_Devices)
         TabDevices.Location = New Point(4, 24)
@@ -2149,24 +2007,6 @@ Partial Class FrmMain
         TabDevices.Size = New Size(1836, 849)
         TabDevices.TabIndex = 0
         TabDevices.Text = "Devices"
-        ' 
-        ' SplitContainer_Devices
-        ' 
-        SplitContainer_Devices.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
-        SplitContainer_Devices.Location = New Point(3, 63)
-        SplitContainer_Devices.Name = "SplitContainer_Devices"
-        SplitContainer_Devices.Orientation = Orientation.Horizontal
-        ' 
-        ' SplitContainer_Devices.Panel1
-        ' 
-        SplitContainer_Devices.Panel1.Controls.Add(DG_Devices)
-        ' 
-        ' SplitContainer_Devices.Panel2
-        ' 
-        SplitContainer_Devices.Panel2.AutoScroll = True
-        SplitContainer_Devices.Size = New Size(1827, 786)
-        SplitContainer_Devices.SplitterDistance = 393
-        SplitContainer_Devices.TabIndex = 4
         ' 
         ' RichTextBox1
         ' 
@@ -2185,7 +2025,7 @@ Partial Class FrmMain
         ToolStrip_Devices.BackColor = Color.MidnightBlue
         ToolStrip_Devices.Font = New Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         ToolStrip_Devices.GripStyle = ToolStripGripStyle.Hidden
-        ToolStrip_Devices.Items.AddRange(New ToolStripItem() {LblDeviceStatus, btnScanNetworkForWLed, btnDevicesRefreshIPs, btnSendUpdatedSegmentsToWLED, btnPingDevice, btnDeleteDevice, btnAddDevice, ToolStripSeparator4, btnGenerateStage, btnGenerateSliders, ToolStripSeparator12, ToolStripLabel8, btnAutoPing})
+        ToolStrip_Devices.Items.AddRange(New ToolStripItem() {LblDeviceStatus, btnScanNetworkForWLed, btnDevicesRefreshIPs, ToolStripSeparator13, btnDownloadSegmentDataFromWLED, btnSendUpdatedSegmentsToWLED, btnDeleteDevice, btnAddDevice, ToolStripSeparator4, btnGenerateStage, ToolStripSeparator12, ToolStripLabel8, btnAutoPing})
         ToolStrip_Devices.Location = New Point(3, 3)
         ToolStrip_Devices.Name = "ToolStrip_Devices"
         ToolStrip_Devices.Size = New Size(1830, 25)
@@ -2202,7 +2042,7 @@ Partial Class FrmMain
         ' 
         btnScanNetworkForWLed.BackColor = Color.Transparent
         btnScanNetworkForWLed.ForeColor = Color.White
-        btnScanNetworkForWLed.Image = My.Resources.Resources.iconScanNetwork_21
+        btnScanNetworkForWLed.Image = My.Resources.Resources.search_web
         btnScanNetworkForWLed.ImageTransparentColor = Color.Magenta
         btnScanNetworkForWLed.Name = "btnScanNetworkForWLed"
         btnScanNetworkForWLed.Size = New Size(192, 22)
@@ -2211,29 +2051,34 @@ Partial Class FrmMain
         ' btnDevicesRefreshIPs
         ' 
         btnDevicesRefreshIPs.ForeColor = SystemColors.ButtonFace
-        btnDevicesRefreshIPs.Image = My.Resources.Resources.iconTime
+        btnDevicesRefreshIPs.Image = My.Resources.Resources.refresh
         btnDevicesRefreshIPs.ImageTransparentColor = Color.Magenta
         btnDevicesRefreshIPs.Name = "btnDevicesRefreshIPs"
         btnDevicesRefreshIPs.Size = New Size(87, 22)
         btnDevicesRefreshIPs.Text = "Refresh IP's"
         ' 
+        ' ToolStripSeparator13
+        ' 
+        ToolStripSeparator13.Name = "ToolStripSeparator13"
+        ToolStripSeparator13.Size = New Size(6, 25)
+        ' 
+        ' btnDownloadSegmentDataFromWLED
+        ' 
+        btnDownloadSegmentDataFromWLED.ForeColor = SystemColors.ControlLightLight
+        btnDownloadSegmentDataFromWLED.Image = My.Resources.Resources.download_box
+        btnDownloadSegmentDataFromWLED.ImageTransparentColor = Color.Magenta
+        btnDownloadSegmentDataFromWLED.Name = "btnDownloadSegmentDataFromWLED"
+        btnDownloadSegmentDataFromWLED.Size = New Size(216, 22)
+        btnDownloadSegmentDataFromWLED.Text = "Download segmentdata from WLED"
+        ' 
         ' btnSendUpdatedSegmentsToWLED
         ' 
         btnSendUpdatedSegmentsToWLED.ForeColor = SystemColors.ControlLightLight
-        btnSendUpdatedSegmentsToWLED.Image = CType(resources.GetObject("btnSendUpdatedSegmentsToWLED.Image"), Image)
+        btnSendUpdatedSegmentsToWLED.Image = My.Resources.Resources.upload_box
         btnSendUpdatedSegmentsToWLED.ImageTransparentColor = Color.Magenta
         btnSendUpdatedSegmentsToWLED.Name = "btnSendUpdatedSegmentsToWLED"
-        btnSendUpdatedSegmentsToWLED.Size = New Size(153, 22)
-        btnSendUpdatedSegmentsToWLED.Text = "Update WLED segments"
-        ' 
-        ' btnPingDevice
-        ' 
-        btnPingDevice.ForeColor = SystemColors.ControlLightLight
-        btnPingDevice.Image = My.Resources.Resources.iconPing
-        btnPingDevice.ImageTransparentColor = Color.Magenta
-        btnPingDevice.Name = "btnPingDevice"
-        btnPingDevice.Size = New Size(51, 22)
-        btnPingDevice.Text = "Ping"
+        btnSendUpdatedSegmentsToWLED.Size = New Size(185, 22)
+        btnSendUpdatedSegmentsToWLED.Text = "Upload segmentdata to WLED"
         ' 
         ' btnDeleteDevice
         ' 
@@ -2262,22 +2107,12 @@ Partial Class FrmMain
         ' 
         ' btnGenerateStage
         ' 
-        btnGenerateStage.DisplayStyle = ToolStripItemDisplayStyle.Text
         btnGenerateStage.ForeColor = SystemColors.ButtonFace
-        btnGenerateStage.Image = CType(resources.GetObject("btnGenerateStage.Image"), Image)
+        btnGenerateStage.Image = My.Resources.Resources.calculator_variant
         btnGenerateStage.ImageTransparentColor = Color.Magenta
         btnGenerateStage.Name = "btnGenerateStage"
-        btnGenerateStage.Size = New Size(89, 22)
+        btnGenerateStage.Size = New Size(105, 22)
         btnGenerateStage.Text = "Generate stage"
-        ' 
-        ' btnGenerateSliders
-        ' 
-        btnGenerateSliders.ForeColor = SystemColors.ControlLightLight
-        btnGenerateSliders.Image = My.Resources.Resources.iconDMXslider
-        btnGenerateSliders.ImageTransparentColor = Color.Magenta
-        btnGenerateSliders.Name = "btnGenerateSliders"
-        btnGenerateSliders.Size = New Size(89, 22)
-        btnGenerateSliders.Text = "DMX sliders"
         ' 
         ' ToolStripSeparator12
         ' 
@@ -2329,7 +2164,7 @@ Partial Class FrmMain
         ' 
         ToolStripGroups.BackColor = Color.MidnightBlue
         ToolStripGroups.GripStyle = ToolStripGripStyle.Hidden
-        ToolStripGroups.Items.AddRange(New ToolStripItem() {btnGroupDeleteRow, btnGroupAddRowBefore, btnGroupAddRowAfter, btnGroupsAutoSplit, btnGroupDMXSlider})
+        ToolStripGroups.Items.AddRange(New ToolStripItem() {btnGroupDeleteRow, btnGroupAddRowBefore, btnGroupAddRowAfter, btnGroupsAutoSplit})
         ToolStripGroups.Location = New Point(3, 3)
         ToolStripGroups.Name = "ToolStripGroups"
         ToolStripGroups.Size = New Size(1830, 25)
@@ -2369,20 +2204,11 @@ Partial Class FrmMain
         ' btnGroupsAutoSplit
         ' 
         btnGroupsAutoSplit.ForeColor = SystemColors.ButtonFace
-        btnGroupsAutoSplit.Image = CType(resources.GetObject("btnGroupsAutoSplit.Image"), Image)
+        btnGroupsAutoSplit.Image = My.Resources.Resources.call_split
         btnGroupsAutoSplit.ImageTransparentColor = Color.Magenta
         btnGroupsAutoSplit.Name = "btnGroupsAutoSplit"
         btnGroupsAutoSplit.Size = New Size(79, 22)
         btnGroupsAutoSplit.Text = "Auto Split"
-        ' 
-        ' btnGroupDMXSlider
-        ' 
-        btnGroupDMXSlider.ForeColor = SystemColors.ButtonFace
-        btnGroupDMXSlider.Image = My.Resources.Resources.iconDMXslider
-        btnGroupDMXSlider.ImageTransparentColor = Color.Magenta
-        btnGroupDMXSlider.Name = "btnGroupDMXSlider"
-        btnGroupDMXSlider.Size = New Size(84, 22)
-        btnGroupDMXSlider.Text = "DMX slider"
         ' 
         ' DG_Groups
         ' 
@@ -3001,12 +2827,98 @@ Partial Class FrmMain
         TimerPingDevices.Enabled = True
         TimerPingDevices.Interval = 60000
         ' 
-        ' ddpTimer
-        ' 
-        ' 
         ' stageTimer
         ' 
         stageTimer.Interval = 500
+        ' 
+        ' colIPAddress
+        ' 
+        colIPAddress.HeaderText = "IP"
+        colIPAddress.Name = "colIPAddress"
+        colIPAddress.Width = 200
+        ' 
+        ' colInstance
+        ' 
+        colInstance.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        colInstance.HeaderText = "WLed Instantie"
+        colInstance.Name = "colInstance"
+        ' 
+        ' colLayout
+        ' 
+        colLayout.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        colLayout.HeaderText = "Layout"
+        colLayout.Name = "colLayout"
+        colLayout.Resizable = DataGridViewTriState.True
+        colLayout.SortMode = DataGridViewColumnSortMode.NotSortable
+        ' 
+        ' colLedCount
+        ' 
+        colLedCount.HeaderText = "#Leds"
+        colLedCount.Name = "colLedCount"
+        colLedCount.Width = 63
+        ' 
+        ' colSegments
+        ' 
+        colSegments.HeaderText = "Segments"
+        colSegments.Name = "colSegments"
+        ' 
+        ' colEffects
+        ' 
+        colEffects.HeaderText = "Effects"
+        colEffects.MaxInputLength = 65535
+        colEffects.Name = "colEffects"
+        ' 
+        ' colPalettes
+        ' 
+        colPalettes.HeaderText = "Palettes"
+        colPalettes.MaxInputLength = 65535
+        colPalettes.Name = "colPalettes"
+        ' 
+        ' colEnabled
+        ' 
+        colEnabled.HeaderText = "Enabled"
+        colEnabled.Name = "colEnabled"
+        colEnabled.Width = 55
+        ' 
+        ' colOnline
+        ' 
+        colOnline.HeaderText = "Online"
+        colOnline.Name = "colOnline"
+        colOnline.Width = 48
+        ' 
+        ' colDDPData
+        ' 
+        colDDPData.HeaderText = "Data"
+        colDDPData.Name = "colDDPData"
+        colDDPData.Visible = False
+        ' 
+        ' colDDPOffset
+        ' 
+        colDDPOffset.HeaderText = "Offset"
+        colDDPOffset.Name = "colDDPOffset"
+        colDDPOffset.Visible = False
+        ' 
+        ' colSegmentsData
+        ' 
+        colSegmentsData.HeaderText = "SegmentData"
+        colSegmentsData.Name = "colSegmentsData"
+        colSegmentsData.Visible = False
+        ' 
+        ' colDataProvider
+        ' 
+        colDataProvider.HeaderText = "Source"
+        colDataProvider.Items.AddRange(New Object() {"DMX", "Effects", "Show"})
+        colDataProvider.MaxDropDownItems = 3
+        colDataProvider.Name = "colDataProvider"
+        colDataProvider.Resizable = DataGridViewTriState.True
+        colDataProvider.SortMode = DataGridViewColumnSortMode.Automatic
+        colDataProvider.Visible = False
+        ' 
+        ' colBrand
+        ' 
+        colBrand.HeaderText = "Brand"
+        colBrand.Items.AddRange(New Object() {"WLED", "WIZ"})
+        colBrand.Name = "colBrand"
         ' 
         ' FrmMain
         ' 
@@ -3091,13 +3003,8 @@ Partial Class FrmMain
         SplitContainer3.ResumeLayout(False)
         CType(DG_Actions, ComponentModel.ISupportInitialize).EndInit()
         CType(DG_ActionsDetail, ComponentModel.ISupportInitialize).EndInit()
-        TabButtons.ResumeLayout(False)
-        CType(DG_SoundButtons, ComponentModel.ISupportInitialize).EndInit()
         TabDevices.ResumeLayout(False)
         TabDevices.PerformLayout()
-        SplitContainer_Devices.Panel1.ResumeLayout(False)
-        CType(SplitContainer_Devices, ComponentModel.ISupportInitialize).EndInit()
-        SplitContainer_Devices.ResumeLayout(False)
         ToolStrip_Devices.ResumeLayout(False)
         ToolStrip_Devices.PerformLayout()
         TabGroups.ResumeLayout(False)
@@ -3222,7 +3129,6 @@ Partial Class FrmMain
     Friend WithEvents lblControl_TimeLeft As Label
     Friend WithEvents TimerNextEvent As Timer
     Friend WithEvents TimerPingDevices As Timer
-    Friend WithEvents btnPingDevice As ToolStripButton
     Friend WithEvents btnAddDevice As ToolStripButton
     Friend WithEvents btnDeleteDevice As ToolStripButton
     Friend WithEvents settings_EffectsPath As TextBox
@@ -3244,11 +3150,8 @@ Partial Class FrmMain
     Friend WithEvents btnGroupAddRowAfter As ToolStripButton
     Friend WithEvents btnGroupAddRowBefore As ToolStripButton
     Friend WithEvents btnGroupDeleteRow As ToolStripButton
-    Friend WithEvents SplitContainer_Devices As SplitContainer
-    Friend WithEvents btnGenerateSliders As ToolStripButton
     Friend WithEvents Label14 As Label
     Friend WithEvents settings_DDPPort As TextBox
-    Friend WithEvents ddpTimer As Timer
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents ToolStripLabel2 As ToolStripLabel
     Friend WithEvents ListCustomEffects As ToolStripComboBox
@@ -3259,7 +3162,6 @@ Partial Class FrmMain
     Friend WithEvents btnGroupsAutoSplit As ToolStripButton
     Friend WithEvents btnStopEffectPreview As Button
     Friend WithEvents btnStartEffectPreview As Button
-    Friend WithEvents btnGroupDMXSlider As ToolStripButton
     Friend WithEvents stageTimer As Timer
     Friend WithEvents btnResetEffect As Button
     Friend WithEvents TabTables As TabPage
@@ -3323,19 +3225,6 @@ Partial Class FrmMain
     Friend WithEvents btnRebuildDGEffects As ToolStripButton
     Friend WithEvents btnRebuildDGPalettes As ToolStripButton
     Friend WithEvents btnSendUpdatedSegmentsToWLED As ToolStripButton
-    Friend WithEvents colIPAddress As DataGridViewTextBoxColumn
-    Friend WithEvents colInstance As DataGridViewTextBoxColumn
-    Friend WithEvents colLayout As DataGridViewTextBoxColumn
-    Friend WithEvents colLedCount As DataGridViewTextBoxColumn
-    Friend WithEvents colSegments As DataGridViewTextBoxColumn
-    Friend WithEvents colEffects As DataGridViewTextBoxColumn
-    Friend WithEvents colPalettes As DataGridViewTextBoxColumn
-    Friend WithEvents colEnabled As DataGridViewCheckBoxColumn
-    Friend WithEvents colOnline As DataGridViewImageColumn
-    Friend WithEvents colDDPData As DataGridViewTextBoxColumn
-    Friend WithEvents colDDPOffset As DataGridViewTextBoxColumn
-    Friend WithEvents colSegmentsData As DataGridViewTextBoxColumn
-    Friend WithEvents colDataProvider As DataGridViewComboBoxColumn
     Friend WithEvents colProcessed As DataGridViewComboBoxColumn
     Friend WithEvents Timer_LoadBuffer As Timer
     Friend WithEvents btnControl_StopAll As Button
@@ -3436,13 +3325,22 @@ Partial Class FrmMain
     Friend WithEvents colActionPosX As DataGridViewTextBoxColumn
     Friend WithEvents colActionPosY As DataGridViewTextBoxColumn
     Friend WithEvents colActionImage As DataGridViewTextBoxColumn
-    Friend WithEvents TabButtons As TabPage
     Friend WithEvents DataGridView1 As DataGridView
-    Friend WithEvents colButtonsId As DataGridViewTextBoxColumn
-    Friend WithEvents colButtonsSoundFile As DataGridViewTextBoxColumn
-    Friend WithEvents colButtonsName As DataGridViewTextBoxColumn
-    Friend WithEvents colButtonsIcon As DataGridViewTextBoxColumn
-    Friend WithEvents colButtonsRepeat As DataGridViewTextBoxColumn
-    Friend WithEvents DG_SoundButtons As DataGridView
+    Friend WithEvents ToolStripSeparator13 As ToolStripSeparator
+    Friend WithEvents btnDownloadSegmentDataFromWLED As ToolStripButton
+    Friend WithEvents colIPAddress As DataGridViewTextBoxColumn
+    Friend WithEvents colInstance As DataGridViewTextBoxColumn
+    Friend WithEvents colLayout As DataGridViewTextBoxColumn
+    Friend WithEvents colLedCount As DataGridViewTextBoxColumn
+    Friend WithEvents colSegments As DataGridViewTextBoxColumn
+    Friend WithEvents colEffects As DataGridViewTextBoxColumn
+    Friend WithEvents colPalettes As DataGridViewTextBoxColumn
+    Friend WithEvents colEnabled As DataGridViewCheckBoxColumn
+    Friend WithEvents colOnline As DataGridViewImageColumn
+    Friend WithEvents colDDPData As DataGridViewTextBoxColumn
+    Friend WithEvents colDDPOffset As DataGridViewTextBoxColumn
+    Friend WithEvents colSegmentsData As DataGridViewTextBoxColumn
+    Friend WithEvents colDataProvider As DataGridViewComboBoxColumn
+    Friend WithEvents colBrand As DataGridViewComboBoxColumn
 
 End Class

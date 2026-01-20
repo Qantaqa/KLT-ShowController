@@ -180,7 +180,7 @@ Module SaveLoad
         SaveDataGridViewToXml(FrmMain.DG_Actions, Folder + "\Actions.xml")
         SaveDataGridViewToXml(FrmMain.DG_ActionsDetail, Folder + "\ActionsDetail.xml")
 
-        SaveDataGridViewToXml(FrmMain.DG_SoundButtons, Folder + "\SoundButtons.xml")
+
 
         ToonFlashBericht("All data has been saved.", 1)
 
@@ -209,7 +209,7 @@ Module SaveLoad
         LoadXmlToDataGridView(FrmMain.DG_Actions, Folder + "\Actions.xml", False)
         LoadXmlToDataGridView(FrmMain.DG_ActionsDetail, Folder + "\ActionsDetail.xml", False)
 
-        LoadXmlToDataGridView(FrmMain.DG_SoundButtons, Folder + "\SoundButtons.xml", False)
+
 
         SetAllDevicesOffline(FrmMain.DG_Devices)
 

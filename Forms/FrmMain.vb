@@ -9,7 +9,6 @@ Public Class FrmMain
     Public Const nextScene As Integer = 0
     Public Const nextEvent As Integer = 1
 
-    Private lastDDPTick As DateTime = Now
 
     'Private LedKleuren As New List(Of Color)
     Dim LastOfflineDevices As Integer = 0       'Nummer van offline apparaten
@@ -359,15 +358,6 @@ Public Class FrmMain
         MoveAndMaximizeForm(cbMonitorControl.Text)
     End Sub
 
-    'Private Sub cbMonitorPrime_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbMonitorPrime.SelectedIndexChanged
-    '    My.Settings.MonitorPrimary = cbMonitorPrime.Text
-    '    My.Settings.Save()
-    'End Sub
-
-    'Private Sub cbMonitorSecond_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbMonitorSecond.SelectedIndexChanged
-    '    My.Settings.MonitorSecond = cbMonitorSecond.Text
-    '    My.Settings.Save()
-    'End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles TimerEverySecond.Tick
         UpdateMonitorStatusIndicators(cbMonitorControl, cbMonitorPrime, cbMonitorSecond)
@@ -527,9 +517,6 @@ Public Class FrmMain
         End If
     End Sub
 
-    Private Sub btnPingDevice_Click(sender As Object, e As EventArgs) Handles btnPingDevice.Click
-        TimerPingDevices_Tick(sender, e)
-    End Sub
 
     Private Sub btnAddDevice_Click(sender As Object, e As EventArgs) Handles btnAddDevice.Click
         DG_Devices_AddNewRowAfter_Click(DG_Devices, DG_Show, DG_Groups)
@@ -590,45 +577,7 @@ Public Class FrmMain
 
 
 
-    'Sub ControlOneLed(DeviceRow As DataGridViewRow, lednr As Integer, redvalue As Integer, greenvalue As Integer, bluevalue As Integer)
-    '    Dim r As Integer = redvalue
-    '    Dim g As Integer = greenvalue
-    '    Dim b As Integer = bluevalue
 
-    '    ' Segment voor LED 0 instellen (start 0, stop 1)
-    '    Dim json As String = JsonConvert.SerializeObject(New With {
-    '    .seg = New Object() {
-    '        New With {
-    '            .id = 0,
-    '            .start = lednr - 1,
-    '            .stop = lednr,
-    '            .col = New Integer()() {New Integer() {r, g, b}}
-    '        }
-    '    }
-    '})
-
-    '    Dim client As New WebClient()
-    '    client.Headers(HttpRequestHeader.ContentType) = "application/json"
-
-    '    Dim MyUrl = "http://" + DeviceRow.Cells("colIPAddress").Value + "/json/state"
-    '    Try
-    '        client.UploadString(MyUrl, "POST", json)
-    '    Catch ex As Exception
-    '        MessageBox.Show("Fout bij verzenden naar WLED: " & ex.Message)
-    '    End Try
-
-    'End Sub
-
-    Private Sub btnGenerateSlider_Click(sender As Object, e As EventArgs) Handles btnGenerateSliders.Click
-
-        If (DG_Devices.CurrentRow Is Nothing) Then
-            ToonFlashBericht("Selecteer eerst een device in de tabel.", 3)
-            Return
-        End If
-        CurrentDeviceId = DG_Devices.CurrentRow.Index
-        CurrentGroupId = -1
-        GenerateSlidersForSelectedFixture(DG_Devices.CurrentRow, SplitContainer_Devices.Panel2)
-    End Sub
 
     Private Sub settings_EffectsPath_TextChanged(sender As Object, e As EventArgs) Handles settings_EffectsPath.TextChanged
         My.Settings.EffectsImagePath = settings_EffectsPath.Text
@@ -700,25 +649,6 @@ Public Class FrmMain
         ClearGroupsToBlack_WithDDP()
     End Sub
 
-    'Private Sub tbEffectSpeed_Scroll(sender As Object, e As EventArgs)
-    '    My.Settings.CustomEffectSpeed = tbEffectSpeed.Value
-    '    My Settings.Save()
-    'End Sub
-
-    'Private Sub tbEffectIntensity_Scroll(sender As Object, e As EventArgs)
-    '    My.Settings.CustomEffectIntensity = tbEffectIntensity.Value
-    '    My.Settings.Save()
-    'End Sub
-
-    'Private Sub tbEffectBrightness_Scroll(sender As Object, e As EventArgs)
-    '    My.Settings.CustomEffectBrightness = tbEffectBrightnessBaseline.Value
-    '    My.Settings.Save()
-    'End Sub
-
-    Private Sub ddpTimer_Tick_1(sender As Object, e As EventArgs) Handles ddpTimer.Tick
-        lastDDPTick = DateTime.Now
-        'HandleDDPTimer_Tick()
-    End Sub
 
     Private Sub btnStartEffectPreview_Click(sender As Object, e As EventArgs) Handles btnStartEffectPreview.Click
 
@@ -748,41 +678,7 @@ Public Class FrmMain
         Next
     End Sub
 
-    'Private Sub tbEffectDuration_Scroll(sender As Object, e As EventArgs)
-    '    My.Settings.CustomEffectDuration = tbEffectDuration.Value
-    '    My.Settings.Save()
-    'End Sub
 
-    Private Sub btnGroupDMXSlider_Click(sender As Object, e As EventArgs) Handles btnGroupDMXSlider.Click
-
-        If (DG_Groups.CurrentRow Is Nothing) Then
-            ToonFlashBericht("Selecteer eerst een groep in de tabel.", 3)
-            Return
-        End If
-
-        CurrentDeviceId = -1
-        CurrentGroupId = DG_Groups.CurrentRow.Cells("colGroupId").Value
-        GenerateSlidersForSelectedGroup(DG_Groups.CurrentRow, SplitContainer_Devices.Panel2)
-    End Sub
-
-    Private Sub stageTimer_Tick(sender As Object, e As EventArgs) Handles stageTimer.Tick
-        Try
-            ' Bereken hoe lang geleden de laatste DDP werd verstuurd
-            Dim sinceDDP = DateTime.Now - lastDDPTick
-
-            ' Als DDP langer dan 1800ms geleden is, sla stage update over
-            If sinceDDP.TotalMilliseconds > 1800 Then
-                Debug.WriteLine("?? stageTimer tick geskipt: DDP loopt achter")
-                Return
-            End If
-
-            ' Normale update
-            Stage.TekenPodium(pb_Stage, My.Settings.PodiumBreedte, My.Settings.PodiumHoogte)
-
-        Catch ex As Exception
-            Debug.WriteLine("[stageTimer_Tick] Fout: " & ex.Message)
-        End Try
-    End Sub
 
     Private Sub pb_Stage_Resize(sender As Object, e As EventArgs) Handles pb_Stage.Resize
         GenereerLedLijst(DG_Devices, DG_Groups, pb_Stage, My.Settings.PodiumBreedte, My.Settings.PodiumHoogte)
@@ -1451,4 +1347,6 @@ Public Class FrmMain
             ToonFlashBericht("Fout bij laden PDF: " & ex.Message, 8, FlashSeverity.IsError)
         End Try
     End Sub
+
+
 End Class

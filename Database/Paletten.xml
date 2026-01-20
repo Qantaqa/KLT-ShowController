@@ -5,9 +5,11 @@
         <Column Name="PaletteId" Type="System.Windows.Forms.DataGridViewTextBoxColumn" MaxLength="32767" AutoSizeMode="NotSet" />
         <Column Name="Beuk_Cour" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="Beuk_Jardin" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="Test_strip" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="Over_Cour" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="Oven_Center" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="Oven_Jardin" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
+        <Column Name="Bureau" Type="System.Windows.Forms.DataGridViewCheckBoxColumn" AutoSizeMode="NotSet" />
         <Column Name="colPaletteImage" Type="System.Windows.Forms.DataGridViewImageColumn" AutoSizeMode="Fill" />
     </Structure>
     <Data>
@@ -16,9 +18,11 @@
             <PaletteId>0</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -26,9 +30,11 @@
             <PaletteId>1</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -36,9 +42,11 @@
             <PaletteId>2</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -46,9 +54,11 @@
             <PaletteId>3</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -56,9 +66,11 @@
             <PaletteId>4</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -66,9 +78,11 @@
             <PaletteId>5</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -76,9 +90,11 @@
             <PaletteId>6</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -86,9 +102,11 @@
             <PaletteId>7</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -96,9 +114,11 @@
             <PaletteId>8</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -106,9 +126,11 @@
             <PaletteId>9</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -116,9 +138,11 @@
             <PaletteId>10</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -126,9 +150,11 @@
             <PaletteId>11</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -136,9 +162,11 @@
             <PaletteId>12</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -146,9 +174,11 @@
             <PaletteId>13</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -156,9 +186,11 @@
             <PaletteId>14</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -166,9 +198,11 @@
             <PaletteId>15</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -176,9 +210,11 @@
             <PaletteId>16</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -186,9 +222,11 @@
             <PaletteId>17</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -196,9 +234,11 @@
             <PaletteId>18</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -206,9 +246,11 @@
             <PaletteId>19</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -216,9 +258,11 @@
             <PaletteId>20</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -226,9 +270,11 @@
             <PaletteId>21</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -236,9 +282,11 @@
             <PaletteId>22</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -246,9 +294,11 @@
             <PaletteId>23</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -256,9 +306,11 @@
             <PaletteId>24</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -266,9 +318,11 @@
             <PaletteId>25</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -276,9 +330,11 @@
             <PaletteId>26</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -286,9 +342,11 @@
             <PaletteId>27</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -296,9 +354,11 @@
             <PaletteId>28</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -306,9 +366,11 @@
             <PaletteId>29</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -316,9 +378,11 @@
             <PaletteId>30</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -326,9 +390,11 @@
             <PaletteId>31</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -336,9 +402,11 @@
             <PaletteId>32</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -346,9 +414,11 @@
             <PaletteId>33</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -356,9 +426,11 @@
             <PaletteId>34</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -366,9 +438,11 @@
             <PaletteId>35</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -376,9 +450,11 @@
             <PaletteId>36</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -386,9 +462,11 @@
             <PaletteId>37</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -396,9 +474,11 @@
             <PaletteId>38</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -406,9 +486,11 @@
             <PaletteId>39</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -416,9 +498,11 @@
             <PaletteId>40</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -426,9 +510,11 @@
             <PaletteId>41</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -436,9 +522,11 @@
             <PaletteId>42</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -446,9 +534,11 @@
             <PaletteId>43</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -456,9 +546,11 @@
             <PaletteId>44</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -466,9 +558,11 @@
             <PaletteId>45</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -476,9 +570,11 @@
             <PaletteId>46</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -486,9 +582,11 @@
             <PaletteId>47</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -496,9 +594,11 @@
             <PaletteId>48</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -506,9 +606,11 @@
             <PaletteId>49</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -516,9 +618,11 @@
             <PaletteId>50</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -526,9 +630,11 @@
             <PaletteId>51</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -536,9 +642,11 @@
             <PaletteId>52</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -546,9 +654,11 @@
             <PaletteId>53</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -556,9 +666,11 @@
             <PaletteId>54</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -566,9 +678,11 @@
             <PaletteId>55</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -576,9 +690,11 @@
             <PaletteId>56</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -586,9 +702,11 @@
             <PaletteId>57</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -596,9 +714,11 @@
             <PaletteId>58</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -606,9 +726,11 @@
             <PaletteId>59</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -616,9 +738,11 @@
             <PaletteId>60</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -626,9 +750,11 @@
             <PaletteId>61</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -636,9 +762,11 @@
             <PaletteId>62</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -646,9 +774,11 @@
             <PaletteId>63</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -656,9 +786,11 @@
             <PaletteId>64</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -666,9 +798,11 @@
             <PaletteId>65</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -676,9 +810,11 @@
             <PaletteId>66</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -686,9 +822,11 @@
             <PaletteId>67</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -696,9 +834,11 @@
             <PaletteId>68</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -706,9 +846,11 @@
             <PaletteId>69</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
         <Row>
@@ -716,9 +858,11 @@
             <PaletteId>70</PaletteId>
             <Beuk_Cour>True</Beuk_Cour>
             <Beuk_Jardin>True</Beuk_Jardin>
+            <Test_strip>True</Test_strip>
             <Over_Cour>True</Over_Cour>
             <Oven_Center>True</Oven_Center>
             <Oven_Jardin>True</Oven_Jardin>
+            <Bureau>True</Bureau>
             <colPaletteImage>System.Drawing.Bitmap</colPaletteImage>
         </Row>
     </Data>

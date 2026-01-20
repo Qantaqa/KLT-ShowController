@@ -155,5 +155,61 @@
             <colGroupRepeat>False</colGroupRepeat>
             <colGroupLayout>Y10,X10,R71</colGroupLayout>
         </Row>
+        <Row>
+            <colGroupId>11</colGroupId>
+            <colGroupParentId>0</colGroupParentId>
+            <colGroupName>Bureau</colGroupName>
+            <colGroupFixture>Bureau</colGroupFixture>
+            <colGroupSegment></colGroupSegment>
+            <colGroupStartLedNr>1</colGroupStartLedNr>
+            <colGroupStopLedNr>190</colGroupStopLedNr>
+            <colGroupOrder>0</colGroupOrder>
+            <colAllFrames></colAllFrames>
+            <colActiveFrame></colActiveFrame>
+            <colGroupRepeat>False</colGroupRepeat>
+            <colGroupLayout>Y50,X300,U30,R65,D30,L65</colGroupLayout>
+        </Row>
+        <Row>
+            <colGroupId>12</colGroupId>
+            <colGroupParentId>11</colGroupParentId>
+            <colGroupName>Bureau-Group1</colGroupName>
+            <colGroupFixture>Bureau</colGroupFixture>
+            <colGroupSegment>0</colGroupSegment>
+            <colGroupStartLedNr>1</colGroupStartLedNr>
+            <colGroupStopLedNr>190</colGroupStopLedNr>
+            <colGroupOrder>1</colGroupOrder>
+            <colAllFrames></colAllFrames>
+            <colActiveFrame></colActiveFrame>
+            <colGroupRepeat>False</colGroupRepeat>
+            <colGroupLayout>Y50,X300,U30,R65,D30,L65</colGroupLayout>
+        </Row>
+        <Row>
+            <colGroupId>13</colGroupId>
+            <colGroupParentId>0</colGroupParentId>
+            <colGroupName>Test strip</colGroupName>
+            <colGroupFixture>Test strip</colGroupFixture>
+            <colGroupSegment></colGroupSegment>
+            <colGroupStartLedNr>1</colGroupStartLedNr>
+            <colGroupStopLedNr>30</colGroupStopLedNr>
+            <colGroupOrder>0</colGroupOrder>
+            <colAllFrames></colAllFrames>
+            <colActiveFrame></colActiveFrame>
+            <colGroupRepeat>False</colGroupRepeat>
+            <colGroupLayout>X10,Y10,R30</colGroupLayout>
+        </Row>
+        <Row>
+            <colGroupId>13</colGroupId>
+            <colGroupParentId>13</colGroupParentId>
+            <colGroupName>Test strip-Group1</colGroupName>
+            <colGroupFixture>Test strip</colGroupFixture>
+            <colGroupSegment>0</colGroupSegment>
+            <colGroupStartLedNr>1</colGroupStartLedNr>
+            <colGroupStopLedNr>30</colGroupStopLedNr>
+            <colGroupOrder>1</colGroupOrder>
+            <colAllFrames></colAllFrames>
+            <colActiveFrame></colActiveFrame>
+            <colGroupRepeat>False</colGroupRepeat>
+            <colGroupLayout>X10,Y10,R30</colGroupLayout>
+        </Row>
     </Data>
 </DataGridData>

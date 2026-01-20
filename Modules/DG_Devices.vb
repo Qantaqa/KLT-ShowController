@@ -90,6 +90,9 @@ Module DG_Devices
 
         ' Loop door elke rij in de DataGridView.
         For Each row As DataGridViewRow In DG_Devices.Rows
+            If row.Cells("colEnabled").Value = False Then Continue For
+
+
             ' Controleer of de rij geldig is en de benodigde cellen niet Nothing zijn.
             If row IsNot Nothing AndAlso
                row.Cells("colIPAddress")?.Value IsNot Nothing AndAlso

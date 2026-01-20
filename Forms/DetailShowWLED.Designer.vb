@@ -61,13 +61,20 @@ Partial Class DetailShowWLED
         tbBrightness = New TrackBar()
         Label9 = New Label()
         cbPower = New CheckBox()
+        cbAutoPreview = New CheckBox()
         btnCopy = New Button()
         btnPaste = New Button()
         pbPreviewPalette = New PictureBox()
         pbPreviewEffect = New PictureBox()
         btnPreview = New Button()
-        cbAutoPreview = New CheckBox()
         GroupBox4 = New GroupBox()
+        SplitContainer1 = New SplitContainer()
+        btnRetrieveFromWLED = New Button()
+        btnCopyToBank = New Button()
+        btnCopyFromBank = New Button()
+        gb_bank = New GroupBox()
+        flpBankSlots = New FlowLayoutPanel()
+        txtSelectedSlot = New TextBox()
         GroupBox1.SuspendLayout()
         GroupBox2.SuspendLayout()
         GroupBox3.SuspendLayout()
@@ -78,14 +85,19 @@ Partial Class DetailShowWLED
         CType(pbPreviewPalette, ComponentModel.ISupportInitialize).BeginInit()
         CType(pbPreviewEffect, ComponentModel.ISupportInitialize).BeginInit()
         GroupBox4.SuspendLayout()
+        CType(SplitContainer1, ComponentModel.ISupportInitialize).BeginInit()
+        SplitContainer1.Panel1.SuspendLayout()
+        SplitContainer1.Panel2.SuspendLayout()
+        SplitContainer1.SuspendLayout()
+        gb_bank.SuspendLayout()
         SuspendLayout()
         ' 
         ' btnOK
         ' 
-        btnOK.ForeColor = SystemColors.Highlight
-        btnOK.Location = New Point(389, 578)
+        btnOK.ForeColor = Color.DarkGreen
+        btnOK.Location = New Point(544, 583)
         btnOK.Name = "btnOK"
-        btnOK.Size = New Size(75, 22)
+        btnOK.Size = New Size(222, 22)
         btnOK.TabIndex = 0
         btnOK.Text = "OK"
         btnOK.UseVisualStyleBackColor = True
@@ -93,7 +105,7 @@ Partial Class DetailShowWLED
         ' btnCancel
         ' 
         btnCancel.ForeColor = Color.Red
-        btnCancel.Location = New Point(12, 578)
+        btnCancel.Location = New Point(12, 583)
         btnCancel.Name = "btnCancel"
         btnCancel.Size = New Size(108, 22)
         btnCancel.TabIndex = 1
@@ -110,8 +122,8 @@ Partial Class DetailShowWLED
         GroupBox1.Controls.Add(tbScene)
         GroupBox1.Controls.Add(Label2)
         GroupBox1.Controls.Add(Label1)
-        GroupBox1.ForeColor = SystemColors.ControlLightLight
-        GroupBox1.Location = New Point(12, 12)
+        GroupBox1.ForeColor = SystemColors.ActiveCaption
+        GroupBox1.Location = New Point(3, 3)
         GroupBox1.Name = "GroupBox1"
         GroupBox1.Size = New Size(462, 88)
         GroupBox1.TabIndex = 2
@@ -190,8 +202,8 @@ Partial Class DetailShowWLED
         GroupBox2.Controls.Add(tbTimer)
         GroupBox2.Controls.Add(cbDevice)
         GroupBox2.Controls.Add(Label7)
-        GroupBox2.ForeColor = SystemColors.ControlLightLight
-        GroupBox2.Location = New Point(12, 106)
+        GroupBox2.ForeColor = SystemColors.ActiveCaption
+        GroupBox2.Location = New Point(3, 97)
         GroupBox2.Name = "GroupBox2"
         GroupBox2.Size = New Size(462, 76)
         GroupBox2.TabIndex = 3
@@ -235,7 +247,7 @@ Partial Class DetailShowWLED
         ' cbPalette
         ' 
         cbPalette.FormattingEnabled = True
-        cbPalette.Location = New Point(104, 99)
+        cbPalette.Location = New Point(104, 50)
         cbPalette.Name = "cbPalette"
         cbPalette.Size = New Size(203, 23)
         cbPalette.TabIndex = 3
@@ -243,7 +255,7 @@ Partial Class DetailShowWLED
         ' Label6
         ' 
         Label6.AutoSize = True
-        Label6.Location = New Point(15, 102)
+        Label6.Location = New Point(15, 53)
         Label6.Name = "Label6"
         Label6.Size = New Size(43, 15)
         Label6.TabIndex = 2
@@ -252,7 +264,7 @@ Partial Class DetailShowWLED
         ' cbEffect
         ' 
         cbEffect.FormattingEnabled = True
-        cbEffect.Location = New Point(104, 71)
+        cbEffect.Location = New Point(104, 22)
         cbEffect.Name = "cbEffect"
         cbEffect.Size = New Size(203, 23)
         cbEffect.TabIndex = 1
@@ -260,7 +272,7 @@ Partial Class DetailShowWLED
         ' Label5
         ' 
         Label5.AutoSize = True
-        Label5.Location = New Point(15, 74)
+        Label5.Location = New Point(15, 25)
         Label5.Name = "Label5"
         Label5.Size = New Size(37, 15)
         Label5.TabIndex = 0
@@ -286,8 +298,8 @@ Partial Class DetailShowWLED
         GroupBox3.Controls.Add(tbBrightness)
         GroupBox3.Controls.Add(Label9)
         GroupBox3.Controls.Add(cbPower)
-        GroupBox3.ForeColor = SystemColors.ControlLightLight
-        GroupBox3.Location = New Point(15, 128)
+        GroupBox3.ForeColor = SystemColors.ActiveCaption
+        GroupBox3.Location = New Point(15, 79)
         GroupBox3.Name = "GroupBox3"
         GroupBox3.Size = New Size(438, 233)
         GroupBox3.TabIndex = 4
@@ -358,6 +370,7 @@ Partial Class DetailShowWLED
         cbBlend.TabIndex = 12
         cbBlend.Text = "Blend"
         cbBlend.UseVisualStyleBackColor = True
+        cbBlend.Visible = False
         ' 
         ' cbSound
         ' 
@@ -368,6 +381,7 @@ Partial Class DetailShowWLED
         cbSound.TabIndex = 11
         cbSound.Text = "Sound"
         cbSound.UseVisualStyleBackColor = True
+        cbSound.Visible = False
         ' 
         ' tbTransition
         ' 
@@ -455,29 +469,41 @@ Partial Class DetailShowWLED
         cbPower.Text = "Power"
         cbPower.UseVisualStyleBackColor = True
         ' 
+        ' cbAutoPreview
+        ' 
+        cbAutoPreview.AutoSize = True
+        cbAutoPreview.Location = New Point(117, 539)
+        cbAutoPreview.Name = "cbAutoPreview"
+        cbAutoPreview.Size = New Size(96, 19)
+        cbAutoPreview.TabIndex = 13
+        cbAutoPreview.Text = "Auto Preview"
+        cbAutoPreview.UseVisualStyleBackColor = True
+        ' 
         ' btnCopy
         ' 
         btnCopy.ForeColor = SystemColors.Highlight
-        btnCopy.Location = New Point(297, 24)
+        btnCopy.Location = New Point(300, 536)
         btnCopy.Name = "btnCopy"
         btnCopy.Size = New Size(75, 23)
         btnCopy.TabIndex = 21
         btnCopy.Text = "Copy"
         btnCopy.UseVisualStyleBackColor = True
+        btnCopy.Visible = False
         ' 
         ' btnPaste
         ' 
         btnPaste.ForeColor = SystemColors.Highlight
-        btnPaste.Location = New Point(378, 24)
+        btnPaste.Location = New Point(381, 536)
         btnPaste.Name = "btnPaste"
         btnPaste.Size = New Size(75, 23)
         btnPaste.TabIndex = 20
         btnPaste.Text = "Paste"
         btnPaste.UseVisualStyleBackColor = True
+        btnPaste.Visible = False
         ' 
         ' pbPreviewPalette
         ' 
-        pbPreviewPalette.Location = New Point(313, 99)
+        pbPreviewPalette.Location = New Point(313, 50)
         pbPreviewPalette.Name = "pbPreviewPalette"
         pbPreviewPalette.Size = New Size(140, 23)
         pbPreviewPalette.SizeMode = PictureBoxSizeMode.StretchImage
@@ -486,7 +512,7 @@ Partial Class DetailShowWLED
         ' 
         ' pbPreviewEffect
         ' 
-        pbPreviewEffect.Location = New Point(313, 70)
+        pbPreviewEffect.Location = New Point(313, 21)
         pbPreviewEffect.Name = "pbPreviewEffect"
         pbPreviewEffect.Size = New Size(140, 23)
         pbPreviewEffect.SizeMode = PictureBoxSizeMode.StretchImage
@@ -495,42 +521,114 @@ Partial Class DetailShowWLED
         ' 
         ' btnPreview
         ' 
-        btnPreview.ForeColor = SystemColors.Highlight
-        btnPreview.Location = New Point(308, 578)
+        btnPreview.ForeColor = Color.MidnightBlue
+        btnPreview.Location = New Point(0, 536)
         btnPreview.Name = "btnPreview"
-        btnPreview.Size = New Size(75, 23)
+        btnPreview.Size = New Size(108, 23)
         btnPreview.TabIndex = 12
         btnPreview.Text = "Preview"
         btnPreview.UseVisualStyleBackColor = True
         ' 
-        ' cbAutoPreview
-        ' 
-        cbAutoPreview.AutoSize = True
-        cbAutoPreview.Location = New Point(206, 578)
-        cbAutoPreview.Name = "cbAutoPreview"
-        cbAutoPreview.Size = New Size(96, 19)
-        cbAutoPreview.TabIndex = 13
-        cbAutoPreview.Text = "Auto Preview"
-        cbAutoPreview.UseVisualStyleBackColor = True
-        ' 
         ' GroupBox4
         ' 
-        GroupBox4.Controls.Add(btnCopy)
         GroupBox4.Controls.Add(cbEffect)
-        GroupBox4.Controls.Add(btnPaste)
         GroupBox4.Controls.Add(Label6)
         GroupBox4.Controls.Add(pbPreviewPalette)
         GroupBox4.Controls.Add(GroupBox3)
         GroupBox4.Controls.Add(pbPreviewEffect)
         GroupBox4.Controls.Add(cbPalette)
         GroupBox4.Controls.Add(Label5)
-        GroupBox4.ForeColor = SystemColors.ControlLight
-        GroupBox4.Location = New Point(12, 188)
+        GroupBox4.ForeColor = SystemColors.ActiveCaption
+        GroupBox4.Location = New Point(3, 179)
         GroupBox4.Name = "GroupBox4"
-        GroupBox4.Size = New Size(462, 373)
+        GroupBox4.Size = New Size(462, 328)
         GroupBox4.TabIndex = 14
         GroupBox4.TabStop = False
         GroupBox4.Text = "WLED"
+        ' 
+        ' SplitContainer1
+        ' 
+        SplitContainer1.Location = New Point(12, 12)
+        SplitContainer1.Name = "SplitContainer1"
+        ' 
+        ' SplitContainer1.Panel1
+        ' 
+        SplitContainer1.Panel1.Controls.Add(btnRetrieveFromWLED)
+        SplitContainer1.Panel1.Controls.Add(btnCopy)
+        SplitContainer1.Panel1.Controls.Add(GroupBox1)
+        SplitContainer1.Panel1.Controls.Add(GroupBox4)
+        SplitContainer1.Panel1.Controls.Add(btnPaste)
+        SplitContainer1.Panel1.Controls.Add(cbAutoPreview)
+        SplitContainer1.Panel1.Controls.Add(btnPreview)
+        SplitContainer1.Panel1.Controls.Add(GroupBox2)
+        ' 
+        ' SplitContainer1.Panel2
+        ' 
+        SplitContainer1.Panel2.Controls.Add(btnCopyToBank)
+        SplitContainer1.Panel2.Controls.Add(btnCopyFromBank)
+        SplitContainer1.Panel2.Controls.Add(gb_bank)
+        SplitContainer1.Panel2.Controls.Add(txtSelectedSlot)
+        SplitContainer1.Size = New Size(779, 565)
+        SplitContainer1.SplitterDistance = 470
+        SplitContainer1.TabIndex = 16
+        ' 
+        ' btnRetrieveFromWLED
+        ' 
+        btnRetrieveFromWLED.ForeColor = SystemColors.Highlight
+        btnRetrieveFromWLED.Location = New Point(300, 512)
+        btnRetrieveFromWLED.Name = "btnRetrieveFromWLED"
+        btnRetrieveFromWLED.Size = New Size(156, 23)
+        btnRetrieveFromWLED.TabIndex = 22
+        btnRetrieveFromWLED.Text = "Retrieve from WLED"
+        btnRetrieveFromWLED.UseVisualStyleBackColor = True
+        ' 
+        ' btnCopyToBank
+        ' 
+        btnCopyToBank.ForeColor = SystemColors.HotTrack
+        btnCopyToBank.Location = New Point(3, 273)
+        btnCopyToBank.Name = "btnCopyToBank"
+        btnCopyToBank.Size = New Size(46, 23)
+        btnCopyToBank.TabIndex = 3
+        btnCopyToBank.Text = "→"
+        btnCopyToBank.UseVisualStyleBackColor = True
+        ' 
+        ' btnCopyFromBank
+        ' 
+        btnCopyFromBank.ForeColor = SystemColors.HotTrack
+        btnCopyFromBank.Location = New Point(3, 302)
+        btnCopyFromBank.Name = "btnCopyFromBank"
+        btnCopyFromBank.Size = New Size(46, 23)
+        btnCopyFromBank.TabIndex = 2
+        btnCopyFromBank.Text = "←"
+        btnCopyFromBank.UseVisualStyleBackColor = True
+        ' 
+        ' gb_bank
+        ' 
+        gb_bank.Controls.Add(flpBankSlots)
+        gb_bank.ForeColor = SystemColors.ActiveCaption
+        gb_bank.Location = New Point(55, 3)
+        gb_bank.Name = "gb_bank"
+        gb_bank.Size = New Size(228, 559)
+        gb_bank.TabIndex = 1
+        gb_bank.TabStop = False
+        gb_bank.Text = "Bank"
+        ' 
+        ' flpBankSlots
+        ' 
+        flpBankSlots.AutoScroll = True
+        flpBankSlots.Dock = DockStyle.Fill
+        flpBankSlots.Location = New Point(3, 19)
+        flpBankSlots.Name = "flpBankSlots"
+        flpBankSlots.Size = New Size(222, 537)
+        flpBankSlots.TabIndex = 0
+        ' 
+        ' txtSelectedSlot
+        ' 
+        txtSelectedSlot.Location = New Point(3, 244)
+        txtSelectedSlot.Name = "txtSelectedSlot"
+        txtSelectedSlot.Size = New Size(46, 23)
+        txtSelectedSlot.TabIndex = 0
+        txtSelectedSlot.Visible = False
         ' 
         ' DetailShowWLED
         ' 
@@ -539,19 +637,16 @@ Partial Class DetailShowWLED
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.Black
         CancelButton = btnCancel
-        ClientSize = New Size(487, 612)
+        ClientSize = New Size(784, 612)
         ControlBox = False
-        Controls.Add(GroupBox4)
-        Controls.Add(cbAutoPreview)
-        Controls.Add(btnPreview)
-        Controls.Add(GroupBox2)
-        Controls.Add(GroupBox1)
+        Controls.Add(SplitContainer1)
         Controls.Add(btnCancel)
         Controls.Add(btnOK)
         ForeColor = SystemColors.ControlLightLight
         MaximizeBox = False
         MinimizeBox = False
         Name = "DetailShowWLED"
+        SizeGripStyle = SizeGripStyle.Hide
         Text = "Edit details (WLED)"
         GroupBox1.ResumeLayout(False)
         GroupBox1.PerformLayout()
@@ -567,8 +662,14 @@ Partial Class DetailShowWLED
         CType(pbPreviewEffect, ComponentModel.ISupportInitialize).EndInit()
         GroupBox4.ResumeLayout(False)
         GroupBox4.PerformLayout()
+        SplitContainer1.Panel1.ResumeLayout(False)
+        SplitContainer1.Panel1.PerformLayout()
+        SplitContainer1.Panel2.ResumeLayout(False)
+        SplitContainer1.Panel2.PerformLayout()
+        CType(SplitContainer1, ComponentModel.ISupportInitialize).EndInit()
+        SplitContainer1.ResumeLayout(False)
+        gb_bank.ResumeLayout(False)
         ResumeLayout(False)
-        PerformLayout()
     End Sub
 
     Friend WithEvents btnOK As Button
@@ -617,4 +718,11 @@ Partial Class DetailShowWLED
     Friend WithEvents btnPaste As Button
     Friend WithEvents cbAutoPreview As CheckBox
     Friend WithEvents GroupBox4 As GroupBox
+    Friend WithEvents SplitContainer1 As SplitContainer
+    Friend WithEvents btnCopyToBank As Button
+    Friend WithEvents btnCopyFromBank As Button
+    Friend WithEvents gb_bank As GroupBox
+    Friend WithEvents txtSelectedSlot As TextBox
+    Friend WithEvents flpBankSlots As FlowLayoutPanel
+    Friend WithEvents btnRetrieveFromWLED As Button
 End Class
