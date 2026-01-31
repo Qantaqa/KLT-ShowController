@@ -389,6 +389,150 @@ Namespace My
                 Me("SplitPosition") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("CTRL+SHIFT+ALT+F1")>  _
+        Public Property RemoteKey_TL() As String
+            Get
+                Return CType(Me("RemoteKey_TL"),String)
+            End Get
+            Set
+                Me("RemoteKey_TL") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("CTRL+SHIFT+ALT+F2")>  _
+        Public Property RemoteKey_TC() As String
+            Get
+                Return CType(Me("RemoteKey_TC"),String)
+            End Get
+            Set
+                Me("RemoteKey_TC") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("PGUP")>  _
+        Public Property RemoteKey_TR() As String
+            Get
+                Return CType(Me("RemoteKey_TR"),String)
+            End Get
+            Set
+                Me("RemoteKey_TR") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("CTRL+SHIFT+ALT+F3")>  _
+        Public Property RemoteKey_BL() As String
+            Get
+                Return CType(Me("RemoteKey_BL"),String)
+            End Get
+            Set
+                Me("RemoteKey_BL") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("CTRL+SHIFT+ALT+F4")>  _
+        Public Property RemoteKey_BC() As String
+            Get
+                Return CType(Me("RemoteKey_BC"),String)
+            End Get
+            Set
+                Me("RemoteKey_BC") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("PGDOWN")>  _
+        Public Property RemoteKey_BR() As String
+            Get
+                Return CType(Me("RemoteKey_BR"),String)
+            End Get
+            Set
+                Me("RemoteKey_BR") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("START")>  _
+        Public Property RemoteKeyTL_Action() As String
+            Get
+                Return CType(Me("RemoteKeyTL_Action"),String)
+            End Get
+            Set
+                Me("RemoteKeyTL_Action") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("NEXTACT")>  _
+        Public Property RemoteKeyTC_Action() As String
+            Get
+                Return CType(Me("RemoteKeyTC_Action"),String)
+            End Get
+            Set
+                Me("RemoteKeyTC_Action") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("SCRIPT_PGUP")>  _
+        Public Property RemoteKeyTR_Action() As String
+            Get
+                Return CType(Me("RemoteKeyTR_Action"),String)
+            End Get
+            Set
+                Me("RemoteKeyTR_Action") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("NEXTSCENE")>  _
+        Public Property RemoteKeyBL_Action() As String
+            Get
+                Return CType(Me("RemoteKeyBL_Action"),String)
+            End Get
+            Set
+                Me("RemoteKeyBL_Action") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("NEXTEVENT")>  _
+        Public Property RemoteKeyBC_Action() As String
+            Get
+                Return CType(Me("RemoteKeyBC_Action"),String)
+            End Get
+            Set
+                Me("RemoteKeyBC_Action") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("SCRIPT_PGDOWN")>  _
+        Public Property RemoteKeyBR_Action() As String
+            Get
+                Return CType(Me("RemoteKeyBR_Action"),String)
+            End Get
+            Set
+                Me("RemoteKeyBR_Action") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

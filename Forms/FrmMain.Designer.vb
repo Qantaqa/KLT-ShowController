@@ -23,10 +23,24 @@ Partial Class FrmMain
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         components = New ComponentModel.Container()
-        Dim DataGridViewCellStyle1 As DataGridViewCellStyle = New DataGridViewCellStyle()
-        Dim DataGridViewCellStyle2 As DataGridViewCellStyle = New DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As DataGridViewCellStyle = New DataGridViewCellStyle()
+        Dim DataGridViewCellStyle6 As DataGridViewCellStyle = New DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FrmMain))
         DG_Devices = New DataGridView()
+        colIPAddress = New DataGridViewTextBoxColumn()
+        colInstance = New DataGridViewTextBoxColumn()
+        colLayout = New DataGridViewTextBoxColumn()
+        colLedCount = New DataGridViewTextBoxColumn()
+        colSegments = New DataGridViewTextBoxColumn()
+        colEffects = New DataGridViewTextBoxColumn()
+        colPalettes = New DataGridViewTextBoxColumn()
+        colEnabled = New DataGridViewCheckBoxColumn()
+        colOnline = New DataGridViewImageColumn()
+        colDDPData = New DataGridViewTextBoxColumn()
+        colDDPOffset = New DataGridViewTextBoxColumn()
+        colSegmentsData = New DataGridViewTextBoxColumn()
+        colDataProvider = New DataGridViewComboBoxColumn()
+        colBrand = New DataGridViewComboBoxColumn()
         DG_Effecten = New DataGridView()
         TabControl = New TabControl()
         TabShow = New TabPage()
@@ -260,6 +274,38 @@ Partial Class FrmMain
         ToolStripButton1 = New ToolStripButton()
         DG_Paletten = New DataGridView()
         TabSettings = New TabPage()
+        gbRK_All = New GroupBox()
+        Label27 = New Label()
+        gbRK_BottomRight = New GroupBox()
+        Label21 = New Label()
+        Label22 = New Label()
+        CBRK_BottomRight = New ComboBox()
+        TBRK_BottomRight = New TextBox()
+        gbRK_TopRight = New GroupBox()
+        Label19 = New Label()
+        Label20 = New Label()
+        CBRK_TopRight = New ComboBox()
+        TBRK_TopRight = New TextBox()
+        gbRK_BottomCenter = New GroupBox()
+        Label23 = New Label()
+        Label24 = New Label()
+        CBRK_BottomCenter = New ComboBox()
+        TBRK_BottomCenter = New TextBox()
+        gbRK_BottomLeft = New GroupBox()
+        Label25 = New Label()
+        Label26 = New Label()
+        CBRK_BottomLeft = New ComboBox()
+        TBRK_BottomLeft = New TextBox()
+        gbRK_TopCenter = New GroupBox()
+        Label17 = New Label()
+        Label18 = New Label()
+        CBRK_TopCenter = New ComboBox()
+        TBRK_TopCenter = New TextBox()
+        gbRK_TopLeft = New GroupBox()
+        Label16 = New Label()
+        Label15 = New Label()
+        CBRK_TopLeft = New ComboBox()
+        TBRK_TopLeft = New TextBox()
         GroupBox8 = New GroupBox()
         btn_ScriptPDF = New Button()
         settings_ScriptPDF = New TextBox()
@@ -304,20 +350,6 @@ Partial Class FrmMain
         TimerPingDevices = New Timer(components)
         stageTimer = New Timer(components)
         Timer_LoadBuffer = New Timer(components)
-        colIPAddress = New DataGridViewTextBoxColumn()
-        colInstance = New DataGridViewTextBoxColumn()
-        colLayout = New DataGridViewTextBoxColumn()
-        colLedCount = New DataGridViewTextBoxColumn()
-        colSegments = New DataGridViewTextBoxColumn()
-        colEffects = New DataGridViewTextBoxColumn()
-        colPalettes = New DataGridViewTextBoxColumn()
-        colEnabled = New DataGridViewCheckBoxColumn()
-        colOnline = New DataGridViewImageColumn()
-        colDDPData = New DataGridViewTextBoxColumn()
-        colDDPOffset = New DataGridViewTextBoxColumn()
-        colSegmentsData = New DataGridViewTextBoxColumn()
-        colDataProvider = New DataGridViewComboBoxColumn()
-        colBrand = New DataGridViewComboBoxColumn()
         CType(DG_Devices, ComponentModel.ISupportInitialize).BeginInit()
         CType(DG_Effecten, ComponentModel.ISupportInitialize).BeginInit()
         TabControl.SuspendLayout()
@@ -386,6 +418,13 @@ Partial Class FrmMain
         ToolStrip_Paletten.SuspendLayout()
         CType(DG_Paletten, ComponentModel.ISupportInitialize).BeginInit()
         TabSettings.SuspendLayout()
+        gbRK_All.SuspendLayout()
+        gbRK_BottomRight.SuspendLayout()
+        gbRK_TopRight.SuspendLayout()
+        gbRK_BottomCenter.SuspendLayout()
+        gbRK_BottomLeft.SuspendLayout()
+        gbRK_TopCenter.SuspendLayout()
+        gbRK_TopLeft.SuspendLayout()
         GroupBox8.SuspendLayout()
         GroupBox4.SuspendLayout()
         GroupBox2.SuspendLayout()
@@ -408,6 +447,95 @@ Partial Class FrmMain
         DG_Devices.RowHeadersWidth = 10
         DG_Devices.Size = New Size(1830, 818)
         DG_Devices.TabIndex = 1
+        ' 
+        ' colIPAddress
+        ' 
+        colIPAddress.HeaderText = "IP"
+        colIPAddress.Name = "colIPAddress"
+        colIPAddress.Width = 200
+        ' 
+        ' colInstance
+        ' 
+        colInstance.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        colInstance.HeaderText = "WLed Instantie"
+        colInstance.Name = "colInstance"
+        ' 
+        ' colLayout
+        ' 
+        colLayout.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+        colLayout.HeaderText = "Layout"
+        colLayout.Name = "colLayout"
+        colLayout.Resizable = DataGridViewTriState.True
+        colLayout.SortMode = DataGridViewColumnSortMode.NotSortable
+        ' 
+        ' colLedCount
+        ' 
+        colLedCount.HeaderText = "#Leds"
+        colLedCount.Name = "colLedCount"
+        colLedCount.Width = 63
+        ' 
+        ' colSegments
+        ' 
+        colSegments.HeaderText = "Segments"
+        colSegments.Name = "colSegments"
+        ' 
+        ' colEffects
+        ' 
+        colEffects.HeaderText = "Effects"
+        colEffects.MaxInputLength = 65535
+        colEffects.Name = "colEffects"
+        ' 
+        ' colPalettes
+        ' 
+        colPalettes.HeaderText = "Palettes"
+        colPalettes.MaxInputLength = 65535
+        colPalettes.Name = "colPalettes"
+        ' 
+        ' colEnabled
+        ' 
+        colEnabled.HeaderText = "Enabled"
+        colEnabled.Name = "colEnabled"
+        colEnabled.Width = 55
+        ' 
+        ' colOnline
+        ' 
+        colOnline.HeaderText = "Online"
+        colOnline.Name = "colOnline"
+        colOnline.Width = 48
+        ' 
+        ' colDDPData
+        ' 
+        colDDPData.HeaderText = "Data"
+        colDDPData.Name = "colDDPData"
+        colDDPData.Visible = False
+        ' 
+        ' colDDPOffset
+        ' 
+        colDDPOffset.HeaderText = "Offset"
+        colDDPOffset.Name = "colDDPOffset"
+        colDDPOffset.Visible = False
+        ' 
+        ' colSegmentsData
+        ' 
+        colSegmentsData.HeaderText = "SegmentData"
+        colSegmentsData.Name = "colSegmentsData"
+        colSegmentsData.Visible = False
+        ' 
+        ' colDataProvider
+        ' 
+        colDataProvider.HeaderText = "Source"
+        colDataProvider.Items.AddRange(New Object() {"DMX", "Effects", "Show"})
+        colDataProvider.MaxDropDownItems = 3
+        colDataProvider.Name = "colDataProvider"
+        colDataProvider.Resizable = DataGridViewTriState.True
+        colDataProvider.SortMode = DataGridViewColumnSortMode.Automatic
+        colDataProvider.Visible = False
+        ' 
+        ' colBrand
+        ' 
+        colBrand.HeaderText = "Brand"
+        colBrand.Items.AddRange(New Object() {"WLED", "WIZ"})
+        colBrand.Name = "colBrand"
         ' 
         ' DG_Effecten
         ' 
@@ -504,9 +632,9 @@ Partial Class FrmMain
         ' 
         ' colSceneId
         ' 
-        DataGridViewCellStyle1.Format = "N0"
-        DataGridViewCellStyle1.NullValue = Nothing
-        colSceneId.DefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle5.Format = "N0"
+        DataGridViewCellStyle5.NullValue = Nothing
+        colSceneId.DefaultCellStyle = DataGridViewCellStyle5
         colSceneId.HeaderText = "Scene"
         colSceneId.Name = "colSceneId"
         colSceneId.ToolTipText = "Scene nummer van de show"
@@ -514,9 +642,9 @@ Partial Class FrmMain
         ' 
         ' colEventId
         ' 
-        DataGridViewCellStyle2.Format = "N0"
-        DataGridViewCellStyle2.NullValue = Nothing
-        colEventId.DefaultCellStyle = DataGridViewCellStyle2
+        DataGridViewCellStyle6.Format = "N0"
+        DataGridViewCellStyle6.NullValue = Nothing
+        colEventId.DefaultCellStyle = DataGridViewCellStyle6
         colEventId.HeaderText = "Event"
         colEventId.Name = "colEventId"
         colEventId.ToolTipText = "Het event nummer binnen een scene."
@@ -713,7 +841,7 @@ Partial Class FrmMain
         btnControl_NextAct.Name = "btnControl_NextAct"
         btnControl_NextAct.Size = New Size(368, 41)
         btnControl_NextAct.TabIndex = 8
-        btnControl_NextAct.Text = "Volgende act"
+        btnControl_NextAct.Text = "Volgende act (F11)"
         btnControl_NextAct.UseVisualStyleBackColor = False
         ' 
         ' btnStopLoopingAtEndOfVideo
@@ -793,7 +921,7 @@ Partial Class FrmMain
         btnControl_NextScene.Name = "btnControl_NextScene"
         btnControl_NextScene.Size = New Size(176, 41)
         btnControl_NextScene.TabIndex = 2
-        btnControl_NextScene.Text = "Volgende scene"
+        btnControl_NextScene.Text = "Volgende scene (F10)"
         btnControl_NextScene.UseVisualStyleBackColor = False
         ' 
         ' btnControl_NextEvent
@@ -806,7 +934,7 @@ Partial Class FrmMain
         btnControl_NextEvent.Name = "btnControl_NextEvent"
         btnControl_NextEvent.Size = New Size(186, 41)
         btnControl_NextEvent.TabIndex = 1
-        btnControl_NextEvent.Text = "Volgende event"
+        btnControl_NextEvent.Text = "Volgende event (F12)"
         btnControl_NextEvent.UseVisualStyleBackColor = False
         ' 
         ' btnControl_Start
@@ -819,7 +947,7 @@ Partial Class FrmMain
         btnControl_Start.Name = "btnControl_Start"
         btnControl_Start.Size = New Size(99, 40)
         btnControl_Start.TabIndex = 0
-        btnControl_Start.Text = "Start"
+        btnControl_Start.Text = "Start (F9)"
         btnControl_Start.UseVisualStyleBackColor = False
         ' 
         ' gb_DetailWLed
@@ -2414,6 +2542,7 @@ Partial Class FrmMain
         ' TabSettings
         ' 
         TabSettings.BackColor = Color.DimGray
+        TabSettings.Controls.Add(gbRK_All)
         TabSettings.Controls.Add(GroupBox8)
         TabSettings.Controls.Add(GroupBox4)
         TabSettings.Controls.Add(GroupBox2)
@@ -2424,6 +2553,313 @@ Partial Class FrmMain
         TabSettings.Size = New Size(1836, 849)
         TabSettings.TabIndex = 4
         TabSettings.Text = "Settings"
+        ' 
+        ' gbRK_All
+        ' 
+        gbRK_All.Controls.Add(Label27)
+        gbRK_All.Controls.Add(gbRK_BottomRight)
+        gbRK_All.Controls.Add(gbRK_TopRight)
+        gbRK_All.Controls.Add(gbRK_BottomCenter)
+        gbRK_All.Controls.Add(gbRK_BottomLeft)
+        gbRK_All.Controls.Add(gbRK_TopCenter)
+        gbRK_All.Controls.Add(gbRK_TopLeft)
+        gbRK_All.Location = New Point(353, 113)
+        gbRK_All.Name = "gbRK_All"
+        gbRK_All.Size = New Size(716, 303)
+        gbRK_All.TabIndex = 8
+        gbRK_All.TabStop = False
+        gbRK_All.Text = "Remote BT Keyboard"
+        ' 
+        ' Label27
+        ' 
+        Label27.AutoSize = True
+        Label27.Location = New Point(35, 252)
+        Label27.Name = "Label27"
+        Label27.Size = New Size(230, 15)
+        Label27.TabIndex = 8
+        Label27.Text = "To setup keyboard: http://sayodevice.com"
+        ' 
+        ' gbRK_BottomRight
+        ' 
+        gbRK_BottomRight.Controls.Add(Label21)
+        gbRK_BottomRight.Controls.Add(Label22)
+        gbRK_BottomRight.Controls.Add(CBRK_BottomRight)
+        gbRK_BottomRight.Controls.Add(TBRK_BottomRight)
+        gbRK_BottomRight.Location = New Point(465, 148)
+        gbRK_BottomRight.Name = "gbRK_BottomRight"
+        gbRK_BottomRight.Size = New Size(210, 94)
+        gbRK_BottomRight.TabIndex = 7
+        gbRK_BottomRight.TabStop = False
+        gbRK_BottomRight.Text = "Top Left"
+        ' 
+        ' Label21
+        ' 
+        Label21.AutoSize = True
+        Label21.Location = New Point(6, 55)
+        Label21.Name = "Label21"
+        Label21.Size = New Size(42, 15)
+        Label21.TabIndex = 3
+        Label21.Text = "Action"
+        ' 
+        ' Label22
+        ' 
+        Label22.AutoSize = True
+        Label22.Location = New Point(6, 29)
+        Label22.Name = "Label22"
+        Label22.Size = New Size(66, 15)
+        Label22.TabIndex = 2
+        Label22.Text = "Bind to key"
+        ' 
+        ' CBRK_BottomRight
+        ' 
+        CBRK_BottomRight.FormattingEnabled = True
+        CBRK_BottomRight.Items.AddRange(New Object() {"START", "NEXTACT", "NEXTSCENE", "NEXTEVENT", "SCRIPT_PGUP", "SCRIPT_PGDOWN"})
+        CBRK_BottomRight.Location = New Point(81, 55)
+        CBRK_BottomRight.Name = "CBRK_BottomRight"
+        CBRK_BottomRight.Size = New Size(121, 23)
+        CBRK_BottomRight.TabIndex = 1
+        ' 
+        ' TBRK_BottomRight
+        ' 
+        TBRK_BottomRight.Location = New Point(81, 26)
+        TBRK_BottomRight.Name = "TBRK_BottomRight"
+        TBRK_BottomRight.Size = New Size(121, 23)
+        TBRK_BottomRight.TabIndex = 0
+        ' 
+        ' gbRK_TopRight
+        ' 
+        gbRK_TopRight.Controls.Add(Label19)
+        gbRK_TopRight.Controls.Add(Label20)
+        gbRK_TopRight.Controls.Add(CBRK_TopRight)
+        gbRK_TopRight.Controls.Add(TBRK_TopRight)
+        gbRK_TopRight.Location = New Point(465, 48)
+        gbRK_TopRight.Name = "gbRK_TopRight"
+        gbRK_TopRight.Size = New Size(210, 94)
+        gbRK_TopRight.TabIndex = 4
+        gbRK_TopRight.TabStop = False
+        gbRK_TopRight.Text = "Top Left"
+        ' 
+        ' Label19
+        ' 
+        Label19.AutoSize = True
+        Label19.Location = New Point(6, 55)
+        Label19.Name = "Label19"
+        Label19.Size = New Size(42, 15)
+        Label19.TabIndex = 3
+        Label19.Text = "Action"
+        ' 
+        ' Label20
+        ' 
+        Label20.AutoSize = True
+        Label20.Location = New Point(6, 29)
+        Label20.Name = "Label20"
+        Label20.Size = New Size(66, 15)
+        Label20.TabIndex = 2
+        Label20.Text = "Bind to key"
+        ' 
+        ' CBRK_TopRight
+        ' 
+        CBRK_TopRight.FormattingEnabled = True
+        CBRK_TopRight.Items.AddRange(New Object() {"START", "NEXTACT", "NEXTSCENE", "NEXTEVENT", "SCRIPT_PGUP", "SCRIPT_PGDOWN"})
+        CBRK_TopRight.Location = New Point(81, 55)
+        CBRK_TopRight.Name = "CBRK_TopRight"
+        CBRK_TopRight.Size = New Size(121, 23)
+        CBRK_TopRight.TabIndex = 1
+        ' 
+        ' TBRK_TopRight
+        ' 
+        TBRK_TopRight.Location = New Point(81, 26)
+        TBRK_TopRight.Name = "TBRK_TopRight"
+        TBRK_TopRight.Size = New Size(121, 23)
+        TBRK_TopRight.TabIndex = 0
+        ' 
+        ' gbRK_BottomCenter
+        ' 
+        gbRK_BottomCenter.Controls.Add(Label23)
+        gbRK_BottomCenter.Controls.Add(Label24)
+        gbRK_BottomCenter.Controls.Add(CBRK_BottomCenter)
+        gbRK_BottomCenter.Controls.Add(TBRK_BottomCenter)
+        gbRK_BottomCenter.Location = New Point(249, 148)
+        gbRK_BottomCenter.Name = "gbRK_BottomCenter"
+        gbRK_BottomCenter.Size = New Size(210, 94)
+        gbRK_BottomCenter.TabIndex = 6
+        gbRK_BottomCenter.TabStop = False
+        gbRK_BottomCenter.Text = "Top Left"
+        ' 
+        ' Label23
+        ' 
+        Label23.AutoSize = True
+        Label23.Location = New Point(6, 55)
+        Label23.Name = "Label23"
+        Label23.Size = New Size(42, 15)
+        Label23.TabIndex = 3
+        Label23.Text = "Action"
+        ' 
+        ' Label24
+        ' 
+        Label24.AutoSize = True
+        Label24.Location = New Point(6, 29)
+        Label24.Name = "Label24"
+        Label24.Size = New Size(66, 15)
+        Label24.TabIndex = 2
+        Label24.Text = "Bind to key"
+        ' 
+        ' CBRK_BottomCenter
+        ' 
+        CBRK_BottomCenter.FormattingEnabled = True
+        CBRK_BottomCenter.Items.AddRange(New Object() {"START", "NEXTACT", "NEXTSCENE", "NEXTEVENT", "SCRIPT_PGUP", "SCRIPT_PGDOWN"})
+        CBRK_BottomCenter.Location = New Point(81, 55)
+        CBRK_BottomCenter.Name = "CBRK_BottomCenter"
+        CBRK_BottomCenter.Size = New Size(121, 23)
+        CBRK_BottomCenter.TabIndex = 1
+        ' 
+        ' TBRK_BottomCenter
+        ' 
+        TBRK_BottomCenter.Location = New Point(81, 26)
+        TBRK_BottomCenter.Name = "TBRK_BottomCenter"
+        TBRK_BottomCenter.Size = New Size(121, 23)
+        TBRK_BottomCenter.TabIndex = 0
+        ' 
+        ' gbRK_BottomLeft
+        ' 
+        gbRK_BottomLeft.Controls.Add(Label25)
+        gbRK_BottomLeft.Controls.Add(Label26)
+        gbRK_BottomLeft.Controls.Add(CBRK_BottomLeft)
+        gbRK_BottomLeft.Controls.Add(TBRK_BottomLeft)
+        gbRK_BottomLeft.Location = New Point(33, 148)
+        gbRK_BottomLeft.Name = "gbRK_BottomLeft"
+        gbRK_BottomLeft.Size = New Size(210, 94)
+        gbRK_BottomLeft.TabIndex = 5
+        gbRK_BottomLeft.TabStop = False
+        gbRK_BottomLeft.Text = "Top Left"
+        ' 
+        ' Label25
+        ' 
+        Label25.AutoSize = True
+        Label25.Location = New Point(6, 55)
+        Label25.Name = "Label25"
+        Label25.Size = New Size(42, 15)
+        Label25.TabIndex = 3
+        Label25.Text = "Action"
+        ' 
+        ' Label26
+        ' 
+        Label26.AutoSize = True
+        Label26.Location = New Point(6, 29)
+        Label26.Name = "Label26"
+        Label26.Size = New Size(66, 15)
+        Label26.TabIndex = 2
+        Label26.Text = "Bind to key"
+        ' 
+        ' CBRK_BottomLeft
+        ' 
+        CBRK_BottomLeft.FormattingEnabled = True
+        CBRK_BottomLeft.Items.AddRange(New Object() {"START", "NEXTACT", "NEXTSCENE", "NEXTEVENT", "SCRIPT_PGUP", "SCRIPT_PGDOWN"})
+        CBRK_BottomLeft.Location = New Point(81, 55)
+        CBRK_BottomLeft.Name = "CBRK_BottomLeft"
+        CBRK_BottomLeft.Size = New Size(121, 23)
+        CBRK_BottomLeft.TabIndex = 1
+        ' 
+        ' TBRK_BottomLeft
+        ' 
+        TBRK_BottomLeft.Location = New Point(81, 26)
+        TBRK_BottomLeft.Name = "TBRK_BottomLeft"
+        TBRK_BottomLeft.Size = New Size(121, 23)
+        TBRK_BottomLeft.TabIndex = 0
+        ' 
+        ' gbRK_TopCenter
+        ' 
+        gbRK_TopCenter.Controls.Add(Label17)
+        gbRK_TopCenter.Controls.Add(Label18)
+        gbRK_TopCenter.Controls.Add(CBRK_TopCenter)
+        gbRK_TopCenter.Controls.Add(TBRK_TopCenter)
+        gbRK_TopCenter.Location = New Point(249, 48)
+        gbRK_TopCenter.Name = "gbRK_TopCenter"
+        gbRK_TopCenter.Size = New Size(210, 94)
+        gbRK_TopCenter.TabIndex = 4
+        gbRK_TopCenter.TabStop = False
+        gbRK_TopCenter.Text = "Top Left"
+        ' 
+        ' Label17
+        ' 
+        Label17.AutoSize = True
+        Label17.Location = New Point(6, 55)
+        Label17.Name = "Label17"
+        Label17.Size = New Size(42, 15)
+        Label17.TabIndex = 3
+        Label17.Text = "Action"
+        ' 
+        ' Label18
+        ' 
+        Label18.AutoSize = True
+        Label18.Location = New Point(6, 29)
+        Label18.Name = "Label18"
+        Label18.Size = New Size(66, 15)
+        Label18.TabIndex = 2
+        Label18.Text = "Bind to key"
+        ' 
+        ' CBRK_TopCenter
+        ' 
+        CBRK_TopCenter.FormattingEnabled = True
+        CBRK_TopCenter.Items.AddRange(New Object() {"START", "NEXTACT", "NEXTSCENE", "NEXTEVENT", "SCRIPT_PGUP", "SCRIPT_PGDOWN"})
+        CBRK_TopCenter.Location = New Point(81, 55)
+        CBRK_TopCenter.Name = "CBRK_TopCenter"
+        CBRK_TopCenter.Size = New Size(121, 23)
+        CBRK_TopCenter.TabIndex = 1
+        ' 
+        ' TBRK_TopCenter
+        ' 
+        TBRK_TopCenter.Location = New Point(81, 26)
+        TBRK_TopCenter.Name = "TBRK_TopCenter"
+        TBRK_TopCenter.Size = New Size(121, 23)
+        TBRK_TopCenter.TabIndex = 0
+        ' 
+        ' gbRK_TopLeft
+        ' 
+        gbRK_TopLeft.Controls.Add(Label16)
+        gbRK_TopLeft.Controls.Add(Label15)
+        gbRK_TopLeft.Controls.Add(CBRK_TopLeft)
+        gbRK_TopLeft.Controls.Add(TBRK_TopLeft)
+        gbRK_TopLeft.Location = New Point(33, 48)
+        gbRK_TopLeft.Name = "gbRK_TopLeft"
+        gbRK_TopLeft.Size = New Size(210, 94)
+        gbRK_TopLeft.TabIndex = 0
+        gbRK_TopLeft.TabStop = False
+        gbRK_TopLeft.Text = "Top Left"
+        ' 
+        ' Label16
+        ' 
+        Label16.AutoSize = True
+        Label16.Location = New Point(6, 55)
+        Label16.Name = "Label16"
+        Label16.Size = New Size(42, 15)
+        Label16.TabIndex = 3
+        Label16.Text = "Action"
+        ' 
+        ' Label15
+        ' 
+        Label15.AutoSize = True
+        Label15.Location = New Point(6, 29)
+        Label15.Name = "Label15"
+        Label15.Size = New Size(66, 15)
+        Label15.TabIndex = 2
+        Label15.Text = "Bind to key"
+        ' 
+        ' CBRK_TopLeft
+        ' 
+        CBRK_TopLeft.FormattingEnabled = True
+        CBRK_TopLeft.Items.AddRange(New Object() {"START", "NEXTACT", "NEXTSCENE", "NEXTEVENT", "SCRIPT_PGUP", "SCRIPT_PGDOWN"})
+        CBRK_TopLeft.Location = New Point(81, 55)
+        CBRK_TopLeft.Name = "CBRK_TopLeft"
+        CBRK_TopLeft.Size = New Size(121, 23)
+        CBRK_TopLeft.TabIndex = 1
+        ' 
+        ' TBRK_TopLeft
+        ' 
+        TBRK_TopLeft.Location = New Point(81, 26)
+        TBRK_TopLeft.Name = "TBRK_TopLeft"
+        TBRK_TopLeft.Size = New Size(121, 23)
+        TBRK_TopLeft.TabIndex = 0
         ' 
         ' GroupBox8
         ' 
@@ -2831,95 +3267,6 @@ Partial Class FrmMain
         ' 
         stageTimer.Interval = 500
         ' 
-        ' colIPAddress
-        ' 
-        colIPAddress.HeaderText = "IP"
-        colIPAddress.Name = "colIPAddress"
-        colIPAddress.Width = 200
-        ' 
-        ' colInstance
-        ' 
-        colInstance.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        colInstance.HeaderText = "WLed Instantie"
-        colInstance.Name = "colInstance"
-        ' 
-        ' colLayout
-        ' 
-        colLayout.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
-        colLayout.HeaderText = "Layout"
-        colLayout.Name = "colLayout"
-        colLayout.Resizable = DataGridViewTriState.True
-        colLayout.SortMode = DataGridViewColumnSortMode.NotSortable
-        ' 
-        ' colLedCount
-        ' 
-        colLedCount.HeaderText = "#Leds"
-        colLedCount.Name = "colLedCount"
-        colLedCount.Width = 63
-        ' 
-        ' colSegments
-        ' 
-        colSegments.HeaderText = "Segments"
-        colSegments.Name = "colSegments"
-        ' 
-        ' colEffects
-        ' 
-        colEffects.HeaderText = "Effects"
-        colEffects.MaxInputLength = 65535
-        colEffects.Name = "colEffects"
-        ' 
-        ' colPalettes
-        ' 
-        colPalettes.HeaderText = "Palettes"
-        colPalettes.MaxInputLength = 65535
-        colPalettes.Name = "colPalettes"
-        ' 
-        ' colEnabled
-        ' 
-        colEnabled.HeaderText = "Enabled"
-        colEnabled.Name = "colEnabled"
-        colEnabled.Width = 55
-        ' 
-        ' colOnline
-        ' 
-        colOnline.HeaderText = "Online"
-        colOnline.Name = "colOnline"
-        colOnline.Width = 48
-        ' 
-        ' colDDPData
-        ' 
-        colDDPData.HeaderText = "Data"
-        colDDPData.Name = "colDDPData"
-        colDDPData.Visible = False
-        ' 
-        ' colDDPOffset
-        ' 
-        colDDPOffset.HeaderText = "Offset"
-        colDDPOffset.Name = "colDDPOffset"
-        colDDPOffset.Visible = False
-        ' 
-        ' colSegmentsData
-        ' 
-        colSegmentsData.HeaderText = "SegmentData"
-        colSegmentsData.Name = "colSegmentsData"
-        colSegmentsData.Visible = False
-        ' 
-        ' colDataProvider
-        ' 
-        colDataProvider.HeaderText = "Source"
-        colDataProvider.Items.AddRange(New Object() {"DMX", "Effects", "Show"})
-        colDataProvider.MaxDropDownItems = 3
-        colDataProvider.Name = "colDataProvider"
-        colDataProvider.Resizable = DataGridViewTriState.True
-        colDataProvider.SortMode = DataGridViewColumnSortMode.Automatic
-        colDataProvider.Visible = False
-        ' 
-        ' colBrand
-        ' 
-        colBrand.HeaderText = "Brand"
-        colBrand.Items.AddRange(New Object() {"WLED", "WIZ"})
-        colBrand.Name = "colBrand"
-        ' 
         ' FrmMain
         ' 
         AutoScaleDimensions = New SizeF(7F, 15F)
@@ -3022,6 +3369,20 @@ Partial Class FrmMain
         ToolStrip_Paletten.PerformLayout()
         CType(DG_Paletten, ComponentModel.ISupportInitialize).EndInit()
         TabSettings.ResumeLayout(False)
+        gbRK_All.ResumeLayout(False)
+        gbRK_All.PerformLayout()
+        gbRK_BottomRight.ResumeLayout(False)
+        gbRK_BottomRight.PerformLayout()
+        gbRK_TopRight.ResumeLayout(False)
+        gbRK_TopRight.PerformLayout()
+        gbRK_BottomCenter.ResumeLayout(False)
+        gbRK_BottomCenter.PerformLayout()
+        gbRK_BottomLeft.ResumeLayout(False)
+        gbRK_BottomLeft.PerformLayout()
+        gbRK_TopCenter.ResumeLayout(False)
+        gbRK_TopCenter.PerformLayout()
+        gbRK_TopLeft.ResumeLayout(False)
+        gbRK_TopLeft.PerformLayout()
         GroupBox8.ResumeLayout(False)
         GroupBox8.PerformLayout()
         GroupBox4.ResumeLayout(False)
@@ -3342,5 +3703,37 @@ Partial Class FrmMain
     Friend WithEvents colSegmentsData As DataGridViewTextBoxColumn
     Friend WithEvents colDataProvider As DataGridViewComboBoxColumn
     Friend WithEvents colBrand As DataGridViewComboBoxColumn
+    Friend WithEvents gbRK_All As GroupBox
+    Friend WithEvents gbRK_TopLeft As GroupBox
+    Friend WithEvents Label27 As Label
+    Friend WithEvents gbRK_BottomRight As GroupBox
+    Friend WithEvents Label21 As Label
+    Friend WithEvents Label22 As Label
+    Friend WithEvents CBRK_BottomRight As ComboBox
+    Friend WithEvents TBRK_BottomRight As TextBox
+    Friend WithEvents gbRK_TopRight As GroupBox
+    Friend WithEvents Label19 As Label
+    Friend WithEvents Label20 As Label
+    Friend WithEvents CBRK_TopRight As ComboBox
+    Friend WithEvents TBRK_TopRight As TextBox
+    Friend WithEvents gbRK_BottomCenter As GroupBox
+    Friend WithEvents Label23 As Label
+    Friend WithEvents Label24 As Label
+    Friend WithEvents CBRK_BottomCenter As ComboBox
+    Friend WithEvents TBRK_BottomCenter As TextBox
+    Friend WithEvents gbRK_BottomLeft As GroupBox
+    Friend WithEvents Label25 As Label
+    Friend WithEvents Label26 As Label
+    Friend WithEvents CBRK_BottomLeft As ComboBox
+    Friend WithEvents TBRK_BottomLeft As TextBox
+    Friend WithEvents gbRK_TopCenter As GroupBox
+    Friend WithEvents Label17 As Label
+    Friend WithEvents Label18 As Label
+    Friend WithEvents CBRK_TopCenter As ComboBox
+    Friend WithEvents TBRK_TopCenter As TextBox
+    Friend WithEvents Label16 As Label
+    Friend WithEvents Label15 As Label
+    Friend WithEvents CBRK_TopLeft As ComboBox
+    Friend WithEvents TBRK_TopLeft As TextBox
 
 End Class
