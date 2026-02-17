@@ -1,7 +1,4 @@
-﻿Imports System.Drawing
-Imports System.Windows.Forms
-
-Public Class BankSlotControl
+﻿Public Class BankSlotControl
     Inherits UserControl
 
     Public Property SlotIndex As Integer

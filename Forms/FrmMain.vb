@@ -1,14 +1,15 @@
-﻿Imports System.Diagnostics.Metrics
+﻿
+
 Imports System.IO
-Imports System.Net
 Imports System.Runtime.InteropServices
-Imports Newtonsoft.Json
 Imports PdfiumViewer
+
+
 
 Public Class FrmMain
     Public Const nextScene As Integer = 0
     Public Const nextEvent As Integer = 1
-
+    Dim StartUpActive As Boolean = True
 
     'Private LedKleuren As New List(Of Color)
     Dim LastOfflineDevices As Integer = 0       'Nummer van offline apparaten
@@ -25,8 +26,6 @@ Public Class FrmMain
     Private updatingScroll As Boolean = False
 
     ' Optional timers you might use later
-    'Friend pdfAutoScrollTimer As Timer
-    'Friend pdfAutoScrollIntervalMs As Integer = 15000 ' 15 sec per page
     Friend pdfPageUpdateTimer As Timer
 
     ' Importeer de functie voor het ophalen van Frame delays
@@ -35,6 +34,10 @@ Public Class FrmMain
     End Function
 
     Private _hotkeys As HotkeyControl
+
+    Private initialBlinkTimer As Timer
+    Private initialBlinkState As Boolean = False
+    Private startBtnDefaultBackColor As Color
 
     Private Sub FrmMain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         _hotkeys = New HotkeyControl(Me, cbMonitorControl)
@@ -110,24 +113,6 @@ Public Class FrmMain
                 SplitContainer2.Panel2.BackColor = Color.Black
             End If
 
-            ' Init sound buttons hover bar on right side of SplitContainer2.Panel2
-            'Try
-            '    SoundButtons.Initialize(SplitContainer2, Me)
-            'Catch
-            'End Try
-
-            ' Definieer de kolommen voor de DataGridView
-            Dim ipColumn As New DataGridViewTextBoxColumn
-            ipColumn.Name = "colIPAddress"
-            ipColumn.HeaderText = "IP Address"
-            ipColumn.DataPropertyName = "IPAddress"
-
-            Dim nameColumn As New DataGridViewTextBoxColumn
-            nameColumn.Name = "colInstance"
-            nameColumn.HeaderText = "WLED Name"
-            nameColumn.DataPropertyName = "WLEDName"
-
-            'DG_Devices.Columns.AddRange(ipColumn, nameColumn) ' Voeg de kolommen toe aan de DataGridView
 
             ' Configureer de DataGridView voor de Effecten tab
             DG_Effecten.AllowUserToAddRows = False
@@ -152,8 +137,6 @@ Public Class FrmMain
             settings_DDPPort.Text = My.Settings.DDPPort
             settings_ScriptPDF.Text = My.Settings.ScriptPDF
 
-            lblPreviewFromPosition.Text = 0
-            lblPreviewToPosition.Text = 90
 
             Dim tip As New ToolTip()
 
@@ -163,6 +146,7 @@ Public Class FrmMain
             Else
                 Update_LockUnlocked("Unlocked")
             End If
+
 
             c = CheckWLEDOnlineStatus(DG_Devices)
             If (c > 0) Then
@@ -179,15 +163,6 @@ Public Class FrmMain
             CurrentGroupId = -1
             CurrentDeviceId = -1
 
-            Dim ZoomFactor As Double = 60
-
-            'EffectBuilder.Initialize(PanelTracks, DG_Tracks, DG_LightSources, ZoomFactor)
-            'Tracks.Initialize()
-            'AddHandler EffectBuilder.TrackClicked, AddressOf EffectBuilder.OnTrackClicked
-            'AddHandler EffectBuilder.LightSourceClicked, AddressOf EffectBuilder.OnLightSourceClicked
-            'AddHandler pb_Stage.MouseClick, AddressOf Stage.OnStageClick
-
-            'SetZoom(ZoomFactor)
 
             ' Zorg dat kolom ScriptPg bestaat in DG_Show
             If DG_Show IsNot Nothing AndAlso Not DG_Show.Columns.Contains("ScriptPg") Then
@@ -214,7 +189,6 @@ Public Class FrmMain
             LoadPdfFromSettings()
             If pbPDFViewer IsNot Nothing Then
                 AddHandler pbPDFViewer.Resize, Sub() RenderCurrentPdfPage()
-                ' Ensure we can capture mouse wheel for page navigation
                 AddHandler pbPDFViewer.MouseWheel, AddressOf pbPDFViewer_MouseWheel
                 AddHandler pbPDFViewer.MouseEnter, Sub() pbPDFViewer.Focus()
             End If
@@ -253,6 +227,8 @@ Public Class FrmMain
                     ToonFlashBericht("Secondary beamer is niet verbonden of ingesteld.", 5, FlashSeverity.IsWarning)
                 End If
             End If
+
+            StartUpActive = False
 
         Catch ex As Exception
             MessageBox.Show($"Fout tijdens laden van form: {ex.Message}", "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -297,9 +273,9 @@ Public Class FrmMain
     ' **************************************************************************************************************************
     ' EVENT HANDLERS - Klik op DG Devices en open de bijbehorende webste
     ' **************************************************************************************************************************
-    Private Sub DG_Devices_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DG_Devices.CellContentClick
-        If (e.ColumnIndex < 2) Then
-            OpenWebsiteOfWLED(Me.DG_Devices, txt_APIResult, e)
+    Private Sub DG_Devices_CellContentClick(sender As Object, e As DataGridViewCellEventArgs)
+        If e.ColumnIndex < 2 Then
+            OpenWebsiteOfWLED(DG_Devices, txt_APIResult, e)
         End If
     End Sub
 
@@ -370,13 +346,12 @@ Public Class FrmMain
 
 
 
-    Private Async Sub btnScanNetworkForWLed_Click(sender As Object, e As EventArgs) Handles btnScanNetworkForWLed.Click
+    Private Async Sub btnScanNetworkForWLed_Click(sender As Object, e As EventArgs)
         Await ScanNetworkForWLEDDevices(DG_Devices)
 
         ' Call your post-scan functions in order
         SplitIntoGroups(DG_Devices, DG_Groups)
         'PopulateTreeView(DG_Groups, tvGroupsSelected)
-        ClearGroupsToBlack_WithDDP()
         Update_DGEffecten_BasedOnDevices()
         Update_DGPalettes_BasedOnDevices()
         ToonFlashBericht("Scan complete.", 3)
@@ -446,46 +421,21 @@ Public Class FrmMain
     End Sub
 
     Private Sub DG_Show_RowEnter(sender As Object, e As DataGridViewCellEventArgs) Handles DG_Show.RowEnter
-        Update_DGGRid_Details(DG_Show, e.RowIndex)
 
         ' New: when locked, selecting a row should update which Next button blinks
         Try
             If e.RowIndex >= 0 AndAlso My.Settings.Locked Then
                 Dim r = DG_Show.Rows(e.RowIndex)
-                KLT_LedShow.RefreshBlinkForSelection(DG_Show, r)
+
+                If Not (StartUpActive) Then
+                    KLT_LedShow.RefreshBlinkForSelection(DG_Show, r)
+                End If
             End If
         Catch
         End Try
 
     End Sub
 
-    Private Sub detailWLed_Brightness_Scroll(sender As Object, e As EventArgs) Handles detailWLed_Brightness.Scroll
-        DG_Show.CurrentRow.Cells("colBrightness").Value = detailWLed_Brightness.Value
-    End Sub
-
-    Private Sub detailWLed_Intensity_Scroll(sender As Object, e As EventArgs) Handles detailWLed_Intensity.Scroll
-        DG_Show.CurrentRow.Cells("colIntensity").Value = detailWLed_Intensity.Value
-    End Sub
-
-    Private Sub detailWLed_Speed_Scroll(sender As Object, e As EventArgs) Handles detailWLed_Speed.Scroll
-        DG_Show.CurrentRow.Cells("colSpeed").Value = detailWLed_Speed.Value
-    End Sub
-
-    Private Sub detailWLed_Color1_Click(sender As Object, e As EventArgs) Handles detailWLed_Color1.Click
-        detailWLed_Color1.BackColor = GetColorByColorWheel()
-        DG_Show.CurrentRow.Cells("colColor1").Value = detailWLed_Color1.BackColor.ToArgb()
-    End Sub
-
-    Private Sub detailWLed_Color2_Click(sender As Object, e As EventArgs) Handles detailWLed_Color2.Click
-        detailWLed_Color2.BackColor = GetColorByColorWheel()
-        DG_Show.CurrentRow.Cells("colColor2").Value = detailWLed_Color2.BackColor.ToArgb()
-    End Sub
-
-    Private Sub detailWLed_Color3_Click(sender As Object, e As EventArgs) Handles detailWLed_Color3.Click
-        detailWLed_Color3.BackColor = GetColorByColorWheel()
-        DG_Show.CurrentRow.Cells("colColor3").Value = detailWLed_Color3.BackColor.ToArgb()
-
-    End Sub
 
     Private Sub btnControl_Start_Click(sender As Object, e As EventArgs) Handles btnControl_Start.Click
         Start_Show(DG_Show)
@@ -500,7 +450,7 @@ Public Class FrmMain
             Return
         End If
 
-        Dim C As Integer = 0
+        Dim C As Integer
         C = CheckWLEDOnlineStatus(DG_Devices)
 
         If (C <> LastOfflineDevices) Then
@@ -518,11 +468,11 @@ Public Class FrmMain
     End Sub
 
 
-    Private Sub btnAddDevice_Click(sender As Object, e As EventArgs) Handles btnAddDevice.Click
+    Private Sub btnAddDevice_Click(sender As Object, e As EventArgs)
         DG_Devices_AddNewRowAfter_Click(DG_Devices, DG_Show, DG_Groups)
     End Sub
 
-    Private Sub btnDeleteDevice_Click(sender As Object, e As EventArgs) Handles btnDeleteDevice.Click
+    Private Sub btnDeleteDevice_Click(sender As Object, e As EventArgs)
         DG_Devices_RemoveCurrentRow_Click(DG_Devices)
     End Sub
 
@@ -534,28 +484,21 @@ Public Class FrmMain
     '    LoadEffectPalettes()
     'End Sub
 
-    Private Sub detailWLed_Effect_Paint(sender As Object, e As PaintEventArgs) Handles detailWLed_Effect.Paint
-        Show_PaintEvent(sender, e)
-    End Sub
 
     Private Sub btnTestExistanceEffects_Click(sender As Object, e As EventArgs) Handles btnTestExistanceEffects.Click
         TextExistanceEffects(DG_Effecten, My.Settings.EffectsImagePath)
     End Sub
 
-    Private Sub btnGenerateStage_Click(sender As Object, e As EventArgs) Handles btnGenerateStage.Click
-        GenereerLedLijst(DG_Devices, DG_Groups, pb_Stage, My.Settings.PodiumBreedte, My.Settings.PodiumHoogte)
-        TekenPodium(pb_Stage, My.Settings.PodiumBreedte, My.Settings.PodiumHoogte)
-    End Sub
 
 
     Private Sub btnUpdateStage_Click(sender As Object, e As EventArgs)
 
     End Sub
 
-    Private Sub DG_Devices_CellValidated(sender As Object, e As DataGridViewCellEventArgs) Handles DG_Devices.CellValidated
+    Private Sub DG_Devices_CellValidated(sender As Object, e As DataGridViewCellEventArgs)
         On Error Resume Next
 
-        If (e.ColumnIndex = DG_Devices.Columns("colLayout").Index) Then
+        If e.ColumnIndex = DG_Devices.Columns("colLayout").Index Then
 
             Dim oldValue = DG_Devices.Rows(e.RowIndex).Cells(e.ColumnIndex).Value
             Dim newValue = ValidateLayoutString(oldValue)
@@ -563,15 +506,15 @@ Public Class FrmMain
         End If
     End Sub
 
-    Private Sub btnGroupAddRowAfter_Click(sender As Object, e As EventArgs) Handles btnGroupAddRowAfter.Click
+    Private Sub btnGroupAddRowAfter_Click(sender As Object, e As EventArgs)
         GroupAddRowAfter(DG_Groups)
     End Sub
 
-    Private Sub btnGroupAddRowBefore_Click(sender As Object, e As EventArgs) Handles btnGroupAddRowBefore.Click
+    Private Sub btnGroupAddRowBefore_Click(sender As Object, e As EventArgs)
         GroupAddRowBefore(DG_Groups)
     End Sub
 
-    Private Sub btnGroupDeleteRow_Click(sender As Object, e As EventArgs) Handles btnGroupDeleteRow.Click
+    Private Sub btnGroupDeleteRow_Click(sender As Object, e As EventArgs)
         GroupDeleteRow(DG_Groups)
     End Sub
 
@@ -594,323 +537,32 @@ Public Class FrmMain
         My.Settings.Save()
     End Sub
 
-    Private Sub ddpTimer_Tick(sender As Object, e As EventArgs)
-        'UpdateWLEDFromSliders_DDP()
-    End Sub
 
-    Private Sub btnApplyCustomEffect_Click(sender As Object, e As EventArgs) Handles btnApplyCustomEffect.Click
-        ' Effect builder
-        Compile_EffectDesigner()
-        'Else
-        '    ' Custom effects.
-        '    HandleApplyCustomEffectClick()
-        'End If
-
-    End Sub
-
-
-    'Private Sub EffectColor1_Click(sender As Object, e As EventArgs)
-    '    EffectColor1.BackColor = GetColorByColorWheel()
-    '    My.Settings.CustomEffectC1 = EffectColor1.BackColor.ToArgb
-    '    My.Settings.Save()
-    'End Sub
-
-    'Private Sub EffectColor2_Click(sender As Object, e As EventArgs)
-    '    EffectColor2.BackColor = GetColorByColorWheel()
-    '    My.Settings.CustomEffectC2 = EffectColor2.BackColor.ToArgb
-    '    My.Settings.Save()
-    'End Sub
-
-    'Private Sub EffectColor3_Click(sender As Object, e As EventArgs)
-    '    EffectColor3.BackColor = GetColorByColorWheel()
-    '    My.Settings.CustomEffectC3 = EffectColor3.BackColor.ToArgb
-    '    My.Settings.Save()
-    'End Sub
-
-    'Private Sub EffectColor4_Click(sender As Object, e As EventArgs)
-    '    EffectColor4.BackColor = GetColorByColorWheel()
-    '    My.Settings.CustomEffectC4 = EffectColor4.BackColor.ToArgb
-    '    My.Settings.Save()
-    'End Sub
-
-    'Private Sub EffectColor5_Click(sender As Object, e As EventArgs)
-    '    EffectColor5.BackColor = GetColorByColorWheel()
-    '    My.Settings.CustomEffectC5 = EffectColor5.BackColor.ToArgb
-    '    My.Settings.Save()
-    'End Sub
-
-    Private Sub btnDevicesRefreshIPs_Click(sender As Object, e As EventArgs) Handles btnDevicesRefreshIPs.Click
+    Private Sub btnDevicesRefreshIPs_Click(sender As Object, e As EventArgs)
         RefreshIPAddresses(DG_Devices)
     End Sub
 
-    Private Sub btnGroupsAutoSplit_Click(sender As Object, e As EventArgs) Handles btnGroupsAutoSplit.Click
+    Private Sub btnGroupsAutoSplit_Click(sender As Object, e As EventArgs)
         SplitIntoGroups(DG_Devices, DG_Groups)
-        'PopulateTreeView(DG_Groups, tvGroupsSelected)
-        ClearGroupsToBlack_WithDDP()
-    End Sub
-
-
-    Private Sub btnStartEffectPreview_Click(sender As Object, e As EventArgs) Handles btnStartEffectPreview.Click
-
-
-        ' Start voor alle groepen die frames hebben
-        For Each row As DataGridViewRow In DG_Groups.Rows.Cast(Of DataGridViewRow)()
-            If Not row.IsNewRow Then
-                Dim frames = TryCast(row.Cells("colAllFrames").Value, List(Of Byte()))
-                If frames IsNot Nothing AndAlso frames.Count > 0 Then
-                    Dim groupId = CInt(row.Cells("colGroupId").Value)
-                    DDP.StartGroupStream(groupId)
-                End If
-            End If
-        Next
-    End Sub
-
-    Private Sub btnStopEffectPreview_Click(sender As Object, e As EventArgs) Handles btnStopEffectPreview.Click
-        ' Stop voor álle actieve groep-streamers
-        For Each row As DataGridViewRow In DG_Groups.Rows.Cast(Of DataGridViewRow)()
-            If Not row.IsNewRow Then
-                Dim frames = TryCast(row.Cells("colAllFrames").Value, List(Of Byte()))
-                If frames IsNot Nothing AndAlso frames.Count > 0 Then
-                    Dim groupId = CInt(row.Cells("colGroupId").Value)
-                    DDP.StopGroupStream(groupId)
-                End If
-            End If
-        Next
     End Sub
 
 
 
-    Private Sub pb_Stage_Resize(sender As Object, e As EventArgs) Handles pb_Stage.Resize
-        GenereerLedLijst(DG_Devices, DG_Groups, pb_Stage, My.Settings.PodiumBreedte, My.Settings.PodiumHoogte)
-    End Sub
-
-    'Private Sub tbEffectBrightnessBaselineEffect_Scroll(sender As Object, e As EventArgs)
-    '    My.Settings.CustomEffectBrightnessEffect = tbEffectBrightnessEffect.Value
-    '    My.Settings.Save()
-    'End Sub
-
-    'Private Sub tbEffectDispersion_Scroll(sender As Object, e As EventArgs)
-    '    My.Settings.CustomEffectDispersion = tbEffectDispersion.Value
-    '    My.Settings.Save()
-
-    'End Sub
-
-    Private Sub btnResetEffect_Click(sender As Object, e As EventArgs) Handles btnResetEffect.Click
-        ResetGroupsEffects()
-        ClearGroupsToBlack_WithDDP()
-    End Sub
-
-    Private Sub btnTablesAddRowBefore_Click(sender As Object, e As EventArgs) Handles btnTablesAddRowBefore.Click
-        Dim currentRowIndex As Integer = 0
-        Dim ThisDGV As DataGridView
-
-        Select Case TabControlTables.SelectedIndex
-            Case 0
-                ThisDGV = DG_Tracks
-            Case 1
-                ThisDGV = DG_Templates
-            Case 2
-                ThisDGV = DG_LightSources
-            Case 3
-                ThisDGV = DG_Frames
-            Case 5
-                ' Start wizard voor SoundButtons (TabIndex 5)
-                SoundButtons.StartAddWizard(Me, insertBefore:=True)
-                Return
-            Case Else
-                Return
-        End Select
-
-        If ThisDGV.Rows.Count > 0 Then
-            currentRowIndex = ThisDGV.CurrentCell.RowIndex
-        End If
-        ThisDGV.Rows.Insert(currentRowIndex, 1) 'Voegt een nieuwe rij in op de gespecificeerde index
-
-        'Stel de focus op de nieuwe rij
-        ThisDGV.CurrentCell = ThisDGV.Rows(currentRowIndex).Cells(0)
-    End Sub
-
-    Private Sub btnTablesAddRowAfter_Click(sender As Object, e As EventArgs) Handles btnTablesAddRowAfter.Click
-        Dim currentRowIndex As Integer = 0
-        Dim ThisDGV As DataGridView
-
-        Select Case TabControlTables.SelectedIndex
-            Case 0
-                ThisDGV = DG_Tracks
-            Case 1
-                ThisDGV = DG_Templates
-            Case 2
-                ThisDGV = DG_LightSources
-            Case 3
-                ThisDGV = DG_Frames
-            Case 5
-                ' Start wizard voor SoundButtons (TabIndex 5)
-                SoundButtons.StartAddWizard(Me, insertBefore:=False)
-                Return
-            Case Else
-                Return
-        End Select
-
-        If ThisDGV.Rows.Count > 0 Then
-            currentRowIndex = ThisDGV.CurrentCell.RowIndex
-            ThisDGV.Rows.Insert(currentRowIndex + 1, 1) 'Voegt een nieuwe rij in na de huidige rij
-        Else
-            ThisDGV.Rows.Insert(0, 1) 'Voegt een nieuwe rij in op de gespecificeerde index
-            currentRowIndex = -1
-        End If
 
 
-        'Stel de focus op de nieuwe rij
-        ThisDGV.CurrentCell = ThisDGV.Rows(currentRowIndex + 1).Cells(0)
-    End Sub
-
-    Private Sub btnTablesDeleteSingleRow_Click(sender As Object, e As EventArgs) Handles btnTablesDeleteSingleRow.Click
-        Dim ThisDGV As DataGridView
-
-        Select Case TabControlTables.SelectedIndex
-            Case 0
-                ThisDGV = DG_Tracks
-            Case 1
-                ThisDGV = DG_Templates
-            Case 2
-                ThisDGV = DG_LightSources
-            Case 3
-                ThisDGV = DG_Frames
-            Case 5
-                ' Verwijder via SoundButtons module (TabIndex 5)
-                SoundButtons.StartDelete(Me)
-                Return
-            Case Else
-                Return
-        End Select
 
 
-        If (ThisDGV.RowCount > 0) Then
-            'Voeg hier de logica toe om de huidige rij te verwijderen
-            Dim currentRowIndex As Integer = ThisDGV.CurrentCell.RowIndex
-            If ThisDGV.Rows.Count > 0 Then
-                ThisDGV.Rows.RemoveAt(currentRowIndex)
-            End If
-        End If
-    End Sub
 
-    Private Sub btnZoom10_Click(sender As Object, e As EventArgs) Handles btnZoom10.Click
-        ZoomFactor = 10
-        btnZoom10.Checked = True
-        btnZoom30.Checked = False
-        btnZoom60.Checked = False
-        btnZoom90.Checked = False
 
-        EffectBuilder.SetZoom(ZoomFactor)
-    End Sub
 
-    Private Sub btnZoom30_Click(sender As Object, e As EventArgs) Handles btnZoom30.Click
-        ZoomFactor = 30
-        btnZoom10.Checked = False
-        btnZoom30.Checked = True
-        btnZoom60.Checked = False
-        btnZoom90.Checked = False
 
-        EffectBuilder.SetZoom(ZoomFactor)
-    End Sub
-
-    Private Sub btnZoom60_Click(sender As Object, e As EventArgs) Handles btnZoom60.Click
-        ZoomFactor = 60
-        btnZoom10.Checked = False
-        btnZoom30.Checked = False
-        btnZoom60.Checked = True
-        btnZoom90.Checked = False
-
-        EffectBuilder.SetZoom(ZoomFactor)
-    End Sub
-
-    Private Sub btnZoom90_Click(sender As Object, e As EventArgs) Handles btnZoom90.Click
-        ZoomFactor = 90
-        btnZoom10.Checked = False
-        btnZoom30.Checked = False
-        btnZoom60.Checked = False
-        btnZoom90.Checked = True
-
-        EffectBuilder.SetZoom(ZoomFactor)
-    End Sub
-
-    Private Sub DG_Tracks_RowValidated(sender As Object, e As DataGridViewCellEventArgs) Handles DG_Tracks.RowValidated
-        EffectBuilder.RefreshTimeline()
-    End Sub
 
 
     Private Sub btnLoadAll_Click_1(sender As Object, e As EventArgs) Handles btnLoadAll.Click
         LoadAll()
     End Sub
 
-    Private Sub btnResetFrames_Click(sender As Object, e As EventArgs) Handles btnResetFrames.Click
-        SplitContainerStage.SplitterDistance = 171
-        TekenPodium(pb_Stage, My.Settings.PodiumBreedte, My.Settings.PodiumHoogte)
-    End Sub
 
-    Private Sub cbSelectedEffect_Click(sender As Object, e As EventArgs) Handles cbSelectedEffect.Click
-        Dim selectedName As String = cbSelectedEffect.Text
-        If String.IsNullOrWhiteSpace(selectedName) Then Exit Sub
-
-        For Each row As DataGridViewRow In DG_Templates.Rows
-            If row.IsNewRow Then Continue For
-            If CStr(row.Cells("colTemplateName").Value) = selectedName Then
-                row.Selected = True
-                DG_Templates.CurrentCell = row.Cells("colTemplateName")
-                Exit For
-            End If
-        Next
-    End Sub
-
-    Private Sub BtnAddTrack_Click(sender As Object, e As EventArgs) Handles BtnAddTrack.Click
-        AddTrack()
-    End Sub
-
-
-    Private Sub BtnRemoveTrack_Click(sender As Object, e As EventArgs) Handles BtnRemoveTrack.Click
-        RemoveTrack()
-    End Sub
-
-
-    Private Sub btnAddShape_Click(sender As Object, e As EventArgs) Handles btnAddShape.Click
-        AddShape()
-    End Sub
-
-    Private Sub btnRemoveShape_Click(sender As Object, e As EventArgs) Handles btnRemoveShape.Click
-        RemoveShape()
-    End Sub
-
-    Private Sub btnEffectAdd_Click(sender As Object, e As EventArgs) Handles btnEffectAdd.Click
-        AddTemplate()
-    End Sub
-
-    Private Sub btnEffectDelete_Click(sender As Object, e As EventArgs) Handles btnEffectDelete.Click
-        RemoveTemplate()
-    End Sub
-
-    Private Sub btnRepeat_Click(sender As Object, e As EventArgs) Handles btnRepeat.Click
-        If (btnRepeat.Checked) Then
-            btnRepeat.Image = My.Resources.iconCheckbox_checked2
-            btnRepeat.Checked = False
-        Else
-            btnRepeat.Image = My.Resources.iconCheckbox_checked
-            btnRepeat.Checked = True
-        End If
-    End Sub
-
-    Private Sub btnPreviewPlayPause_Click(sender As Object, e As EventArgs) Handles btnPreviewPlayPause.Click
-        PreviewMarkerCurrent = lblPreviewFromPosition.Text
-
-        If btnPreviewPlayPause.Checked Then
-            btnPreviewPlayPause.Image = My.Resources.iconPause
-            btnPreviewPlayPause.Checked = False
-            ' Add code to pause preview
-        Else
-            btnPreviewPlayPause.Image = My.Resources.iconPlay
-            btnPreviewPlayPause.Checked = True
-            ' Add code to start preview
-        End If
-    End Sub
 
     Private Sub btnRebuildDGEffects_Click(sender As Object, e As EventArgs) Handles btnRebuildDGEffects.Click
         Update_DGEffecten_BasedOnDevices()
@@ -920,7 +572,7 @@ Public Class FrmMain
         Update_DGPalettes_BasedOnDevices()
     End Sub
 
-    Private Sub btnSendUpdatedSegmentsToWLED_Click(sender As Object, e As EventArgs) Handles btnSendUpdatedSegmentsToWLED.Click
+    Private Sub btnSendUpdatedSegmentsToWLED_Click(sender As Object, e As EventArgs)
         SetSegmentsFromGrid(DG_Devices)
     End Sub
 
@@ -944,7 +596,7 @@ Public Class FrmMain
 
         If (FixtureString = "**") Then
             ' Show the details form FOR VIDEO
-            Using detailsForm As New DetailShowVideo(rowData)
+            Using detailsForm As New PopUp_DetailShowVideo(rowData)
                 If detailsForm.ShowDialog() = DialogResult.OK Then
                     ' Update the row with any changes
                     For Each col As DataGridViewColumn In DG_Show.Columns
@@ -955,7 +607,7 @@ Public Class FrmMain
 
         Else
             ' Show the details form FOR WLED
-            Using detailsForm As New DetailShowWLED(rowData)
+            Using detailsForm As New PopUp_DetailShowWLED(rowData)
                 If detailsForm.ShowDialog() = DialogResult.OK Then
                     ' Update the row with any changes
                     For Each col As DataGridViewColumn In DG_Show.Columns
@@ -1054,7 +706,7 @@ Public Class FrmMain
 
     End Sub
 
-    Private Sub btnStopLoopingAtEndOfVideo_Click(sender As Object, e As EventArgs) Handles btnStopLoopingAtEndOfVideo.Click
+    Private Sub btnStopLoopingAtEndOfVideo_Click(sender As Object, e As EventArgs)
         Beamer_Primary.WMP_PrimaryPlayer_Live.settings.setMode("loop", False)
         Beamer_Secondairy.WMP_SecondairyPlayer_Live.settings.setMode("loop", False)
         WMP_PrimaryPlayer_Preview.settings.setMode("loop", False)
@@ -1066,9 +718,6 @@ Public Class FrmMain
 
 
 
-    Private Sub btnEditTemplate_Click(sender As Object, e As EventArgs) Handles btnEditTemplate.Click
-        Template.EditSelectedTemplate()
-    End Sub
 
     Private Sub EnsurePdfScrollBar()
         If pdfScroll Is Nothing Then
@@ -1270,8 +919,8 @@ Public Class FrmMain
         End Try
     End Sub
 
-    Private Sub btnAutoPing_Click(sender As Object, e As EventArgs) Handles btnAutoPing.Click
-        If (btnAutoPing.Text = "on") Then
+    Private Sub btnAutoPing_Click(sender As Object, e As EventArgs)
+        If btnAutoPing.Text = "on" Then
             btnAutoPing.Text = "off"
             btnAutoPing.Checked = False
             btnAutoPing.Image = My.Resources.icon_toggle_off
@@ -1348,5 +997,7 @@ Public Class FrmMain
         End Try
     End Sub
 
+    Private Sub DG_ActionsDetail_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles DG_ActionsDetail.CellContentClick
 
+    End Sub
 End Class

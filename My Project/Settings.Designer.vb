@@ -416,7 +416,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("PGUP")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("CTRL+SHIFT+ALT+PGUP")>  _
         Public Property RemoteKey_TR() As String
             Get
                 Return CType(Me("RemoteKey_TR"),String)
@@ -452,7 +452,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("PGDOWN")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("CTRL+SHIFT+ALT+PGDOWN")>  _
         Public Property RemoteKey_BR() As String
             Get
                 Return CType(Me("RemoteKey_BR"),String)

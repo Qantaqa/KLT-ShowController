@@ -93,7 +93,7 @@
       <Value Profile="(Default)">CTRL+SHIFT+ALT+F2</Value>
     </Setting>
     <Setting Name="RemoteKey_TR" Type="System.String" Scope="User">
-      <Value Profile="(Default)">PGUP</Value>
+      <Value Profile="(Default)">CTRL+SHIFT+ALT+PGUP</Value>
     </Setting>
     <Setting Name="RemoteKey_BL" Type="System.String" Scope="User">
       <Value Profile="(Default)">CTRL+SHIFT+ALT+F3</Value>
@@ -102,7 +102,7 @@
       <Value Profile="(Default)">CTRL+SHIFT+ALT+F4</Value>
     </Setting>
     <Setting Name="RemoteKey_BR" Type="System.String" Scope="User">
-      <Value Profile="(Default)">PGDOWN</Value>
+      <Value Profile="(Default)">CTRL+SHIFT+ALT+PGDOWN</Value>
     </Setting>
     <Setting Name="RemoteKeyTL_Action" Type="System.String" Scope="User">
       <Value Profile="(Default)">START</Value>

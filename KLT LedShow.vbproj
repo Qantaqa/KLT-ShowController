@@ -9,9 +9,13 @@
     <MyType>WindowsForms</MyType>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Modules\CustomEffects\Iceberg.vb" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
+  </PropertyGroup>
 
   <ItemGroup>
     <COMReference Include="WMPLib">
@@ -88,10 +92,6 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <compile Include="Modules\CustomEffects\Iceberg.vb" />
   </ItemGroup>
 
 </Project>
