@@ -45,11 +45,16 @@ class DbManager {
             this.db.exec('ALTER TABLE shows ADD COLUMN viewState JSON');
         } catch (e) { /* ignore if column exists */ }
 
+        try {
+            this.db.exec('ALTER TABLE shows ADD COLUMN totalPages INTEGER DEFAULT 0');
+        } catch (e) { /* ignore if column exists */ }
+
         this.db.exec(`
             CREATE TABLE IF NOT EXISTS shows (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
                 pdfPath TEXT,
+                totalPages INTEGER DEFAULT 0,
                 sidebarWidth INTEGER DEFAULT 500,
                 invertScriptColors INTEGER DEFAULT 0,
                 schedule JSON,
@@ -67,10 +72,17 @@ class DbManager {
                 name TEXT NOT NULL,
                 type TEXT NOT NULL,
                 config JSON,
-                mediaState JSON,
-                FOREIGN KEY(showId) REFERENCES shows(id) ON DELETE CASCADE
+                mediaState JSON
+                -- Removed FK constraint for flexibility with GLOBAL devices
             )
         `);
+
+        // Global devices are show-independent and stored with showId='GLOBAL'
+        // We need this entry in the 'shows' table to satisfy FOREIGN KEY constraints
+        // even though we hide it from the UI in getShows().
+        try {
+            this.db.prepare("INSERT OR IGNORE INTO shows (id, name) VALUES ('GLOBAL', 'System Devices')").run();
+        } catch (e) { /* ignore */ }
 
         // Migration: add mediaState column for existing databases
         try {
@@ -100,14 +112,44 @@ class DbManager {
                 sound INTEGER,
                 scriptPg INTEGER,
                 duration INTEGER,
+                filename TEXT,
                 FOREIGN KEY(showId) REFERENCES shows(id) ON DELETE CASCADE
             )
         `);
 
-        // Migration: add duration column for existing databases
-        try {
-            this.db.exec('ALTER TABLE sequences ADD COLUMN duration INTEGER');
-        } catch (e) { /* ignore if column exists */ }
+        // Remote Clients (Tracking connected stations)
+        this.db.exec(`
+            CREATE TABLE IF NOT EXISTS remote_clients (
+                id TEXT PRIMARY KEY,
+                friendlyName TEXT,
+                pinCode TEXT,
+                type TEXT DEFAULT 'REMOTE',
+                isCameraActive INTEGER DEFAULT 0,
+                isSelfPreviewVisible INTEGER DEFAULT 1,
+                selectedCameraClients JSON,
+                isLocked INTEGER DEFAULT 0,
+                lastConnected DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Migration: ensure columns exist
+        const columns = this.db.pragma('table_info(sequences)').map((c: any) => c.name);
+
+        if (!columns.includes('duration')) this.db.exec('ALTER TABLE sequences ADD COLUMN duration INTEGER');
+        if (!columns.includes('filename')) this.db.exec('ALTER TABLE sequences ADD COLUMN filename TEXT');
+        if (!columns.includes('segmentId')) this.db.exec('ALTER TABLE sequences ADD COLUMN segmentId INTEGER');
+        if (!columns.includes('effectId')) this.db.exec('ALTER TABLE sequences ADD COLUMN effectId INTEGER');
+        if (!columns.includes('paletteId')) this.db.exec('ALTER TABLE sequences ADD COLUMN paletteId INTEGER');
+
+        // Clipboard for copy-paste
+        this.db.exec(`
+            CREATE TABLE IF NOT EXISTS clipboard (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT,
+                data JSON,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
 
         // Seed default settings if empty
         const settings = this.db.prepare('SELECT * FROM app_settings WHERE id = 1').get();
@@ -123,7 +165,13 @@ class DbManager {
 
     updateAppSettings(settings: any) {
         const current = this.getAppSettings();
+        console.log('--- DB: updateAppSettings (Incoming partial):', settings);
         const next = { ...current, ...settings };
+        console.log('--- DB: updateAppSettings (Final merged):', {
+            defaultLogo: next.defaultLogo,
+            accessPin: next.accessPin ? 'SET (length:' + next.accessPin.length + ')' : 'EMPTY',
+            serverPort: next.serverPort
+        });
         return this.db.prepare(`
             UPDATE app_settings 
             SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?
@@ -142,9 +190,9 @@ class DbManager {
 
         let shows;
         if (includeArchived) {
-            shows = this.db.prepare('SELECT * FROM shows ORDER BY updated_at DESC').all();
+            shows = this.db.prepare("SELECT * FROM shows WHERE id != 'GLOBAL' ORDER BY updated_at DESC").all();
         } else {
-            shows = this.db.prepare('SELECT * FROM shows WHERE (archived = 0 OR archived IS NULL) ORDER BY updated_at DESC').all();
+            shows = this.db.prepare("SELECT * FROM shows WHERE (archived = 0 OR archived IS NULL) AND id != 'GLOBAL' ORDER BY updated_at DESC").all();
         }
 
         console.log('--- DB: Raw shows from query:', shows.length, '---', shows.map((s: any) => ({ id: s.id, name: s.name, archived: s.archived })));
@@ -174,12 +222,13 @@ class DbManager {
         }
         console.log('--- DB: createShow ---', name);
         return this.db.prepare(`
-            INSERT INTO shows (id, name, pdfPath, sidebarWidth, invertScriptColors, schedule, viewState)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO shows (id, name, pdfPath, totalPages, sidebarWidth, invertScriptColors, schedule, viewState)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
             show.id,
             show.name,
             show.pdfPath || '',
+            show.totalPages || 0,
             show.sidebarWidth || 500,
             show.invertScriptColors ? 1 : 0,
             JSON.stringify(show.schedule || {}),
@@ -304,8 +353,8 @@ class DbManager {
         const deleteStmt = this.db.prepare('DELETE FROM sequences WHERE showId = ?');
         const insertStmt = this.db.prepare(`
             INSERT INTO sequences 
-            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
 
         const transaction = this.db.transaction((showId: string, events: any[]) => {
@@ -317,12 +366,102 @@ class DbManager {
                     e.color1 || '', e.color2 || '', e.color3 || '',
                     e.brightness ?? 255, e.speed ?? 127, e.intensity ?? 127,
                     e.transition ?? 0, e.sound ? 1 : 0, e.scriptPg ?? 1,
-                    e.duration ?? null
+                    e.duration ?? null, e.filename || '',
+                    e.segmentId !== undefined ? e.segmentId : null,
+                    e.effectId !== undefined ? e.effectId : null,
+                    e.paletteId !== undefined ? e.paletteId : null
                 );
             }
         });
 
-        return transaction(showId, events);
+        try {
+            return transaction(showId, events);
+        } catch (err: any) {
+            console.error('Failed to save sequences:', err);
+            throw err;
+        }
+    }
+
+    // Remote Clients
+    getRemoteClients() {
+        return this.db.prepare('SELECT * FROM remote_clients ORDER BY lastConnected DESC').all().map((c: any) => ({
+            ...c,
+            isCameraActive: !!c.isCameraActive,
+            isSelfPreviewVisible: !!c.isSelfPreviewVisible,
+            isLocked: !!c.isLocked,
+            selectedCameraClients: c.selectedCameraClients ? JSON.parse(c.selectedCameraClients) : []
+        }));
+    }
+
+    getRemoteClient(id: string) {
+        const c = this.db.prepare('SELECT * FROM remote_clients WHERE id = ?').get(id);
+        if (!c) return null;
+        return {
+            ...c,
+            isCameraActive: !!c.isCameraActive,
+            isSelfPreviewVisible: !!c.isSelfPreviewVisible,
+            isLocked: !!c.isLocked,
+            selectedCameraClients: c.selectedCameraClients ? JSON.parse(c.selectedCameraClients) : []
+        };
+    }
+
+    upsertRemoteClient(client: any) {
+        return this.db.prepare(`
+            INSERT INTO remote_clients (id, friendlyName, pinCode, type, isCameraActive, isSelfPreviewVisible, selectedCameraClients, isLocked, lastConnected)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(id) DO UPDATE SET
+                friendlyName = excluded.friendlyName,
+                pinCode = excluded.pinCode,
+                type = excluded.type,
+                isCameraActive = excluded.isCameraActive,
+                isSelfPreviewVisible = excluded.isSelfPreviewVisible,
+                selectedCameraClients = excluded.selectedCameraClients,
+                isLocked = excluded.isLocked,
+                lastConnected = CURRENT_TIMESTAMP
+        `).run(
+            client.id,
+            client.friendlyName,
+            client.pinCode,
+            client.type || 'REMOTE',
+            client.isCameraActive ? 1 : 0,
+            client.isSelfPreviewVisible !== false ? 1 : 0,
+            JSON.stringify(client.selectedCameraClients || []),
+            client.isLocked ? 1 : 0
+        );
+    }
+
+    updateRemoteClientStatus(id: string, updates: any) {
+        const fields = Object.keys(updates);
+        const values = Object.values(updates).map(v => {
+            if (typeof v === 'boolean') return v ? 1 : 0;
+            if (Array.isArray(v) || typeof v === 'object') return JSON.stringify(v);
+            return v;
+        });
+        const setClause = fields.map(f => `${f} = ?`).join(', ');
+
+        return this.db.prepare(`
+            UPDATE remote_clients SET ${setClause}, lastConnected = CURRENT_TIMESTAMP WHERE id = ?
+        `).run(...values, id);
+    }
+
+    // Clipboard
+    getClipboard() {
+        return this.db.prepare("SELECT * FROM clipboard ORDER BY timestamp DESC").all().map((item: any) => ({
+            ...item,
+            data: JSON.parse(item.data)
+        }));
+    }
+
+    addToClipboard(type: string, data: any) {
+        return this.db.prepare("INSERT INTO clipboard (type, data) VALUES (?, ?)").run(type, JSON.stringify(data));
+    }
+
+    removeFromClipboard(id: number) {
+        return this.db.prepare("DELETE FROM clipboard WHERE id = ?").run(id);
+    }
+
+    clearClipboard() {
+        return this.db.prepare("DELETE FROM clipboard").run();
     }
 }
 

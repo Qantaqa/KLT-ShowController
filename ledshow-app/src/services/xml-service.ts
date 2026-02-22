@@ -20,6 +20,16 @@ export interface ShowEvent {
     type?: string
     filename?: string
     duration?: number
+    segmentId?: number
+    effectId?: number
+    paletteId?: number
+}
+
+export interface ClipboardItem {
+    id: number
+    type: string
+    data: ShowEvent
+    timestamp: string
 }
 
 export class XmlService {
@@ -32,10 +42,23 @@ export class XmlService {
         })
     }
 
-    parseShow(xmlContent: string): ShowEvent[] {
+    parseShow(xmlContent: string, basePath?: string): ShowEvent[] {
         const jsonObj = this.parser.parse(xmlContent)
         const rows = jsonObj.DataGridData?.Data?.Row || []
-        return Array.isArray(rows) ? rows.map(this.mapEvent) : [this.mapEvent(rows)]
+        const events = Array.isArray(rows) ? rows.map(this.mapEvent) : [this.mapEvent(rows)]
+
+        if (basePath) {
+            return events.map(evt => {
+                if (evt.filename && !evt.filename.includes(':') && !evt.filename.startsWith('/') && !evt.filename.startsWith('\\')) {
+                    // Try to make it absolute
+                    const cleanBasePath = basePath.replace(/\\/g, '/').replace(/\/[^\/]*\.xml$/i, '')
+                    evt.filename = `${cleanBasePath}/${evt.filename.replace(/\\/g, '/')}`
+                }
+                return evt
+            })
+        }
+
+        return events
     }
 
     private mapEvent(raw: any): ShowEvent {

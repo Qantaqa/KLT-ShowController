@@ -1,6 +1,7 @@
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { app as app$1 } from "electron";
 import require$$1 from "util";
 import stream, { Readable } from "stream";
 import require$$1$1 from "path";
@@ -16,8 +17,417 @@ import require$$0$2 from "os";
 import zlib from "zlib";
 import { EventEmitter } from "events";
 import dgram from "node:dgram";
-import { app as app$1 } from "electron";
 import os from "node:os";
+const require$2 = createRequire(import.meta.url);
+const Database = require$2("better-sqlite3");
+class DbManager {
+  constructor() {
+    const dbPath = path.join(app$1.getPath("userData"), "ledshow.db");
+    console.log("--- Initializing Database at:", dbPath);
+    this.db = new Database(dbPath);
+    this.init();
+  }
+  init() {
+    this.db.exec(`
+            CREATE TABLE IF NOT EXISTS app_settings (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                defaultLogo TEXT,
+                accessPin TEXT,
+                serverPort INTEGER,
+                testVideoPath TEXT
+            )
+        `);
+    try {
+      this.db.exec("ALTER TABLE app_settings ADD COLUMN testVideoPath TEXT");
+    } catch (e) {
+    }
+    try {
+      this.db.exec("ALTER TABLE shows ADD COLUMN archived INTEGER DEFAULT 0");
+    } catch (e) {
+    }
+    try {
+      this.db.exec("ALTER TABLE shows ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+    } catch (e) {
+    }
+    try {
+      this.db.exec("ALTER TABLE shows ADD COLUMN viewState JSON");
+    } catch (e) {
+    }
+    try {
+      this.db.exec("ALTER TABLE shows ADD COLUMN totalPages INTEGER DEFAULT 0");
+    } catch (e) {
+    }
+    this.db.exec(`
+            CREATE TABLE IF NOT EXISTS shows (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                pdfPath TEXT,
+                totalPages INTEGER DEFAULT 0,
+                sidebarWidth INTEGER DEFAULT 500,
+                invertScriptColors INTEGER DEFAULT 0,
+                schedule JSON,
+                viewState JSON,
+                archived INTEGER DEFAULT 0,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+    this.db.exec(`
+            CREATE TABLE IF NOT EXISTS devices (
+                id TEXT PRIMARY KEY,
+                showId TEXT NOT NULL,
+                name TEXT NOT NULL,
+                type TEXT NOT NULL,
+                config JSON,
+                mediaState JSON
+                -- Removed FK constraint for flexibility with GLOBAL devices
+            )
+        `);
+    try {
+      this.db.prepare("INSERT OR IGNORE INTO shows (id, name) VALUES ('GLOBAL', 'System Devices')").run();
+    } catch (e) {
+    }
+    try {
+      this.db.exec("ALTER TABLE devices ADD COLUMN mediaState JSON");
+    } catch (e) {
+    }
+    this.db.exec(`
+            CREATE TABLE IF NOT EXISTS sequences (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                showId TEXT NOT NULL,
+                act TEXT,
+                sceneId INTEGER,
+                eventId INTEGER,
+                type TEXT,
+                cue TEXT,
+                fixture TEXT,
+                effect TEXT,
+                palette TEXT,
+                color1 TEXT,
+                color2 TEXT,
+                color3 TEXT,
+                brightness INTEGER,
+                speed INTEGER,
+                intensity INTEGER,
+                transition INTEGER,
+                sound INTEGER,
+                scriptPg INTEGER,
+                duration INTEGER,
+                filename TEXT,
+                FOREIGN KEY(showId) REFERENCES shows(id) ON DELETE CASCADE
+            )
+        `);
+    this.db.exec(`
+            CREATE TABLE IF NOT EXISTS remote_clients (
+                id TEXT PRIMARY KEY,
+                friendlyName TEXT,
+                pinCode TEXT,
+                type TEXT DEFAULT 'REMOTE',
+                isCameraActive INTEGER DEFAULT 0,
+                isSelfPreviewVisible INTEGER DEFAULT 1,
+                selectedCameraClients JSON,
+                isLocked INTEGER DEFAULT 0,
+                lastConnected DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+    const columns = this.db.pragma("table_info(sequences)").map((c) => c.name);
+    if (!columns.includes("duration")) this.db.exec("ALTER TABLE sequences ADD COLUMN duration INTEGER");
+    if (!columns.includes("filename")) this.db.exec("ALTER TABLE sequences ADD COLUMN filename TEXT");
+    if (!columns.includes("segmentId")) this.db.exec("ALTER TABLE sequences ADD COLUMN segmentId INTEGER");
+    if (!columns.includes("effectId")) this.db.exec("ALTER TABLE sequences ADD COLUMN effectId INTEGER");
+    if (!columns.includes("paletteId")) this.db.exec("ALTER TABLE sequences ADD COLUMN paletteId INTEGER");
+    this.db.exec(`
+            CREATE TABLE IF NOT EXISTS clipboard (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT,
+                data JSON,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+    const settings = this.db.prepare("SELECT * FROM app_settings WHERE id = 1").get();
+    if (!settings) {
+      this.db.prepare("INSERT INTO app_settings (id, defaultLogo, accessPin, serverPort) VALUES (1, '', '', 3001)").run();
+    }
+  }
+  // App Settings
+  getAppSettings() {
+    return this.db.prepare("SELECT * FROM app_settings WHERE id = 1").get();
+  }
+  updateAppSettings(settings) {
+    const current = this.getAppSettings();
+    console.log("--- DB: updateAppSettings (Incoming partial):", settings);
+    const next = { ...current, ...settings };
+    console.log("--- DB: updateAppSettings (Final merged):", {
+      defaultLogo: next.defaultLogo,
+      accessPin: next.accessPin ? "SET (length:" + next.accessPin.length + ")" : "EMPTY",
+      serverPort: next.serverPort
+    });
+    return this.db.prepare(`
+            UPDATE app_settings 
+            SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?
+            WHERE id = 1
+        `).run(next.defaultLogo, next.accessPin, next.serverPort, next.testVideoPath || "");
+  }
+  // Shows
+  getShows(includeArchived = false) {
+    console.log("--- DB: getShows (includeArchived:", includeArchived, ") ---");
+    const totalCount = this.db.prepare("SELECT COUNT(*) as count FROM shows").get();
+    const archivedCount = this.db.prepare("SELECT COUNT(*) as count FROM shows WHERE archived = 1").get();
+    console.log("--- DB: Total shows in DB:", totalCount.count, ", Archived:", archivedCount.count, "---");
+    let shows;
+    if (includeArchived) {
+      shows = this.db.prepare("SELECT * FROM shows WHERE id != 'GLOBAL' ORDER BY updated_at DESC").all();
+    } else {
+      shows = this.db.prepare("SELECT * FROM shows WHERE (archived = 0 OR archived IS NULL) AND id != 'GLOBAL' ORDER BY updated_at DESC").all();
+    }
+    console.log("--- DB: Raw shows from query:", shows.length, "---", shows.map((s) => ({ id: s.id, name: s.name, archived: s.archived })));
+    shows = shows.map((s) => {
+      try {
+        return {
+          ...s,
+          schedule: s.schedule ? JSON.parse(s.schedule) : {},
+          viewState: s.viewState ? JSON.parse(s.viewState) : {}
+        };
+      } catch (e) {
+        console.error("Failed to parse show JSON for", s.id, e);
+        return { ...s, schedule: {}, viewState: {} };
+      }
+    });
+    console.log("--- DB: found", shows.length, "shows after filtering ---");
+    return shows;
+  }
+  createShow(show) {
+    const name = (show.name || "").trim();
+    if (!name) {
+      throw new Error("Show naam mag niet leeg zijn");
+    }
+    console.log("--- DB: createShow ---", name);
+    return this.db.prepare(`
+            INSERT INTO shows (id, name, pdfPath, totalPages, sidebarWidth, invertScriptColors, schedule, viewState)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+      show.id,
+      show.name,
+      show.pdfPath || "",
+      show.totalPages || 0,
+      show.sidebarWidth || 500,
+      show.invertScriptColors ? 1 : 0,
+      JSON.stringify(show.schedule || {}),
+      JSON.stringify(show.viewState || {})
+    );
+  }
+  updateShow(id, partial) {
+    const fields = Object.keys(partial);
+    const values = Object.values(partial).map((v) => typeof v === "object" ? JSON.stringify(v) : v);
+    const setClause = fields.map((f) => `${f} = ?`).join(", ");
+    return this.db.prepare(`
+            UPDATE shows SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+        `).run(...values, id);
+  }
+  deleteShow(id) {
+    return this.db.prepare("DELETE FROM shows WHERE id = ?").run(id);
+  }
+  archiveShow(id, archived) {
+    return this.db.prepare("UPDATE shows SET archived = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(archived ? 1 : 0, id);
+  }
+  debugDump() {
+    return {
+      app_settings: this.db.prepare("SELECT * FROM app_settings").all(),
+      shows: this.db.prepare("SELECT * FROM shows").all(),
+      devices: this.db.prepare("SELECT * FROM devices").all(),
+      sequencesCount: this.db.prepare("SELECT COUNT(*) as count FROM sequences").get().count
+    };
+  }
+  getTables() {
+    return this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all().map((t) => t.name);
+  }
+  getTableData(tableName) {
+    if (!/^[a-zA-Z0-9_]+$/.test(tableName)) {
+      throw new Error("Invalid table name");
+    }
+    return this.db.prepare(`SELECT * FROM ${tableName}`).all();
+  }
+  updateRow(tableName, id, data) {
+    if (!/^[a-zA-Z0-9_]+$/.test(tableName)) throw new Error("Invalid table");
+    const keys = Object.keys(data).filter((k) => k !== "id");
+    const setClause = keys.map((k) => `${k} = ?`).join(", ");
+    const values = keys.map((k) => {
+      const val = data[k];
+      return typeof val === "object" ? JSON.stringify(val) : val;
+    });
+    return this.db.prepare(`UPDATE ${tableName} SET ${setClause} WHERE id = ?`).run(...values, id);
+  }
+  deleteRow(tableName, id) {
+    if (!/^[a-zA-Z0-9_]+$/.test(tableName)) throw new Error("Invalid table");
+    return this.db.prepare(`DELETE FROM ${tableName} WHERE id = ?`).run(id);
+  }
+  // Devices
+  getDevices(showId) {
+    return this.db.prepare("SELECT * FROM devices WHERE showId = ?").all(showId).map((d) => {
+      const config = JSON.parse(d.config || "{}");
+      const mediaState = d.mediaState ? JSON.parse(d.mediaState) : null;
+      return {
+        ...d,
+        ...config,
+        mediaState
+      };
+    });
+  }
+  saveDevices(showId, devices) {
+    const deleteStmt = this.db.prepare("DELETE FROM devices WHERE showId = ?");
+    const insertStmt = this.db.prepare("INSERT INTO devices (id, showId, name, type, config, mediaState) VALUES (?, ?, ?, ?, ?, ?)");
+    const transaction = this.db.transaction((showId2, devices2) => {
+      deleteStmt.run(showId2);
+      for (const device of devices2) {
+        insertStmt.run(
+          device.id,
+          showId2,
+          device.name,
+          device.type,
+          JSON.stringify(device),
+          device.mediaState ? JSON.stringify(device.mediaState) : null
+        );
+      }
+    });
+    return transaction(showId, devices);
+  }
+  updateDeviceMediaState(id, mediaState) {
+    return this.db.prepare("UPDATE devices SET mediaState = ? WHERE id = ?").run(
+      JSON.stringify(mediaState),
+      id
+    );
+  }
+  getAllMediaStates() {
+    return this.db.prepare("SELECT id, mediaState FROM devices WHERE mediaState IS NOT NULL").all().map((d) => ({
+      id: d.id,
+      mediaState: d.mediaState ? JSON.parse(d.mediaState) : null
+    }));
+  }
+  // Sequences
+  getSequences(showId) {
+    return this.db.prepare("SELECT * FROM sequences WHERE showId = ? ORDER BY id ASC").all(showId).map((s) => ({
+      ...s,
+      sound: !!s.sound
+    }));
+  }
+  saveSequences(showId, events) {
+    const deleteStmt = this.db.prepare("DELETE FROM sequences WHERE showId = ?");
+    const insertStmt = this.db.prepare(`
+            INSERT INTO sequences 
+            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+    const transaction = this.db.transaction((showId2, events2) => {
+      deleteStmt.run(showId2);
+      for (const e of events2) {
+        insertStmt.run(
+          showId2,
+          e.act,
+          e.sceneId,
+          e.eventId,
+          e.type,
+          e.cue,
+          e.fixture || "",
+          e.effect || "",
+          e.palette || "",
+          e.color1 || "",
+          e.color2 || "",
+          e.color3 || "",
+          e.brightness ?? 255,
+          e.speed ?? 127,
+          e.intensity ?? 127,
+          e.transition ?? 0,
+          e.sound ? 1 : 0,
+          e.scriptPg ?? 1,
+          e.duration ?? null,
+          e.filename || "",
+          e.segmentId !== void 0 ? e.segmentId : null,
+          e.effectId !== void 0 ? e.effectId : null,
+          e.paletteId !== void 0 ? e.paletteId : null
+        );
+      }
+    });
+    try {
+      return transaction(showId, events);
+    } catch (err) {
+      console.error("Failed to save sequences:", err);
+      throw err;
+    }
+  }
+  // Remote Clients
+  getRemoteClients() {
+    return this.db.prepare("SELECT * FROM remote_clients ORDER BY lastConnected DESC").all().map((c) => ({
+      ...c,
+      isCameraActive: !!c.isCameraActive,
+      isSelfPreviewVisible: !!c.isSelfPreviewVisible,
+      isLocked: !!c.isLocked,
+      selectedCameraClients: c.selectedCameraClients ? JSON.parse(c.selectedCameraClients) : []
+    }));
+  }
+  getRemoteClient(id) {
+    const c = this.db.prepare("SELECT * FROM remote_clients WHERE id = ?").get(id);
+    if (!c) return null;
+    return {
+      ...c,
+      isCameraActive: !!c.isCameraActive,
+      isSelfPreviewVisible: !!c.isSelfPreviewVisible,
+      isLocked: !!c.isLocked,
+      selectedCameraClients: c.selectedCameraClients ? JSON.parse(c.selectedCameraClients) : []
+    };
+  }
+  upsertRemoteClient(client) {
+    return this.db.prepare(`
+            INSERT INTO remote_clients (id, friendlyName, pinCode, type, isCameraActive, isSelfPreviewVisible, selectedCameraClients, isLocked, lastConnected)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(id) DO UPDATE SET
+                friendlyName = excluded.friendlyName,
+                pinCode = excluded.pinCode,
+                type = excluded.type,
+                isCameraActive = excluded.isCameraActive,
+                isSelfPreviewVisible = excluded.isSelfPreviewVisible,
+                selectedCameraClients = excluded.selectedCameraClients,
+                isLocked = excluded.isLocked,
+                lastConnected = CURRENT_TIMESTAMP
+        `).run(
+      client.id,
+      client.friendlyName,
+      client.pinCode,
+      client.type || "REMOTE",
+      client.isCameraActive ? 1 : 0,
+      client.isSelfPreviewVisible !== false ? 1 : 0,
+      JSON.stringify(client.selectedCameraClients || []),
+      client.isLocked ? 1 : 0
+    );
+  }
+  updateRemoteClientStatus(id, updates) {
+    const fields = Object.keys(updates);
+    const values = Object.values(updates).map((v) => {
+      if (typeof v === "boolean") return v ? 1 : 0;
+      if (Array.isArray(v) || typeof v === "object") return JSON.stringify(v);
+      return v;
+    });
+    const setClause = fields.map((f) => `${f} = ?`).join(", ");
+    return this.db.prepare(`
+            UPDATE remote_clients SET ${setClause}, lastConnected = CURRENT_TIMESTAMP WHERE id = ?
+        `).run(...values, id);
+  }
+  // Clipboard
+  getClipboard() {
+    return this.db.prepare("SELECT * FROM clipboard ORDER BY timestamp DESC").all().map((item) => ({
+      ...item,
+      data: JSON.parse(item.data)
+    }));
+  }
+  addToClipboard(type2, data) {
+    return this.db.prepare("INSERT INTO clipboard (type, data) VALUES (?, ?)").run(type2, JSON.stringify(data));
+  }
+  removeFromClipboard(id) {
+    return this.db.prepare("DELETE FROM clipboard WHERE id = ?").run(id);
+  }
+  clearClipboard() {
+    return this.db.prepare("DELETE FROM clipboard").run();
+  }
+}
+const dbManager = new DbManager();
 function bind(fn, thisArg) {
   return function wrap() {
     return fn.apply(thisArg, arguments);
@@ -8876,26 +9286,26 @@ function createInstance(defaultConfig) {
   };
   return instance;
 }
-const axios = createInstance(defaults);
-axios.Axios = Axios$1;
-axios.CanceledError = CanceledError$1;
-axios.CancelToken = CancelToken$1;
-axios.isCancel = isCancel$1;
-axios.VERSION = VERSION$1;
-axios.toFormData = toFormData$1;
-axios.AxiosError = AxiosError$1;
-axios.Cancel = axios.CanceledError;
-axios.all = function all(promises) {
+const axios$1 = createInstance(defaults);
+axios$1.Axios = Axios$1;
+axios$1.CanceledError = CanceledError$1;
+axios$1.CancelToken = CancelToken$1;
+axios$1.isCancel = isCancel$1;
+axios$1.VERSION = VERSION$1;
+axios$1.toFormData = toFormData$1;
+axios$1.AxiosError = AxiosError$1;
+axios$1.Cancel = axios$1.CanceledError;
+axios$1.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = spread$1;
-axios.isAxiosError = isAxiosError$1;
-axios.mergeConfig = mergeConfig$1;
-axios.AxiosHeaders = AxiosHeaders$1;
-axios.formToJSON = (thing) => formDataToJSON(utils$1.isHTMLForm(thing) ? new FormData(thing) : thing);
-axios.getAdapter = adapters.getAdapter;
-axios.HttpStatusCode = HttpStatusCode$1;
-axios.default = axios;
+axios$1.spread = spread$1;
+axios$1.isAxiosError = isAxiosError$1;
+axios$1.mergeConfig = mergeConfig$1;
+axios$1.AxiosHeaders = AxiosHeaders$1;
+axios$1.formToJSON = (thing) => formDataToJSON(utils$1.isHTMLForm(thing) ? new FormData(thing) : thing);
+axios$1.getAdapter = adapters.getAdapter;
+axios$1.HttpStatusCode = HttpStatusCode$1;
+axios$1.default = axios$1;
 const {
   Axios: Axios2,
   AxiosError: AxiosError2,
@@ -8913,42 +9323,137 @@ const {
   formToJSON,
   getAdapter,
   mergeConfig
-} = axios;
+} = axios$1;
 class NetworkManager {
   async sendWledCommand(command) {
     const { ip, ...params } = command;
     const url = `http://${ip}/json/state`;
     try {
       console.log(`Sending WLED command to ${ip}:`, JSON.stringify(params));
-      await axios.post(url, params, { timeout: 1e3 });
+      await axios$1.post(url, params, { timeout: 1e3 });
     } catch (error) {
       console.error(`WLED command failed for ${ip}:`, error.message);
     }
   }
+  async sendWizCommand(ip, method, params) {
+    return new Promise((resolve, reject) => {
+      const socket = dgram.createSocket("udp4");
+      const msg = JSON.stringify({ method, params });
+      socket.send(msg, 38899, ip, (err) => {
+        if (err) {
+          socket.close();
+          reject(err);
+          return;
+        }
+        if (method === "getPilot") {
+          socket.on("message", (msg2) => {
+            try {
+              const result = JSON.parse(msg2.toString());
+              socket.close();
+              resolve(result);
+            } catch (e) {
+              socket.close();
+              reject(e);
+            }
+          });
+          setTimeout(() => {
+            try {
+              socket.close();
+            } catch (e) {
+            }
+            resolve({ error: "timeout" });
+          }, 2e3);
+        } else {
+          socket.close();
+          resolve({ success: true });
+        }
+      });
+    });
+  }
+  async getWledInfo(ip) {
+    try {
+      const response = await axios$1.get(`http://${ip}/json/info`, { timeout: 2e3 });
+      const stateResponse = await axios$1.get(`http://${ip}/json/state`, { timeout: 2e3 });
+      return { info: response.data, state: stateResponse.data };
+    } catch (error) {
+      console.error(`Failed to get WLED info from ${ip}:`, error.message);
+      return null;
+    }
+  }
+  async getWledEffects(ip) {
+    try {
+      const response = await axios$1.get(`http://${ip}/json/eff`, { timeout: 2e3 });
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to get WLED effects from ${ip}:`, error.message);
+      return [];
+    }
+  }
+  async getWledPalettes(ip) {
+    try {
+      const response = await axios$1.get(`http://${ip}/json/pal`, { timeout: 2e3 });
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to get WLED palettes from ${ip}:`, error.message);
+      return [];
+    }
+  }
   // Handle various show event types
   processEvent(event) {
-    if (event.type === "Light" && event.fixture) {
+    if (event.type?.toLowerCase() === "light" && event.fixture) {
       const ipMap = {
         "Beuk Cour": "192.168.0.10",
         "Beuk Jardin": "192.168.0.11",
         "WIZ Lamp": "192.168.0.119"
       };
-      const ip = ipMap[event.fixture] || ipMap[event.fixture.split("/")[0]];
+      const devices = dbManager.getDevices("GLOBAL") || [];
+      const device = devices.find((d) => d.name === event.fixture);
+      const ip = device?.ip || ipMap[event.fixture];
       if (ip) {
-        this.sendWledCommand({
-          ip,
-          on: true,
-          bri: event.brightness,
-          seg: [{
-            fx: event.colEffectId || 0,
-            pal: event.colPaletteId || 0,
+        if (device?.type === "wiz") {
+          this.sendWizCommand(ip, "setPilot", {
+            r: this.hexToRgb(event.color1)[0],
+            g: this.hexToRgb(event.color1)[1],
+            b: this.hexToRgb(event.color1)[2],
+            dimming: event.brightness !== void 0 ? Math.round(event.brightness / 2.55) : 100
+          });
+        } else {
+          const payload = {
+            on: true,
+            bri: event.brightness,
+            seg: []
+          };
+          const segUpdate = {
+            fx: event.effectId !== void 0 ? event.effectId : 0,
+            pal: event.paletteId !== void 0 ? event.paletteId : 0,
             col: [
               this.hexToRgb(event.color1),
               this.hexToRgb(event.color2),
               this.hexToRgb(event.color3)
-            ]
-          }]
-        });
+            ],
+            sx: event.speed,
+            ix: event.intensity
+          };
+          if (event.segmentId !== void 0 && event.segmentId >= 0) {
+            payload.seg.push({ id: event.segmentId, ...segUpdate });
+          } else {
+            try {
+              this.getWledInfo(ip).then((data) => {
+                if (data && data.state && data.state.seg) {
+                  payload.seg = data.state.seg.map((s) => ({ id: s.id, ...segUpdate }));
+                  this.sendWledCommand({ ip, ...payload });
+                } else {
+                  payload.seg.push({ id: 0, ...segUpdate });
+                  this.sendWledCommand({ ip, ...payload });
+                }
+              });
+              return;
+            } catch (e) {
+              payload.seg.push({ id: 0, ...segUpdate });
+            }
+          }
+          this.sendWledCommand({ ip, ...payload });
+        }
       }
     }
   }
@@ -8957,10 +9462,10 @@ class NetworkManager {
     if (device.type === "wled") {
       const url = `http://${device.ip}/json/state`;
       try {
-        await axios.post(url, { on: true, bri: 255, seg: [{ id: 0, col: [[255, 0, 0]] }] }, { timeout: 1e3 });
-        setTimeout(() => axios.post(url, { seg: [{ id: 0, col: [[0, 255, 0]] }] }).catch(() => {
+        await axios$1.post(url, { on: true, bri: 255, seg: [{ id: 0, col: [[255, 0, 0]] }] }, { timeout: 1e3 });
+        setTimeout(() => axios$1.post(url, { seg: [{ id: 0, col: [[0, 255, 0]] }] }).catch(() => {
         }), 500);
-        setTimeout(() => axios.post(url, { seg: [{ id: 0, col: [[0, 0, 255]] }] }).catch(() => {
+        setTimeout(() => axios$1.post(url, { seg: [{ id: 0, col: [[0, 0, 255]] }] }).catch(() => {
         }), 1e3);
       } catch (e) {
         console.error(`Test WLED failed: ${e.message}`);
@@ -8990,294 +9495,6 @@ class NetworkManager {
   }
 }
 const networkManager = new NetworkManager();
-const require$2 = createRequire(import.meta.url);
-const Database = require$2("better-sqlite3");
-class DbManager {
-  constructor() {
-    const dbPath = path.join(app$1.getPath("userData"), "ledshow.db");
-    console.log("--- Initializing Database at:", dbPath);
-    this.db = new Database(dbPath);
-    this.init();
-  }
-  init() {
-    this.db.exec(`
-            CREATE TABLE IF NOT EXISTS app_settings (
-                id INTEGER PRIMARY KEY CHECK (id = 1),
-                defaultLogo TEXT,
-                accessPin TEXT,
-                serverPort INTEGER,
-                testVideoPath TEXT
-            )
-        `);
-    try {
-      this.db.exec("ALTER TABLE app_settings ADD COLUMN testVideoPath TEXT");
-    } catch (e) {
-    }
-    try {
-      this.db.exec("ALTER TABLE shows ADD COLUMN archived INTEGER DEFAULT 0");
-    } catch (e) {
-    }
-    try {
-      this.db.exec("ALTER TABLE shows ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
-    } catch (e) {
-    }
-    try {
-      this.db.exec("ALTER TABLE shows ADD COLUMN viewState JSON");
-    } catch (e) {
-    }
-    this.db.exec(`
-            CREATE TABLE IF NOT EXISTS shows (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                pdfPath TEXT,
-                sidebarWidth INTEGER DEFAULT 500,
-                invertScriptColors INTEGER DEFAULT 0,
-                schedule JSON,
-                viewState JSON,
-                archived INTEGER DEFAULT 0,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-    this.db.exec(`
-            CREATE TABLE IF NOT EXISTS devices (
-                id TEXT PRIMARY KEY,
-                showId TEXT NOT NULL,
-                name TEXT NOT NULL,
-                type TEXT NOT NULL,
-                config JSON,
-                mediaState JSON,
-                FOREIGN KEY(showId) REFERENCES shows(id) ON DELETE CASCADE
-            )
-        `);
-    try {
-      this.db.exec("ALTER TABLE devices ADD COLUMN mediaState JSON");
-    } catch (e) {
-    }
-    this.db.exec(`
-            CREATE TABLE IF NOT EXISTS sequences (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                showId TEXT NOT NULL,
-                act TEXT,
-                sceneId INTEGER,
-                eventId INTEGER,
-                type TEXT,
-                cue TEXT,
-                fixture TEXT,
-                effect TEXT,
-                palette TEXT,
-                color1 TEXT,
-                color2 TEXT,
-                color3 TEXT,
-                brightness INTEGER,
-                speed INTEGER,
-                intensity INTEGER,
-                transition INTEGER,
-                sound INTEGER,
-                scriptPg INTEGER,
-                duration INTEGER,
-                FOREIGN KEY(showId) REFERENCES shows(id) ON DELETE CASCADE
-            )
-        `);
-    try {
-      this.db.exec("ALTER TABLE sequences ADD COLUMN duration INTEGER");
-    } catch (e) {
-    }
-    const settings = this.db.prepare("SELECT * FROM app_settings WHERE id = 1").get();
-    if (!settings) {
-      this.db.prepare("INSERT INTO app_settings (id, defaultLogo, accessPin, serverPort) VALUES (1, '', '', 3001)").run();
-    }
-  }
-  // App Settings
-  getAppSettings() {
-    return this.db.prepare("SELECT * FROM app_settings WHERE id = 1").get();
-  }
-  updateAppSettings(settings) {
-    const current = this.getAppSettings();
-    const next = { ...current, ...settings };
-    return this.db.prepare(`
-            UPDATE app_settings 
-            SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?
-            WHERE id = 1
-        `).run(next.defaultLogo, next.accessPin, next.serverPort, next.testVideoPath || "");
-  }
-  // Shows
-  getShows(includeArchived = false) {
-    console.log("--- DB: getShows (includeArchived:", includeArchived, ") ---");
-    const totalCount = this.db.prepare("SELECT COUNT(*) as count FROM shows").get();
-    const archivedCount = this.db.prepare("SELECT COUNT(*) as count FROM shows WHERE archived = 1").get();
-    console.log("--- DB: Total shows in DB:", totalCount.count, ", Archived:", archivedCount.count, "---");
-    let shows;
-    if (includeArchived) {
-      shows = this.db.prepare("SELECT * FROM shows ORDER BY updated_at DESC").all();
-    } else {
-      shows = this.db.prepare("SELECT * FROM shows WHERE (archived = 0 OR archived IS NULL) ORDER BY updated_at DESC").all();
-    }
-    console.log("--- DB: Raw shows from query:", shows.length, "---", shows.map((s) => ({ id: s.id, name: s.name, archived: s.archived })));
-    shows = shows.map((s) => {
-      try {
-        return {
-          ...s,
-          schedule: s.schedule ? JSON.parse(s.schedule) : {},
-          viewState: s.viewState ? JSON.parse(s.viewState) : {}
-        };
-      } catch (e) {
-        console.error("Failed to parse show JSON for", s.id, e);
-        return { ...s, schedule: {}, viewState: {} };
-      }
-    });
-    console.log("--- DB: found", shows.length, "shows after filtering ---");
-    return shows;
-  }
-  createShow(show) {
-    const name = (show.name || "").trim();
-    if (!name) {
-      throw new Error("Show naam mag niet leeg zijn");
-    }
-    console.log("--- DB: createShow ---", name);
-    return this.db.prepare(`
-            INSERT INTO shows (id, name, pdfPath, sidebarWidth, invertScriptColors, schedule, viewState)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run(
-      show.id,
-      show.name,
-      show.pdfPath || "",
-      show.sidebarWidth || 500,
-      show.invertScriptColors ? 1 : 0,
-      JSON.stringify(show.schedule || {}),
-      JSON.stringify(show.viewState || {})
-    );
-  }
-  updateShow(id, partial) {
-    const fields = Object.keys(partial);
-    const values = Object.values(partial).map((v) => typeof v === "object" ? JSON.stringify(v) : v);
-    const setClause = fields.map((f) => `${f} = ?`).join(", ");
-    return this.db.prepare(`
-            UPDATE shows SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-        `).run(...values, id);
-  }
-  deleteShow(id) {
-    return this.db.prepare("DELETE FROM shows WHERE id = ?").run(id);
-  }
-  archiveShow(id, archived) {
-    return this.db.prepare("UPDATE shows SET archived = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(archived ? 1 : 0, id);
-  }
-  debugDump() {
-    return {
-      app_settings: this.db.prepare("SELECT * FROM app_settings").all(),
-      shows: this.db.prepare("SELECT * FROM shows").all(),
-      devices: this.db.prepare("SELECT * FROM devices").all(),
-      sequencesCount: this.db.prepare("SELECT COUNT(*) as count FROM sequences").get().count
-    };
-  }
-  getTables() {
-    return this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all().map((t) => t.name);
-  }
-  getTableData(tableName) {
-    if (!/^[a-zA-Z0-9_]+$/.test(tableName)) {
-      throw new Error("Invalid table name");
-    }
-    return this.db.prepare(`SELECT * FROM ${tableName}`).all();
-  }
-  updateRow(tableName, id, data) {
-    if (!/^[a-zA-Z0-9_]+$/.test(tableName)) throw new Error("Invalid table");
-    const keys = Object.keys(data).filter((k) => k !== "id");
-    const setClause = keys.map((k) => `${k} = ?`).join(", ");
-    const values = keys.map((k) => {
-      const val = data[k];
-      return typeof val === "object" ? JSON.stringify(val) : val;
-    });
-    return this.db.prepare(`UPDATE ${tableName} SET ${setClause} WHERE id = ?`).run(...values, id);
-  }
-  deleteRow(tableName, id) {
-    if (!/^[a-zA-Z0-9_]+$/.test(tableName)) throw new Error("Invalid table");
-    return this.db.prepare(`DELETE FROM ${tableName} WHERE id = ?`).run(id);
-  }
-  // Devices
-  getDevices(showId) {
-    return this.db.prepare("SELECT * FROM devices WHERE showId = ?").all(showId).map((d) => {
-      const config = JSON.parse(d.config || "{}");
-      const mediaState = d.mediaState ? JSON.parse(d.mediaState) : null;
-      return {
-        ...d,
-        ...config,
-        mediaState
-      };
-    });
-  }
-  saveDevices(showId, devices) {
-    const deleteStmt = this.db.prepare("DELETE FROM devices WHERE showId = ?");
-    const insertStmt = this.db.prepare("INSERT INTO devices (id, showId, name, type, config, mediaState) VALUES (?, ?, ?, ?, ?, ?)");
-    const transaction = this.db.transaction((showId2, devices2) => {
-      deleteStmt.run(showId2);
-      for (const device of devices2) {
-        insertStmt.run(
-          device.id,
-          showId2,
-          device.name,
-          device.type,
-          JSON.stringify(device),
-          device.mediaState ? JSON.stringify(device.mediaState) : null
-        );
-      }
-    });
-    return transaction(showId, devices);
-  }
-  updateDeviceMediaState(id, mediaState) {
-    return this.db.prepare("UPDATE devices SET mediaState = ? WHERE id = ?").run(
-      JSON.stringify(mediaState),
-      id
-    );
-  }
-  getAllMediaStates() {
-    return this.db.prepare("SELECT id, mediaState FROM devices WHERE mediaState IS NOT NULL").all().map((d) => ({
-      id: d.id,
-      mediaState: d.mediaState ? JSON.parse(d.mediaState) : null
-    }));
-  }
-  // Sequences
-  getSequences(showId) {
-    return this.db.prepare("SELECT * FROM sequences WHERE showId = ? ORDER BY id ASC").all(showId).map((s) => ({
-      ...s,
-      sound: !!s.sound
-    }));
-  }
-  saveSequences(showId, events) {
-    const deleteStmt = this.db.prepare("DELETE FROM sequences WHERE showId = ?");
-    const insertStmt = this.db.prepare(`
-            INSERT INTO sequences 
-            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `);
-    const transaction = this.db.transaction((showId2, events2) => {
-      deleteStmt.run(showId2);
-      for (const e of events2) {
-        insertStmt.run(
-          showId2,
-          e.act,
-          e.sceneId,
-          e.eventId,
-          e.type,
-          e.cue,
-          e.fixture || "",
-          e.effect || "",
-          e.palette || "",
-          e.color1 || "",
-          e.color2 || "",
-          e.color3 || "",
-          e.brightness ?? 255,
-          e.speed ?? 127,
-          e.intensity ?? 127,
-          e.transition ?? 0,
-          e.sound ? 1 : 0,
-          e.scriptPg ?? 1,
-          e.duration ?? null
-        );
-      }
-    });
-    return transaction(showId, events);
-  }
-}
-const dbManager = new DbManager();
 class DeviceScanner {
   constructor() {
     this.interfaces = [];
@@ -9349,7 +9566,7 @@ class DeviceScanner {
   }
   async checkWled(ip) {
     try {
-      const response = await axios.get(`http://${ip}/json/info`, { timeout: 1500 });
+      const response = await axios$1.get(`http://${ip}/json/info`, { timeout: 1500 });
       if (response.data && response.data.ver && response.data.leds) {
         return {
           ip,
@@ -9428,6 +9645,7 @@ const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net } = require$1
 const http = require$1("http");
 const { Server } = require$1("socket.io");
 const fs = require$1("node:fs");
+const axios = require$1("axios");
 const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
 const _initSettings = dbManager.getAppSettings();
 const SOCKET_PORT = _initSettings?.serverPort || 3001;
@@ -9475,6 +9693,40 @@ const fileServer = http.createServer((req, res) => {
     }
     return;
   }
+  if (url.pathname === "/setup") {
+    let setupPath = path.join(__dirname$1, "./setup-portal.html");
+    if (!fs.existsSync(setupPath)) {
+      setupPath = path.join(__dirname$1, "../electron/setup-portal.html");
+    }
+    if (fs.existsSync(setupPath)) {
+      res.writeHead(200, { "Content-Type": "text/html", "Access-Control-Allow-Origin": "*" });
+      fs.createReadStream(setupPath).pipe(res);
+    } else {
+      console.error("[Main] Setup portal not found at:", setupPath);
+      res.writeHead(404);
+      res.end("Setup portal not found");
+    }
+    return;
+  }
+  if (url.pathname === "/agent-package") {
+    let zipPath = path.join(__dirname$1, "./ledshow-agent.zip");
+    if (!fs.existsSync(zipPath)) {
+      zipPath = path.join(__dirname$1, "../electron/ledshow-agent.zip");
+    }
+    if (fs.existsSync(zipPath)) {
+      res.writeHead(200, {
+        "Content-Type": "application/zip",
+        "Access-Control-Allow-Origin": "*",
+        "Content-Disposition": 'attachment; filename="ledshow-agent.zip"'
+      });
+      fs.createReadStream(zipPath).pipe(res);
+    } else {
+      console.error("[Main] Agent package not found at:", zipPath);
+      res.writeHead(404);
+      res.end("Agent package not found");
+    }
+    return;
+  }
   res.writeHead(404);
   res.end("Not found");
 });
@@ -9482,7 +9734,16 @@ io.on("connection", (socket) => {
   console.log("Client connected to Antigravity Socket:", socket.id);
   io.emit("execute", { type: "REQUEST_STATE" });
   const broadcastClients = () => {
-    const clients = Array.from(io.sockets.sockets.values()).map((s) => s.id);
+    const clients = Array.from(io.sockets.sockets.values()).map((s) => {
+      const dbClient = s._clientUUID ? dbManager.getRemoteClient(s._clientUUID) : null;
+      return {
+        id: s.id,
+        uuid: s._clientUUID || null,
+        friendlyName: dbClient?.friendlyName || (s._clientUUID ? "Workstation" : null),
+        isLocked: !!dbClient?.isLocked,
+        isAuthorized: !!s._isAuthorized
+      };
+    });
     io.emit("execute", { type: "CLIENTS_UPDATE", clients });
   };
   broadcastClients();
@@ -9494,18 +9755,132 @@ io.on("connection", (socket) => {
     if (data.type !== "CAMERA_FRAME") {
       console.log("Command received:", data);
     }
+    const authCommands = ["REGISTER_CLIENT", "VERIFY_HOST_PIN", "COMPLETE_REGISTRATION", "VERIFY_CLIENT_PIN"];
+    if (!socket._isAuthorized && !authCommands.includes(data.type)) {
+      return;
+    }
     if (data.type === "EVENT_TRIGGER") {
       networkManager.processEvent(data.event);
     }
     if (data.type === "STATE_SYNC") {
-      socket.broadcast.emit("execute", data);
+      for (const s of io.sockets.sockets.values()) {
+        const rs = s;
+        if (rs._isAuthorized && s.id !== socket.id) {
+          s.emit("execute", data);
+        }
+      }
+      return;
+    }
+    if (data.type === "REGISTER_CLIENT") {
+      const uuid = data.clientUUID;
+      socket._clientUUID = uuid;
+      console.log(`--- NETWORK: Registering client ${socket.id} with UUID: ${uuid}`);
+      const isLocal = socket.handshake.address === "127.0.0.1" || socket.handshake.address === "::1" || socket.handshake.address.includes("localhost") || socket.handshake.address.includes("127.0.0.1");
+      if (isLocal && data.isHost) {
+        console.log(`--- NETWORK: Authorizing local Electron host ${socket.id}`);
+        const existing = Array.from(io.sockets.sockets.values()).find((s) => s._clientUUID === uuid && s._isAuthorized && s.id !== socket.id);
+        if (existing) {
+          console.log(`--- NETWORK: Host ${uuid} already connected on ${existing.id}. Disconnecting old socket.`);
+          existing.disconnect();
+        }
+        socket._isAuthorized = true;
+        let hostClient = dbManager.getRemoteClient(uuid);
+        if (!hostClient) {
+          console.log(`--- NETWORK: Creating initial DB entry for Host station`);
+          dbManager.upsertRemoteClient({
+            id: uuid,
+            friendlyName: "Show Controller (Host)",
+            pinCode: "",
+            type: "HOST"
+          });
+          hostClient = dbManager.getRemoteClient(uuid);
+        }
+        socket.emit("execute", { type: "AUTHORIZED", friendlyName: hostClient?.friendlyName || "Show Controller" });
+        broadcastClients();
+        return;
+      }
+      console.log(`--- NETWORK: Client ${uuid} is a REMOTE connection (isHost: ${data.isHost}, address: ${socket.handshake.address})`);
+      const client = dbManager.getRemoteClient(uuid);
+      const clientsInDb = dbManager.getRemoteClients().filter((c) => c.type !== "HOST");
+      if (!client) {
+        console.log(`--- NETWORK: Client ${uuid} NOT found in DB. Sending REGISTRATION_REQUIRED (NOT_FOUND).`);
+        socket.emit("execute", {
+          type: "REGISTRATION_REQUIRED",
+          status: "NOT_FOUND",
+          existingClients: clientsInDb.map((c) => ({ id: c.id, friendlyName: c.friendlyName }))
+        });
+      } else {
+        console.log(`--- NETWORK: Client ${uuid} found in DB as '${client.friendlyName}'. Sending REGISTRATION_REQUIRED (WAITING_PIN).`);
+        socket.emit("execute", {
+          type: "REGISTRATION_REQUIRED",
+          status: "WAITING_PIN",
+          friendlyName: client.friendlyName
+        });
+      }
+      broadcastClients();
+      return;
+    }
+    if (data.type === "VERIFY_HOST_PIN") {
+      const settings = dbManager.getAppSettings();
+      if (data.pin === settings.accessPin || settings.accessPin === "") {
+        socket.emit("execute", { type: "HOST_PIN_CORRECT" });
+      } else {
+        socket.emit("execute", { type: "HOST_PIN_INCORRECT" });
+      }
+      return;
+    }
+    if (data.type === "COMPLETE_REGISTRATION") {
+      console.log(`--- NETWORK: Completing registration for ${socket._clientUUID} as '${data.friendlyName}'`);
+      dbManager.upsertRemoteClient({
+        id: socket._clientUUID,
+        friendlyName: data.friendlyName,
+        pinCode: data.pinCode,
+        type: "REMOTE"
+      });
+      socket._isAuthorized = true;
+      socket.emit("execute", { type: "AUTHORIZED", friendlyName: data.friendlyName });
+      broadcastClients();
+      return;
+    }
+    if (data.type === "VERIFY_CLIENT_PIN") {
+      const client = dbManager.getRemoteClient(socket._clientUUID);
+      const settings = dbManager.getAppSettings() || { accessPin: "" };
+      const inputPin = String(data.pin || "").trim();
+      const masterPin = String(settings.accessPin || "").trim();
+      const clientPin = String(client?.pinCode || "").trim();
+      console.log(`--- NETWORK: PIN Auth for ${socket._clientUUID} (${client?.friendlyName || "Unknown"})`);
+      console.log(`--- NETWORK: [${inputPin}] vs Client:[${clientPin}] vs Master:[${masterPin}]`);
+      const isClientPin = clientPin !== "" && inputPin === clientPin;
+      const isMasterPin = masterPin !== "" && inputPin === masterPin;
+      if (isClientPin || isMasterPin) {
+        console.log(`--- NETWORK: Auth SUCCESS via ${isMasterPin ? "MASTER PIN" : "CLIENT PIN"}`);
+        const existing = Array.from(io.sockets.sockets.values()).find((s) => s._clientUUID === socket._clientUUID && s._isAuthorized && s.id !== socket.id);
+        if (existing) {
+          console.log(`--- NETWORK: Active session found for this UUID. Disconnecting old socket.`);
+          existing.disconnect();
+        }
+        socket._isAuthorized = true;
+        socket.emit("execute", { type: "AUTHORIZED", friendlyName: client?.friendlyName || "Show Controller" });
+        dbManager.updateRemoteClientStatus(socket._clientUUID, { lastConnected: /* @__PURE__ */ new Date(), isLocked: false });
+        broadcastClients();
+      } else {
+        console.log(`--- NETWORK: Auth FAILED. Invalid PIN.`);
+        socket.emit("execute", { type: "CLIENT_PIN_INCORRECT" });
+      }
+      return;
+    }
+    if (data.type === "SET_LOCKED") {
+      if (socket._clientUUID) {
+        dbManager.updateRemoteClientStatus(socket._clientUUID, { isLocked: data.locked });
+        broadcastClients();
+      }
       return;
     }
     if (data.type === "CAMERA_FRAME") {
       if (!socket._cameraFrameCount) socket._cameraFrameCount = 0;
       socket._cameraFrameCount++;
       if (socket._cameraFrameCount % 50 === 1) {
-        console.log(`[Server] CAMERA_FRAME #${socket._cameraFrameCount} from ${socket.id}, broadcasting to ${io.sockets.sockets.size - 1} other clients`);
+        console.log(`[Server] CAMERA_FRAME #${socket._cameraFrameCount} from ${socket.id} (${socket._clientUUID}), broadcasting to ${io.sockets.sockets.size - 1} other clients`);
       }
       socket.broadcast.emit("execute", data);
       return;
@@ -9558,6 +9933,10 @@ ipcMain.handle("db:get-devices", (_e, showId) => dbManager.getDevices(showId));
 ipcMain.handle("db:save-devices", (_e, { showId, devices }) => dbManager.saveDevices(showId, devices));
 ipcMain.handle("db:get-sequences", (_e, showId) => dbManager.getSequences(showId));
 ipcMain.handle("db:save-sequences", (_e, { showId, events }) => dbManager.saveSequences(showId, events));
+ipcMain.handle("db:get-remote-clients", () => dbManager.getRemoteClients());
+ipcMain.handle("db:get-remote-client", (_e, id) => dbManager.getRemoteClient(id));
+ipcMain.handle("db:upsert-remote-client", (_e, client) => dbManager.upsertRemoteClient(client));
+ipcMain.handle("db:update-remote-client-status", (_e, { id, updates }) => dbManager.updateRemoteClientStatus(id, updates));
 ipcMain.handle("get-ip-address", () => {
   const os2 = require$1("os");
   const interfaces = os2.networkInterfaces();
@@ -9614,7 +9993,7 @@ ipcMain.handle("test-device", (_e, device) => {
     if (fileUrl) {
       console.log("[Main] Playing test video from:", fileUrl);
       setTimeout(() => {
-        if (!win.isDestroyed()) {
+        if (win && !win.isDestroyed()) {
           win.webContents.send("media-play", {
             url: fileUrl,
             loop: true,
@@ -9627,6 +10006,17 @@ ipcMain.handle("test-device", (_e, device) => {
     return true;
   }
   return networkManager.testDevice(device);
+});
+ipcMain.handle("wled:get-info", (_e, ip) => networkManager.getWledInfo(ip));
+ipcMain.handle("wled:get-effects", (_e, ip) => networkManager.getWledEffects(ip));
+ipcMain.handle("wled:get-palettes", (_e, ip) => networkManager.getWledPalettes(ip));
+ipcMain.handle("wiz:get-pilot", (_e, ip) => networkManager.sendWizCommand(ip, "getPilot", {}));
+ipcMain.handle("db:get-clipboard", () => dbManager.getClipboard());
+ipcMain.handle("db:add-to-clipboard", (_e, { type: type2, data }) => dbManager.addToClipboard(type2, data));
+ipcMain.handle("db:remove-from-clipboard", (_e, id) => dbManager.removeFromClipboard(id));
+ipcMain.handle("db:clear-clipboard", () => dbManager.clearClipboard());
+ipcMain.on("app-quit", () => {
+  app.quit();
 });
 ipcMain.on("projection-error", (event, error) => {
   const wins = BrowserWindow.getAllWindows();
@@ -9677,17 +10067,14 @@ function ensureProjectionWindow(deviceId, monitorIndex) {
     title: `Projection - Device ${deviceId}`
   });
   if (process.env.VITE_DEV_SERVER_URL) {
-    win.loadURL(`${process.env.VITE_DEV_SERVER_URL}#projection`);
+    win.loadURL(`${process.env.VITE_DEV_SERVER_URL}#projection?deviceId=${deviceId}`);
   } else {
-    win.loadFile(path.join(__dirname$1, "../dist/index.html"), { hash: "projection" });
+    win.loadFile(path.join(__dirname$1, "../dist/index.html"), { hash: `projection?deviceId=${deviceId}` });
   }
   projectionWindows.set(deviceId, win);
   win.webContents.on("did-finish-load", () => {
     win.webContents.executeJavaScript(`window.projectionDeviceId = "${deviceId}";`);
-    const lastState = lastMediaStates.get(deviceId);
-    if (lastState) {
-      win.webContents.send(`media-${lastState.command}`, lastState.payload);
-    }
+    console.log(`[Main] Projection window for ${deviceId} loaded.`);
   });
   win.on("closed", () => {
     projectionWindows.delete(deviceId);
@@ -9704,6 +10091,24 @@ ipcMain.handle("close-projection", (_e, deviceId) => {
     win.close();
   }
   projectionWindows.delete(deviceId);
+});
+ipcMain.on("projection-ready", (event, rendererDeviceId) => {
+  let deviceId = rendererDeviceId;
+  if (!deviceId) {
+    for (const [id, win] of projectionWindows.entries()) {
+      if (win.webContents === event.sender) {
+        deviceId = id;
+        break;
+      }
+    }
+  }
+  if (deviceId) {
+    console.log(`[Main] Projection window ready for device ${deviceId}. Syncing state...`);
+    const lastState = lastMediaStates.get(deviceId);
+    if (lastState) {
+      event.sender.send(`media-${lastState.command}`, lastState.payload);
+    }
+  }
 });
 ipcMain.on("media-status-update", (_e, { deviceId, status }) => {
   if (!deviceId) return;
@@ -9760,12 +10165,41 @@ ipcMain.on("media-command", (_e, { deviceId, command, payload }) => {
     console.log(`[Main] No window found for device ${deviceId}, command saved for when it opens.`);
   }
 });
+ipcMain.handle("wiz-command", async (_e, { ip, method, params }) => {
+  return await networkManager.sendWizCommand(ip, method, params);
+});
+ipcMain.handle("upload-to-agent", async (_e, { url, filePath }) => {
+  console.log(`[Main] Uploading ${filePath} to ${url}...`);
+  try {
+    const formData = new (require$1("form-data"))();
+    formData.append("video", fs.createReadStream(filePath));
+    const response = await axios.post(url, formData, {
+      headers: {
+        ...formData.getHeaders()
+      }
+    });
+    return response.status === 200 || response.status === 201;
+  } catch (error) {
+    console.error("[Main] Upload failed:", error);
+    return false;
+  }
+});
 server.listen(SOCKET_PORT, () => {
   console.log(`Socket.io server running on port ${SOCKET_PORT}`);
+});
+server.on("error", (e) => {
+  if (e.code === "EADDRINUSE") {
+    console.error("Socket Port in use");
+    dialog.showErrorBox("Applicatie is al actief", `Er draait al een instantie van de applicatie op poort ${SOCKET_PORT}.
+Controleer of de app al open staat en sluit deze eerst af.`);
+    app.quit();
+  }
 });
 fileServer.listen(FILE_PORT, () => {
   console.log(`File server running on port ${FILE_PORT} (logo, PDFs)`);
 });
+const DIST = path.join(__dirname$1, "../dist");
+app.isPackaged ? DIST : path.join(DIST, "../public");
 function createWindow() {
   const settings = dbManager.getAppSettings();
   const monitorIndex = settings?.controllerMonitorIndex || 0;
@@ -9780,14 +10214,24 @@ function createWindow() {
     backgroundColor: "#000000",
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false
+      contextIsolation: false,
+      webSecurity: false,
+      // Allow loading local resources (file://) and prevent CORS issues
+      allowRunningInsecureContent: true
     },
     title: "KLT LedShow Host"
+  });
+  win.webContents.on("did-fail-load", (event, errorCode, errorDescription) => {
+    console.error("Failed to load window:", errorCode, errorDescription);
+    dialog.showErrorBox("Failed to load application", `Error: ${errorCode} - ${errorDescription}
+Path: ${path.join(DIST, "index.html")}`);
   });
   if (process.env.VITE_DEV_SERVER_URL) {
     win.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
-    win.loadFile(path.join(__dirname$1, "../dist/index.html"));
+    const indexUrl = require$1("url").pathToFileURL(path.join(DIST, "index.html")).href;
+    console.log("Loading URL:", indexUrl);
+    win.loadURL(indexUrl);
   }
 }
 if (app) {

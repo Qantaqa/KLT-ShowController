@@ -2,44 +2,67 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Activity, WifiOff } from 'lucide-react'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import '../styles/projection.css'
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
 
+interface PlayerState {
+    src: string | null;
+    playing: boolean;
+    opacity: number;
+    fadeDuration: number;
+    loop: boolean;
+    volume: number;
+    muted: boolean;
+}
+
 const ProjectionWindow: React.FC = () => {
-    const videoRef = useRef<HTMLVideoElement>(null)
+    const videoRefA = useRef<HTMLVideoElement>(null)
+    const videoRefB = useRef<HTMLVideoElement>(null)
+
+    const [activePlayer, setActivePlayer] = useState<'A' | 'B'>('A')
     const [debugInfo, setDebugInfo] = useState<string | null>(null)
-    const [videoSource, setVideoSource] = useState<string | null>(null)
-    const [videoProps, setVideoProps] = useState({ loop: false, volume: 1, muted: false, playing: false, opacity: 1, fadeDuration: 0 })
     const [isConnected, setIsConnected] = useState(false)
     const [isDeveloperMode, setIsDeveloperMode] = useState(false)
 
-    // Sync state to video element
-    useEffect(() => {
-        if (!videoRef.current) return
+    const [playerA, setPlayerA] = useState<PlayerState>({
+        src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false
+    })
+    const [playerB, setPlayerB] = useState<PlayerState>({
+        src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false
+    })
 
-        if (videoSource) {
-            videoRef.current.loop = videoProps.loop
-            videoRef.current.volume = videoProps.volume
-            videoRef.current.muted = videoProps.muted
+    // Helper to get active ref
+    const getActiveRef = () => activePlayer === 'A' ? videoRefA : videoRefB;
 
-            if (videoProps.playing) {
-                videoRef.current.play().catch(e => {
-                    // Ignore abort errors which are common when switching srcs rapidly
-                    if (e.name !== 'AbortError') console.warn("Playback failed", e)
-                })
+    // Sync individual players
+    const syncPlayer = (ref: React.RefObject<HTMLVideoElement | null>, state: PlayerState) => {
+        const video = ref.current;
+        if (!video) return;
+
+        if (state.src) {
+            video.loop = state.loop;
+            video.volume = state.volume;
+            video.muted = state.muted;
+
+            if (state.playing) {
+                video.play().catch(e => {
+                    if (e.name !== 'AbortError') console.warn("Playback failed", e);
+                });
             } else {
-                videoRef.current.pause()
+                video.pause();
             }
         } else {
-            // STOP state: Pause and clear buffer
-            videoRef.current.pause()
-            videoRef.current.currentTime = 0
-            // Since src is becoming undefined in JSX, load() unloads the current video
-            videoRef.current.load()
+            video.pause();
+            video.currentTime = 0;
+            if (video.src) video.load();
         }
-    }, [videoSource, videoProps.loop, videoProps.volume, videoProps.muted, videoProps.playing])
+    }
+
+    useEffect(() => syncPlayer(videoRefA, playerA), [playerA]);
+    useEffect(() => syncPlayer(videoRefB, playerB), [playerB]);
 
     useEffect(() => {
         if ((window as any).require) {
@@ -48,134 +71,134 @@ const ProjectionWindow: React.FC = () => {
 
             const handlePlay = (_: any, { url, loop, volume, mute, transitionTime }: { url: string, loop: boolean, volume: number, mute: boolean, transitionTime?: number }) => {
                 const vol = Math.max(0, Math.min(1, volume / 100))
+                const nextPlayer = activePlayer === 'A' ? 'B' : 'A';
+                const fadeMs = transitionTime || 0;
 
-                if (transitionTime && transitionTime > 0 && videoSource) {
-                    // Fade out current
-                    setVideoProps(prev => ({ ...prev, opacity: 0, fadeDuration: transitionTime / 2 }));
+                // Load and start next player in background
+                const nextState: PlayerState = {
+                    src: url,
+                    playing: true,
+                    opacity: 0, // start invisible
+                    fadeDuration: 0,
+                    loop,
+                    volume: vol,
+                    muted: mute
+                };
 
-                    setTimeout(() => {
-                        // Swap source
-                        setVideoSource(url)
-                        // Fade in
+                if (nextPlayer === 'A') setPlayerA(nextState); else setPlayerB(nextState);
+
+                // Wait a tiny bit for video to at least start loading/playing before swapping
+                setTimeout(() => {
+                    // Start crossfade
+                    if (fadeMs > 0) {
+                        setPlayerA(prev => ({ ...prev, opacity: nextPlayer === 'A' ? 1 : 0, fadeDuration: fadeMs }));
+                        setPlayerB(prev => ({ ...prev, opacity: nextPlayer === 'B' ? 1 : 0, fadeDuration: fadeMs }));
+                    } else {
+                        setPlayerA(prev => ({ ...prev, opacity: nextPlayer === 'A' ? 1 : 0, fadeDuration: 0 }));
+                        setPlayerB(prev => ({ ...prev, opacity: nextPlayer === 'B' ? 1 : 0, fadeDuration: 0 }));
+                    }
+
+                    setActivePlayer(nextPlayer);
+
+                    // After fade, cleanup old player
+                    if (fadeMs > 0) {
                         setTimeout(() => {
-                            setVideoProps(prev => ({
-                                ...prev,
-                                loop,
-                                volume: vol,
-                                muted: mute,
-                                playing: true,
-                                opacity: 1,
-                                fadeDuration: transitionTime / 2
-                            }));
-                        }, 50);
-                    }, transitionTime / 2);
-                } else if (transitionTime && transitionTime > 0) {
-                    // No previous source, just fade in
-                    setVideoProps(prev => ({ ...prev, opacity: 0, fadeDuration: 0 }));
-                    setVideoSource(url)
-                    setTimeout(() => {
-                        setVideoProps(prev => ({
-                            ...prev,
-                            loop,
-                            volume: vol,
-                            muted: mute,
-                            playing: true,
-                            opacity: 1,
-                            fadeDuration: transitionTime
-                        }));
-                    }, 50);
-                } else {
-                    // Instant play
-                    setVideoSource(url)
-                    setVideoProps(prev => ({
-                        ...prev,
-                        loop,
-                        volume: vol,
-                        muted: mute,
-                        playing: true,
-                        opacity: 1,
-                        fadeDuration: 0
-                    }))
-                }
+                            const cleanup = { src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false };
+                            if (nextPlayer === 'A') setPlayerB(cleanup); else setPlayerA(cleanup);
+                        }, fadeMs + 100);
+                    } else {
+                        const cleanup = { src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false };
+                        if (nextPlayer === 'A') setPlayerB(cleanup); else setPlayerA(cleanup);
+                    }
+                }, 100); // 100ms buffer to ensure next video is somewhat ready
 
-                setDebugInfo(`Playing: ${url.split(/[\\/]/).pop()} (Vol: ${volume}%)`)
+                setDebugInfo(`Playing: ${url} (Vol: ${volume}%)`)
             }
 
             const handleStop = (_: any, { fadeOutTime }: { fadeOutTime?: number } = {}) => {
-                if (fadeOutTime && fadeOutTime > 0) {
-                    // Fade out first
-                    setVideoProps(prev => ({ ...prev, opacity: 0, fadeDuration: fadeOutTime }));
+                const fadeMs = fadeOutTime || 0;
+                if (fadeMs > 0) {
+                    setPlayerA(prev => ({ ...prev, opacity: 0, fadeDuration: fadeMs }));
+                    setPlayerB(prev => ({ ...prev, opacity: 0, fadeDuration: fadeMs }));
                     setTimeout(() => {
-                        setVideoSource(null)
-                        setVideoProps(prev => ({ ...prev, playing: false }))
+                        const stop = { src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false };
+                        setPlayerA(stop);
+                        setPlayerB(stop);
                         setDebugInfo('Stopped (Faded)')
-                    }, fadeOutTime);
+                    }, fadeMs);
                 } else {
-                    setVideoSource(null)
-                    setVideoProps(prev => ({ ...prev, playing: false, opacity: 1, fadeDuration: 0 }))
+                    const stop = { src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false };
+                    setPlayerA(stop);
+                    setPlayerB(stop);
                     setDebugInfo('Stopped')
                 }
             }
 
             const handlePause = () => {
-                setVideoProps(prev => ({ ...prev, playing: false }))
+                setPlayerA(prev => ({ ...prev, playing: false }));
+                setPlayerB(prev => ({ ...prev, playing: false }));
                 setDebugInfo('Paused')
             }
 
             const handleVolume = (_: any, { volume, mute }: { volume: number, mute: boolean }) => {
                 const vol = Math.max(0, Math.min(1, volume / 100))
-                setVideoProps(prev => ({ ...prev, volume: vol, muted: mute }))
-                if (videoRef.current) {
-                    videoRef.current.volume = vol
-                    videoRef.current.muted = mute
-                }
+                setPlayerA(prev => ({ ...prev, volume: vol, muted: mute }));
+                setPlayerB(prev => ({ ...prev, volume: vol, muted: mute }));
                 setDebugInfo(`Volume: ${volume}% ${mute ? '(Muted)' : ''}`)
+            }
+
+            const hash = window.location.hash;
+            const urlParams = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+            const deviceId = urlParams.get('deviceId') || (window as any).projectionDeviceId;
+
+            const handleUpdate = (_: any, { loop }: { loop?: boolean }) => {
+                if (typeof loop === 'boolean') {
+                    setPlayerA(prev => ({ ...prev, loop }));
+                    setPlayerB(prev => ({ ...prev, loop }));
+                    setDebugInfo(prev => `${prev ? prev.split(' (')[0] : 'Playing'} (Loop: ${loop})`)
+                    sendStatusUpdate();
+                }
             }
 
             ipcRenderer.on('media-play', handlePlay)
             ipcRenderer.on('media-stop', handleStop)
             ipcRenderer.on('media-pause', handlePause)
             ipcRenderer.on('media-volume', handleVolume)
-
-            const handleUpdate = (_: any, { loop }: { loop?: boolean }) => {
-                if (typeof loop === 'boolean') {
-                    setVideoProps(prev => ({ ...prev, loop }))
-                    if (videoRef.current) {
-                        videoRef.current.loop = loop
-                    }
-                    setDebugInfo(prev => `${prev ? prev.split(' (')[0] : 'Playing'} (Loop: ${loop})`)
-                    sendStatusUpdate(); // Trigger immediate update
-                }
-            }
             ipcRenderer.on('media-update', handleUpdate)
 
             const sendStatusUpdate = () => {
-                if (videoRef.current) {
+                const targetId = deviceId || (window as any).projectionDeviceId;
+                const activeRef = getActiveRef();
+                if (activeRef.current && targetId) {
                     ipcRenderer.send('media-status-update', {
-                        deviceId: (window as any).projectionDeviceId,
+                        deviceId: targetId,
                         status: {
-                            playing: !videoRef.current.paused,
-                            currentTime: videoRef.current.currentTime,
-                            duration: videoRef.current.duration,
-                            volume: videoRef.current.volume,
-                            muted: videoRef.current.muted,
-                            loop: videoRef.current.loop,
-                            playbackRate: videoRef.current.playbackRate,
+                            playing: !activeRef.current.paused,
+                            currentTime: activeRef.current.currentTime,
+                            duration: activeRef.current.duration,
+                            volume: activeRef.current.volume,
+                            muted: activeRef.current.muted,
+                            loop: activeRef.current.loop,
+                            playbackRate: activeRef.current.playbackRate,
                             lastUpdated: Date.now()
                         }
+                    });
+                } else if (targetId) {
+                    // Even if no video, send idle status
+                    ipcRenderer.send('media-status-update', {
+                        deviceId: targetId,
+                        status: { playing: false, lastUpdated: Date.now() }
                     });
                 }
             };
 
-            // Periodically send status updates (every 5 seconds)
             const statusInterval = setInterval(sendStatusUpdate, 5000);
 
             ipcRenderer.on('set-mode', (_: any, { developer }: { developer: boolean }) => {
                 setIsDeveloperMode(developer)
             })
 
-            // Notify main process we are ready
-            ipcRenderer.send('projection-ready')
+            ipcRenderer.send('projection-ready', deviceId)
 
             return () => {
                 clearInterval(statusInterval);
@@ -184,31 +207,38 @@ const ProjectionWindow: React.FC = () => {
                 ipcRenderer.removeListener('media-pause', handlePause)
                 ipcRenderer.removeListener('media-volume', handleVolume)
                 ipcRenderer.removeListener('media-update', handleUpdate)
+                ipcRenderer.removeAllListeners('set-mode')
             }
         }
-    }, [])
+    }, [activePlayer])
 
-    return (
-        <div className="w-screen h-screen bg-black overflow-hidden flex items-center justify-center relative">
+    const renderVideo = (id: 'A' | 'B', ref: React.RefObject<HTMLVideoElement | null>, state: PlayerState) => {
+        if (!state.src && state.opacity === 0) return null;
+
+        const videoUrl = state.src ? (
+            state.src.startsWith('file://') || state.src.startsWith('http') || state.src.startsWith('ledshow-file://')
+                ? state.src
+                : `file:///${state.src.replace(/\\/g, '/')}`
+        ) : undefined;
+
+        return (
             <video
-                ref={videoRef}
-                src={videoSource ? (
-                    videoSource.startsWith('file://') || videoSource.startsWith('http') || videoSource.startsWith('ledshow-file://')
-                        ? videoSource
-                        : `file:///${videoSource.replace(/\\/g, '/')}`
-                ) : undefined}
-                className="w-full h-full object-contain bg-black transition-opacity duration-500"
+                key={id}
+                ref={ref}
+                src={videoUrl}
+                className="projection-video absolute inset-0"
                 style={{
-                    opacity: videoProps.opacity,
-                    transitionDuration: `${videoProps.fadeDuration}ms`
-                }}
+                    '--video-opacity': state.opacity,
+                    '--video-fade-duration': `${state.fadeDuration}ms`,
+                    zIndex: activePlayer === id ? 10 : 5
+                } as React.CSSProperties}
                 playsInline
                 autoPlay
                 onLoadedMetadata={(e) => {
                     const video = e.target as HTMLVideoElement;
-                    video.volume = videoProps.volume;
-                    video.muted = videoProps.muted;
-                    video.loop = videoProps.loop;
+                    video.volume = state.volume;
+                    video.muted = state.muted;
+                    video.loop = state.loop;
                 }}
                 onError={(e) => {
                     const video = e.target as HTMLVideoElement;
@@ -224,8 +254,8 @@ const ProjectionWindow: React.FC = () => {
                             default: msg = `Error Code: ${error?.code}`;
                         }
                     }
-                    const errMsg = `Video Error: ${msg}`;
-                    setDebugInfo(`${errMsg} (${video.src.split('/').pop()})`);
+                    const errMsg = `Video Error (${id}): ${msg}`;
+                    setDebugInfo(`${errMsg} (${video.src})`);
                     console.error("Video playback error:", error, video.src);
 
                     if ((window as any).require) {
@@ -234,26 +264,33 @@ const ProjectionWindow: React.FC = () => {
                     }
                 }}
             />
+        );
+    }
+
+    return (
+        <div className="w-screen h-screen bg-black overflow-hidden flex items-center justify-center relative">
+            {renderVideo('A', videoRefA, playerA)}
+            {renderVideo('B', videoRefB, playerB)}
 
             {/* Fallback / Idle State */}
-            {!videoRef.current?.src && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center opacity-20">
+            {!playerA.src && !playerB.src && (
+                <div className="idle-fallback">
                     <Activity className="w-24 h-24 text-white/20 mb-4" />
                 </div>
             )}
 
-            {/* Debug Overlay (Hidden by default unless specifically toggled or errors in DEV mode) */}
+            {/* Debug Overlay */}
             {debugInfo && (isDeveloperMode || debugInfo.startsWith('Video Error')) && (
                 <div className={cn(
-                    "absolute top-4 left-4 font-mono text-xs px-2 py-1 rounded backdrop-blur border opacity-80 z-50",
-                    debugInfo.startsWith('Video Error') ? "bg-red-900/80 text-white border-red-500" : "bg-black/50 text-green-500 border-white/10"
+                    "debug-overlay",
+                    debugInfo.startsWith('Video Error') ? "debug-error" : "debug-info"
                 )}>
                     [PROJECTION] {debugInfo}
                 </div>
             )}
 
             {!isConnected && (
-                <div className="absolute top-4 right-4 bg-red-500/20 text-red-500 font-mono text-xs px-2 py-1 rounded backdrop-blur border border-red-500/10">
+                <div className="disconnected-status">
                     <WifiOff className="w-3 h-3 inline mr-1" /> Disconnected
                 </div>
             )}

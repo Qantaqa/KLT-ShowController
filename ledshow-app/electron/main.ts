@@ -11,6 +11,7 @@ const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net } = require('
 const http = require('http');
 const { Server } = require('socket.io');
 const fs = require('node:fs');
+const axios = require('axios');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -60,6 +61,44 @@ const fileServer = http.createServer((req: any, res: any) => {
         return;
     }
 
+    // Serve Agent Setup Portal
+    if (url.pathname === '/setup') {
+        let setupPath = path.join(__dirname, './setup-portal.html');
+        if (!fs.existsSync(setupPath)) {
+            setupPath = path.join(__dirname, '../electron/setup-portal.html'); // Fallback for dev
+        }
+
+        if (fs.existsSync(setupPath)) {
+            res.writeHead(200, { 'Content-Type': 'text/html', 'Access-Control-Allow-Origin': '*' });
+            fs.createReadStream(setupPath).pipe(res);
+        } else {
+            console.error('[Main] Setup portal not found at:', setupPath);
+            res.writeHead(404); res.end('Setup portal not found');
+        }
+        return;
+    }
+
+    // Serve Agent Package
+    if (url.pathname === '/agent-package') {
+        let zipPath = path.join(__dirname, './ledshow-agent.zip');
+        if (!fs.existsSync(zipPath)) {
+            zipPath = path.join(__dirname, '../electron/ledshow-agent.zip'); // Fallback for dev
+        }
+
+        if (fs.existsSync(zipPath)) {
+            res.writeHead(200, {
+                'Content-Type': 'application/zip',
+                'Access-Control-Allow-Origin': '*',
+                'Content-Disposition': 'attachment; filename="ledshow-agent.zip"'
+            });
+            fs.createReadStream(zipPath).pipe(res);
+        } else {
+            console.error('[Main] Agent package not found at:', zipPath);
+            res.writeHead(404); res.end('Agent package not found');
+        }
+        return;
+    }
+
     res.writeHead(404); res.end('Not found');
 });
 
@@ -71,7 +110,16 @@ io.on('connection', (socket: any) => {
 
     // Broadcast updated client list
     const broadcastClients = () => {
-        const clients = Array.from(io.sockets.sockets.values()).map((s: any) => s.id);
+        const clients = Array.from(io.sockets.sockets.values()).map((s: any) => {
+            const dbClient = s._clientUUID ? dbManager.getRemoteClient(s._clientUUID) : null;
+            return {
+                id: s.id,
+                uuid: s._clientUUID || null,
+                friendlyName: dbClient?.friendlyName || (s._clientUUID ? 'Workstation' : null),
+                isLocked: !!dbClient?.isLocked,
+                isAuthorized: !!s._isAuthorized
+            };
+        });
         io.emit('execute', { type: 'CLIENTS_UPDATE', clients });
     };
 
@@ -88,14 +136,160 @@ io.on('connection', (socket: any) => {
             console.log('Command received:', data);
         }
 
+        // Authorization check: Only allow certain commands if not authorized
+        const authCommands = ['REGISTER_CLIENT', 'VERIFY_HOST_PIN', 'COMPLETE_REGISTRATION', 'VERIFY_CLIENT_PIN'];
+        if (!socket._isAuthorized && !authCommands.includes(data.type)) {
+            // console.log(`[Server] Blocking unauthorized command ${data.type} from ${socket.id}`);
+            return;
+        }
+
         // If it's an event trigger, process it for WLED/Video
         if (data.type === 'EVENT_TRIGGER') {
             networkManager.processEvent(data.event);
         }
 
-        // If it's a state broadcast from host to clients
+        // If it's a state broadcast from host to clients, only send to authorized ones
         if (data.type === 'STATE_SYNC') {
-            socket.broadcast.emit('execute', data);
+            for (const s of io.sockets.sockets.values()) {
+                const rs = s as any;
+                if (rs._isAuthorized && s.id !== socket.id) {
+                    s.emit('execute', data);
+                }
+            }
+            return;
+        }
+
+        // Register client with UUID
+        if (data.type === 'REGISTER_CLIENT') {
+            const uuid = data.clientUUID;
+            socket._clientUUID = uuid;
+            console.log(`--- NETWORK: Registering client ${socket.id} with UUID: ${uuid}`);
+
+            // Only auto-authorize if it's the actual Electron app (isHost) on the local machine
+            const isLocal = socket.handshake.address === '127.0.0.1' ||
+                socket.handshake.address === '::1' ||
+                socket.handshake.address.includes('localhost') ||
+                socket.handshake.address.includes('127.0.0.1');
+
+            if (isLocal && data.isHost) {
+                console.log(`--- NETWORK: Authorizing local Electron host ${socket.id}`);
+
+                // Check if host is already connected on another socket
+                const existing = Array.from(io.sockets.sockets.values()).find((s: any) => s._clientUUID === uuid && s._isAuthorized && s.id !== socket.id) as any;
+                if (existing) {
+                    console.log(`--- NETWORK: Host ${uuid} already connected on ${existing.id}. Disconnecting old socket.`);
+                    existing.disconnect();
+                }
+
+                socket._isAuthorized = true;
+
+                // Ensure host is in DB
+                let hostClient = dbManager.getRemoteClient(uuid);
+                if (!hostClient) {
+                    console.log(`--- NETWORK: Creating initial DB entry for Host station`);
+                    dbManager.upsertRemoteClient({
+                        id: uuid,
+                        friendlyName: 'Show Controller (Host)',
+                        pinCode: '',
+                        type: 'HOST'
+                    });
+                    hostClient = dbManager.getRemoteClient(uuid);
+                }
+
+                socket.emit('execute', { type: 'AUTHORIZED', friendlyName: hostClient?.friendlyName || 'Show Controller' });
+                broadcastClients();
+                return;
+            }
+
+            console.log(`--- NETWORK: Client ${uuid} is a REMOTE connection (isHost: ${data.isHost}, address: ${socket.handshake.address})`);
+
+            // Check if client exists in DB
+            const client = dbManager.getRemoteClient(uuid);
+            const clientsInDb = dbManager.getRemoteClients().filter((c: any) => c.type !== 'HOST');
+
+            if (!client) {
+                console.log(`--- NETWORK: Client ${uuid} NOT found in DB. Sending REGISTRATION_REQUIRED (NOT_FOUND).`);
+                socket.emit('execute', {
+                    type: 'REGISTRATION_REQUIRED',
+                    status: 'NOT_FOUND',
+                    existingClients: clientsInDb.map((c: any) => ({ id: c.id, friendlyName: c.friendlyName }))
+                });
+            } else {
+                console.log(`--- NETWORK: Client ${uuid} found in DB as '${client.friendlyName}'. Sending REGISTRATION_REQUIRED (WAITING_PIN).`);
+                socket.emit('execute', {
+                    type: 'REGISTRATION_REQUIRED',
+                    status: 'WAITING_PIN',
+                    friendlyName: client.friendlyName
+                });
+            }
+            broadcastClients();
+            return;
+        }
+
+        if (data.type === 'VERIFY_HOST_PIN') {
+            const settings = dbManager.getAppSettings();
+            if (data.pin === settings.accessPin || settings.accessPin === '') {
+                socket.emit('execute', { type: 'HOST_PIN_CORRECT' });
+            } else {
+                socket.emit('execute', { type: 'HOST_PIN_INCORRECT' });
+            }
+            return;
+        }
+
+        if (data.type === 'COMPLETE_REGISTRATION') {
+            console.log(`--- NETWORK: Completing registration for ${socket._clientUUID} as '${data.friendlyName}'`);
+            // New client registration after Host PIN was correct
+            dbManager.upsertRemoteClient({
+                id: socket._clientUUID,
+                friendlyName: data.friendlyName,
+                pinCode: data.pinCode,
+                type: 'REMOTE'
+            });
+            socket._isAuthorized = true;
+            socket.emit('execute', { type: 'AUTHORIZED', friendlyName: data.friendlyName });
+            broadcastClients();
+            return;
+        }
+
+        if (data.type === 'VERIFY_CLIENT_PIN') {
+            const client = dbManager.getRemoteClient(socket._clientUUID);
+            const settings = dbManager.getAppSettings() || { accessPin: '' };
+            const inputPin = String(data.pin || '').trim();
+            const masterPin = String(settings.accessPin || '').trim();
+            const clientPin = String(client?.pinCode || '').trim();
+
+            console.log(`--- NETWORK: PIN Auth for ${socket._clientUUID} (${client?.friendlyName || 'Unknown'})`);
+            console.log(`--- NETWORK: [${inputPin}] vs Client:[${clientPin}] vs Master:[${masterPin}]`);
+
+            const isClientPin = clientPin !== '' && inputPin === clientPin;
+            const isMasterPin = masterPin !== '' && inputPin === masterPin;
+
+            if (isClientPin || isMasterPin) {
+                console.log(`--- NETWORK: Auth SUCCESS via ${isMasterPin ? 'MASTER PIN' : 'CLIENT PIN'}`);
+
+                // Concurrent session cleanup
+                const existing = Array.from(io.sockets.sockets.values()).find((s: any) => s._clientUUID === socket._clientUUID && s._isAuthorized && s.id !== socket.id) as any;
+                if (existing) {
+                    console.log(`--- NETWORK: Active session found for this UUID. Disconnecting old socket.`);
+                    existing.disconnect();
+                }
+
+                socket._isAuthorized = true;
+                socket.emit('execute', { type: 'AUTHORIZED', friendlyName: client?.friendlyName || 'Show Controller' });
+                dbManager.updateRemoteClientStatus(socket._clientUUID, { lastConnected: new Date(), isLocked: false });
+                broadcastClients();
+            } else {
+                console.log(`--- NETWORK: Auth FAILED. Invalid PIN.`);
+                socket.emit('execute', { type: 'CLIENT_PIN_INCORRECT' });
+            }
+            return;
+        }
+
+        if (data.type === 'SET_LOCKED') {
+            if (socket._clientUUID) {
+                dbManager.updateRemoteClientStatus(socket._clientUUID, { isLocked: data.locked });
+                broadcastClients();
+            }
             return;
         }
 
@@ -105,7 +299,7 @@ io.on('connection', (socket: any) => {
             if (!socket._cameraFrameCount) socket._cameraFrameCount = 0;
             socket._cameraFrameCount++;
             if (socket._cameraFrameCount % 50 === 1) {
-                console.log(`[Server] CAMERA_FRAME #${socket._cameraFrameCount} from ${socket.id}, broadcasting to ${io.sockets.sockets.size - 1} other clients`);
+                console.log(`[Server] CAMERA_FRAME #${socket._cameraFrameCount} from ${socket.id} (${socket._clientUUID}), broadcasting to ${io.sockets.sockets.size - 1} other clients`);
             }
             socket.broadcast.emit('execute', data);
             return;
@@ -174,6 +368,11 @@ ipcMain.handle('db:save-devices', (_e: any, { showId, devices }: any) => dbManag
 
 ipcMain.handle('db:get-sequences', (_e: any, showId: any) => dbManager.getSequences(showId));
 ipcMain.handle('db:save-sequences', (_e: any, { showId, events }: any) => dbManager.saveSequences(showId, events));
+
+ipcMain.handle('db:get-remote-clients', () => dbManager.getRemoteClients());
+ipcMain.handle('db:get-remote-client', (_e: any, id: string) => dbManager.getRemoteClient(id));
+ipcMain.handle('db:upsert-remote-client', (_e: any, client: any) => dbManager.upsertRemoteClient(client));
+ipcMain.handle('db:update-remote-client-status', (_e: any, { id, updates }: any) => dbManager.updateRemoteClientStatus(id, updates));
 
 ipcMain.handle('get-ip-address', () => {
     const os = require('os');
@@ -253,7 +452,7 @@ ipcMain.handle('test-device', (_e: any, device: any) => {
         if (fileUrl) {
             console.log('[Main] Playing test video from:', fileUrl);
             setTimeout(() => {
-                if (!win.isDestroyed()) {
+                if (win && !win.isDestroyed()) {
                     win.webContents.send('media-play', {
                         url: fileUrl,
                         loop: true,
@@ -266,6 +465,21 @@ ipcMain.handle('test-device', (_e: any, device: any) => {
         return true;
     }
     return networkManager.testDevice(device);
+});
+
+ipcMain.handle('wled:get-info', (_e: any, ip: string) => networkManager.getWledInfo(ip));
+ipcMain.handle('wled:get-effects', (_e: any, ip: string) => networkManager.getWledEffects(ip));
+ipcMain.handle('wled:get-palettes', (_e: any, ip: string) => networkManager.getWledPalettes(ip));
+ipcMain.handle('wiz:get-pilot', (_e: any, ip: string) => networkManager.sendWizCommand(ip, 'getPilot', {}));
+
+// Clipboard Handlers
+ipcMain.handle('db:get-clipboard', () => dbManager.getClipboard());
+ipcMain.handle('db:add-to-clipboard', (_e: any, { type, data }: any) => dbManager.addToClipboard(type, data));
+ipcMain.handle('db:remove-from-clipboard', (_e: any, id: number) => dbManager.removeFromClipboard(id));
+ipcMain.handle('db:clear-clipboard', () => dbManager.clearClipboard());
+
+ipcMain.on('app-quit', () => {
+    app.quit();
 });
 
 ipcMain.on('projection-error', (event: any, error: any) => {
@@ -328,22 +542,17 @@ function ensureProjectionWindow(deviceId: string, monitorIndex: number) {
     const isDevMode = false; // We could pass this via query param if we had it handy, or send via IPC after load
 
     if (process.env.VITE_DEV_SERVER_URL) {
-        win.loadURL(`${process.env.VITE_DEV_SERVER_URL}#projection`);
+        win.loadURL(`${process.env.VITE_DEV_SERVER_URL}#projection?deviceId=${deviceId}`);
     } else {
-        win.loadFile(path.join(__dirname, '../dist/index.html'), { hash: 'projection' });
+        win.loadFile(path.join(__dirname, '../dist/index.html'), { hash: `projection?deviceId=${deviceId}` });
     }
 
     projectionWindows.set(deviceId, win);
 
     win.webContents.on('did-finish-load', () => {
-        // Inject deviceId so the window knows who it is
+        // Inject deviceId so the window knows who it is (fallback to URL param)
         win.webContents.executeJavaScript(`window.projectionDeviceId = "${deviceId}";`);
-
-        // Restore last media state if exists
-        const lastState = lastMediaStates.get(deviceId);
-        if (lastState) {
-            win.webContents.send(`media-${lastState.command}`, lastState.payload);
-        }
+        console.log(`[Main] Projection window for ${deviceId} loaded.`);
     });
 
     win.on('closed', () => {
@@ -364,6 +573,29 @@ ipcMain.handle('close-projection', (_e: any, deviceId: string) => {
         win.close();
     }
     projectionWindows.delete(deviceId);
+});
+
+// Window notifies it is ready (React mounted and listening)
+ipcMain.on('projection-ready', (event: any, rendererDeviceId?: string) => {
+    // Find deviceId for this sender
+    let deviceId = rendererDeviceId;
+
+    if (!deviceId) {
+        for (const [id, win] of projectionWindows.entries()) {
+            if (win.webContents === event.sender) {
+                deviceId = id;
+                break;
+            }
+        }
+    }
+
+    if (deviceId) {
+        console.log(`[Main] Projection window ready for device ${deviceId}. Syncing state...`);
+        const lastState = lastMediaStates.get(deviceId);
+        if (lastState) {
+            event.sender.send(`media-${lastState.command}`, lastState.payload);
+        }
+    }
 });
 
 // Status updates from Projection Window
@@ -436,6 +668,28 @@ ipcMain.on('media-command', (_e: any, { deviceId, command, payload }: any) => {
     }
 });
 
+ipcMain.handle('wiz-command', async (_e: any, { ip, method, params }: any) => {
+    return await networkManager.sendWizCommand(ip, method, params);
+});
+
+ipcMain.handle('upload-to-agent', async (_e: any, { url, filePath }: { url: string, filePath: string }) => {
+    console.log(`[Main] Uploading ${filePath} to ${url}...`);
+    try {
+        const formData = new (require('form-data'))();
+        formData.append('video', fs.createReadStream(filePath));
+
+        const response = await axios.post(url, formData, {
+            headers: {
+                ...formData.getHeaders()
+            }
+        });
+        return response.status === 200 || response.status === 201;
+    } catch (error) {
+        console.error('[Main] Upload failed:', error);
+        return false;
+    }
+});
+
 
 // Get port from settings, default to 3001 (already declared above)
 
@@ -443,10 +697,25 @@ server.listen(SOCKET_PORT, () => {
     console.log(`Socket.io server running on port ${SOCKET_PORT}`);
 });
 
+server.on('error', (e: any) => {
+    if (e.code === 'EADDRINUSE') {
+        console.error('Socket Port in use');
+        dialog.showErrorBox('Applicatie is al actief', `Er draait al een instantie van de applicatie op poort ${SOCKET_PORT}.\nControleer of de app al open staat en sluit deze eerst af.`);
+        app.quit();
+    }
+});
+
 fileServer.listen(FILE_PORT, () => {
     console.log(`File server running on port ${FILE_PORT} (logo, PDFs)`);
 });
 
+
+// Define paths for production/dev
+const DIST = path.join(__dirname, '../dist');
+const PUBLIC = app.isPackaged ? DIST : path.join(DIST, '../public');
+
+
+// ... (existing code)
 
 function createWindow() {
     const settings = dbManager.getAppSettings();
@@ -464,14 +733,24 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
+            webSecurity: false, // Allow loading local resources (file://) and prevent CORS issues
+            allowRunningInsecureContent: true
         },
         title: 'KLT LedShow Host'
+    });
+
+    win.webContents.on('did-fail-load', (event: any, errorCode: number, errorDescription: string) => {
+        console.error('Failed to load window:', errorCode, errorDescription);
+        dialog.showErrorBox('Failed to load application', `Error: ${errorCode} - ${errorDescription}\nPath: ${path.join(DIST, 'index.html')}`);
     });
 
     if (process.env.VITE_DEV_SERVER_URL) {
         win.loadURL(process.env.VITE_DEV_SERVER_URL);
     } else {
-        win.loadFile(path.join(__dirname, '../dist/index.html'));
+        // Use pathToFileURL to handle special characters and ensuring proper protocol
+        const indexUrl = require('url').pathToFileURL(path.join(DIST, 'index.html')).href;
+        console.log('Loading URL:', indexUrl);
+        win.loadURL(indexUrl);
     }
 }
 

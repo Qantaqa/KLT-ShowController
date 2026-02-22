@@ -10,7 +10,8 @@ class NetworkService {
         this.socket = io(url)
 
         this.socket.on('connect', () => {
-            console.log('Connected to Antigravity Central Hub, socket ID:', this.socket?.id)
+            console.log('--- NETWORK: Connected to Hub, socket ID:', this.socket?.id)
+            this.registerClient()
         })
 
         this.socket.on('execute', (data: any) => {
@@ -58,23 +59,73 @@ class NetworkService {
                     useShowStore.getState().broadcastState()
                 }
             } else if (data.type === 'CLIENTS_UPDATE') {
-                console.log('SYNC: Clients updated:', data.clients)
-                useShowStore.getState().setConnectedClients(data.clients)
-            } else if (data.type === 'CAMERA_FRAME') {
                 const store = useShowStore.getState()
-                store.updateCameraFrame(data.clientId, data.frame)
-                // Auto-select this camera on the host if not already selected (max 2)
+                store.setConnectedClients(data.clients)
+                // Sync local lock state if server says we are locked/unlocked
+                const me = data.clients.find((c: any) => c.uuid === store.clientUUID)
+                if (me && me.isLocked !== undefined && me.isLocked !== store.appLocked) {
+                    console.log('SYNC: Remote lock status changed to', me.isLocked)
+                    useShowStore.setState({ appLocked: me.isLocked })
+                }
+            } else if (data.type === 'CAMERA_FRAME') {
+                const senderUUID = data.clientUUID || data.clientId // fallback to clientId if uuid missing
+                useShowStore.getState().updateCameraFrame(senderUUID, data.frame)
+
+                // Auto-selection logic based on UUID
+                const store = useShowStore.getState()
+                const { selectedCameraClients, dismissedWebcams } = store
                 const isHost = !!(window as any).require
-                if (isHost && data.clientId) {
-                    const { selectedCameraClients } = store
-                    if (!selectedCameraClients.includes(data.clientId)) {
-                        console.log('CAMERA: Auto-selecting client', data.clientId)
-                        store.toggleCameraSelection(data.clientId)
+
+                // Check if this client was manually dismissed
+                if (senderUUID && !selectedCameraClients.includes(senderUUID) && !dismissedWebcams.includes(senderUUID)) {
+                    // Host auto-selects remote streams (any client that isn't the host itself)
+                    // Remote auto-selects the host stream (the first client in the list)
+                    const isHostSender = store.connectedClients.indexOf(senderUUID) === 0 // Assuming host is always first in connectedClients
+                    if ((isHost && !isHostSender) || (!isHost && isHostSender)) {
+                        // Only auto-select if we have space (max 2)
+                        if (selectedCameraClients.length < 2) {
+                            console.log('CAMERA: Auto-selecting stream', senderUUID)
+                            store.toggleCameraSelection(senderUUID)
+                        }
                     }
                 }
             } else if (data.type === 'CAMERA_STOPPED') {
-                console.log('CAMERA: Client stopped camera:', data.clientId)
-                useShowStore.getState().clearCameraStream(data.clientId)
+                const stoppedUUID = data.clientUUID || data.clientId
+                console.log('CAMERA: Client stopped camera:', stoppedUUID)
+                useShowStore.getState().clearCameraStream(stoppedUUID)
+            } else if (data.type === 'REMOTE_CONTROL') {
+                const isHost = !!(window as any).require
+                if (isHost) {
+                    console.log('HOST: Executing remote control command:', data.action)
+                    const store = useShowStore.getState()
+                    if (data.action === 'nextEvent') store.nextEvent(data.force)
+                    else if (data.action === 'nextScene') store.nextScene(data.force)
+                    else if (data.action === 'nextAct') store.nextAct(data.force)
+                    else if (data.action === 'stop' || data.action === 'setActiveEvent') {
+                        store.setActiveEvent(data.index !== undefined ? data.index : -1)
+                    }
+                }
+            } else if (data.type === 'REGISTRATION_REQUIRED') {
+                useShowStore.setState({
+                    registrationStatus: data.status,
+                    registrationData: { existingClients: data.existingClients },
+                    clientFriendlyName: data.friendlyName || ''
+                })
+            } else if (data.type === 'HOST_PIN_CORRECT') {
+                useShowStore.setState({ registrationStatus: 'WAITING_REGISTRATION' })
+            } else if (data.type === 'HOST_PIN_INCORRECT') {
+                useShowStore.getState().addToast('Ongeldige Host Pin', 'error')
+            } else if (data.type === 'AUTHORIZED') {
+                useShowStore.setState({
+                    isAuthorized: true,
+                    registrationStatus: 'AUTHORIZED',
+                    clientFriendlyName: data.friendlyName,
+                    appLocked: false
+                })
+                // Once authorized, request state
+                this.sendCommand({ type: 'REQUEST_STATE' })
+            } else if (data.type === 'CLIENT_PIN_INCORRECT') {
+                useShowStore.getState().addToast('Ongeldige Client Pincode', 'error')
             }
         })
 
@@ -98,6 +149,20 @@ class NetworkService {
     disconnect() {
         this.socket?.disconnect()
         this.socket = null
+    }
+
+    registerClient() {
+        const state = useShowStore.getState()
+        const uuid = state.clientUUID
+        const isHost = !!(window as any).require
+        if (uuid && this.socket?.connected) {
+            this.sendCommand({
+                type: 'REGISTER_CLIENT',
+                clientUUID: uuid,
+                isHost: isHost
+            })
+            console.log('--- NETWORK: Registered client UUID:', uuid, 'isHost:', isHost)
+        }
     }
 }
 

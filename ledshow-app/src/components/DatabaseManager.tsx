@@ -7,12 +7,15 @@ function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
 
+import { useShowStore } from '../store/useShowStore'
+
 interface DatabaseManagerProps {
     isOpen: boolean
     onClose: () => void
 }
 
 export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClose }) => {
+    const { openModal, addToast } = useShowStore()
     const [tables, setTables] = useState<string[]>([])
     const [selectedTable, setSelectedTable] = useState<string | null>(null)
     const [tableData, setTableData] = useState<any[]>([])
@@ -67,29 +70,37 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
             })
             setEditingRow(null)
             loadTableData(selectedTable)
-        } catch (e) {
+        } catch (e: any) {
             console.error(e)
-            alert('Update failed: ' + e)
+            addToast('Update mislukt: ' + e.message || e, 'error')
         }
     }
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (!selectedTable || !editingRow) return
-        if (!confirm('Rij verwijderen?')) return
-        if (!(window as any).require) return
-        const { ipcRenderer } = (window as any).require('electron')
 
-        try {
-            await ipcRenderer.invoke('db:delete-row', {
-                tableName: selectedTable,
-                id: editingRow.id
-            })
-            setEditingRow(null)
-            loadTableData(selectedTable)
-        } catch (e) {
-            console.error(e)
-            alert('Delete failed: ' + e)
-        }
+        openModal({
+            title: 'Rij Verwijderen',
+            message: 'Weet je zeker dat je deze rij definitief wilt verwijderen?',
+            type: 'confirm',
+            onConfirm: async () => {
+                if (!(window as any).require) return
+                const { ipcRenderer } = (window as any).require('electron')
+
+                try {
+                    await ipcRenderer.invoke('db:delete-row', {
+                        tableName: selectedTable,
+                        id: editingRow.id
+                    })
+                    setEditingRow(null)
+                    loadTableData(selectedTable)
+                    addToast('Rij succesvol verwijderd', 'info')
+                } catch (e: any) {
+                    console.error(e)
+                    addToast('Delete mislukt: ' + e.message || e, 'error')
+                }
+            }
+        })
     }
 
     if (!isOpen) return null

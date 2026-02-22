@@ -12,6 +12,13 @@ import {
   Trash2,
   Settings2,
   SkipForward,
+  Laptop,
+  Video,
+  Camera,
+  ChevronDown,
+  Lock,
+  ShieldAlert,
+  Fingerprint,
   Play,
   StopCircle,
   Clock,
@@ -20,9 +27,7 @@ import {
   Maximize,
   Minimize,
   Layers,
-  Laptop,
-  Video,
-  Camera
+  Download
 } from 'lucide-react'
 import { useShowStore } from './store/useShowStore'
 import { clsx, type ClassValue } from 'clsx'
@@ -91,13 +96,78 @@ export default function App() {
     connectedClients,
     isCameraActive,
     setCameraActive,
+    isSelfPreviewVisible,
+    setSelfPreviewVisible,
     activeCameraStreams,
     selectedCameraClients,
     toggleCameraSelection,
     toasts,
     addToast,
-    removeToast
+    removeToast,
+    importShow,
+    modalConfig,  // From store
+    openModal,    // From store
+
+    // Auth & Registration
+    isAuthorized,
+    registrationStatus,
+    registrationData,
+    clientFriendlyName,
+    appLocked,
+    verifyHostPin,
+    completeRegistration,
+    verifyClientPin,
+    setAppLocked
   } = useShowStore()
+
+  const isHost = !!(window as any).require
+
+  const handleImportShow = useCallback(async () => {
+    if (!isHost) return
+    const { ipcRenderer } = (window as any).require('electron')
+    const result = await ipcRenderer.invoke('select-file', {
+      title: 'Importeer XML Show',
+      filters: [{ name: 'XML Bestanden', extensions: ['xml'] }],
+      properties: ['openFile']
+    })
+
+    if (!result.canceled && result.filePaths.length > 0) {
+      const filePath = result.filePaths[0]
+      try {
+        const fs = (window as any).require('fs')
+        const content = fs.readFileSync(filePath, 'utf-8')
+        await importShow('', content, filePath)
+        addToast('Show succesvol geïmporteerd', 'info')
+      } catch (err: any) {
+        addToast(`Fout bij importeren: ${err.message}`, 'error')
+      }
+    }
+  }, [isHost, importShow, addToast])
+
+  const handleExportShow = useCallback(async () => {
+    if (!isHost || !activeShow) return
+    const { ipcRenderer } = (window as any).require('electron')
+    const result = await ipcRenderer.invoke('save-file-dialog', {
+      title: 'Exporteer Show',
+      defaultPath: `${activeShow.name || 'show'}.json`,
+      filters: [{ name: 'JSON Bestanden', extensions: ['json'] }]
+    })
+
+    if (!result.canceled && result.filePath) {
+      try {
+        const fs = (window as any).require('fs')
+        const data = {
+          show: activeShow,
+          events: events
+        }
+        fs.writeFileSync(result.filePath, JSON.stringify(data, null, 2))
+        addToast('Show succesvol geëxporteerd', 'info')
+      } catch (err: any) {
+        addToast(`Fout bij exporteren: ${err.message}`, 'error')
+      }
+    }
+  }, [isHost, activeShow, events, addToast])
+
 
   const currentScriptPage = activeShow?.viewState?.currentScriptPage || 1
 
@@ -111,54 +181,36 @@ export default function App() {
   const [isDbManagerOpen, setIsDbManagerOpen] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [pinInput, setPinInput] = useState('')
-  const [isPinVerified, setIsPinVerified] = useState(false)
   const [hasInitialSync, setHasInitialSync] = useState(false)
+  const [isWebcamExpanded, setIsWebcamExpanded] = useState(true)
 
-  // Double click protection for version
+  // Set initial sync to true if we are the host
+  useEffect(() => {
+    if (isHost) {
+      console.log('--- APP: Setting hasInitialSync to true for Host');
+      setHasInitialSync(true);
+    }
+  }, [isHost]);
+
+  // Version & Dev mode
   const [versionClickCount, setVersionClickCount] = useState(0)
   const [versionClickTimer, setVersionClickTimer] = useState<any>(null)
   const [isDeveloperMode, setIsDeveloperMode] = useState(false)
 
-  const [modalConfig, setModalConfig] = useState({
-    isOpen: false,
-    title: '',
-    message: '',
-    type: 'confirm' as 'confirm' | 'prompt',
-    defaultValue: '',
-    onConfirm: (val?: string) => { console.log(val) }
-  })
-
-  const [showCameraHelp, setShowCameraHelp] = useState(false)
-
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  const isHost = !!(window as any).require
-
-  // Set initial sync to true if we are the host
   useEffect(() => {
-    if (isHost) setHasInitialSync(true);
-  }, [isHost]);
+    console.log('--- APP: registrationStatus changed:', registrationStatus)
+  }, [registrationStatus])
 
-  // Auto-fullscreen on host mount
-  useEffect(() => {
-    if (isHost) {
-      // Small delay to ensure everything is settled
-      setTimeout(() => {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {
-            console.log('Fullscreen attempt blocked or failed');
-          });
-        }
-      }, 2000);
-    }
-  }, [isHost]);
+  // Auto-fullscreen is handled by Electron main process (fullscreen: true)
+  // Redundant web API call removed to prevent console error about user gesture
+
 
   // Listen for sync to set hasInitialSync
   useEffect(() => {
     if (!isHost) {
       const checkSync = () => {
         const state = useShowStore.getState();
-        if (state.activeShow || state.appSettings.serverPort) {
+        if (state.isSynced) {
           setHasInitialSync(true);
         }
       };
@@ -168,7 +220,6 @@ export default function App() {
     }
   }, [isHost]);
 
-  const showPinScreen = !isLocalhost && !isHost && (appSettings.accessPin ? !isPinVerified : false)
 
   // Timer Calculation Logic
   const getShowTimer = () => {
@@ -212,7 +263,8 @@ export default function App() {
   const eventElapsed = lastTransitionTime ? Math.round((Date.now() - lastTransitionTime) / 1000) : 0
   const eventRemaining = Math.max(0, eventDuration - eventElapsed)
   const isEventOverdue = eventDuration > 0 && eventRemaining === 0
-  const pulseClass = isEventOverdue ? "animate-fast-bright-pulse" : "animate-bright-pulse"
+  // "Quiet" pulse when running, "Fast/Bright" pulse when overdue
+  const pulseClass = isEventOverdue ? "animate-fast-bright-pulse" : "animate-pulse"
 
   useEffect(() => {
     initializeShows()
@@ -262,13 +314,13 @@ export default function App() {
 
   // Sync scroll on active event change
   useEffect(() => {
-    if (activeEventIndex !== -1 && autoFollowScript) {
+    if (activeEventIndex !== -1 && autoFollowScript && isLocked) {
       const activeEvent = events[activeEventIndex]
       if (activeEvent && activeEvent.scriptPg) {
         setCurrentScriptPage(activeEvent.scriptPg)
       }
     }
-  }, [activeEventIndex, events])
+  }, [activeEventIndex, events, autoFollowScript, isLocked, setCurrentScriptPage])
 
   // Sync back to extension when page changes locally
   useEffect(() => {
@@ -347,16 +399,16 @@ export default function App() {
     }
   }
 
-  console.log('--- App.tsx: Proceeding to render JSX ---')
+  console.log('--- App.tsx: Render check ---', { isAuthorized, hasInitialSync, isHost })
 
-  if (!hasInitialSync) {
+  if (isAuthorized && !hasInitialSync) {
     return (
       <div className="h-screen w-screen bg-[#050505] flex flex-col items-center justify-center text-white p-12">
         <div className="w-24 h-24 rounded-3xl bg-primary/10 flex items-center justify-center border border-primary/20 animate-bright-pulse mb-8">
           <Activity className="w-12 h-12 text-primary" />
         </div>
         <h2 className="text-2xl font-bold tracking-tighter mb-2">LedShow Initialisatie</h2>
-        <p className="text-white/40 text-sm animate-pulse mb-12">Verbinden met systeem-service...</p>
+        <p className="text-white/40 text-sm animate-pulse mb-12">Showgegevens synchroniseren...</p>
         <div className="w-64 h-1 bg-white/5 rounded-full overflow-hidden">
           <div className="h-full bg-primary w-1/2 animate-[loading_2s_infinite_ease-in-out]" />
         </div>
@@ -372,36 +424,6 @@ export default function App() {
     )
   }
 
-  if (showPinScreen) {
-    return (
-      <div className="h-screen w-screen bg-[#050505] flex flex-col items-center justify-center text-white p-8">
-        <div className="glass border border-white/10 p-8 rounded-3xl w-full max-w-sm flex flex-col items-center gap-8 animate-in zoom-in-95 duration-300">
-          <div className="p-4 rounded-2xl bg-primary/20 text-primary">
-            <Laptop className="w-8 h-8" />
-          </div>
-          <div className="text-center space-y-2">
-            <h2 className="text-xl font-bold">Remote Toegang</h2>
-            <p className="text-sm text-white/40">Voer de pincode in van de Show Controller om verbinding te maken.</p>
-          </div>
-          <input
-            type="password"
-            value={pinInput}
-            onChange={(e) => {
-              const val = e.target.value
-              setPinInput(val)
-              if (val === appSettings.accessPin) setIsPinVerified(true)
-            }}
-            placeholder="PINCODE"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-center text-2xl font-mono tracking-[1em] focus:border-primary/50 outline-none transition-all"
-            autoFocus
-          />
-          <div className="text-[10px] text-white/20 uppercase tracking-widest font-black">
-            Verbinding via {window.location.hostname}
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="h-screen w-screen bg-background text-foreground flex flex-col overflow-hidden font-sans select-none relative">
@@ -420,7 +442,7 @@ export default function App() {
               <p className="text-sm font-bold leading-tight">{toast.type === 'error' ? 'Foutmelding' : toast.type === 'warning' ? 'Waarschuwing' : 'Info'}</p>
               <p className="text-xs opacity-80 leading-relaxed font-mono">{toast.message}</p>
             </div>
-            <button onClick={() => removeToast(toast.id)} className="p-1 hover:bg-white/10 rounded-lg transition-colors -mr-2 -mt-2"><X className="w-4 h-4 opacity-50" /></button>
+            <button onClick={() => removeToast(toast.id)} className="p-1 hover:bg-white/10 rounded-lg transition-colors -mr-2 -mt-2" title="Melding sluiten"><X className="w-4 h-4 opacity-50" /></button>
           </div>
         ))}
       </div>
@@ -473,26 +495,31 @@ export default function App() {
             <button
               onClick={() => setLocked(!isLocked)}
               className={cn(
-                "h-10 px-4 rounded-xl flex items-center gap-3 transition-all font-bold text-xs uppercase tracking-widest",
+                "h-10 px-4 rounded-xl flex items-center gap-3 transition-all font-bold text-xs uppercase tracking-widest border border-white/10",
                 isLocked
-                  ? "bg-white/5 border border-white/10 text-white/40 hover:bg-white/10"
+                  ? "bg-black/20 text-white/90 hover:bg-white/5"
                   : "bg-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.4)] text-black"
               )}
             >
-              {isLocked
-                ? <><svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg> In Show</>
-                : <><svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></svg> Edit mode</>
-              }
+              <svg xmlns="http://www.w3.org/2000/svg" className={cn("w-3.5 h-3.5", isLocked ? "text-primary" : "text-black")} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                {isLocked ? (
+                  <><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></>
+                ) : (
+                  <><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></>
+                )}
+              </svg>
+              {isLocked ? "In Show" : "Edit mode"}
             </button>
           )}
+
 
           {isHost && (
             <div className="relative group/menu">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={cn(
-                  "h-10 px-4 rounded-xl border border-white/10 flex items-center gap-3 transition-all hover:bg-white/5",
-                  isMenuOpen ? "bg-white/10 border-white/20 shadow-lg" : "bg-black/20"
+                  "h-10 px-4 rounded-xl border border-white/10 flex items-center gap-3 transition-all bg-black/20 hover:bg-white/5",
+                  isMenuOpen && "bg-white/10 border-white/20 shadow-lg"
                 )}
               >
                 <Menu className="w-4 h-4 text-primary" />
@@ -511,73 +538,216 @@ export default function App() {
                     </div>
 
                     <div className="px-2 space-y-1">
-                      <button onClick={() => { setModalConfig({ isOpen: true, title: 'Nieuwe Show', message: 'Voer de naam in voor de nieuwe show:', type: 'prompt', defaultValue: 'Mijn LedShow', onConfirm: (name) => { if (name) createNewShow(name); setModalConfig(p => ({ ...p, isOpen: false })); } }); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold"><Plus className="w-3.5 h-3.5 text-primary" /> Nieuwe Show Maken</button>
-
-                      <div className="relative group/submenu">
-                        <button className="w-full px-4 py-2 text-left text-xs flex items-center justify-between hover:bg-white/10 rounded-lg transition-colors font-bold">
-                          <div className="flex items-center gap-3"><Layers className="w-3.5 h-3.5 text-blue-400" /> Show Laden</div>
-                          <ChevronRight className="w-3 h-3 opacity-40 group-hover/submenu:translate-x-1 transition-transform" />
-                        </button>
-                        <div className="absolute right-full top-0 mr-1 w-64 bg-[#0a0a0a] border border-white/20 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] py-2 hidden group-hover/submenu:block animate-in fade-in slide-in-from-right-2 duration-200">
-                          {availableShows.length === 0 ? (<div className="px-4 py-2 text-[10px] text-muted-foreground italic text-left">Geen shows gevonden</div>) : availableShows.map((show) => (<button key={show.id} onClick={async () => { await setActiveShow(show); setIsMenuOpen(false); }} className={cn("w-full px-4 py-2 text-left text-[10px] hover:bg-white/10 transition-colors truncate text-left", activeShow?.id === show.id && "text-primary font-bold bg-primary/5")}>{show.name || 'Naamloze Show'}</button>))}
+                      {isLocked ? (
+                        <div className="px-4 py-2 text-[10px] text-white/40 italic text-center">
+                          Show Modus Actief
+                          <br />
+                          Ontgrendel om aan te passen
                         </div>
-                      </div>
+                      ) : (
+                        <>
+                          <button onClick={() => {
+                            openModal({
+                              title: 'Nieuwe Show',
+                              message: 'Voer de naam in voor de nieuwe show:',
+                              type: 'prompt',
+                              defaultValue: 'Mijn LedShow',
+                              onConfirm: (name) => {
+                                if (name) createNewShow(name);
+                              }
+                            });
+                            setIsMenuOpen(false);
+                          }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Maak een nieuwe show aan">
+                            <Plus className="w-3.5 h-3.5 text-purple-500" /> Nieuwe show maken
+                          </button>
+
+                          <div className="relative group/submenu">
+                            <button className="w-full px-4 py-2 text-left text-xs flex items-center justify-between hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Laad een bestaande show uit de database">
+                              <div className="flex items-center gap-3"><Layers className="w-3.5 h-3.5 text-blue-400" /> Show laden</div>
+                              <ChevronRight className="w-3 h-3 opacity-40 group-hover/submenu:translate-x-1 transition-transform" />
+                            </button>
+                            <div className="absolute right-full top-0 mr-1 w-64 bg-[#0a0a0a] border border-white/20 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] py-2 hidden group-hover/submenu:block animate-in fade-in slide-in-from-right-2 duration-200">
+                              {availableShows.length === 0 ? (
+                                <div className="px-4 py-2 text-[10px] text-white/40 italic text-left">Geen shows gevonden</div>
+                              ) : availableShows.map((show) => (
+                                <button
+                                  key={show.id}
+                                  onClick={async () => { await setActiveShow(show); setIsMenuOpen(false); }}
+                                  className={cn(
+                                    "w-full px-4 py-2 text-left text-[10px] hover:bg-white/10 transition-colors truncate text-white flex items-center gap-2",
+                                    activeShow?.id === show.id && "text-blue-400 font-bold bg-blue-400/5"
+                                  )}
+                                  title={`Laad show: ${show.name}`}
+                                >
+                                  <Activity className="w-2.5 h-2.5 text-blue-400/60" />
+                                  {show.name || 'Naamloze Show'}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <button onClick={() => { handleImportShow(); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Importeer een show vanuit een XML of JSON bestand">
+                            <FileText className="w-3.5 h-3.5 text-purple-500" /> Show importeren
+                          </button>
+
+                          {activeShow && (
+                            <button onClick={() => { handleExportShow(); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Exporteer de huidige show naar een JSON bestand">
+                              <Download className="w-3.5 h-3.5 text-purple-500" /> Show exporteren
+                            </button>
+                          )}
+
+                          {activeShow && (
+                            <button onClick={() => {
+                              if (!activeShow) return;
+                              openModal({
+                                title: 'Show Verwijderen',
+                                message: `Weet je zeker dat je show "${activeShow.name}" wilt verwijderen (archiveren)?`,
+                                type: 'confirm',
+                                onConfirm: () => {
+                                  archiveShow(activeShow.id);
+                                  setIsMenuOpen(false);
+                                }
+                              });
+                            }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Verwijder de huidige show definitief">
+                              <Trash2 className="w-3.5 h-3.5 text-red-500" /> Show verwijderen
+                            </button>
+                          )}
+
+                          <div className="h-px bg-white/10 my-1" />
+                        </>
+                      )}
 
                       {activeShow && (
                         <>
-                          <div className="h-px bg-white/10 my-1" />
-                          <button onClick={() => { if (!activeShow) return; setModalConfig({ isOpen: true, title: 'Show Verwijderen', message: `Weet je zeker dat je show "${activeShow.name}" wilt verwijderen (archiveren)?`, type: 'confirm', defaultValue: '', onConfirm: () => { archiveShow(activeShow.id); setModalConfig(prev => ({ ...prev, isOpen: false })); setIsMenuOpen(false); } }); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors text-red-500 opacity-60 hover:opacity-100"><Trash2 className="w-3.5 h-3.5" /> Show Verwijderen</button>
-                          <div className="h-px bg-white/10 my-1" />
-                          <button onClick={() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-left"><Settings className="w-3.5 h-3.5 text-primary" /> Show Instellingen</button>
-                          <div className="h-px bg-white/10 my-1" />
                           <div className="w-full px-4 py-2 flex items-center justify-between hover:bg-white/5 transition-colors">
                             <div className="flex items-center gap-3">
-                              <Clock className={cn("w-3.5 h-3.5", isTimeTracking ? "text-primary" : "text-muted-foreground/40", isTimeTracking && "animate-pulse")} />
-                              <div className="flex flex-col"><span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Timing Bijhouden</span><span className="text-[8px] opacity-40 uppercase font-bold">{isTimeTracking ? 'Actief' : 'Uitgeschakeld'}</span></div>
+                              <Clock className={cn("w-3.5 h-3.5 text-purple-500", !isTimeTracking && "opacity-40", isTimeTracking && "animate-pulse")} />
+                              <div className="flex flex-col"><span className="text-[10px] font-black uppercase tracking-widest text-white">Timing Bijhouden</span><span className="text-[8px] opacity-40 uppercase font-bold text-white">{isTimeTracking ? 'Actief' : 'Uitgeschakeld'}</span></div>
                             </div>
-                            <button onClick={(e) => { e.stopPropagation(); toggleTimeTracking(); }} className={cn("w-10 h-5 rounded-full relative transition-all duration-500 p-1 border border-white/10", isTimeTracking ? "bg-primary/20 shadow-[inset_0_0_10px_rgba(var(--primary-rgb),0.1)]" : "bg-white/5 shadow-inner")}><div className={cn("w-2.5 h-2.5 rounded-full transition-all duration-500 shadow-lg", isTimeTracking ? "ml-auto bg-primary shadow-[0_0_8px_#f97316]" : "mr-auto bg-white/20")} /></button>
+                            <button onClick={(e) => { e.stopPropagation(); toggleTimeTracking(); }} className={cn("w-10 h-5 rounded-full relative transition-all duration-500 p-1 border border-white/10", isTimeTracking ? "bg-purple-500/20 shadow-[inset_0_0_10px_rgba(168,85,247,0.1)]" : "bg-white/5 shadow-inner")} title="Schakel timing bijhouden in/uit"><div className={cn("w-2.5 h-2.5 rounded-full transition-all duration-500 shadow-lg", isTimeTracking ? "ml-auto bg-purple-500 shadow-[0_0_8px_#a855f7]" : "mr-auto bg-white/20")} /></button>
                           </div>
                           <div className="w-full px-4 py-2 flex items-center justify-between hover:bg-white/5 transition-colors border-t border-white/5">
                             <div className="flex items-center gap-3 text-left">
-                              <FileText className={cn("w-3.5 h-3.5", autoFollowScript ? "text-primary" : "text-muted-foreground/40")} />
-                              <div className="flex flex-col"><span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volg Script</span><span className="text-[8px] opacity-40 uppercase font-bold text-left">{autoFollowScript ? 'Automatisch' : 'Handmatig'}</span></div>
+                              <FileText className={cn("w-3.5 h-3.5 text-purple-500", !autoFollowScript && "opacity-40")} />
+                              <div className="flex flex-col"><span className="text-[10px] font-black uppercase tracking-widest text-white">Volg Script</span><span className="text-[8px] opacity-40 uppercase font-bold text-left text-white">{autoFollowScript ? 'Automatisch' : 'Handmatig'}</span></div>
                             </div>
-                            <button onClick={(e) => { e.stopPropagation(); toggleAutoFollowScript(); }} className={cn("w-10 h-5 rounded-full relative transition-all duration-500 p-1 border border-white/10", autoFollowScript ? "bg-primary/20 shadow-[inset_0_0_10px_rgba(var(--primary-rgb),0.1)]" : "bg-white/5 shadow-inner")}><div className={cn("w-2.5 h-2.5 rounded-full transition-all duration-500 shadow-lg", autoFollowScript ? "ml-auto bg-primary shadow-[0_0_8px_#f97316]" : "mr-auto bg-white/20")} /></button>
+                            <button onClick={(e) => { e.stopPropagation(); toggleAutoFollowScript(); }} className={cn("w-10 h-5 rounded-full relative transition-all duration-500 p-1 border border-white/10", autoFollowScript ? "bg-purple-500/20 shadow-[inset_0_0_10px_rgba(168,85,247,0.1)]" : "bg-white/5 shadow-inner")} title="Schakel script automatisch volgen in/uit"><div className={cn("w-2.5 h-2.5 rounded-full transition-all duration-500 shadow-lg", autoFollowScript ? "ml-auto bg-purple-500 shadow-[0_0_8px_#a855f7]" : "mr-auto bg-white/20")} /></button>
                           </div>
+
+                          <button onClick={() => {
+                            const port = appSettings.serverPort || 3001;
+                            const filePort = port + 1;
+                            const setupUrl = `http://${serverIp}:${filePort}/setup`;
+
+                            openModal({
+                              title: 'VideoWall agent installatie',
+                              message: `Gebruik de setup portal om nieuwe VideoWall Agents te installeren en configureren.\n\nOpen op de externe computer een browser en ga naar:\n\n${setupUrl}\n\nZorg dat de computer verbonden is met hetzelfde netwerk als deze host.`,
+                              type: 'confirm',
+                              confirmLabel: 'Sluiten',
+                              onConfirm: () => { }
+                            });
+                            setIsMenuOpen(false);
+                          }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white border-t border-white/5" title="Configureer externe VideoWall Agents">
+                            <Monitor className="w-3.5 h-3.5 text-purple-500" /> VideoWall agent setup
+                          </button>
                         </>
                       )}
-                      <div className="h-px bg-white/10 my-1" />
-                      <button onClick={() => { setIsAppSettingsOpen(true); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold opacity-60 hover:opacity-100 text-left"><Settings2 className="w-3.5 h-3.5" /> App Instellingen</button>
-                      {isDeveloperMode && (<button onClick={() => { setIsDbManagerOpen(true); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-yellow-500/80 text-left"><Monitor className="w-3.5 h-3.5" /> Database Beheer</button>)}
+
+                      {!isLocked && (
+                        <>
+                          <div className="h-px bg-white/10 my-1" />
+
+                          {activeShow && (
+                            <button onClick={() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-left text-white" title="Pas show-specifieke instellingen aan"><Settings className="w-3.5 h-3.5 text-purple-500" /> Show instellingen</button>
+                          )}
+
+                          <button onClick={() => { setIsAppSettingsOpen(true); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-left text-white" title="Pas algemene applicatie instellingen aan"><Settings2 className="w-3.5 h-3.5 text-purple-500" /> App instellingen</button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </>
               )}
             </div>
+
           )}
+
 
           {isHost && (
             <button
               onClick={toggleFullscreen}
-              className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
+              className="w-10 h-10 rounded-xl bg-black/20 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
               title={isFullscreen ? 'Minimize' : 'Maximize'}
             >
-              {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+              {isFullscreen ? <Minimize className="w-4 h-4 text-primary" /> : <Maximize className="w-4 h-4 text-primary" />}
+            </button>
+          )}
+
+          <button
+            onClick={() => {
+              if (!appSettings.accessPin) {
+                openModal({
+                  title: 'Toegangspincode Instellen',
+                  message: 'Er is nog geen pincode ingesteld voor dit systeem. Voer een pincode in om de LedShow te kunnen vergrendelen:',
+                  type: 'prompt',
+                  confirmLabel: 'Opslaan & Vergrendelen',
+                  onConfirm: (pin) => {
+                    if (pin && pin.trim()) {
+                      useShowStore.getState().updateAppSettings({ accessPin: pin.trim() });
+                      setAppLocked(true);
+                      addToast('Pincode opgeslagen en systeem vergrendeld', 'info');
+                    } else {
+                      addToast('Pincode mag niet leeg zijn', 'warning');
+                    }
+                  }
+                });
+              } else {
+                setAppLocked(true);
+              }
+            }}
+            className={cn(
+              "h-10 w-10 rounded-xl flex items-center justify-center transition-all bg-black/20 border border-white/10",
+              appLocked ? "text-red-500 bg-red-500/10 shadow-[0_0_20px_rgba(239,68,68,0.2)]" : "text-white/40 hover:text-white hover:bg-white/5"
+            )}
+            title="Systeemslot"
+          >
+            <Lock className="w-4 h-4" />
+          </button>
+
+          {isHost && (
+            <button
+              onClick={() => {
+                openModal({
+                  title: 'Applicatie Sluiten',
+                  message: 'Weet je zeker dat je de applicatie wilt afsluiten?',
+                  type: 'confirm',
+                  onConfirm: () => {
+                    if ((window as any).require) {
+                      const { ipcRenderer } = (window as any).require('electron')
+                      ipcRenderer.send('app-quit')
+                    }
+                  }
+                });
+              }}
+              className="w-10 h-10 rounded-xl bg-black/20 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors text-red-500/60 hover:text-red-500"
+              title="Applicatie Sluiten"
+            >
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>
       </header>
 
       {/* Main Content Area */}
-      < main className="flex-1 flex overflow-hidden relative" >
+      <main className="flex-1 flex overflow-hidden relative" >
         {!activeShow && (
           <div className="absolute inset-0 z-[60] bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-6">
             <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 animate-pulse">
               <Layers className="w-10 h-10 text-primary opacity-40" />
             </div>
             <div className="text-center space-y-2">
-              <h2 className="text-xl font-bold tracking-tight">Geen Show Geladen</h2>
-              <p className="text-sm text-muted-foreground max-w-xs">Kies een bestaande show of maak een nieuwe aan om te beginnen.</p>
+              <h2 className="text-xl font-bold tracking-tight">Geen show geladen</h2>
+              <p className="text-sm text-muted-foreground max-w-xs">Er is momenteel geen active show ingeladen.</p>
             </div>
             <div className="flex flex-col gap-3 w-full max-w-sm">
               {/* Recent shows list */}
@@ -613,24 +783,24 @@ export default function App() {
                 </div>
               )}
 
-              <button
-                onClick={() => {
-                  setModalConfig({
-                    isOpen: true,
-                    title: 'Nieuwe Show',
-                    message: 'Voer de naam in voor de nieuwe show:',
-                    type: 'prompt',
-                    defaultValue: 'Mijn LedShow',
-                    onConfirm: (name) => {
-                      if (name) createNewShow(name)
-                      setModalConfig(p => ({ ...p, isOpen: false }))
-                    }
-                  })
-                }}
-                className="w-full py-3 bg-primary text-black font-black uppercase tracking-[0.2em] rounded-xl hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center gap-3"
-              >
-                <Plus className="w-4 h-4" /> Nieuwe Show
-              </button>
+              {isHost && (
+                <button
+                  onClick={() => {
+                    openModal({
+                      title: 'Nieuwe Show',
+                      message: 'Voer de naam in voor de nieuwe show:',
+                      type: 'prompt',
+                      defaultValue: 'Mijn LedShow',
+                      onConfirm: (name) => {
+                        if (name) createNewShow(name)
+                      }
+                    })
+                  }}
+                  className="w-full py-3 bg-primary text-black font-black uppercase tracking-[0.2em] rounded-xl hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center gap-3"
+                >
+                  <Plus className="w-4 h-4" /> Nieuwe Show
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -642,10 +812,9 @@ export default function App() {
                 <div className="w-20 h-20 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center mb-6 animate-pulse">
                   <Settings className="w-10 h-10 text-yellow-500" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Show in Onderhoud</h3>
+                <h3 className="text-xl font-bold text-white mb-2">Show in bewerking</h3>
                 <p className="text-sm text-white/40 max-w-xs">
-                  De hoofdcomputer is de show momenteel aan het aanpassen.<br />
-                  Zodra deze weer wordt vergrendeld, zie je hier de actuele planning.
+                  De hoofdcomputer is de show momenteel aan het aanpassen. Zodra deze weer wordt vrijgegeven, verschijnt hier de nieuwe actuele show.
                 </p>
               </div>
             )}
@@ -683,16 +852,26 @@ export default function App() {
                 <>
                   <div className="p-3 border-b border-white/5 flex items-center justify-between bg-black/20">
                     <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-2">Webcam Streams</span>
+                    <button
+                      onClick={() => setIsWebcamExpanded(!isWebcamExpanded)}
+                      className="p-1 hover:bg-white/10 rounded-lg transition-colors border border-transparent hover:border-white/10"
+                      title={isWebcamExpanded ? "Inklappen" : "Uitklappen"}
+                    >
+                      {isWebcamExpanded ? <ChevronDown className="w-3.5 h-3.5 opacity-40" /> : <ChevronRight className="w-3.5 h-3.5 opacity-40" />}
+                    </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-px bg-white/5 border-b border-white/10 shrink-0 h-48 overflow-hidden">
+                  <div className={cn(
+                    "grid grid-cols-2 gap-px bg-white/5 border-b border-white/10 shrink-0 transition-all duration-300 overflow-hidden",
+                    isWebcamExpanded ? "h-48 opacity-100" : "h-0 opacity-0 border-none"
+                  )}>
                     {[0, 1].map((idx) => {
-                      const clientId = selectedCameraClients[idx]
-                      const frame = clientId ? activeCameraStreams[clientId] : null
-                      const remoteIdx = connectedClients.findIndex(c => c === clientId)
-                      const label = remoteIdx === 0 ? 'Host' : remoteIdx > 0 ? `Workstation ${remoteIdx + 1}` : `Client ${idx + 1}`
+                      const uuid = selectedCameraClients[idx]
+                      const frame = uuid ? activeCameraStreams[uuid] : null
+                      const clientIdx = connectedClients.findIndex(c => c.uuid === uuid)
+                      const label = clientIdx === 0 ? 'Host' : clientIdx > 0 ? `Workstation ${clientIdx + 1}` : `Client ${idx + 1}`
                       return (
                         <div key={idx} className="relative bg-black flex items-center justify-center overflow-hidden h-full group border-r border-white/5">
-                          {clientId && frame ? (
+                          {uuid && frame ? (
                             <>
                               <img src={frame} className="w-full h-full object-cover" alt={`Camera ${idx + 1}`} />
                               <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest text-white/60 border border-white/10 flex items-center gap-1">
@@ -700,27 +879,19 @@ export default function App() {
                                 {label}
                               </div>
                             </>
-                          ) : clientId && !frame ? (
-                            // Client selected but camera is off / no frame yet
-                            <div className="flex flex-col items-center gap-2 text-white/30">
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                                <line x1="2" y1="2" x2="22" y2="22" />
-                                <path d="M10.68 10.68a2 2 0 0 0 2.64 2.64" />
-                                <path d="M14 14H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3.5-2H21a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-1" />
-                                <path d="M16 8l4-4" />
-                              </svg>
-                              <span className="text-[8px] font-black uppercase tracking-[0.2em]">{label} — Camera Uit</span>
-                            </div>
                           ) : (
-                            // Empty slot
-                            <div className="flex flex-col items-center gap-2 opacity-10">
-                              <Camera className="w-8 h-8" />
-                              <span className="text-[8px] font-black uppercase tracking-[0.2em]">Kijkvenster {idx + 1}</span>
+                            <div className="flex flex-col items-center gap-2 opacity-20">
+                              <Camera className="w-6 h-6" />
+                              <span className="text-[10px] font-black uppercase tracking-widest">No Stream</span>
                             </div>
                           )}
-                          {clientId && (
+
+                          {uuid && (
                             <button
-                              onClick={() => toggleCameraSelection(clientId)}
+                              onClick={() => {
+                                useShowStore.getState().clearCameraStream(uuid)
+                                toggleCameraSelection(uuid)
+                              }}
                               className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/20 text-red-500"
                               title="Sluiten"
                             >
@@ -739,19 +910,7 @@ export default function App() {
               </div>
 
               <div className="flex-1 p-0 overflow-hidden relative">
-                <PdfViewer
-                  pdfUrl={activeShow?.pdfPath || ''}
-                  pageNumber={currentScriptPage}
-                  invertScriptColors={activeShow?.invertScriptColors}
-                />
-                <div className="absolute top-4 right-4 flex flex-col gap-2 z-30">
-                  <div className="w-32 aspect-video glass rounded border border-white/10 flex items-center justify-center relative overflow-hidden group shadow-2xl">
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center z-10 transition-opacity">
-                      <span className="text-[8px] font-bold uppercase tracking-widest text-white/60 text-center px-2">Remote Wall 1<br />Preview Coming Soon</span>
-                    </div>
-                    <Monitor className="w-4 h-4 opacity-10" />
-                  </div>
-                </div>
+                <PdfViewer />
               </div>
             </div>
           </section>
@@ -912,41 +1071,60 @@ export default function App() {
                           : (isCameraActive ? 'Actief' : 'Geweigerd')}
                       </p>
                     </div>
-                    <button
-                      onClick={() => {
-                        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                          setShowCameraHelp(true)
-                        } else {
-                          setCameraActive(!isCameraActive)
-                        }
-                      }}
-                      title={!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia ? "Camera niet beschikbaar (HTTPS vereist). Klik voor instructies." : "Lokale camera delen aan/uit"}
-                      className={cn(
-                        "relative w-10 h-5 rounded-full transition-all duration-300 p-1 border border-white/10",
-                        isCameraActive ? "bg-primary/20" : "bg-white/5 shadow-inner",
-                        (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) && "bg-orange-500/20 shadow-[0_0_10px_rgba(249,115,22,0.2)]"
+                    <div className="flex flex-col items-end gap-1">
+                      <button
+                        onClick={() => {
+                          if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                            openModal({
+                              title: "Webcam Beveiliging",
+                              message: `Om je camera te kunnen gebruiken op deze remote laptop, moet de browser toestemming geven voor onbeveiligde verbindingen.\n\nInstructies:\n1. Open een nieuw tabblad en ga naar:\nchrome://flags/#unsafely-treat-insecure-origin-as-secure\n\n2. Vul bij \'Unsafely treat insecure origin as secure\' dit adres in:\nhttp://${window.location.hostname}:5173\n\n3. Zet de optie op \'Enabled\' en herstart de browser.`,
+                              type: "confirm",
+                              confirmLabel: "Ik snap het",
+                              cancelLabel: "Sluiten",
+                              onConfirm: () => { },
+                            })
+                          } else {
+                            const nextActive = !isCameraActive
+                            setCameraActive(nextActive)
+                            if (nextActive) setSelfPreviewVisible(true)
+                          }
+                        }}
+                        title={!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia ? "Camera niet beschikbaar (HTTPS vereist). Klik voor instructies." : "Lokale camera delen aan/uit"}
+                        className={cn(
+                          "relative w-10 h-5 rounded-full transition-all duration-300 p-1 border border-white/10",
+                          isCameraActive ? "bg-primary/20" : "bg-white/5 shadow-inner",
+                          (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) && "bg-orange-500/20 shadow-[0_0_10px_rgba(249,115,22,0.2)]"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-2.5 h-2.5 rounded-full transition-all duration-500",
+                          isCameraActive ? "ml-auto bg-primary shadow-[0_0_8px_#f97316]" : "mr-auto bg-white/20",
+                          (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) && "bg-orange-500 animate-pulse"
+                        )} />
+                      </button>
+                      {isCameraActive && !isSelfPreviewVisible && (
+                        <button
+                          onClick={() => setSelfPreviewVisible(true)}
+                          className="text-[7px] font-black uppercase tracking-widest text-primary/60 hover:text-primary transition-colors pr-1"
+                        >
+                          Toon preview
+                        </button>
                       )}
-                    >
-                      <div className={cn(
-                        "w-2.5 h-2.5 rounded-full transition-all duration-500",
-                        isCameraActive ? "ml-auto bg-primary shadow-[0_0_8px_#f97316]" : "mr-auto bg-white/20",
-                        (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) && "bg-orange-500 animate-pulse"
-                      )} />
-                    </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 gap-1.5">
                     {/* Show Host First (usually index 0) */}
                     {connectedClients.length > 0 && (() => {
-                      const myId = networkService.getSocketId()
-                      return connectedClients.map((clientId) => {
-                        const idx = connectedClients.findIndex(c => c === clientId)
-                        const isSelf = clientId === myId
+                      const { clientUUID: myUUID } = useShowStore.getState()
+                      return connectedClients.map((clientObj, idx) => {
+                        const { id: clientId, uuid: clientUUID } = clientObj
+                        const isSelf = clientUUID === myUUID
                         const isHostClient = idx === 0
-                        const isSelected = selectedCameraClients.includes(clientId)
+                        const isSelected = selectedCameraClients.includes(clientUUID)
 
                         return (
-                          <div key={clientId} className={cn(
+                          <div key={clientUUID || clientId} className={cn(
                             "flex items-center justify-between text-[10px] p-2 rounded-lg border transition-all",
                             isSelf ? "bg-primary/5 border-primary/20" : "bg-white/2 border-white/5 hover:bg-white/5"
                           )}>
@@ -954,7 +1132,7 @@ export default function App() {
                               <Monitor className={cn("w-3 h-3", isHostClient ? "text-yellow-500/60" : "text-purple-400/60")} />
                               <div className="flex flex-col">
                                 <span className="font-mono">
-                                  {isHostClient ? 'Host Controller' : `Workstation ${idx + 1}`}
+                                  {clientObj.friendlyName || (isHostClient ? 'Host Controller' : `Workstation ${idx + 1}`)}
                                   {isSelf && <span className="text-[8px] text-primary ml-1.5 opacity-60">(Jij)</span>}
                                 </span>
                               </div>
@@ -962,7 +1140,7 @@ export default function App() {
                             <div className="flex items-center gap-3">
                               {!isSelf && (
                                 <button
-                                  onClick={() => toggleCameraSelection(clientId)}
+                                  onClick={() => toggleCameraSelection(clientUUID)}
                                   className={cn(
                                     "p-1.5 rounded-lg transition-all",
                                     isSelected ? "bg-primary text-black" : "bg-white/5 text-purple-400 hover:bg-purple-500/20"
@@ -986,16 +1164,29 @@ export default function App() {
                     {isDeveloperMode && Object.keys(activeCameraStreams).length > 0 && (
                       <div className="mt-3 space-y-2">
                         <div className="text-[8px] font-black uppercase tracking-[0.2em] text-primary/40 px-1">Live Camera</div>
-                        {Object.entries(activeCameraStreams).map(([clientId, frame]) => {
-                          const idx = connectedClients.findIndex(c => c === clientId)
-                          const label = idx === 0 ? 'Host' : idx > 0 ? `Workstation ${idx + 1}` : clientId.slice(0, 8)
+                        {Object.entries(activeCameraStreams).map(([uuid, frame]) => {
+                          const client = connectedClients.find(c => c.uuid === uuid)
+                          const label = client?.friendlyName || (uuid.slice(0, 8))
                           return (
-                            <div key={clientId} className="relative rounded-lg overflow-hidden border border-white/10 bg-black">
+                            <div key={uuid} className="relative rounded-lg overflow-hidden border border-white/10 bg-black group/cam">
                               <img src={frame} className="w-full object-cover" alt={label} style={{ aspectRatio: '4/3' }} />
                               <div className="absolute top-1 left-1 bg-black/70 px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-widest text-white/70 flex items-center gap-1">
                                 <div className="w-1 h-1 rounded-full bg-green-400 animate-pulse" />
                                 {label}
                               </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  useShowStore.getState().clearCameraStream(uuid)
+                                  if (selectedCameraClients.includes(uuid)) {
+                                    toggleCameraSelection(uuid)
+                                  }
+                                }}
+                                className="absolute top-1 right-1 p-1 bg-black/60 rounded-full opacity-0 group-hover/cam:opacity-100 transition-opacity hover:bg-red-500/20 text-red-500"
+                                title="Stream verwijderen"
+                              >
+                                <X className="w-2.5 h-2.5" />
+                              </button>
                             </div>
                           )
                         })}
@@ -1010,16 +1201,18 @@ export default function App() {
       </main >
 
       {/* Host Debug Overlay for Camera Frames */}
-      {isDeveloperMode && isHost && Object.keys(activeCameraStreams).length > 0 && (
-        <div className="fixed bottom-28 left-8 z-[9999] bg-black/80 text-green-400 p-2 rounded-lg border border-green-500/30 text-[10px] font-mono pointer-events-none">
-          <div className="font-bold border-b border-green-500/30 mb-1">CAMERA DEBUG</div>
-          {Object.entries(activeCameraStreams).map(([cid, frame]) => (
-            <div key={cid}>
-              {cid.slice(0, 8)}: Received {(frame.length / 1024).toFixed(1)} KB
-            </div>
-          ))}
-        </div>
-      )}
+      {
+        isDeveloperMode && isHost && Object.keys(activeCameraStreams).length > 0 && (
+          <div className="fixed bottom-28 left-8 z-[9999] bg-black/80 text-green-400 p-2 rounded-lg border border-green-500/30 text-[10px] font-mono pointer-events-none">
+            <div className="font-bold border-b border-green-500/30 mb-1">CAMERA DEBUG</div>
+            {Object.entries(activeCameraStreams).map(([cid, frame]) => (
+              <div key={cid}>
+                {cid.slice(0, 8)}: Received {(frame.length / 1024).toFixed(1)} KB
+              </div>
+            ))}
+          </div>
+        )
+      }
 
       {/* Bottom Control Bar */}
       <footer className="h-24 glass-header border-t border-white/10 shrink-0 flex items-center justify-between px-8 bg-black/60 z-[100]" >
@@ -1031,23 +1224,22 @@ export default function App() {
           <button
             onClick={() => {
               if (!isTimeTracking && activeEventIndex === -1) {
-                setModalConfig({
-                  isOpen: true,
+                openModal({
                   title: 'Timing Starten?',
                   message: 'Wil je de timing bijhouden voor deze show? Dit wordt opgeslagen in de database.',
                   type: 'confirm',
                   defaultValue: '',
+                  confirmLabel: 'Ja, start timing',
+                  cancelLabel: 'Nee, alleen starten',
                   onConfirm: () => {
                     toggleTimeTracking();
                     setActiveEvent(0);
-                    setModalConfig(p => ({ ...p, isOpen: false }));
                   },
                   onCancel: () => {
                     // Start show WITHOUT tracking timings
                     setActiveEvent(0);
-                    setModalConfig(p => ({ ...p, isOpen: false }));
                   }
-                } as any);
+                });
               } else {
                 setActiveEvent(0);
               }
@@ -1094,71 +1286,81 @@ export default function App() {
             </div>
           )}
 
-          <div className="flex gap-3">
-            <button
-              onClick={() => nextEvent()}
-              disabled={!isLocked || !activeShow}
-              className={cn(
-                "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
-                blinkingNextEvent && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
-                navigationWarning === 'event' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
-                !isLocked && "opacity-20"
-              )}
-            >
-              <SkipForward className={cn("w-5 h-5", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-primary")} />
-              <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-muted-foreground")}>
-                {navigationWarning === 'event' ? 'Override?' : 'Next Event'}
-              </span>
-            </button>
+          {activeShow && isLocked && activeEventIndex >= 0 && (
+            <div className="flex gap-3">
+              <button
+                onClick={() => nextEvent()}
+                disabled={!isLocked || !activeShow}
+                className={cn(
+                  "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
+                  blinkingNextEvent && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
+                  navigationWarning === 'event' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
+                  !isLocked && "opacity-20"
+                )}
+              >
+                <SkipForward className={cn("w-5 h-5", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-primary")} />
+                <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-muted-foreground")}>
+                  {navigationWarning === 'event' ? 'Override?' : 'Next Event'}
+                </span>
+              </button>
 
-            <button
-              onClick={() => nextScene()}
-              disabled={!isLocked || !activeShow}
-              className={cn(
-                "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
-                blinkingNextScene && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
-                navigationWarning === 'scene' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
-                !isLocked && "opacity-20"
-              )}
-            >
-              <Layers className={cn("w-5 h-5", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-blue-400")} />
-              <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-muted-foreground")}>
-                {navigationWarning === 'scene' ? 'Override?' : 'Next Scene'}
-              </span>
-            </button>
-            <button
-              onClick={() => nextAct()}
-              disabled={!isLocked || !activeShow}
-              className={cn(
-                "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
-                blinkingNextAct && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
-                navigationWarning === 'act' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
-                !isLocked && "opacity-20"
-              )}
-            >
-              <SkipForward className={cn("w-5 h-5 rotate-90", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-orange-400")} />
-              <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-muted-foreground")}>
-                {navigationWarning === 'act' ? 'Override?' : 'Next Act'}
-              </span>
-            </button>
-          </div>
+              <button
+                onClick={() => nextScene()}
+                disabled={!isLocked || !activeShow}
+                className={cn(
+                  "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
+                  blinkingNextScene && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
+                  navigationWarning === 'scene' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
+                  !isLocked && "opacity-20"
+                )}
+              >
+                <Layers className={cn("w-5 h-5", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-blue-400")} />
+                <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-muted-foreground")}>
+                  {navigationWarning === 'scene' ? 'Override?' : 'Next Scene'}
+                </span>
+              </button>
+              <button
+                onClick={() => nextAct()}
+                disabled={!isLocked || !activeShow}
+                className={cn(
+                  "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
+                  blinkingNextAct && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
+                  navigationWarning === 'act' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
+                  !isLocked && "opacity-20"
+                )}
+              >
+                <SkipForward className={cn("w-5 h-5 rotate-90", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-orange-400")} />
+                <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-muted-foreground")}>
+                  {navigationWarning === 'act' ? 'Override?' : 'Next Act'}
+                </span>
+              </button>
+            </div>
+          )}
 
-          <button
-            onClick={() => { setActiveEvent(-1) }}
-            disabled={!activeShow || !isLocked}
-            title="Stop/Reset Show"
-            className={cn(
-              "w-16 h-16 rounded-full glass border-red-500/20 flex items-center justify-center hover:bg-red-500/20 transition-all text-red-500 disabled:opacity-20",
-              !activeShow && "cursor-not-allowed"
-            )}
-          >
-            <StopCircle className="w-6 h-6" />
-          </button>
+          {activeShow && isLocked && activeEventIndex === -1 && !isHost && (
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20 animate-pulse border border-white/5 px-8 py-4 rounded-xl glass">
+              Wachten tot show start
+            </div>
+          )}
+
+          {activeShow && isLocked && activeEventIndex >= 0 && (
+            <button
+              onClick={() => { setActiveEvent(-1) }}
+              disabled={!activeShow || !isLocked}
+              title="Stop/Reset Show"
+              className={cn(
+                "w-16 h-16 rounded-full glass border-red-500/20 flex items-center justify-center hover:bg-red-500/20 transition-all text-red-500 disabled:opacity-20",
+                !activeShow && "cursor-not-allowed"
+              )}
+            >
+              <StopCircle className="w-6 h-6" />
+            </button>
+          )}
         </div>
 
         <div className="flex-1 flex flex-col items-end justify-center gap-0.5 text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/30">
           <span
-            className={cn("cursor-default select-none transition-colors", isDeveloperMode && "text-yellow-500/60")}
+            className={cn("cursor-default select-none transition-colors flex items-center gap-2", isDeveloperMode ? "text-purple-500/60" : "text-muted-foreground/30")}
             onClick={() => {
               const newCount = versionClickCount + 1
               if (versionClickTimer) clearTimeout(versionClickTimer)
@@ -1172,9 +1374,22 @@ export default function App() {
             }}
             title={isDeveloperMode ? 'Developer Mode actief' : undefined}
           >
+            {isDeveloperMode && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDbManagerOpen(true);
+                }}
+                className="p-1 hover:bg-white/10 rounded-md transition-all text-purple-500/50 hover:text-purple-500 pointer-events-auto"
+                title="Database Beheer"
+              >
+                <Monitor className="w-3 h-3" />
+              </button>
+            )}
             V0.1.0{isDeveloperMode ? ' 🛠' : ''}
           </span>
           <span>{serverIp}:5173</span>
+
         </div>
       </footer >
 
@@ -1198,25 +1413,256 @@ export default function App() {
 
       <CameraStreamer />
 
+      {/* Registration Overlay */}
+      {!isAuthorized && registrationStatus && registrationStatus !== 'AUTHORIZED' && (
+        <div className="fixed inset-0 z-[10000] bg-[#050505] flex flex-col items-center justify-center p-8 animate-in fade-in duration-500">
+          <div className="glass border border-white/10 p-10 rounded-[2.5rem] w-full max-w-md flex flex-col items-center gap-10 shadow-2xl relative overflow-hidden group">
+            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
 
-      <SimpleModal
-        isOpen={showCameraHelp}
-        title="Webcam Beveiliging"
-        message={`Om je camera te kunnen gebruiken op deze remote laptop, moet de browser toestemming geven voor onbeveiligde verbindingen.\n\nInstructies:\n1. Open een nieuw tabblad en ga naar:\nchrome://flags/#unsafely-treat-insecure-origin-as-secure\n\n2. Vul bij \'Unsafely treat insecure origin as secure\' dit adres in:\nhttp://${window.location.hostname}:5173\n\n3. Zet de optie op \'Enabled\' en herstart de browser.`}
-        type="confirm"
-        onConfirm={() => setShowCameraHelp(false)}
-        onCancel={() => setShowCameraHelp(false)}
-      />
+            <div className="relative">
+              <div className="w-20 h-20 rounded-3xl bg-primary/20 flex items-center justify-center text-primary animate-pulse">
+                <Fingerprint className="w-10 h-10" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-black border-4 border-[#050505]">
+                <ShieldAlert className="w-4 h-4" />
+              </div>
+            </div>
 
-      <SimpleModal
-        isOpen={modalConfig.isOpen}
-        title={modalConfig.title}
-        message={modalConfig.message}
-        type={modalConfig.type}
-        defaultValue={modalConfig.defaultValue}
-        onConfirm={modalConfig.onConfirm}
-        onCancel={(modalConfig as any).onCancel || (() => setModalConfig({ ...modalConfig, isOpen: false }))}
-      />
-    </div>
+            <div className="text-center space-y-3 relative z-10">
+              <h2 className="text-3xl font-black uppercase tracking-tighter">Station Registratie</h2>
+              <p className="text-sm text-white/40 font-medium">Beveiligde verbinding vereist autorisatie</p>
+            </div>
+
+            <div className="w-full space-y-6 relative z-10">
+              {(!registrationStatus || registrationStatus === 'STARTING') && (
+                <div className="flex flex-col items-center justify-center py-10 gap-4">
+                  <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                  <p className="text-xs text-white/40 font-bold tracking-widest uppercase animate-pulse">Verbinden met Hub...</p>
+                </div>
+              )}
+
+              {registrationStatus === 'NOT_FOUND' && (
+                <div className="space-y-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary/60 text-center mb-6">Selecteer uw station</p>
+                  <div className="grid gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                    {registrationData?.existingClients?.map(client => (
+                      <button
+                        key={client.id}
+                        onClick={() => {
+                          localStorage.setItem('ledshow_client_uuid', client.id)
+                          useShowStore.setState({
+                            clientUUID: client.id,
+                            registrationStatus: 'WAITING_PIN',
+                            registrationData: { ...registrationData, selectedClientId: client.id }
+                          })
+                          networkService.registerClient()
+                        }}
+                        className="w-full p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-left flex items-center justify-between group/item"
+                      >
+                        <span className="font-bold text-sm tracking-wide">{client.friendlyName}</span>
+                        <ChevronRight className="w-4 h-4 opacity-20 group-hover/item:opacity-100 group-hover/item:translate-x-1 transition-all" />
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => useShowStore.setState({ registrationStatus: 'WAITING_HOST_PIN' })}
+                    className="w-full p-4 rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/50 hover:bg-primary/5 transition-all text-xs font-black uppercase tracking-widest text-white/40 hover:text-primary"
+                  >
+                    + Nieuw Station Toevoegen
+                  </button>
+                </div>
+              )}
+
+              {registrationStatus === 'WAITING_HOST_PIN' && (
+                <div className="space-y-6">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-orange-500 text-center">Beheerder Verificatie</p>
+                  <p className="text-xs text-white/40 text-center -mt-4 italic">Voer de Host PIN in om een nieuw station te registreren.</p>
+                  <div className="space-y-4">
+                    <input
+                      id="host-pin-input"
+                      type="password"
+                      placeholder="HOST PIN"
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-5 text-center text-3xl font-mono tracking-[0.8em] focus:border-primary/50 outline-none transition-all shadow-inner"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') verifyHostPin((e.target as HTMLInputElement).value)
+                      }}
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => {
+                        const input = document.getElementById('host-pin-input') as HTMLInputElement
+                        if (input) verifyHostPin(input.value)
+                      }}
+                      className="w-full p-4 rounded-2xl bg-orange-500 text-black font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    >
+                      Verifiëren
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => useShowStore.setState({ registrationStatus: 'NOT_FOUND' })}
+                    className="w-full text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors"
+                  >
+                    Terug naar lijst
+                  </button>
+                </div>
+              )}
+
+              {registrationStatus === 'WAITING_REGISTRATION' && (
+                <div className="space-y-6">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary text-center">Nieuw Station Instellen</p>
+                  <div className="space-y-3">
+                    <input
+                      id="reg-name"
+                      type="text"
+                      placeholder="STATION NAAM (bijv. Lichtregie)"
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-center text-sm font-bold tracking-widest focus:border-primary/50 outline-none transition-all"
+                      autoFocus
+                    />
+                    <input
+                      id="reg-pin"
+                      type="password"
+                      placeholder="NIEUWE CLIENT PIN"
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-center text-xl font-mono tracking-[0.5em] focus:border-primary/50 outline-none transition-all"
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      const name = (document.getElementById('reg-name') as HTMLInputElement).value
+                      const pin = (document.getElementById('reg-pin') as HTMLInputElement).value
+                      if (name && pin) completeRegistration(name, pin)
+                    }}
+                    className="w-full p-4 rounded-2xl bg-primary text-black font-black uppercase tracking-widest text-sm shadow-[0_10px_30px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
+                  >
+                    Registratie Voltooien
+                  </button>
+                </div>
+              )}
+
+              {registrationStatus === 'WAITING_PIN' && (
+                <div className="space-y-6">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary text-center">Toegang Station</p>
+                  <p className="text-xs text-white/40 text-center -mt-4 italic">Voer de PIN in voor dit station.</p>
+                  <div className="space-y-4">
+                    <input
+                      id="client-pin-input"
+                      type="password"
+                      placeholder="PIN18"
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-5 text-center text-3xl font-mono tracking-[0.8em] focus:border-primary/50 outline-none transition-all shadow-inner"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') verifyClientPin((e.target as HTMLInputElement).value)
+                      }}
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => {
+                        const input = document.getElementById('client-pin-input') as HTMLInputElement
+                        if (input) verifyClientPin(input.value)
+                      }}
+                      className="w-full p-4 rounded-2xl bg-primary text-black font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+                    >
+                      Verbinden
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => useShowStore.setState({ registrationStatus: 'NOT_FOUND' })}
+                    className="w-full text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors"
+                  >
+                    Andere station kiezen
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="text-[10px] text-white/20 uppercase tracking-[0.3em] font-black relative z-10 flex items-center gap-2">
+              <Wifi className="w-3 h-3 text-primary animate-pulse" />
+              Connected to Antigravity Hub
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lock Overlay */}
+      {appLocked && (
+        <div className="fixed inset-0 z-[20000] bg-black flex flex-col items-center justify-center p-8 animate-in backdrop-blur-3xl duration-700">
+          <div className="flex flex-col items-center gap-12 max-w-sm w-full">
+            <div className="relative">
+              <div className="w-32 h-32 rounded-[2.5rem] bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500">
+                <Lock className="w-16 h-16 animate-pulse" />
+              </div>
+              <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-black border border-white/10 flex items-center justify-center text-white/40 rotate-12">
+                <SkipForward className="w-6 h-6" />
+              </div>
+            </div>
+
+            <div className="text-center space-y-4">
+              <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Systeem Gesloten</h2>
+              <p className="text-sm text-white/40 font-medium">Voer uw pincode in om dit station te ontgrendelen</p>
+            </div>
+
+            <div className="w-full space-y-4">
+              <input
+                type="password"
+                placeholder="PIN"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-6 text-center text-4xl font-mono tracking-[1em] focus:border-red-500/50 focus:bg-red-500/5 outline-none transition-all"
+                onKeyDown={(e) => {
+                  const val = (e.target as HTMLInputElement).value
+                  if (e.key === 'Enter') {
+                    if (isHost) {
+                      (async () => {
+                        try {
+                          // Force refresh app settings from DB first
+                          if ((window as any).require) {
+                            const { ipcRenderer } = (window as any).require('electron')
+                            const settings = await ipcRenderer.invoke('db:get-app-settings')
+                            console.log('--- HOST AUTH: Refreshed DB Settings:', settings)
+                            useShowStore.setState({ appSettings: { ...useShowStore.getState().appSettings, ...settings } })
+                          }
+                          const currentSettings = useShowStore.getState().appSettings;
+                          const inputPin = val.trim()
+                          const masterPin = (currentSettings.accessPin || '').trim()
+                          console.log('--- HOST AUTH: Comparing input', `[${inputPin}]`, 'with stored', `[${masterPin}]`)
+
+                          if (inputPin === masterPin) setAppLocked(false)
+                          else useShowStore.getState().addToast('Ongeldige Host Pin', 'error')
+                        } catch (err) {
+                          console.error('Auth Error:', err)
+                          useShowStore.getState().addToast('Fout bij verifiëren', 'error')
+                        }
+                      })()
+                    } else {
+                      // Remote clients check their own PIN via server
+                      verifyClientPin(val)
+                    }
+                  }
+                }}
+                autoFocus
+              />
+              <div className="flex justify-between px-2 items-center">
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Station: {clientFriendlyName || (isHost ? 'Host Controller' : 'Unknown')}</span>
+                {isHost && (
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-orange-500/40">Host Authentication</span>
+                    <button
+                      className="text-[9px] text-red-500/50 hover:text-red-500 underline decoration-red-500/30 font-bold uppercase tracking-widest cursor-pointer"
+                      onClick={() => {
+                        console.log('--- EMERGENCY UNLOCK TRIGGERED ---');
+                        console.log('Current Stored PIN:', appSettings.accessPin);
+                        if (confirm(`Noodstop: Lock geforceerd verwijderen?\n(Huidige PIN is: '${appSettings.accessPin}')`)) {
+                          setAppLocked(false);
+                        }
+                      }}
+                    >
+                      NOOD-UNLOCK
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <SimpleModal {...modalConfig} />
+    </div >
   )
 }

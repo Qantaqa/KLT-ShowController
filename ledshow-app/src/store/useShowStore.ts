@@ -1,11 +1,11 @@
 import { create } from 'zustand'
-import type { ShowEvent } from '../services/xml-service'
+import type { ShowEvent, ClipboardItem } from '../services/xml-service'
 import { networkService } from '../services/network-service'
 import { XmlService } from '../services/xml-service'
 import * as MediaPlayer from '../services/media-player-service'
 
 
-export type DeviceType = 'wled' | 'wiz' | 'local_monitor' | 'remote_ledwall'
+export type DeviceType = 'wled' | 'wiz' | 'local_monitor' | 'remote_ledwall' | 'videowall_agent'
 
 export interface BaseDevice {
     id: string
@@ -27,11 +27,16 @@ export interface WLEDDevice extends BaseDevice {
 export interface WiZDevice extends BaseDevice {
     type: 'wiz'
     ip: string
+    fadeInTime?: number         // In seconds
+    fadeOutTime?: number        // In seconds
+    transitionTime?: number     // In seconds
 }
 
 export interface LocalMonitorDevice extends BaseDevice {
     type: 'local_monitor'
     monitorId: number
+    fadeOutTime?: number        // In seconds
+    transitionTime?: number     // In seconds
 }
 
 export interface RemoteLedwallDevice extends BaseDevice {
@@ -42,12 +47,28 @@ export interface RemoteLedwallDevice extends BaseDevice {
     orientation: 'landscape' | 'portrait'
 }
 
-export type Device = WLEDDevice | WiZDevice | LocalMonitorDevice | RemoteLedwallDevice
+export interface VideoWallAgentDevice extends BaseDevice {
+    type: 'videowall_agent'
+    ip: string
+    port: number
+    model: '4-screen' | '9-screen'
+    layout: string
+    orientation: 'landscape' | 'portrait'
+    cachedFiles?: string[]
+    fadeInTime?: number         // In seconds
+    fadeOutTime?: number        // In seconds
+    crossoverTime?: number      // In seconds
+    repeat?: boolean
+    bezelSize?: number          // Gap between screens in pixels (preview only for now)
+}
+
+export type Device = WLEDDevice | WiZDevice | LocalMonitorDevice | RemoteLedwallDevice | VideoWallAgentDevice
 
 export interface ShowProfile {
     id: string
     name: string
     pdfPath: string
+    totalPages?: number          // Total number of script pages
     sidebarWidth?: number
     invertScriptColors?: boolean
     schedule?: Record<number, { time1: string; time2: string }> // 0 = Sunday, 1 = Monday, etc.
@@ -65,11 +86,19 @@ export interface AppSettingsProfile {
     serverIp: string // 'localhost' default
     controllerMonitorIndex?: number // 0 = primary
     testVideoPath?: string
+    devices: Device[]
+    clientConfigs?: Record<string, {
+        isCameraActive?: boolean
+        isSelfPreviewVisible?: boolean
+        selectedCameraClients?: string[]
+        lastSeen?: number
+    }>
 }
 
 interface ShowState {
     events: ShowEvent[]
     activeEventIndex: number
+    selectedEventIndex: number // New state for Edit Mode selection
     isLocked: boolean
 
     // Indicators for blinking buttons
@@ -94,17 +123,24 @@ interface ShowState {
 
     // Navigation Safety & Warnings
     navigationWarning: 'event' | 'scene' | 'act' | null
+    playingMedia: Record<string, { filename: string; timestamp: number }>
+
+    // Runtime Collapse State (for Show Mode)
+    runtimeCollapsedGroups: Record<string, boolean>
 
     // UI State
     autoFollowScript: boolean
 
     // Status tracking for network events
     eventStatuses: Record<number, 'sending' | 'ok' | 'failed' | null>
-    connectedClients: string[]
+    connectedClients: any[] // array of { id, uuid }
+    isSynced: boolean
+    clipboard: ClipboardItem[]
 
     // Actions
     setEvents: (events: ShowEvent[]) => void
     setActiveEvent: (index: number) => void
+    setSelectedEvent: (index: number) => void // New action
     setLocked: (locked: boolean) => void
     setShowStartTime: (time: string) => void
     nextEvent: (force?: boolean) => void
@@ -115,10 +151,22 @@ interface ShowState {
 
     // Camera Sharing State
     isCameraActive: boolean
-
-
+    isSelfPreviewVisible: boolean
     activeCameraStreams: Record<string, string> // clientId -> base64 frame
     selectedCameraClients: string[] // List of up to 2 client IDs we want to see
+    dismissedWebcams: string[] // List of client IDs we manually closed
+    clientUUID: string
+    clientFriendlyName: string
+
+    // Auth & Registration
+    isAuthorized: boolean
+    registrationStatus: 'NOT_FOUND' | 'WAITING_PIN' | 'WAITING_HOST_PIN' | 'WAITING_REGISTRATION' | 'AUTHORIZED' | 'STARTING' | null
+    registrationData: {
+        existingClients?: { id: string, friendlyName: string }[]
+        status?: string
+        selectedClientId?: string
+    }
+    appLocked: boolean
 
     // Show management
     setActiveShow: (show: ShowProfile) => void
@@ -131,7 +179,7 @@ interface ShowState {
     saveCurrentShow: () => Promise<void>
     initializeShows: () => Promise<void>
     updateAppSettings: (partial: Partial<AppSettingsProfile>) => Promise<void>
-    importShow: (name: string, xmlContent: string) => Promise<void>
+    importShow: (name: string, xmlContent: string, xmlPath?: string) => Promise<void>
 
     // Device actions
     addDevice: (device: Device) => void
@@ -170,23 +218,61 @@ interface ShowState {
     toggleTimeTracking: () => void
     toggleAutoFollowScript: () => void
     setCurrentScriptPage: (page: number) => void
-    syncFromRemote: (state: { activeShow: ShowProfile, events: ShowEvent[], activeEventIndex: number, isLocked: boolean, blinkingNextEvent: boolean, blinkingNextScene: boolean, blinkingNextAct: boolean, navigationWarning: 'event' | 'scene' | 'act' | null, lastTransitionTime: number | null }) => void
+    syncFromRemote: (state: any) => void
     syncAppSettings: (settings: AppSettingsProfile) => void
-    setConnectedClients: (ids: string[]) => void
+    setConnectedClients: (ids: any[]) => void
     broadcastState: () => void
-
     mediaAction: (deviceId: string, action: string, payload?: any) => void
 
+    // Auth Actions
+    verifyHostPin: (pin: string) => void
+    completeRegistration: (name: string, pin: string) => void
+    verifyClientPin: (pin: string) => void
+    setAppLocked: (locked: boolean) => void
+
     // Camera Actions
-    setCameraActive: (active: boolean) => void
     updateCameraFrame: (clientId: string, frame: string) => void
     clearCameraStream: (clientId: string) => void
+    setCameraActive: (active: boolean) => void
+    setSelfPreviewVisible: (visible: boolean) => void
     toggleCameraSelection: (clientId: string) => void
+    dismissCameraStream: (clientId: string) => void
 
     // Toast Messages
     toasts: { id: string, type: 'info' | 'warning' | 'error', message: string }[]
     addToast: (message: string, type?: 'info' | 'warning' | 'error') => void
     removeToast: (id: string) => void
+
+    // Modal State
+    modalConfig: {
+        isOpen: boolean
+        title: string
+        message: string
+        type: 'confirm' | 'prompt'
+        defaultValue?: string
+        onConfirm: (value?: string) => void
+        onCancel: () => void
+        confirmLabel?: string
+        cancelLabel?: string
+    }
+    openModal: (config: {
+        title: string
+        message: string
+        type: 'confirm' | 'prompt'
+        defaultValue?: string
+        onConfirm: (value?: string) => void
+        onCancel?: () => void
+        confirmLabel?: string
+        cancelLabel?: string
+    }) => void
+    closeModal: () => void
+
+    // Clipboard Actions
+    copyToClipboard: (event: ShowEvent) => Promise<void>
+    loadClipboard: () => Promise<void>
+    removeFromClipboard: (id: number) => Promise<void>
+    clearClipboard: () => Promise<void>
+    pasteEvent: (index: number, partialData: Partial<ShowEvent>) => void
 }
 
 const DEFAULT_SHOWS: ShowProfile[] = []
@@ -194,41 +280,111 @@ const DEFAULT_SHOWS: ShowProfile[] = []
 export const useShowStore = create<ShowState>((set, get) => ({
     events: [],
     activeEventIndex: -1,
+    selectedEventIndex: -1,
     isLocked: true,
     blinkingNextEvent: false,
     blinkingNextScene: false,
     blinkingNextAct: false,
     isTimeTracking: false,
     autoFollowScript: true,
-    lastTransitionTime: null,
     navigationWarning: null,
     activeShow: null,
     availableShows: DEFAULT_SHOWS,
     eventStatuses: {},
     connectedClients: [],
+    isSynced: false,
+    clientUUID: (() => {
+        const key = 'ledshow_client_uuid'
+        let id = localStorage.getItem(key)
+        if (!id) {
+            id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+            localStorage.setItem(key, id)
+        }
+        return id
+    })(),
+    clientFriendlyName: '',
+    isAuthorized: !!(window as any).require, // Host is always authorized
+    registrationStatus: !!(window as any).require ? 'AUTHORIZED' : 'STARTING',
+    registrationData: {},
+    appLocked: false,
+    clipboard: [],
+
     appSettings: {
         defaultLogo: '',
         accessPin: '',
         serverPort: 3001,
         serverIp: 'localhost',
-        controllerMonitorIndex: 0
+        devices: []
     },
 
     isCameraActive: false,
+    isSelfPreviewVisible: true,
     activeCameraStreams: {},
     selectedCameraClients: [],
+    dismissedWebcams: [],
 
     showStartTime: "19:30",
     actualStartTime: null,
     isPaused: false,
     pauseStartTime: null,
+    lastTransitionTime: null,
+    playingMedia: {},
+
+    runtimeCollapsedGroups: {},
+
+    modalConfig: {
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'confirm',
+        onConfirm: () => { },
+        onCancel: () => { }
+    },
 
     setEvents: (events) => set({ events }),
     setLocked: async (isLocked) => {
+        const { activeShow, events } = get()
         set({ isLocked })
         get().broadcastState()
+
         if (isLocked) {
+            // Unlocked -> Locked (Show Mode)
+            // Save current show first
             await get().saveCurrentShow()
+
+            // Default Show Mode View: Collapse All except Next (Act 1, Scene 1)
+            // Or if there is an active event, focus on that.
+            // Requirement: "klap dan alles in behalve act 1- scene 1 en event 1" (if mostly starting fresh)
+            // We'll use the activeEventIndex to determine what to show, defaulting to index 0 if -1.
+
+            const targetIndex = get().activeEventIndex >= 0 ? get().activeEventIndex : 0
+            if (events && events.length > 0) {
+                const target = events[targetIndex]
+                const actKey = `act-${target.act}`
+                const sceneKey = `scene-${target.act}-${target.sceneId}`
+
+                // Collapse ALL acts and scenes initially
+                const newRuntimeCollapsed: Record<string, boolean> = {}
+                const acts = new Set(events.map(e => e.act))
+                acts.forEach(a => newRuntimeCollapsed[`act-${a}`] = true)
+
+                const scenes = new Set(events.map(e => `scene-${e.act}-${e.sceneId}`))
+                scenes.forEach(s => newRuntimeCollapsed[s] = true)
+
+                // Expand target
+                newRuntimeCollapsed[actKey] = false
+                newRuntimeCollapsed[sceneKey] = false
+
+                set({ runtimeCollapsedGroups: newRuntimeCollapsed })
+            }
+        } else {
+            // Locked -> Unlocked (Edit Mode)
+            // Restore persistent view state from DB (activeShow.viewState)
+            // The SequenceGrid will defer to activeShow.viewState.collapsedGroups when !isLocked
+            // But we can also sync runtimeCollapsedGroups just in case we need it
+            if (activeShow?.viewState?.collapsedGroups) {
+                set({ runtimeCollapsedGroups: { ...activeShow.viewState.collapsedGroups } })
+            }
         }
     },
     toggleTimeTracking: () => set(state => ({ isTimeTracking: !state.isTimeTracking })),
@@ -249,8 +405,13 @@ export const useShowStore = create<ShowState>((set, get) => ({
             blinkingNextScene: state.blinkingNextScene,
             blinkingNextAct: state.blinkingNextAct,
             navigationWarning: state.navigationWarning,
-            lastTransitionTime: state.lastTransitionTime
+            lastTransitionTime: state.lastTransitionTime,
+            runtimeCollapsedGroups: state.runtimeCollapsedGroups || {},
+            isSynced: true
         })
+
+        // On remote, we don't overwrite selectedCameraClients if they are already set locally?
+        // Actually, the user wants per-client settings.
     },
 
     syncAppSettings: (appSettings) => {
@@ -259,28 +420,64 @@ export const useShowStore = create<ShowState>((set, get) => ({
 
     setConnectedClients: (ids) => set({ connectedClients: ids }),
 
-    setCameraActive: (active) => set({ isCameraActive: active }),
+    setCameraActive: (active) => {
+        const { clientUUID, appSettings, updateAppSettings } = get()
+        set({ isCameraActive: active })
+
+        // Persist to database
+        const configs = { ...(appSettings.clientConfigs || {}) }
+        configs[clientUUID] = {
+            ...(configs[clientUUID] || {}),
+            isCameraActive: active,
+            lastSeen: Date.now()
+        }
+        updateAppSettings({ clientConfigs: configs })
+    },
     updateCameraFrame: (clientId, frame) => set(state => ({
         activeCameraStreams: { ...state.activeCameraStreams, [clientId]: frame }
     })),
     clearCameraStream: (clientId) => set(state => {
         const streams = { ...state.activeCameraStreams }
         delete streams[clientId]
-        // Keep in selectedCameraClients so we show the "Camera Off" placeholder
-        // const selected = state.selectedCameraClients.filter(id => id !== clientId)
         return { activeCameraStreams: streams }
     }),
-    toggleCameraSelection: (clientId) => set(state => {
-        const selected = [...state.selectedCameraClients]
+    toggleCameraSelection: (clientId) => {
+        const { selectedCameraClients, clientUUID, appSettings, updateAppSettings } = get()
+        let selected = [...selectedCameraClients]
         if (selected.includes(clientId)) {
-            return { selectedCameraClients: selected.filter(id => id !== clientId) }
+            selected = selected.filter(id => id !== clientId)
         } else {
             if (selected.length >= 2) selected.shift()
             selected.push(clientId)
-            return { selectedCameraClients: selected }
         }
-    }
-    ),
+        set({ selectedCameraClients: selected })
+
+        // Persist to database
+        const configs = { ...(appSettings.clientConfigs || {}) }
+        configs[clientUUID] = {
+            ...(configs[clientUUID] || {}),
+            selectedCameraClients: selected,
+            lastSeen: Date.now()
+        }
+        updateAppSettings({ clientConfigs: configs })
+    },
+    dismissCameraStream: (clientId) => set(state => ({
+        dismissedWebcams: [...state.dismissedWebcams, clientId],
+        selectedCameraClients: state.selectedCameraClients.filter(id => id !== clientId)
+    })),
+    setSelfPreviewVisible: (visible) => {
+        const { clientUUID, appSettings, updateAppSettings } = get()
+        set({ isSelfPreviewVisible: visible })
+
+        // Persist to database
+        const configs = { ...(appSettings.clientConfigs || {}) }
+        configs[clientUUID] = {
+            ...(configs[clientUUID] || {}),
+            isSelfPreviewVisible: visible,
+            lastSeen: Date.now()
+        }
+        updateAppSettings({ clientConfigs: configs })
+    },
 
     toasts: [],
     addToast: (message, type = 'info') => {
@@ -301,14 +498,50 @@ export const useShowStore = create<ShowState>((set, get) => ({
             }
             networkService.sendCommand({
                 type: 'STATE_SYNC',
-                state: { activeShow, events, activeEventIndex, isLocked, appSettings: remoteAppSettings, blinkingNextEvent, blinkingNextScene, blinkingNextAct, navigationWarning, lastTransitionTime }
+                state: {
+                    activeShow,
+                    events,
+                    activeEventIndex,
+                    isLocked,
+                    appSettings: remoteAppSettings,
+                    blinkingNextEvent,
+                    blinkingNextScene,
+                    blinkingNextAct,
+                    navigationWarning,
+                    lastTransitionTime,
+                    runtimeCollapsedGroups: get().runtimeCollapsedGroups
+                }
             })
         }
     },
 
+    setSelectedEvent: (index) => set({ selectedEventIndex: index }),
+
+    setAppLocked: (locked) => {
+        set({ appLocked: locked })
+        networkService.sendCommand({ type: 'SET_LOCKED', locked })
+    },
+
+    verifyHostPin: (pin) => {
+        networkService.sendCommand({ type: 'VERIFY_HOST_PIN', pin })
+    },
+
+    completeRegistration: (name, pin) => {
+        networkService.sendCommand({ type: 'COMPLETE_REGISTRATION', friendlyName: name, pinCode: pin })
+    },
+
+    verifyClientPin: (pin) => {
+        networkService.sendCommand({ type: 'VERIFY_CLIENT_PIN', pin })
+    },
 
     setActiveEvent: (index) => {
-        const { events, activeEventIndex, actualStartTime, isPaused, isTimeTracking, lastTransitionTime } = get()
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            networkService.sendCommand({ type: 'REMOTE_CONTROL', action: 'setActiveEvent', index })
+            return
+        }
+
+        const { events, activeEventIndex, actualStartTime, isPaused, isTimeTracking, lastTransitionTime, isLocked } = get()
 
         // Stop/Reset: index -1 resets the show
         if (index === -1) {
@@ -376,34 +609,102 @@ export const useShowStore = create<ShowState>((set, get) => ({
             updates.pauseStartTime = null
         }
 
+        // ---------------------------------------------------------
+        // AUTO-COLLAPSE LOGIC (Show Mode Only)
+        // ---------------------------------------------------------
+        if (isLocked) {
+            // Identify Next Group (Event, Scene, or Act)
+            // We want to keep Current and Next expanded.
+            // Simplest approach: Collapse All, then Expand Current & Next.
+
+            // 1. Build list of all Group Keys
+            const allGroupKeys = new Set<string>()
+            newEvents.forEach(e => {
+                allGroupKeys.add(`act-${e.act}`)
+                allGroupKeys.add(`scene-${e.act}-${e.sceneId}`)
+            })
+
+            const nextRuntimeCollapsed: Record<string, boolean> = {}
+            // Set all to true
+            allGroupKeys.forEach(k => nextRuntimeCollapsed[k] = true)
+
+            // 2. Expand Current
+            nextRuntimeCollapsed[`act-${currentEvent.act}`] = false
+            nextRuntimeCollapsed[`scene-${currentEvent.act}-${currentEvent.sceneId}`] = false
+
+            // 3. Find Next Context (Next Event, Scene, or Act)
+            // We look forward for the first row that belongs to a different event group
+            let nextGroupIdx = -1;
+            for (let i = index + 1; i < newEvents.length; i++) {
+                const e = newEvents[i];
+                if (e.act !== currentEvent.act || e.sceneId !== currentEvent.sceneId || e.eventId !== currentEvent.eventId) {
+                    nextGroupIdx = i;
+                    break;
+                }
+            }
+
+            if (nextGroupIdx !== -1) {
+                const nextE = newEvents[nextGroupIdx];
+                nextRuntimeCollapsed[`act-${nextE.act}`] = false;
+                nextRuntimeCollapsed[`scene-${nextE.act}-${nextE.sceneId}`] = false;
+            }
+
+            updates.runtimeCollapsedGroups = nextRuntimeCollapsed;
+        }
+        // ---------------------------------------------------------
+
         set(updates)
 
-        // Trigger Media if active event is media type
+        // ---------------------------------------------------------
+        // SCRIPT FOLLOW LOGIC
+        // ---------------------------------------------------------
+        if (isLocked && get().autoFollowScript) {
+            // Check current row first, then fallback to group title
+            let pageToJump = currentEvent.scriptPg
+
+            if (!pageToJump || pageToJump <= 0) {
+                // Find group title row (search backward from current index)
+                for (let i = index; i >= 0; i--) {
+                    const row = newEvents[i]
+                    if (row.act === currentEvent.act &&
+                        row.sceneId === currentEvent.sceneId &&
+                        row.eventId === currentEvent.eventId) {
+
+                        if (row.scriptPg && row.scriptPg > 0) {
+                            pageToJump = row.scriptPg
+                            break
+                        }
+                    } else {
+                        // We left the group, stop searching
+                        break
+                    }
+                }
+            }
+
+            if (pageToJump && pageToJump > 0) {
+                get().setCurrentScriptPage(pageToJump)
+            }
+        }
+        // ---------------------------------------------------------
+
         // ---------------------------------------------------------
         // MEDIA TRIGGER LOGIC
         // ---------------------------------------------------------
-        // When a row becomes active, we trigger ALL media events in the same group.
-        // A group is defined by [Act, Scene, EventId].
         const activeGroupEvents = newEvents.filter(e =>
             e.act === currentEvent.act &&
             e.sceneId === currentEvent.sceneId &&
             e.eventId === currentEvent.eventId
         )
+        const { appSettings, playingMedia } = get()
+        const devices = appSettings.devices || []
+        const nextPlayingMedia: Record<string, { filename: string; timestamp: number }> = {}
+        const targetedDeviceIds = new Set<string>()
 
-        const { activeShow } = get()
-        const devices = activeShow?.devices || []
-
-        const getMediaUrl = (path: string) => {
-            if (!path) return ''
-            if (path.startsWith('http') || path.startsWith('file') || path.startsWith('ledshow-file')) return path
-            return `ledshow-file:///${path.replace(/\\/g, '/')}`
-        }
-
-        activeGroupEvents.forEach(evt => {
+        activeGroupEvents.forEach((evt: ShowEvent) => {
             if (evt.type?.toLowerCase() === 'media' && evt.filename) {
                 const targetName = (evt.fixture || '').trim().toLowerCase()
 
-                // Find matching devices (Local Monitor or Remote Ledwall)
+                // Find matching devices
                 const targets = devices.filter(d => {
                     const isTypeMatch = d.type === 'local_monitor' || d.type === 'remote_ledwall'
                     const isEnabled = (d as any).enabled !== false
@@ -411,33 +712,70 @@ export const useShowStore = create<ShowState>((set, get) => ({
                     return isTypeMatch && isEnabled && isNameMatch
                 })
 
-                if (targets.length === 0 && targetName) {
-                    console.warn(`No target devices found for media fixture: "${targetName}"`)
-                }
-
                 targets.forEach(device => {
-                    const mediaUrl = getMediaUrl(evt.filename || '')
+                    targetedDeviceIds.add(device.id)
+                    const mediaUrl = evt.filename || ''
                     const repeat = evt.effect === 'repeat'
                     const volume = evt.intensity !== undefined ? evt.intensity : 100
+                    const isLocal = device.type === 'local_monitor'
+                    const dLocal = isLocal ? device as LocalMonitorDevice : null
 
-                    if (device.type === 'local_monitor') {
-                        MediaPlayer.StartMediaPlayer(device, mediaUrl, repeat, volume, 0, undefined, evt.transition);
+                    // Conversion from seconds to milliseconds
+                    const deviceTransition = (dLocal?.transitionTime || 0) * 1000
+                    const transitionTime = evt.transition || deviceTransition || 0
+
+                    if (isLocal) {
+                        const alreadyPlaying = playingMedia[device.id]
+                        if (alreadyPlaying && alreadyPlaying.filename === evt.filename) {
+                            // Same file already playing? Just update loop/volume if needed
+                            MediaPlayer.SetRepeatMediaPlayer(device, repeat)
+                            MediaPlayer.SetVolumeMediaPlayer(device, volume, !evt.sound)
+                        } else if (alreadyPlaying) {
+                            // Transition to new file
+                            MediaPlayer.ChangeMediaPlayer(device, mediaUrl, transitionTime, repeat, volume, !evt.sound)
+                        } else {
+                            // Start new
+                            MediaPlayer.StartMediaPlayer(device, mediaUrl, repeat, volume, 0, undefined, transitionTime, !evt.sound)
+                        }
                     } else if (device.type === 'remote_ledwall') {
-                        networkService.sendCommand({
-                            type: 'MEDIA_CONTROL',
-                            action: 'play',
-                            payload: {
-                                url: mediaUrl,
-                                loop: repeat,
-                                volume: volume,
-                                mute: !evt.sound,
-                                deviceId: device.id
-                            }
-                        })
+                        MediaPlayer.StartMediaPlayer(device, mediaUrl, repeat, volume, 0, undefined, transitionTime, !evt.sound)
                     }
+
+                    nextPlayingMedia[device.id] = { filename: evt.filename || '', timestamp: Date.now() }
                 })
             }
         })
+
+        // Stop devices that were playing but are no longer targeted
+        Object.keys(playingMedia).forEach(deviceId => {
+            if (!targetedDeviceIds.has(deviceId)) {
+                const device = devices.find(d => d.id === deviceId)
+                if (device) {
+                    const dLocal = device.type === 'local_monitor' ? device as LocalMonitorDevice : null
+                    const fadeOutTime = (dLocal?.fadeOutTime || 0.5) * 1000
+                    MediaPlayer.StopMediaPlayer(device, fadeOutTime)
+                }
+            }
+        })
+
+        // ---------------------------------------------------------
+
+        // ---------------------------------------------------------
+        // LIGHT TRIGGER LOGIC
+        // ---------------------------------------------------------
+        activeGroupEvents.forEach((evt: ShowEvent) => {
+            if (evt.type?.toLowerCase() === 'light') {
+                // Send trigger to backend via network service (which emits socket event)
+                // The backend listens for 'EVENT_TRIGGER' and calls networkManager.processEvent
+                networkService.sendCommand({
+                    type: 'EVENT_TRIGGER',
+                    event: evt
+                })
+            }
+        })
+        // ---------------------------------------------------------
+
+        set({ playingMedia: nextPlayingMedia })
         // ---------------------------------------------------------
 
         get().updateBlinkRecommendations(index)
@@ -478,6 +816,12 @@ export const useShowStore = create<ShowState>((set, get) => ({
     },
 
     nextEvent: (force = false) => {
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            networkService.sendCommand({ type: 'REMOTE_CONTROL', action: 'nextEvent', force })
+            return
+        }
+
         const { activeEventIndex, events, blinkingNextEvent, navigationWarning } = get()
         if (activeEventIndex >= events.length - 1) return
 
@@ -496,6 +840,12 @@ export const useShowStore = create<ShowState>((set, get) => ({
     },
 
     nextScene: (force = false) => {
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            networkService.sendCommand({ type: 'REMOTE_CONTROL', action: 'nextScene', force })
+            return
+        }
+
         const { activeEventIndex, events, blinkingNextScene, navigationWarning } = get()
         const current = events[activeEventIndex]
         if (!current) return
@@ -512,6 +862,12 @@ export const useShowStore = create<ShowState>((set, get) => ({
     },
 
     nextAct: (force = false) => {
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            networkService.sendCommand({ type: 'REMOTE_CONTROL', action: 'nextAct', force })
+            return
+        }
+
         const { activeEventIndex, events, blinkingNextAct, navigationWarning } = get()
         const current = events[activeEventIndex]
         if (!current) return
@@ -555,8 +911,8 @@ export const useShowStore = create<ShowState>((set, get) => ({
                 }
             }
 
-            const devices = await ipcRenderer.invoke('db:get-devices', show.id)
-            set({ events, activeShow: { ...show, devices } })
+            set({ events, activeShow: show, isLocked: true }) // Default to Locked (Show Mode) when loading
+            get().broadcastState()
             localStorage.setItem('ledshow_last_show_id', show.id)
         }
     },
@@ -578,13 +934,22 @@ export const useShowStore = create<ShowState>((set, get) => ({
     updateActiveShowSidebarWidth: (width) => get().updateActiveShow({ sidebarWidth: width }),
 
     toggleCollapse: (id) => {
-        const { activeShow } = get()
-        if (activeShow) {
-            const currentGroups = activeShow.viewState?.collapsedGroups || {}
-            const newGroups = { ...currentGroups, [id]: !currentGroups[id] }
-            get().updateActiveShow({
-                viewState: { ...activeShow.viewState, collapsedGroups: newGroups }
-            })
+        const { activeShow, isLocked, runtimeCollapsedGroups } = get()
+
+        if (isLocked) {
+            // Show Mode: Update runtime state only (not saved)
+            set({ runtimeCollapsedGroups: { ...runtimeCollapsedGroups, [id]: !runtimeCollapsedGroups[id] } })
+        } else {
+            // Edit Mode: Update persistent state AND save
+            if (activeShow) {
+                const currentGroups = activeShow.viewState?.collapsedGroups || {}
+                const newGroups = { ...currentGroups, [id]: !currentGroups[id] }
+
+                // Also update runtime to keep UI responsive/synced if it uses that
+                set({ runtimeCollapsedGroups: { ...runtimeCollapsedGroups, [id]: !runtimeCollapsedGroups[id] } })
+
+                get().updateActiveShow({ viewState: { ...activeShow.viewState, collapsedGroups: newGroups } })
+            }
         }
     },
 
@@ -682,6 +1047,7 @@ export const useShowStore = create<ShowState>((set, get) => ({
                 partial: {
                     name: activeShow.name,
                     pdfPath: activeShow.pdfPath,
+                    totalPages: activeShow.totalPages || 0,
                     sidebarWidth: activeShow.sidebarWidth,
                     invertScriptColors: activeShow.invertScriptColors ? 1 : 0,
                     schedule: JSON.stringify(activeShow.schedule || {}),
@@ -689,9 +1055,6 @@ export const useShowStore = create<ShowState>((set, get) => ({
                 }
             })
             await ipcRenderer.invoke('db:save-sequences', { showId: activeShow.id, events })
-            if (activeShow.devices) {
-                await ipcRenderer.invoke('db:save-devices', { showId: activeShow.id, devices: activeShow.devices })
-            }
         }
     },
 
@@ -744,18 +1107,40 @@ export const useShowStore = create<ShowState>((set, get) => ({
 
             // Set available shows and app settings first; 
             // Also clear events if no active show to prevent stale data
+            const globalDevices = await ipcRenderer.invoke('db:get-devices', 'GLOBAL')
+
             set({
                 availableShows: available,
                 activeShow: null,
                 events: [],
                 activeEventIndex: -1,
-                appSettings
+                appSettings: { ...appSettings, devices: globalDevices || [] }
             })
 
+            networkService.registerClient()
             if (active) {
                 console.log('--- STORE: loading data for active show ---')
                 await get().setActiveShow(active)
             }
+            // --- Restore Client Settings ---
+            let uuid = localStorage.getItem('ledshow_client_uuid')
+            if (!uuid) {
+                uuid = 'client_' + Math.random().toString(36).substring(2, 15)
+                localStorage.setItem('ledshow_client_uuid', uuid)
+            }
+
+            const clientConfig = appSettings?.clientConfigs?.[uuid]
+            if (clientConfig) {
+                set({
+                    clientUUID: uuid,
+                    isCameraActive: clientConfig.isCameraActive ?? false,
+                    isSelfPreviewVisible: clientConfig.isSelfPreviewVisible ?? true,
+                    selectedCameraClients: clientConfig.selectedCameraClients ?? []
+                })
+            } else {
+                set({ clientUUID: uuid })
+            }
+
             console.log('--- STORE: initializeShows DONE ---')
         } catch (err) {
             console.error('--- STORE: initializeShows FAILED ---', err)
@@ -763,21 +1148,30 @@ export const useShowStore = create<ShowState>((set, get) => ({
     },
 
     updateAppSettings: async (partial) => {
-        const newSettings = { ...get().appSettings, ...partial }
+        const { appSettings } = get()
+        const newSettings = { ...appSettings, ...partial }
         set({ appSettings: newSettings })
+
         if ((window as any).require) {
             const { ipcRenderer } = (window as any).require('electron')
-            await ipcRenderer.invoke('db:update-app-settings', newSettings)
+            console.log('--- STORE: updateAppSettings (IPC partial) ---', partial);
+            await ipcRenderer.invoke('db:update-app-settings', partial)
         }
     },
 
-    importShow: async (name, xmlContent) => {
-        const trimmedName = (name || '').trim()
+    importShow: async (name: string, xmlContent: string, xmlPath?: string) => {
+        const xmlService = new XmlService()
+        const importedEvents = xmlService.parseShow(xmlContent, xmlPath)
+
+        let trimmedName = (name || '').trim()
+        if (!trimmedName && xmlPath) {
+            trimmedName = xmlPath.split(/[\\/]/).pop()?.replace(/\.xml$/i, '') || 'Imported Show'
+        }
+
         if (!trimmedName) {
             throw new Error('Show naam mag niet leeg zijn')
         }
-        const xmlService = new XmlService()
-        const importedEvents = xmlService.parseShow(xmlContent)
+
         const newId = `show_${Date.now()}`
         const newShow: ShowProfile = { id: newId, name: trimmedName, pdfPath: '', sidebarWidth: 500, invertScriptColors: false, schedule: {}, devices: [] }
 
@@ -797,27 +1191,41 @@ export const useShowStore = create<ShowState>((set, get) => ({
     },
 
     addDevice: (device) => {
-        const { activeShow } = get()
-        if (activeShow) {
-            const devices = [...(activeShow.devices || []), device]
-            get().updateActiveShow({ devices })
+        const { appSettings } = get()
+        const devices = [...(appSettings.devices || []), device]
+        set({ appSettings: { ...appSettings, devices } })
+
+        if ((window as any).require) {
+            const { ipcRenderer } = (window as any).require('electron')
+            ipcRenderer.invoke('db:save-devices', { showId: 'GLOBAL', devices })
         }
+        get().broadcastState()
     },
 
     updateDevice: (id, partial) => {
-        const { activeShow } = get()
-        if (activeShow?.devices) {
-            const devices = activeShow.devices.map(d => d.id === id ? { ...d, ...partial } as Device : d)
-            get().updateActiveShow({ devices })
+        const { appSettings } = get()
+        const devices = (appSettings.devices || []).map(d =>
+            d.id === id ? { ...d, ...partial } as Device : d
+        )
+        set({ appSettings: { ...appSettings, devices } })
+
+        if ((window as any).require) {
+            const { ipcRenderer } = (window as any).require('electron')
+            ipcRenderer.invoke('db:save-devices', { showId: 'GLOBAL', devices })
         }
+        get().broadcastState()
     },
 
     deleteDevice: (id) => {
-        const { activeShow } = get()
-        if (activeShow?.devices) {
-            const devices = activeShow.devices.filter(d => d.id !== id)
-            get().updateActiveShow({ devices })
+        const { appSettings } = get()
+        const devices = (appSettings.devices || []).filter(d => d.id !== id)
+        set({ appSettings: { ...appSettings, devices } })
+
+        if ((window as any).require) {
+            const { ipcRenderer } = (window as any).require('electron')
+            ipcRenderer.invoke('db:save-devices', { showId: 'GLOBAL', devices })
         }
+        get().broadcastState()
     },
 
     addEventAbove: (index, type = 'Scene', cue = '') => {
@@ -1092,47 +1500,40 @@ export const useShowStore = create<ShowState>((set, get) => ({
     },
 
     deleteGroup: (act, sceneId, eventId) => {
-        const { events, isLocked, activeEventIndex } = get()
-        if (isLocked) return
+        // Validation/Confirm moved to UI
+        const { events } = get()
         const newEvents = events.filter(e => !(e.act === act && e.sceneId === sceneId && e.eventId === eventId))
-        let newActive = activeEventIndex
-        if (newActive >= newEvents.length) newActive = newEvents.length - 1
-        set({ events: newEvents, activeEventIndex: newActive })
+        set({ events: newEvents })
         get().saveCurrentShow()
     },
 
+    // Delete Act
     deleteAct: (act) => {
-        const { events, isLocked, activeEventIndex } = get()
-        if (isLocked) return
-        if (!confirm(`Weet je zeker dat je ${act} en alle scenes/events daarin wilt verwijderen?`)) return
-
+        // Validation/Confirm moved to UI
+        const { events } = get()
         const newEvents = events.filter(e => e.act !== act)
-        let newActive = activeEventIndex
-        if (newActive >= newEvents.length) newActive = newEvents.length - 1
-
-        set({ events: newEvents, activeEventIndex: newActive })
+        set({ events: newEvents })
         get().saveCurrentShow()
     },
 
+    // Delete Scene
     deleteScene: (act, sceneId) => {
-        const { events, isLocked, activeEventIndex } = get()
-        if (isLocked) return
-        if (!confirm(`Weet je zeker dat je Scene ${sceneId} (in ${act}) wilt verwijderen?`)) return
-
+        // Validation/Confirm moved to UI
+        const { events } = get()
         const newEvents = events.filter(e => !(e.act === act && e.sceneId === sceneId))
-        let newActive = activeEventIndex
-        if (newActive >= newEvents.length) newActive = newEvents.length - 1
-
-        set({ events: newEvents, activeEventIndex: newActive })
+        set({ events: newEvents })
         get().saveCurrentShow()
     },
 
     updateEvent: (index, partial) => {
-        const { isLocked } = get()
-        if (isLocked) return
-        set(state => ({ events: state.events.map((e, i) => i === index ? { ...e, ...partial } : e) }))
+        const { events } = get()
+        const newEvents = [...events]
+        newEvents[index] = { ...newEvents[index], ...partial }
+        set({ events: newEvents })
+        // saveCurrentShow is debounced usually or we call it explicitly
         get().saveCurrentShow()
     },
+
 
     resendEvent: async (index) => {
         const event = get().events[index]
@@ -1152,12 +1553,12 @@ export const useShowStore = create<ShowState>((set, get) => ({
     },
 
     restartMedia: (index) => {
-        const { events, activeShow } = get()
+        const { events, appSettings } = get()
         const event = events[index]
         if (!event) return
 
         const targetName = (event.fixture || '').trim().toLowerCase()
-        const devices = activeShow?.devices || []
+        const devices = appSettings.devices || []
         const targets = devices.filter(d => {
             const isTypeMatch = d.type === 'local_monitor' || d.type === 'remote_ledwall'
             const isEnabled = (d as any).enabled !== false
@@ -1165,42 +1566,26 @@ export const useShowStore = create<ShowState>((set, get) => ({
             return isTypeMatch && isEnabled && isNameMatch
         })
 
-        const getMediaUrl = (path: string) => {
-            if (!path) return ''
-            if (path.startsWith('http') || path.startsWith('file') || path.startsWith('ledshow-file')) return path
-            return `ledshow-file:///${path.replace(/\\/g, '/')}`
-        }
-
+        const newPlaying = { ...get().playingMedia }
         targets.forEach(d => {
-            const mediaUrl = getMediaUrl(event.filename || '')
+            const mediaUrl = event.filename || ''
             const repeat = event.type === 'media' && event.effect === 'repeat'
             const volume = event.intensity !== undefined ? event.intensity : 100
+            const mute = !event.sound
 
-            if (d.type === 'local_monitor') {
-                MediaPlayer.StartMediaPlayer(d, mediaUrl, repeat, volume, 0, undefined, event.transition)
-            } else {
-                networkService.sendCommand({
-                    type: 'MEDIA_CONTROL',
-                    action: 'play',
-                    payload: {
-                        url: mediaUrl,
-                        loop: repeat,
-                        volume: volume,
-                        mute: !event.sound,
-                        deviceId: d.id
-                    }
-                })
-            }
+            MediaPlayer.StartMediaPlayer(d, mediaUrl, repeat, volume, 0, undefined, event.transition, mute)
+            newPlaying[d.id] = { filename: event.filename || '', timestamp: Date.now() }
         })
+        set({ playingMedia: newPlaying })
     },
 
     stopMedia: (index) => {
-        const { events, activeShow } = get()
+        const { events, appSettings } = get()
         const event = events[index]
         if (!event) return
 
         const targetName = (event.fixture || '').trim().toLowerCase()
-        const devices = activeShow?.devices || []
+        const devices = appSettings.devices || []
         const targets = devices.filter(d => {
             const isTypeMatch = d.type === 'local_monitor' || d.type === 'remote_ledwall'
             const isEnabled = (d as any).enabled !== false
@@ -1208,42 +1593,36 @@ export const useShowStore = create<ShowState>((set, get) => ({
             return isTypeMatch && isEnabled && isNameMatch
         })
 
+        const newPlaying = { ...get().playingMedia }
         targets.forEach(d => {
-            if (d.type === 'local_monitor') {
-                MediaPlayer.StopMediaPlayer(d, 500)
-            } else {
-                networkService.sendCommand({
-                    type: 'MEDIA_CONTROL',
-                    action: 'stop',
-                    payload: { deviceId: d.id }
-                })
-            }
+            const dLocal = d.type === 'local_monitor' ? d as LocalMonitorDevice : null
+            const fadeOutTime = (dLocal?.fadeOutTime || 0.5) * 1000
+            MediaPlayer.StopMediaPlayer(d, fadeOutTime)
+            delete newPlaying[d.id]
         })
+        set({ playingMedia: newPlaying })
     },
 
     stopAllMedia: () => {
-        const { activeShow } = get()
-        const devices = activeShow?.devices || []
+        const { appSettings } = get()
+        const devices = appSettings.devices || []
 
-        devices.filter(d => d.type === 'local_monitor' && (d as any).enabled !== false).forEach(d => {
+        devices.filter(d => (d.type === 'local_monitor' || d.type === 'remote_ledwall') && (d as any).enabled !== false).forEach(d => {
             MediaPlayer.StopMediaPlayer(d, 500)
         })
 
-        networkService.sendCommand({
-            type: 'MEDIA_CONTROL',
-            action: 'stop_all'
-        })
+        set({ playingMedia: {} })
     },
 
     setMediaVolume: (index: number, volume: number) => {
-        const { events, activeShow, updateEvent } = get()
+        const { events, appSettings, updateEvent } = get()
         const event = events[index]
         if (!event) return
 
         updateEvent(index, { intensity: volume })
 
         const targetName = (event.fixture || '').trim().toLowerCase()
-        const devices = activeShow?.devices || []
+        const devices = appSettings.devices || []
         const targets = devices.filter(d => {
             const isTypeMatch = d.type === 'local_monitor' || d.type === 'remote_ledwall'
             const isEnabled = (d as any).enabled !== false
@@ -1252,27 +1631,19 @@ export const useShowStore = create<ShowState>((set, get) => ({
         })
 
         targets.forEach(d => {
-            if (d.type === 'local_monitor') {
-                MediaPlayer.SetVolumeMediaPlayer(d, volume)
-            } else {
-                networkService.sendCommand({
-                    type: 'MEDIA_CONTROL',
-                    action: 'volume',
-                    payload: { deviceId: d.id, volume, mute: !event.sound }
-                })
-            }
+            MediaPlayer.SetVolumeMediaPlayer(d, volume, !event.sound)
         })
     },
 
     toggleAudio: async (index) => {
-        const { events, activeShow, updateEvent } = get()
+        const { events, appSettings, updateEvent } = get()
         const event = events[index]
         if (event) {
             const newState = !event.sound
             updateEvent(index, { sound: newState })
 
             const targetName = (event.fixture || '').trim().toLowerCase()
-            const devices = activeShow?.devices || []
+            const devices = appSettings.devices || []
             const targets = devices.filter(d => {
                 const isTypeMatch = d.type === 'local_monitor' || d.type === 'remote_ledwall'
                 const isEnabled = (d as any).enabled !== false
@@ -1282,28 +1653,20 @@ export const useShowStore = create<ShowState>((set, get) => ({
 
             targets.forEach(d => {
                 const vol = event.intensity !== undefined ? event.intensity : 100
-                if (d.type === 'local_monitor') {
-                    MediaPlayer.SetVolumeMediaPlayer(d, newState ? vol : 0)
-                } else {
-                    networkService.sendCommand({
-                        type: 'MEDIA_CONTROL',
-                        action: 'volume',
-                        payload: { deviceId: d.id, volume: vol, mute: !newState }
-                    })
-                }
+                MediaPlayer.SetVolumeMediaPlayer(d, vol, !newState)
             })
         }
     },
 
     toggleRepeat: async (index) => {
-        const { events, activeShow, updateEvent } = get()
+        const { events, appSettings, updateEvent } = get()
         const event = events[index]
         if (event) {
             const newState = event.effect !== 'repeat'
             updateEvent(index, { effect: newState ? 'repeat' : '' })
 
             const targetName = (event.fixture || '').trim().toLowerCase()
-            const devices = activeShow?.devices || []
+            const devices = appSettings.devices || []
             const targets = devices.filter(d => {
                 const isTypeMatch = d.type === 'local_monitor' || d.type === 'remote_ledwall'
                 const isEnabled = (d as any).enabled !== false
@@ -1312,34 +1675,117 @@ export const useShowStore = create<ShowState>((set, get) => ({
             })
 
             targets.forEach(d => {
-                if (d.type === 'local_monitor') {
-                    MediaPlayer.SetRepeatMediaPlayer(d, newState)
-                } else if (d.type === 'remote_ledwall') {
-                    networkService.sendCommand({
-                        type: 'MEDIA_CONTROL',
-                        action: 'toggle_repeat',
-                        payload: { deviceId: d.id, repeat: newState }
-                    })
-                }
+                MediaPlayer.SetRepeatMediaPlayer(d, newState)
             })
         }
     },
 
-    startProjection: (deviceId, monitorIndex) => {
-        if ((window as any).require) {
-            const { ipcRenderer } = (window as any).require('electron')
-            ipcRenderer.invoke('start-projection', { deviceId, monitorIndex })
+    copyToClipboard: async (event: ShowEvent) => {
+        if (!(window as any).require) return
+        const { ipcRenderer } = (window as any).require('electron')
+        await ipcRenderer.invoke('db:add-to-clipboard', { type: event.type, data: event })
+        await get().loadClipboard()
+    },
+
+    loadClipboard: async () => {
+        if (!(window as any).require) return
+        const { ipcRenderer } = (window as any).require('electron')
+        const items = await ipcRenderer.invoke('db:get-clipboard')
+        set({ clipboard: items })
+    },
+
+    removeFromClipboard: async (id: number) => {
+        if (!(window as any).require) return
+        const { ipcRenderer } = (window as any).require('electron')
+        await ipcRenderer.invoke('db:remove-from-clipboard', id)
+        await get().loadClipboard()
+    },
+
+    clearClipboard: async () => {
+        if (!(window as any).require) return
+        const { ipcRenderer } = (window as any).require('electron')
+        await ipcRenderer.invoke('db:clear-clipboard')
+        set({ clipboard: [] })
+    },
+
+    pasteEvent: (index, partialData) => {
+        const { events, isLocked } = get()
+        if (isLocked) return
+        const target = events[index]
+        if (!target) return
+
+        // Find last index in this group to maintain group order/integrity
+        let insertIdx = index
+        for (let i = index; i < events.length; i++) {
+            if (events[i].act === target.act && events[i].sceneId === target.sceneId && events[i].eventId === target.eventId) {
+                insertIdx = i
+            } else {
+                break
+            }
+        }
+        insertIdx += 1
+
+        const newEvent: ShowEvent = {
+            ...target, // Keep group IDs
+            ...partialData, // Overwrite with pasted data (or different device)
+            act: target.act,
+            sceneId: target.sceneId,
+            eventId: target.eventId
+        }
+
+        const newEvents = [...events]
+        newEvents.splice(insertIdx, 0, newEvent)
+        set({ events: newEvents })
+        get().saveCurrentShow()
+    },
+
+    startProjection: (deviceId, _monitorIndex) => {
+        const { appSettings } = get()
+        const device = appSettings.devices?.find(d => d.id === deviceId)
+        if (device) {
+            MediaPlayer.StartMediaPlayer(device, '', false, 0, 0)
         }
     },
 
     mediaAction: (deviceId, action, payload) => {
-        if ((window as any).require) {
-            const { ipcRenderer } = (window as any).require('electron')
-            ipcRenderer.send('media-command', {
-                deviceId,
-                command: action,
-                payload
-            })
+        const { appSettings } = get()
+        const device = appSettings.devices?.find(d => d.id === deviceId)
+        if (!device) return
+
+        switch (action) {
+            case 'play':
+                MediaPlayer.StartMediaPlayer(device, payload.url, payload.loop, payload.volume * 100, 0, undefined, payload.transitionTime, payload.mute)
+                break
+            case 'stop':
+                MediaPlayer.StopMediaPlayer(device, payload.fadeOutTime)
+                break
+            case 'volume':
+                MediaPlayer.SetVolumeMediaPlayer(device, payload.volume * 100, payload.mute)
+                break
+            case 'update':
+                if (payload.loop !== undefined) {
+                    MediaPlayer.SetRepeatMediaPlayer(device, payload.loop)
+                }
+                break
         }
-    }
+    },
+
+    openModal: (config) => {
+        set({
+            modalConfig: {
+                ...config,
+                isOpen: true,
+                onCancel: () => {
+                    if (config.onCancel) config.onCancel()
+                    get().closeModal()
+                },
+                onConfirm: (val: string | undefined) => {
+                    config.onConfirm(val)
+                    get().closeModal()
+                },
+                onClose: () => get().closeModal()
+            } as any
+        })
+    },
+    closeModal: () => set((state) => ({ modalConfig: { ...state.modalConfig, isOpen: false } })),
 }))

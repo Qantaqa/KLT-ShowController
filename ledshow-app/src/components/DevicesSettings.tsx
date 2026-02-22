@@ -6,13 +6,17 @@ import { twMerge } from 'tailwind-merge'
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
-import { useShowStore } from '../store/useShowStore'
-import type { Device, DeviceType, WLEDDevice, LocalMonitorDevice, RemoteLedwallDevice } from '../store/useShowStore'
-import { StartMediaPlayer, StopMediaPlayer, SetVolumeMediaPlayer } from '../services/media-player-service'
 
+import { useShowStore } from '../store/useShowStore'
+import type { Device, DeviceType, WLEDDevice, LocalMonitorDevice, RemoteLedwallDevice, WiZDevice, VideoWallAgentDevice } from '../store/useShowStore'
+import { StartMediaPlayer, StopMediaPlayer, SetVolumeMediaPlayer } from '../services/media-player-service'
+import { TurnOnWiz, SetWizColor, TurnOffWiz } from '../services/wiz-service'
+
+const LAYOUTS_4 = ['2x2', '1x1', '1x2', '1x3', '1x4', '4x1', '3x1', '2x1'];
+const LAYOUTS_9 = ['1x1', '1x2', '1x3', '1x4', '2x1', '2x2', '2x3', '2x4', '3x1', '3x2', '3x3', '4x1', '4x2'];
 
 const DevicesSettings: React.FC = () => {
-    const { activeShow, addDevice, updateDevice, deleteDevice } = useShowStore()
+    const { appSettings, addDevice, updateDevice, deleteDevice, openModal, addToast } = useShowStore()
     const [expandedDevice, setExpandedDevice] = useState<string | null>(null)
     const [isScanning, setIsScanning] = useState(false)
     const [scanResults, setScanResults] = useState<any[]>([])
@@ -47,19 +51,26 @@ const DevicesSettings: React.FC = () => {
                 setScanResults(results)
 
                 // Calculate unreachable devices
-                const currentDevices = useShowStore.getState().activeShow?.devices || []
+                const currentDevices = useShowStore.getState().appSettings.devices || []
                 const foundIps = new Set(results.map(r => r.ip))
                 const foundMacs = new Set(results.map(r => r.mac).filter(Boolean))
 
                 const unreachable = new Set<string>()
                 currentDevices.forEach(d => {
                     const isFound = (d as any).ip && (foundIps.has((d as any).ip) || (d.mac && foundMacs.has(d.mac)))
-                    // Local monitors are always "reachable" in this context (or ignored)
                     if (d.type !== 'local_monitor' && !isFound) {
                         unreachable.add(d.id)
                     }
                 })
                 setUnreachableDevices(unreachable)
+
+                // Auto-process VideoWall Agents (always update/add)
+                const agentResults = results.filter(r => r.type === 'ledwall_agent');
+                if (agentResults.length > 0) {
+                    agentResults.forEach(agent => {
+                        handleAddFromScan(agent, true);
+                    });
+                }
 
             } catch (e) {
                 console.error(e)
@@ -71,9 +82,10 @@ const DevicesSettings: React.FC = () => {
         setIsScanning(false)
     }
 
-    const handleAddFromScan = (device: any) => {
+    const handleAddFromScan = (device: any, isAuto = false) => {
         // Check if device already exists
-        const existingDevice = (activeShow?.devices || []).find(d =>
+        const currentDevices = useShowStore.getState().appSettings.devices || [];
+        const existingDevice = currentDevices.find(d =>
             (d.mac && device.mac && d.mac === device.mac) ||
             ((d as any).ip === device.ip)
         );
@@ -85,9 +97,19 @@ const DevicesSettings: React.FC = () => {
                 mac: device.mac || existingDevice.mac
             };
 
+            // For auto-updates, avoid overriding names if they were customized, 
+            // but update technical config if it changed.
+            // If manual (not isAuto), we prioritize the scanned info.
+            if (device.type === 'ledwall_agent') {
+                if (!isAuto || existingDevice.name.startsWith('VideoWall') || existingDevice.name.startsWith('TestWall')) {
+                    updates.name = device.name || existingDevice.name;
+                }
+                (updates as any).model = device.details?.model || (existingDevice as any).model;
+                (updates as any).layout = device.details?.layout || (existingDevice as any).layout;
+                (updates as any).orientation = device.details?.orientation || (existingDevice as any).orientation;
+            }
+
             if (device.type === 'wled') {
-                // Determine if we should update segments. Attempt to preserve existing logic if names are custom?
-                // For now, accept the scanned segments as truth for hardware config.
                 const segmentCount = device.details?.leds?.segs?.length || 1;
                 const segments = Array.from({ length: segmentCount }, (_, i) => ({
                     id: i,
@@ -96,9 +118,23 @@ const DevicesSettings: React.FC = () => {
                 (updates as any).segments = segments;
             }
 
-            updateDevice(existingDevice.id, updates);
-            // Remove from scan results (visual cleanup)
-            // setScanResults(prev => prev.filter(p => p.ip !== device.ip)); // Optional: keep it to show it's done?
+            // Only update and toast if something actually changed or if it's manual
+            const hasChanges = (existingDevice as any).ip !== device.ip ||
+                ((updates as any).name && (existingDevice as any).name !== (updates as any).name) ||
+                (device.type === 'ledwall_agent' && (
+                    (existingDevice as any).model !== (updates as any).model ||
+                    (existingDevice as any).layout !== (updates as any).layout ||
+                    (existingDevice as any).orientation !== (updates as any).orientation
+                ));
+
+            if (hasChanges || !isAuto) {
+                updateDevice(existingDevice.id, updates);
+                if (isAuto && hasChanges) {
+                    addToast(`VideoWall "${existingDevice.name}" automatisch bijgewerkt naar ${device.ip}`, "info");
+                } else if (!isAuto) {
+                    addToast(`${existingDevice.name} bijgewerkt`, "info");
+                }
+            }
         } else {
             // Add new
             const id = `device_${Date.now()}`
@@ -132,19 +168,25 @@ const DevicesSettings: React.FC = () => {
             } else if (device.type === 'ledwall_agent') {
                 newDevice = {
                     id,
-                    name: device.name || 'LedWall Agent',
-                    type: 'remote_ledwall',
+                    name: device.name || 'VideoWall Agent',
+                    type: 'videowall_agent',
                     enabled: true,
                     ip: device.ip,
+                    port: 3000,
                     mac: device.mac,
-                    width: 1920,
-                    height: 1080,
-                    orientation: 'landscape'
+                    model: device.details?.model || '4-screen',
+                    layout: device.details?.layout || '2x2',
+                    orientation: device.details?.orientation || 'landscape'
                 }
             }
 
             if (newDevice) {
                 addDevice(newDevice)
+                if (isAuto) {
+                    addToast(`Nieuwe VideoWall "${newDevice.name}" automatisch toegevoegd`, "info");
+                } else {
+                    addToast(`${newDevice.name} toegevoegd`, "info");
+                }
                 // Mark as processed to hide from list
                 setProcessedScanResults(prev => new Set([...prev, device.ip]))
             }
@@ -155,9 +197,7 @@ const DevicesSettings: React.FC = () => {
         setProcessedScanResults(prev => new Set([...prev, ip]))
     }
 
-    if (!activeShow) return null
-
-    const devices = activeShow.devices || []
+    const devices = appSettings.devices || []
 
     const handleAddDevice = (type: DeviceType) => {
         const id = `device_${Date.now()}`
@@ -176,6 +216,9 @@ const DevicesSettings: React.FC = () => {
             case 'remote_ledwall':
                 newDevice = { id, name: 'Remote Ledwall', type, enabled: true, ip: '', width: 1920, height: 1080, orientation: 'landscape' }
                 break
+            case 'videowall_agent':
+                newDevice = { id, name: 'Nieuwe VideoWall Agent', type, enabled: true, ip: '', port: 3000, model: '4-screen', layout: '2x2', orientation: 'landscape' }
+                break
         }
 
         addDevice(newDevice)
@@ -189,16 +232,40 @@ const DevicesSettings: React.FC = () => {
             const { ipcRenderer } = (window as any).require('electron')
 
             if (device.type === 'local_monitor') {
+                const monitor = device as LocalMonitorDevice;
                 const testVideoPath = await ipcRenderer.invoke('get-test-video-path');
                 if (testVideoPath) {
-                    await StartMediaPlayer(device, testVideoPath, true, 100, 0);
-                    // Reset test volume tracking
+                    const fadeInTime = (monitor.transitionTime || 0.5) * 1000;
+                    const transitionTime = (monitor.transitionTime || 0.5) * 1000;
+
+                    await StartMediaPlayer(device, testVideoPath, true, 100, fadeInTime, undefined, transitionTime);
                     setTestVolumes(prev => ({ ...prev, [device.id]: 100 }))
+                    addToast(`Test gestart op monitor: ${device.name}`, "info");
                 } else {
-                    alert("Test video not found!");
+                    addToast("Test video bestand niet gevonden!", "error");
+                }
+            } else if (device.type === 'wiz') {
+                const wiz = device as WiZDevice;
+                try {
+                    // Turn on with fade in
+                    await TurnOnWiz(wiz, 100);
+
+                    const transitionMs = (wiz.transitionTime || 0.5) * 1000;
+
+                    // Cycle colors with transition
+                    setTimeout(() => SetWizColor(wiz, 255, 0, 0), 1000);
+                    setTimeout(() => SetWizColor(wiz, 0, 255, 0), 1000 + transitionMs + 500);
+                    setTimeout(() => SetWizColor(wiz, 0, 0, 255), 1000 + (transitionMs + 500) * 2);
+
+                    // Turn off with fade out
+                    setTimeout(() => TurnOffWiz(wiz), 1000 + (transitionMs + 500) * 3 + 1000);
+
+                    addToast(`Test gestart voor WiZ: ${device.name}`, "info");
+                } catch (e) {
+                    addToast("WiZ Test mislukt!", "error");
                 }
             } else {
-                // Keep original logic for other device types for now, or move them to service later
+                // Keep original logic for WLED
                 await ipcRenderer.invoke('test-device', device)
             }
         }
@@ -238,6 +305,7 @@ const DevicesSettings: React.FC = () => {
             case 'wiz': return <Wifi className="w-4 h-4 text-blue-400" />
             case 'local_monitor': return <Monitor className="w-4 h-4" />
             case 'remote_ledwall': return <Tv className="w-4 h-4" />
+            case 'videowall_agent': return <Tv className="w-4 h-4 text-primary" />
         }
     }
 
@@ -287,6 +355,12 @@ const DevicesSettings: React.FC = () => {
                         className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2"
                     >
                         <Plus className="w-3 h-3" /> Monitor
+                    </button>
+                    <button
+                        onClick={() => handleAddDevice('videowall_agent')}
+                        className="px-3 py-1 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2"
+                    >
+                        <Plus className="w-3 h-3" /> Agent
                     </button>
                     <button
                         onClick={() => handleAddDevice('remote_ledwall')}
@@ -431,26 +505,54 @@ const DevicesSettings: React.FC = () => {
                                                 </div>
                                             )}
                                             {device.type === 'local_monitor' && (
-                                                <div className="space-y-1.5 col-span-2">
-                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Fysiek Scherm</label>
-                                                    <select
-                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all appearance-none"
-                                                        value={(device as LocalMonitorDevice).monitorId}
-                                                        onChange={e => updateDevice(device.id, { monitorId: parseInt(e.target.value) } as any)}
-                                                        title="Selecteer Fysiek Scherm"
-                                                    >
-                                                        {displays.length > 0 ? (
-                                                            displays.map((d: any) => (
-                                                                <option key={d.id} value={d.index} className="bg-[#1a1a1a]">{d.label}</option>
-                                                            ))
-                                                        ) : (
-                                                            <option value={1} className="bg-[#1a1a1a]">Scherm 1</option>
-                                                        )}
-                                                    </select>
-                                                    <p className="text-[9px] opacity-30 px-1 italic">
-                                                        Dit is het fysieke scherm van de host machine waarop dit venster wordt getoond.
-                                                    </p>
-                                                </div>
+                                                <>
+                                                    <div className="space-y-1.5 col-span-2">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Fysiek Scherm</label>
+                                                        <select
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all appearance-none"
+                                                            value={(device as LocalMonitorDevice).monitorId}
+                                                            onChange={e => updateDevice(device.id, { monitorId: parseInt(e.target.value) } as any)}
+                                                            title="Selecteer Fysiek Scherm"
+                                                        >
+                                                            {displays.length > 0 ? (
+                                                                displays.map((d: any) => (
+                                                                    <option key={d.id} value={d.index} className="bg-[#1a1a1a]">{d.label}</option>
+                                                                ))
+                                                            ) : (
+                                                                <option value={1} className="bg-[#1a1a1a]">Scherm 1</option>
+                                                            )}
+                                                        </select>
+                                                        <p className="text-[9px] opacity-30 px-1 italic">
+                                                            Dit is het fysieke scherm van de host machine waarop dit venster wordt getoond.
+                                                        </p>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-4 mt-4 col-span-2">
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Fade-out tijd (sec)</label>
+                                                            <input
+                                                                type="number"
+                                                                step="0.1"
+                                                                min="0"
+                                                                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                                value={(device as LocalMonitorDevice).fadeOutTime !== undefined ? (device as LocalMonitorDevice).fadeOutTime : 0.5}
+                                                                placeholder="0.5"
+                                                                onChange={e => updateDevice(device.id, { fadeOutTime: parseFloat(e.target.value) || 0 } as any)}
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Transitie tijd (sec)</label>
+                                                            <input
+                                                                type="number"
+                                                                step="0.1"
+                                                                min="0"
+                                                                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                                value={(device as LocalMonitorDevice).transitionTime !== undefined ? (device as LocalMonitorDevice).transitionTime : 0.5}
+                                                                placeholder="0.5"
+                                                                onChange={e => updateDevice(device.id, { transitionTime: parseFloat(e.target.value) || 0 } as any)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </>
                                             )}
                                         </div>
 
@@ -503,47 +605,219 @@ const DevicesSettings: React.FC = () => {
                                             </div>
                                         )}
 
-                                        {device.type === 'remote_ledwall' && (
-                                            <div className="grid grid-cols-3 gap-4">
+                                        {device.type === 'wiz' && (
+                                            <div className="grid grid-cols-3 gap-4 mt-2">
                                                 <div className="space-y-1.5">
-                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Breedte</label>
+                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Fade-in (sec)</label>
                                                     <input
-                                                        type="number"
-                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all"
-                                                        value={(device as RemoteLedwallDevice).width}
-                                                        placeholder="1920"
-                                                        aria-label="Breedte"
-                                                        onChange={e => updateDevice(device.id, { width: parseInt(e.target.value) } as any)}
+                                                        type="number" step="0.1" min="0"
+                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                        value={(device as WiZDevice).fadeInTime ?? 0.5}
+                                                        title="Fade-in tijd in seconden"
+                                                        placeholder="0.5"
+                                                        onChange={e => updateDevice(device.id, { fadeInTime: parseFloat(e.target.value) || 0 } as any)}
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Hoogte</label>
+                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Fade-out (sec)</label>
                                                     <input
-                                                        type="number"
-                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all"
-                                                        value={(device as RemoteLedwallDevice).height}
-                                                        placeholder="1080"
-                                                        aria-label="Hoogte"
-                                                        onChange={e => updateDevice(device.id, { height: parseInt(e.target.value) } as any)}
+                                                        type="number" step="0.1" min="0"
+                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                        value={(device as WiZDevice).fadeOutTime ?? 0.5}
+                                                        title="Fade-out tijd in seconden"
+                                                        placeholder="0.5"
+                                                        onChange={e => updateDevice(device.id, { fadeOutTime: parseFloat(e.target.value) || 0 } as any)}
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Orientatie</label>
-                                                    <select
-                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all appearance-none"
-                                                        value={(device as RemoteLedwallDevice).orientation}
-                                                        aria-label="Orientatie"
-                                                        title="Scherm Oriëntatie"
-                                                        onChange={e => updateDevice(device.id, { orientation: e.target.value as any } as any)}
-                                                    >
-                                                        <option value="landscape" className="bg-[#1a1a1a]">Landscape</option>
-                                                        <option value="portrait" className="bg-[#1a1a1a]">Portrait</option>
-                                                    </select>
+                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Kleur-tijd (sec)</label>
+                                                    <input
+                                                        type="number" step="0.1" min="0"
+                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                        value={(device as WiZDevice).transitionTime ?? 0.5}
+                                                        title="Kleur-transitie tijd in seconden"
+                                                        placeholder="0.5"
+                                                        onChange={e => updateDevice(device.id, { transitionTime: parseFloat(e.target.value) || 0 } as any)}
+                                                    />
                                                 </div>
                                             </div>
                                         )}
 
-                                        <div className="flex items-center justify-between pt-2">
+                                        {device.type === 'videowall_agent' && (
+                                            <div className="space-y-4">
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Poort</label>
+                                                        <input
+                                                            type="number"
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                            value={(device as VideoWallAgentDevice).port || 3000}
+                                                            title="Netwerk Poort"
+                                                            placeholder="3000"
+                                                            onChange={e => updateDevice(device.id, { port: parseInt(e.target.value) } as any)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Model</label>
+                                                        <select
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all appearance-none"
+                                                            value={(device as VideoWallAgentDevice).model}
+                                                            title="VideoWall Model"
+                                                            onChange={e => updateDevice(device.id, { model: e.target.value as any } as any)}
+                                                        >
+                                                            <option value="4-screen" className="bg-[#1a1a1a]">4 Schermen</option>
+                                                            <option value="9-screen" className="bg-[#1a1a1a]">9 Schermen</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Orientatie</label>
+                                                        <select
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all appearance-none"
+                                                            value={(device as VideoWallAgentDevice).orientation}
+                                                            title="Scherm Oriëntatie"
+                                                            onChange={e => updateDevice(device.id, { orientation: e.target.value as any } as any)}
+                                                        >
+                                                            <option value="landscape" className="bg-[#1a1a1a]">Landscape</option>
+                                                            <option value="portrait" className="bg-[#1a1a1a]">Portrait</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-1 gap-2">
+                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Layout</label>
+                                                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                                                        {((device as VideoWallAgentDevice).model === '4-screen' ? LAYOUTS_4 : LAYOUTS_9).map(layout => (
+                                                            <button
+                                                                key={layout}
+                                                                onClick={() => updateDevice(device.id, { layout } as any)}
+                                                                className={cn(
+                                                                    "px-2 py-1.5 rounded-lg text-[10px] font-bold border transition-all",
+                                                                    (device as VideoWallAgentDevice).layout === layout
+                                                                        ? "bg-primary text-black border-primary"
+                                                                        : "bg-white/5 text-white/40 border-white/10 hover:border-white/20"
+                                                                )}
+                                                            >
+                                                                {layout}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-4 gap-4 mt-2">
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Fade-In (sec)</label>
+                                                        <input
+                                                            type="number" step="0.1" min="0"
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                            value={(device as VideoWallAgentDevice).fadeInTime ?? 0.5}
+                                                            title="Fade-In tijd in seconden"
+                                                            placeholder="0.5"
+                                                            onChange={e => updateDevice(device.id, { fadeInTime: parseFloat(e.target.value) || 0 } as any)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Fade-Out (sec)</label>
+                                                        <input
+                                                            type="number" step="0.1" min="0"
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                            value={(device as VideoWallAgentDevice).fadeOutTime ?? 0.5}
+                                                            title="Fade-Out tijd in seconden"
+                                                            placeholder="0.5"
+                                                            onChange={e => updateDevice(device.id, { fadeOutTime: parseFloat(e.target.value) || 0 } as any)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Crossover (sec)</label>
+                                                        <input
+                                                            type="number" step="0.1" min="0"
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                            value={(device as VideoWallAgentDevice).crossoverTime ?? 1.0}
+                                                            title="Crossover tijd in seconden"
+                                                            placeholder="1.0"
+                                                            onChange={e => updateDevice(device.id, { crossoverTime: parseFloat(e.target.value) || 0 } as any)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1 block">Repeat</label>
+                                                        <button
+                                                            onClick={() => updateDevice(device.id, { repeat: !(device as VideoWallAgentDevice).repeat } as any)}
+                                                            className={cn(
+                                                                "w-full px-3 py-2 rounded-lg text-sm font-bold border transition-all flex items-center justify-center gap-2",
+                                                                (device as VideoWallAgentDevice).repeat
+                                                                    ? "bg-primary/20 text-primary border-primary/30"
+                                                                    : "bg-white/5 text-white/40 border-white/10"
+                                                            )}
+                                                        >
+                                                            <RefreshCw className={cn("w-3.5 h-3.5", (device as VideoWallAgentDevice).repeat && "animate-spin-slow")} />
+                                                            {(device as VideoWallAgentDevice).repeat ? 'Aan' : 'Uit'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2 mt-2">
+                                                    <div className="flex justify-between items-center px-1">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase">Bezel / Scherm Ruimte (px)</label>
+                                                        <span className="text-[10px] font-mono opacity-60">{(device as VideoWallAgentDevice).bezelSize ?? 0}px</span>
+                                                    </div>
+                                                    <input
+                                                        type="range"
+                                                        min="0"
+                                                        max="20"
+                                                        step="1"
+                                                        className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary"
+                                                        value={(device as VideoWallAgentDevice).bezelSize ?? 0}
+                                                        onChange={e => updateDevice(device.id, { bezelSize: parseInt(e.target.value) } as any)}
+                                                        title="Bezel / Ruimte tussen schermen"
+                                                    />
+                                                    <p className="text-[9px] opacity-30 italic px-1">
+                                                        Dit beïnvloedt de weergave in de preview zodat je rekening kunt houden met de fysieke randen van de schermen.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {
+                                            device.type === 'remote_ledwall' && (
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Breedte</label>
+                                                        <input
+                                                            type="number"
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all"
+                                                            value={(device as RemoteLedwallDevice).width}
+                                                            title="Breedte"
+                                                            placeholder="1920"
+                                                            aria-label="Breedte"
+                                                            onChange={e => updateDevice(device.id, { width: parseInt(e.target.value) } as any)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Hoogte</label>
+                                                        <input
+                                                            type="number"
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all"
+                                                            value={(device as RemoteLedwallDevice).height}
+                                                            title="Hoogte"
+                                                            placeholder="1080"
+                                                            aria-label="Hoogte"
+                                                            onChange={e => updateDevice(device.id, { height: parseInt(e.target.value) } as any)}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Orientatie</label>
+                                                        <select
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all appearance-none"
+                                                            value={(device as RemoteLedwallDevice).orientation}
+                                                            aria-label="Orientatie"
+                                                            title="Scherm Oriëntatie"
+                                                            onChange={e => updateDevice(device.id, { orientation: e.target.value as any } as any)}
+                                                        >
+                                                            <option value="landscape" className="bg-[#1a1a1a]">Landscape</option>
+                                                            <option value="portrait" className="bg-[#1a1a1a]">Portrait</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+
+                                        < div className="flex items-center justify-between pt-2" >
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => updateDevice(device.id, { enabled: !device.enabled })}
@@ -609,9 +883,12 @@ const DevicesSettings: React.FC = () => {
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation()
-                                                    if (confirm('Weet je zeker dat je dit apparaat wilt verwijderen?')) {
-                                                        deleteDevice(device.id)
-                                                    }
+                                                    openModal({
+                                                        title: 'Apparaat Verwijderen',
+                                                        message: `Weet je zeker dat je apparaat "${device.name}" wilt verwijderen?`,
+                                                        type: 'confirm',
+                                                        onConfirm: () => deleteDevice(device.id)
+                                                    })
                                                 }}
                                                 className="px-3 py-1.5 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-2"
                                                 title="Verwijder apparaat"
@@ -627,13 +904,14 @@ const DevicesSettings: React.FC = () => {
                                             <ChevronDown className="w-3 h-3 rotate-180" />
                                         </div>
                                     </div>
-                                )}
-                            </div>
+                                )
+                                }
+                            </div >
                         )
                     })
                 )}
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }
 
