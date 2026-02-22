@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react'
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import {
     MoreVertical,
@@ -24,20 +24,13 @@ import {
     Repeat,
     FolderOpen,
     Monitor,
-    MousePointer2,
     Pipette,
     Copy,
     ClipboardPaste
 } from 'lucide-react'
-import { useShowStore } from '../store/useShowStore'
-import { getMediaUrl } from '../services/media-player-service'
+import { useShowStore, type Device } from '../store/useShowStore'
 import type { ShowEvent, ClipboardItem } from '../services/xml-service'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs))
-}
+import { cn } from '../lib/utils'
 
 interface RenamableInputProps {
     value: string
@@ -169,6 +162,20 @@ const LightConfigurator: React.FC<{
         }
     }
 
+    const appSettings = useShowStore(s => s.appSettings)
+    const serverIp = appSettings.serverIp || window.location.hostname;
+    const FILE_PORT = (appSettings.serverPort || 3001) + 1;
+
+    const getEffectPreviewUrl = (id: number | undefined) => {
+        if (id === undefined || id < 0) return null;
+        return `http://${serverIp}:${FILE_PORT}/wled/effects/${id}.gif`;
+    }
+
+    const getPalettePreviewUrl = (id: number | undefined) => {
+        if (id === undefined || id < 0) return null;
+        return `http://${serverIp}:${FILE_PORT}/wled/palettes/${id}.gif`;
+    }
+
     return (
         <div className="flex flex-col gap-2 p-2 bg-black/40 rounded border border-white/10 mt-2 relative">
             {loading && <div className="absolute top-2 right-2"><Loader2 className="w-3 h-3 animate-spin text-white/50" /></div>}
@@ -244,8 +251,8 @@ const LightConfigurator: React.FC<{
             </div>
 
             {selectedDevice?.type === 'wled' && (
-                <div className="grid grid-cols-2 gap-2 text-[10px]">
-                    <div className="col-span-2 flex gap-2">
+                <div className="grid grid-cols-12 gap-2 text-[10px]">
+                    <div className="col-span-12 flex gap-2">
                         <select
                             title="WLED Segment Selectie"
                             className="flex-1 bg-zinc-900 border border-white/10 rounded px-2 py-1 outline-none"
@@ -273,44 +280,91 @@ const LightConfigurator: React.FC<{
                         />
                     </div>
 
-                    <div className="space-y-1">
-                        <label className="opacity-50 block">Effect</label>
-                        <select
-                            title="Effect Selectie"
-                            className="w-full bg-zinc-900 border border-white/10 rounded px-1 py-1 outline-none"
-                            value={event.effect || ''}
-                            onChange={(e) => {
-                                const idx = e.target.selectedIndex;
-                                // effects array matches WLED ID order
-                                updateEvent({ effect: e.target.value, effectId: idx - 1 } as any)
-                            }}
-                        >
-                            <option value="">Geen Effect</option>
-                            {wledEffects.map((eff, idx) => (
-                                <option key={idx} value={eff}>{eff}</option>
-                            ))}
-                        </select>
+                    <div className="col-span-12 grid grid-cols-2 gap-2">
+                        <div className="flex gap-2 min-w-0">
+                            <div className="flex-1 space-y-1 min-w-0">
+                                <label className="opacity-50 block font-bold uppercase tracking-tighter text-[8px]">Effect</label>
+                                <select
+                                    title="Effect Selectie"
+                                    className="w-full bg-zinc-900 border border-white/10 rounded px-1 py-1 outline-none truncate"
+                                    value={event.effect || ''}
+                                    onChange={(e) => {
+                                        const idx = e.target.selectedIndex;
+                                        // effects array matches WLED ID order
+                                        updateEvent({ effect: e.target.value, effectId: idx - 1 } as any)
+                                    }}
+                                >
+                                    <option value="">Geen Effect</option>
+                                    {wledEffects.map((eff, idx) => (
+                                        <option key={idx} value={eff}>{eff}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            {(event as any).effectId !== undefined && (event as any).effectId >= 0 && (
+                                <div className="w-12 h-10 shrink-0 bg-black rounded border border-white/10 overflow-hidden relative group/prev-eff mt-4 self-end">
+                                    <img
+                                        src={getEffectPreviewUrl((event as any).effectId)!}
+                                        alt="Effect"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => (e.target as HTMLImageElement).src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
+                                    />
+                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/prev-eff:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                        <Info className="w-3 h-3 text-white" />
+                                    </div>
+                                    <div className="fixed hidden group-hover/prev-eff:block z-[250] pointer-events-none p-1 bg-[#111] border border-white/20 rounded shadow-2xl animate-in fade-in zoom-in-95 duration-200" style={{ transform: 'translate(40px, -60px)' }}>
+                                        <img
+                                            src={getEffectPreviewUrl((event as any).effectId)!}
+                                            alt="Preview"
+                                            className="w-48 aspect-video object-cover rounded"
+                                            onError={(e) => (e.target as HTMLImageElement).src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
+                                        />
+                                        <div className="mt-1 px-1 py-0.5 text-[8px] font-bold uppercase tracking-widest text-center text-primary">{event.effect}</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex gap-2 min-w-0">
+                            <div className="flex-1 space-y-1 min-w-0">
+                                <label className="opacity-50 block font-bold uppercase tracking-tighter text-[8px]">Palette</label>
+                                <select
+                                    title="Palette Selectie"
+                                    className="w-full bg-zinc-900 border border-white/10 rounded px-1 py-1 outline-none truncate"
+                                    value={event.palette || ''}
+                                    onChange={(e) => {
+                                        const idx = e.target.selectedIndex;
+                                        updateEvent({ palette: e.target.value, paletteId: idx - 1 } as any)
+                                    }}
+                                >
+                                    <option value="">Geen Palette</option>
+                                    {wledPalettes.map((pal, idx) => (
+                                        <option key={idx} value={pal}>{pal}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            {(event as any).paletteId !== undefined && (event as any).paletteId >= 0 && (
+                                <div className="w-12 h-10 shrink-0 bg-black rounded border border-white/10 overflow-hidden relative group/prev-pal mt-4 self-end">
+                                    <img
+                                        src={getPalettePreviewUrl((event as any).paletteId)!}
+                                        alt="Palette"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => (e.target as HTMLImageElement).src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
+                                    />
+                                    <div className="fixed hidden group-hover/prev-pal:block z-[250] pointer-events-none p-1 bg-[#111] border border-white/20 rounded shadow-2xl animate-in fade-in zoom-in-95 duration-200" style={{ transform: 'translate(40px, -60px)' }}>
+                                        <img
+                                            src={getPalettePreviewUrl((event as any).paletteId)!}
+                                            alt="Preview"
+                                            className="w-48 aspect-video object-cover rounded"
+                                            onError={(e) => (e.target as HTMLImageElement).src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
+                                        />
+                                        <div className="mt-1 px-1 py-0.5 text-[8px] font-bold uppercase tracking-widest text-center text-primary">{event.palette}</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="space-y-1">
-                        <label className="opacity-50 block">Palette</label>
-                        <select
-                            title="Palette Selectie"
-                            className="w-full bg-zinc-900 border border-white/10 rounded px-1 py-1 outline-none"
-                            value={event.palette || ''}
-                            onChange={(e) => {
-                                const idx = e.target.selectedIndex;
-                                updateEvent({ palette: e.target.value, paletteId: idx - 1 } as any)
-                            }}
-                        >
-                            <option value="">Geen Palette</option>
-                            {wledPalettes.map((pal, idx) => (
-                                <option key={idx} value={pal}>{pal}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="space-y-1">
+                    <div className="col-span-6 space-y-1">
                         <label className="opacity-50 flex justify-between"><span>Speed</span> <span>{event.speed}</span></label>
                         <input
                             title="Effect Snelheid"
@@ -321,7 +375,7 @@ const LightConfigurator: React.FC<{
                             className="w-full h-1 bg-white/10 rounded appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
                         />
                     </div>
-                    <div className="space-y-1">
+                    <div className="col-span-6 space-y-1">
                         <label className="opacity-50 flex justify-between"><span>Intensity</span> <span>{event.intensity}</span></label>
                         <input
                             title="Effect Intensiteit"
@@ -378,7 +432,7 @@ const RowItem: React.FC<{
     selectedEvent: ShowEvent | null
 }> = ({
     event, originalIndex, isActiveGroup, isNextGroup, handleRowClick, handleRowDoubleClick,
-    editingIndex, setEditingIndex, menuOpenIndex, setMenuOpenIndex, activeShow, isLocked,
+    editingIndex, setEditingIndex, menuOpenIndex, setMenuOpenIndex, isLocked,
     activeEventIndex, eventStatuses, selectedEventIndex, selectedEvent
 }) => {
         const [currentTime, setCurrentTime] = useState(new Date())
@@ -482,20 +536,56 @@ const RowItem: React.FC<{
         const status = eventStatuses[originalIndex]
         const videoRef = useRef<HTMLVideoElement>(null)
 
-        // Sync Playback for Active Row
+        const appSettings = useShowStore(s => s.appSettings)
+        const serverIp = appSettings.serverIp || window.location.hostname;
+        const SOCKET_PORT = appSettings.serverPort || 3001;
+        const FILE_PORT = SOCKET_PORT + 1;
+
+        const getMediaUrlWithContext = (path: string) => {
+            if (!path) return '';
+            if (path.startsWith('http') || path.startsWith('ledshow-file')) return path;
+            return `http://${serverIp}:${FILE_PORT}/media?path=${encodeURIComponent(path)}`;
+        };
+
+        const getDevices = useCallback(() => appSettings.devices || [], [appSettings.devices])
+
+        const playingMedia = useShowStore(s => s.playingMedia)
+        const isActuallyPlaying = useMemo(() => {
+            if (type !== 'media' || !event.filename) return false;
+            if (isRowActive) return true; // Sequence active is always "live"
+
+            // Check if this file is playing on the target fixture (or any if empty)
+            const entries = Object.entries(playingMedia);
+            if (event.fixture) {
+                const device = getDevices().find(d => d.name === event.fixture);
+                if (device && playingMedia[device.id]?.filename === event.filename) return true;
+            } else {
+                if (entries.some(([_, data]) => data.filename === event.filename)) return true;
+            }
+            return false;
+        }, [type, event.filename, event.fixture, isRowActive, playingMedia, getDevices]);
+
+        const [videoTimes, setVideoTimes] = useState({ current: 0, total: 0 });
+
+        // Sync Playback for Active or Manually Playing Row
         useEffect(() => {
             if (!videoRef.current) return
-            if (isRowActive) {
+            if (isActuallyPlaying) {
+                // Try to sync with lastTransitionTime if it's the sequence-active row
+                if (isRowActive && lastTransitionTime) {
+                    const diff = (Date.now() - lastTransitionTime) / 1000;
+                    if (diff > 0.1 && diff < 3600 && Math.abs(videoRef.current.currentTime - diff) > 1) {
+                        videoRef.current.currentTime = diff;
+                    }
+                }
                 videoRef.current.play().catch(e => console.warn('Preview play failed', e))
             } else {
                 videoRef.current.pause()
                 videoRef.current.currentTime = 0
             }
-        }, [isRowActive])
+        }, [isActuallyPlaying, isRowActive, lastTransitionTime])
 
         if (!event) return null
-        const appSettings = useShowStore(s => s.appSettings)
-        const getDevices = () => appSettings.devices || []
 
         return (
             <div
@@ -646,14 +736,47 @@ const RowItem: React.FC<{
                             </div>
                             {event.filename && (
                                 <div className="w-32 aspect-video bg-black rounded border border-white/10 overflow-hidden relative group/preview">
-                                    <video ref={videoRef} src={getMediaUrl(event.filename)} className="w-full h-full object-cover" muted />
-                                    {event.fixture && getDevices().find(d => d.name === event.fixture)?.type === 'videowall_agent' && (
+                                    <video
+                                        ref={videoRef}
+                                        src={getMediaUrlWithContext(event.filename)}
+                                        className="w-full h-full object-cover"
+                                        muted
+                                        onTimeUpdate={(e) => {
+                                            const v = e.currentTarget;
+                                            if (v.duration) {
+                                                const progress = (v.currentTime / v.duration) * 100;
+                                                const bar = v.parentElement?.querySelector('.video-progress-bar') as HTMLElement;
+                                                if (bar) bar.style.width = `${progress}%`;
+                                                setVideoTimes({ current: Math.floor(v.currentTime), total: Math.floor(v.duration) });
+                                            }
+                                        }}
+                                        onLoadedMetadata={(e) => {
+                                            const v = e.currentTarget;
+                                            setVideoTimes({ current: 0, total: Math.floor(v.duration) });
+                                        }}
+                                    />
+                                    {event.fixture && getDevices().find((d: Device) => d.name === event.fixture)?.type === 'videowall_agent' && (
                                         <VideoWallPreviewOverlay
-                                            layout={(getDevices().find(d => d.name === event.fixture) as any)?.layout || '1x1'}
-                                            bezelSize={(getDevices().find(d => d.name === event.fixture) as any)?.bezelSize}
+                                            layout={(getDevices().find((d: Device) => d.name === event.fixture) as any)?.layout || '1x1'}
+                                            bezelSize={(getDevices().find((d: Device) => d.name === event.fixture) as any)?.bezelSize}
                                         />
                                     )}
-                                    <div className="absolute top-1 right-1 px-1 bg-black/60 text-[7px] font-bold rounded text-white/50 uppercase">Preview</div>
+                                    <div className={cn(
+                                        "absolute top-1 right-1 px-1 text-[7px] font-black rounded uppercase tracking-wider transition-colors",
+                                        isActuallyPlaying && isLocked ? "bg-red-500 text-white animate-pulse" : "bg-black/60 text-white/50"
+                                    )}>
+                                        {isActuallyPlaying && isLocked ? 'Live' : 'Preview'}
+                                    </div>
+
+                                    {/* Numeric Time Overlay */}
+                                    <div className="absolute top-1 left-1 px-1 bg-black/60 text-[7px] font-mono rounded text-white/70 tabular-nums">
+                                        {Math.floor(videoTimes.current / 60)}:{(videoTimes.current % 60).toString().padStart(2, '0')} / {Math.floor(videoTimes.total / 60)}:{(videoTimes.total % 60).toString().padStart(2, '0')}
+                                    </div>
+
+                                    {/* Progress Bar */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
+                                        <div className="video-progress-bar h-full bg-primary transition-[width] duration-300 ease-linear" style={{ width: '0%' }} />
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -718,7 +841,6 @@ const SequenceGrid: React.FC = () => {
     const setSelectedEvent = useShowStore(s => s.setSelectedEvent)
     const selectedEvent = events[selectedEventIndex] || null;
 
-    const isTimeTracking = useShowStore(s => s.isTimeTracking)
     const lastTransitionTime = useShowStore(s => s.lastTransitionTime)
 
     // Actions
@@ -731,14 +853,6 @@ const SequenceGrid: React.FC = () => {
     const insertAct = useShowStore(s => s.insertAct)
     const insertScene = useShowStore(s => s.insertScene)
     const insertEvent = useShowStore(s => s.insertEvent)
-    const addEventAbove = useShowStore(s => s.addEventAbove)
-    const addEventBelow = useShowStore(s => s.addEventBelow)
-    const restartMedia = useShowStore(s => s.restartMedia)
-    const stopMedia = useShowStore(s => s.stopMedia)
-    const toggleAudio = useShowStore(s => s.toggleAudio)
-    const toggleRepeat = useShowStore(s => s.toggleRepeat)
-    const setMediaVolume = useShowStore(s => s.setMediaVolume)
-    const resendEvent = useShowStore(s => s.resendEvent)
 
 
     const [editingIndex, setEditingIndex] = useState<number | null>(null)

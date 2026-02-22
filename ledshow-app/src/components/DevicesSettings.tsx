@@ -1,12 +1,6 @@
 import React, { useState } from 'react'
 import { Plus, Trash2, Settings2, Monitor, Wifi, Tv, ChevronDown, Radar, RefreshCw, WifiOff, Play, X, StopCircle, Volume2, VolumeX } from 'lucide-react'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs))
-}
-
+import { cn } from '../lib/utils'
 import { useShowStore } from '../store/useShowStore'
 import type { Device, DeviceType, WLEDDevice, LocalMonitorDevice, RemoteLedwallDevice, WiZDevice, VideoWallAgentDevice } from '../store/useShowStore'
 import { StartMediaPlayer, StopMediaPlayer, SetVolumeMediaPlayer } from '../services/media-player-service'
@@ -302,7 +296,7 @@ const DevicesSettings: React.FC = () => {
     const renderDeviceIcon = (type: DeviceType) => {
         switch (type) {
             case 'wled': return <Wifi className="w-4 h-4" />
-            case 'wiz': return <Wifi className="w-4 h-4 text-blue-400" />
+            case 'wiz': return <Wifi className="w-4 h-4 text-info" />
             case 'local_monitor': return <Monitor className="w-4 h-4" />
             case 'remote_ledwall': return <Tv className="w-4 h-4" />
             case 'videowall_agent': return <Tv className="w-4 h-4 text-primary" />
@@ -408,7 +402,7 @@ const DevicesSettings: React.FC = () => {
                                         </button>
                                         <button
                                             onClick={() => handleAddFromScan(result)}
-                                            className={`p-2 rounded-lg transition-colors ${existing ? 'bg-orange-500/20 text-orange-500 hover:bg-orange-500 hover:text-white' : 'bg-primary text-black hover:bg-white'}`}
+                                            className={`p-2 rounded-lg transition-colors ${existing ? 'bg-warning/20 text-warning hover:bg-warning hover:text-white' : 'bg-primary text-primary-foreground hover:bg-white shadow-lg shadow-primary/20'}`}
                                             title={existing ? "Bijwerken" : "Toevoegen"}
                                         >
                                             {existing ? <RefreshCw className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
@@ -434,9 +428,9 @@ const DevicesSettings: React.FC = () => {
 
                         return (
                             <div key={device.id} className={cn(
-                                "rounded-2xl border overflow-hidden transition-colors relative",
-                                !device.enabled ? "bg-black/40 border-white/5 opacity-70" : "bg-white/5",
-                                missingIp ? "border-red-500/50" : (isUnreachable ? "border-red-500/50" : "border-white/10")
+                                "rounded-2xl border overflow-hidden transition-colors relative transition-all",
+                                !device.enabled ? "bg-black/40 border-white/5 opacity-70" : "glass bg-white/5",
+                                missingIp ? "border-destructive/50" : (isUnreachable ? "border-destructive/50" : "border-white/10")
                             )}>
                                 <div className="absolute top-3 right-3 flex gap-2">
                                     {!device.enabled && <span className="text-[9px] font-black uppercase px-1.5 py-0.5 bg-white/5 text-white/40 rounded">Disabled</span>}
@@ -460,7 +454,7 @@ const DevicesSettings: React.FC = () => {
                                             <div className="text-[10px] opacity-40 flex items-center gap-2 mt-0.5">
                                                 {device.type === 'local_monitor' ? `Monitor ID: ${(device as LocalMonitorDevice).monitorId}` : (device as any).ip || 'Geen IP opgegeven'}
                                                 {isUnreachable && (
-                                                    <span className="text-red-500 flex items-center gap-1 font-bold ml-2">
+                                                    <span className="text-destructive flex items-center gap-1 font-bold ml-2 uppercase tracking-tight text-[9px]">
                                                         <WifiOff className="w-3 h-3" /> Niet bereikbaar
                                                     </span>
                                                 )}
@@ -514,13 +508,14 @@ const DevicesSettings: React.FC = () => {
                                                             onChange={e => updateDevice(device.id, { monitorId: parseInt(e.target.value) } as any)}
                                                             title="Selecteer Fysiek Scherm"
                                                         >
-                                                            {displays.length > 0 ? (
-                                                                displays.map((d: any) => (
-                                                                    <option key={d.id} value={d.index} className="bg-[#1a1a1a]">{d.label}</option>
-                                                                ))
-                                                            ) : (
-                                                                <option value={1} className="bg-[#1a1a1a]">Scherm 1</option>
-                                                            )}
+                                                            {[0, 1, 2].map(idx => {
+                                                                const d = displays.find(disp => disp.index === idx);
+                                                                return (
+                                                                    <option key={idx} value={idx} className="bg-background">
+                                                                        Scherm {idx + 1}: {d ? `${d.index === 0 ? '(Hoofdscherm) ' : ''}${d.bounds.width}x${d.bounds.height}` : '(Niet verbonden)'}
+                                                                    </option>
+                                                                )
+                                                            })}
                                                         </select>
                                                         <p className="text-[9px] opacity-30 px-1 italic">
                                                             Dit is het fysieke scherm van de host machine waarop dit venster wordt getoond.
@@ -593,12 +588,13 @@ const DevicesSettings: React.FC = () => {
                                                                     const segments = (d.segments || []).filter((_, si) => si !== idx)
                                                                     updateDevice(device.id, { segments } as any)
                                                                 }}
-                                                                className="p-1.5 hover:bg-red-500/20 text-red-500 rounded transition-colors"
+                                                                className="p-1.5 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
                                                                 title="Verwijder segment"
                                                                 aria-label="Verwijder segment"
                                                             >
                                                                 <Trash2 className="w-3 h-3" />
                                                             </button>
+                                                            pocket
                                                         </div>
                                                     ))}
                                                 </div>
@@ -665,8 +661,8 @@ const DevicesSettings: React.FC = () => {
                                                             title="VideoWall Model"
                                                             onChange={e => updateDevice(device.id, { model: e.target.value as any } as any)}
                                                         >
-                                                            <option value="4-screen" className="bg-[#1a1a1a]">4 Schermen</option>
-                                                            <option value="9-screen" className="bg-[#1a1a1a]">9 Schermen</option>
+                                                            <option value="4-screen" className="bg-background">4 Schermen</option>
+                                                            <option value="9-screen" className="bg-background">9 Schermen</option>
                                                         </select>
                                                     </div>
                                                     <div className="space-y-1.5">
@@ -677,8 +673,8 @@ const DevicesSettings: React.FC = () => {
                                                             title="Scherm Oriëntatie"
                                                             onChange={e => updateDevice(device.id, { orientation: e.target.value as any } as any)}
                                                         >
-                                                            <option value="landscape" className="bg-[#1a1a1a]">Landscape</option>
-                                                            <option value="portrait" className="bg-[#1a1a1a]">Portrait</option>
+                                                            <option value="landscape" className="bg-background">Landscape</option>
+                                                            <option value="portrait" className="bg-background">Portrait</option>
                                                         </select>
                                                     </div>
                                                 </div>

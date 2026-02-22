@@ -1,13 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { X, Upload, Save, Shield, Globe, Code, Monitor, Laptop, Settings2 } from 'lucide-react'
 import { useShowStore } from '../store/useShowStore'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
 import DevicesSettings from './DevicesSettings'
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs))
-}
+import { cn } from '../lib/utils'
 
 interface AppSettingsProps {
     isOpen: boolean
@@ -227,13 +222,14 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                                 onChange={(e) => updateAppSettings({ controllerMonitorIndex: parseInt(e.target.value) })}
                                                 className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-primary/50 outline-none"
                                             >
-                                                {displays.length > 0 ? (
-                                                    displays.map((d: any) => (
-                                                        <option key={d.id} value={d.index} className="bg-[#111]">{d.label}</option>
-                                                    ))
-                                                ) : (
-                                                    <option value={0} className="bg-[#111]">1: Hoofdscherm (Standaard)</option>
-                                                )}
+                                                {[0, 1, 2].map(idx => {
+                                                    const d = displays.find(disp => disp.index === idx);
+                                                    return (
+                                                        <option key={idx} value={idx} className="bg-[#111]">
+                                                            Scherm {idx + 1}: {d ? `${d.index === 0 ? '(Hoofdscherm) ' : ''}${d.bounds.width}x${d.bounds.height}` : '(Niet verbonden)'}
+                                                        </option>
+                                                    )
+                                                })}
                                             </select>
                                             <p className="text-[10px] opacity-30">
                                                 Het scherm waarop de bediening van LedShow wordt geopend.
@@ -379,7 +375,7 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
 
                 {/* Footer */}
                 <div className="p-4 bg-black/20 border-t border-white/10 flex justify-between">
-                    
+
                     <button
                         onClick={onClose}
                         className="px-6 py-2 bg-primary text-black font-bold rounded-lg hover:bg-primary/90 transition-colors flex items-center gap-2"

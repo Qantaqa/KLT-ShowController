@@ -99,6 +99,80 @@ const fileServer = http.createServer((req: any, res: any) => {
         return;
     }
 
+    // Serve WLED Effect Previews
+    if (url.pathname.startsWith('/wled/effects/')) {
+        const effectId = url.pathname.split('/').pop()?.replace('.gif', '');
+        if (effectId) {
+            // Try different naming conventions FX_0, FX_00, FX_000
+            const paddedId = effectId.padStart(3, '0');
+            const projectRoot = path.join(__dirname, '../../');
+            const possiblePaths = [
+                path.join(projectRoot, 'database', 'Effects', `FX_${effectId}.gif`),
+                path.join(projectRoot, 'database', 'Effects', `FX_${paddedId}.gif`),
+                path.join(projectRoot, 'database', 'Effects', `FX_${effectId.padStart(2, '0')}.gif`)
+            ];
+
+            const foundPath = possiblePaths.find(p => fs.existsSync(p));
+            if (foundPath) {
+                res.writeHead(200, { 'Content-Type': 'image/gif', 'Access-Control-Allow-Origin': '*' });
+                fs.createReadStream(foundPath).pipe(res);
+                return;
+            }
+        }
+        res.writeHead(404); res.end('Effect preview not found');
+        return;
+    }
+
+    // Serve WLED Palette Previews
+    if (url.pathname.startsWith('/wled/palettes/')) {
+        const paletteId = url.pathname.split('/').pop()?.replace('.gif', '');
+        if (paletteId) {
+            const paddedId = paletteId.padStart(2, '0');
+            const projectRoot = path.join(__dirname, '../../');
+            const possiblePaths = [
+                path.join(projectRoot, 'database', 'Palettes', `PAL_${paletteId}.gif`),
+                path.join(projectRoot, 'database', 'Palettes', `PAL_${paddedId}.gif`)
+            ];
+
+            const foundPath = possiblePaths.find(p => fs.existsSync(p));
+            if (foundPath) {
+                res.writeHead(200, { 'Content-Type': 'image/gif', 'Access-Control-Allow-Origin': '*' });
+                fs.createReadStream(foundPath).pipe(res);
+                return;
+            }
+        }
+        res.writeHead(404); res.end('Palette preview not found');
+        return;
+    }
+
+    // Serve media files (generic)
+    if (url.pathname === '/media') {
+        const filePath = url.searchParams.get('path');
+        if (filePath && fs.existsSync(filePath)) {
+            const ext = path.extname(filePath).toLowerCase();
+            const mimeTypes: Record<string, string> = {
+                '.mp4': 'video/mp4',
+                '.webm': 'video/webm',
+                '.ogg': 'video/ogg',
+                '.mov': 'video/quicktime',
+                '.png': 'image/png',
+                '.jpg': 'image/jpeg',
+                '.jpeg': 'image/jpeg',
+                '.gif': 'image/gif'
+            };
+            const contentType = mimeTypes[ext] || 'application/octet-stream';
+            res.writeHead(200, {
+                'Content-Type': contentType,
+                'Access-Control-Allow-Origin': '*',
+                'Accept-Ranges': 'bytes'
+            });
+            fs.createReadStream(filePath).pipe(res);
+        } else {
+            res.writeHead(404); res.end('Not found');
+        }
+        return;
+    }
+
     res.writeHead(404); res.end('Not found');
 });
 
@@ -498,10 +572,13 @@ ipcMain.on('test-flash', (event: any) => {
 });
 
 ipcMain.handle('get-displays', () => {
-    return screen.getAllDisplays().map((d: any, i: number) => ({
+    const displays = screen.getAllDisplays();
+    const primaryId = screen.getPrimaryDisplay().id;
+    return displays.map((d: any, i: number) => ({
         id: d.id,
         index: i,
-        label: `${i + 1}: ${d.size.width}x${d.size.height}${i === 0 ? ' (Hoofdscherm)' : ''}`,
+        isPrimary: d.id === primaryId,
+        label: `${i + 1}: ${d.size.width}x${d.size.height}${d.id === primaryId ? ' (Hoofdscherm)' : ''}`,
         bounds: d.bounds
     }));
 });
@@ -534,7 +611,9 @@ function ensureProjectionWindow(deviceId: string, monitorIndex: number) {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-            webSecurity: false
+            webSecurity: false,
+            backgroundThrottling: false,
+            autoplayPolicy: 'no-user-gesture-required'
         },
         title: `Projection - Device ${deviceId}`
     });

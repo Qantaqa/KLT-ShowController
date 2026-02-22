@@ -1,12 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Activity, WifiOff } from 'lucide-react'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-import '../styles/projection.css'
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs))
-}
+import { cn } from '../lib/utils'
 
 interface PlayerState {
     src: string | null;
@@ -34,8 +28,6 @@ const ProjectionWindow: React.FC = () => {
         src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false
     })
 
-    // Helper to get active ref
-    const getActiveRef = () => activePlayer === 'A' ? videoRefA : videoRefB;
 
     // Sync individual players
     const syncPlayer = (ref: React.RefObject<HTMLVideoElement | null>, state: PlayerState) => {
@@ -64,6 +56,9 @@ const ProjectionWindow: React.FC = () => {
     useEffect(() => syncPlayer(videoRefA, playerA), [playerA]);
     useEffect(() => syncPlayer(videoRefB, playerB), [playerB]);
 
+    const activePlayerRef = useRef<'A' | 'B'>(activePlayer)
+    useEffect(() => { activePlayerRef.current = activePlayer }, [activePlayer])
+
     useEffect(() => {
         if ((window as any).require) {
             const { ipcRenderer } = (window as any).require('electron')
@@ -71,15 +66,16 @@ const ProjectionWindow: React.FC = () => {
 
             const handlePlay = (_: any, { url, loop, volume, mute, transitionTime }: { url: string, loop: boolean, volume: number, mute: boolean, transitionTime?: number }) => {
                 const vol = Math.max(0, Math.min(1, volume / 100))
-                const nextPlayer = activePlayer === 'A' ? 'B' : 'A';
+                const nextPlayer = activePlayerRef.current === 'A' ? 'B' : 'A';
                 const fadeMs = transitionTime || 0;
 
-                // Load and start next player in background
+                console.log(`[Proj] Play Request: ${url} (Next: ${nextPlayer}, Fade: ${fadeMs}ms)`);
+
                 const nextState: PlayerState = {
                     src: url,
                     playing: true,
-                    opacity: 0, // start invisible
-                    fadeDuration: 0,
+                    opacity: 0,
+                    fadeDuration: fadeMs,
                     loop,
                     volume: vol,
                     muted: mute
@@ -87,36 +83,33 @@ const ProjectionWindow: React.FC = () => {
 
                 if (nextPlayer === 'A') setPlayerA(nextState); else setPlayerB(nextState);
 
-                // Wait a tiny bit for video to at least start loading/playing before swapping
-                setTimeout(() => {
-                    // Start crossfade
-                    if (fadeMs > 0) {
-                        setPlayerA(prev => ({ ...prev, opacity: nextPlayer === 'A' ? 1 : 0, fadeDuration: fadeMs }));
-                        setPlayerB(prev => ({ ...prev, opacity: nextPlayer === 'B' ? 1 : 0, fadeDuration: fadeMs }));
-                    } else {
-                        setPlayerA(prev => ({ ...prev, opacity: nextPlayer === 'A' ? 1 : 0, fadeDuration: 0 }));
-                        setPlayerB(prev => ({ ...prev, opacity: nextPlayer === 'B' ? 1 : 0, fadeDuration: 0 }));
-                    }
+                if (fadeMs > 0) {
+                    pendingFadeMs.current = fadeMs;
+                    setDebugInfo(`Buffering: ${url}`)
 
+                    // Safety Timeout: If video never fires onCanPlay, swap anyway after 2s
+                    setTimeout(() => {
+                        if (pendingFadeMs.current === fadeMs) {
+                            console.warn("[Proj] onCanPlay timeout, forcing swap");
+                            handleCanPlay(nextPlayer);
+                        }
+                    }, 2000);
+                } else {
                     setActivePlayer(nextPlayer);
+                    setPlayerA(prev => ({ ...prev, opacity: nextPlayer === 'A' ? 1 : 0, fadeDuration: 0 }));
+                    setPlayerB(prev => ({ ...prev, opacity: nextPlayer === 'B' ? 1 : 0, fadeDuration: 0 }));
 
-                    // After fade, cleanup old player
-                    if (fadeMs > 0) {
-                        setTimeout(() => {
-                            const cleanup = { src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false };
-                            if (nextPlayer === 'A') setPlayerB(cleanup); else setPlayerA(cleanup);
-                        }, fadeMs + 100);
-                    } else {
+                    setTimeout(() => {
                         const cleanup = { src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false };
                         if (nextPlayer === 'A') setPlayerB(cleanup); else setPlayerA(cleanup);
-                    }
-                }, 100); // 100ms buffer to ensure next video is somewhat ready
-
-                setDebugInfo(`Playing: ${url} (Vol: ${volume}%)`)
+                    }, 50);
+                    setDebugInfo(`Immediate Play: ${url}`)
+                }
             }
 
             const handleStop = (_: any, { fadeOutTime }: { fadeOutTime?: number } = {}) => {
                 const fadeMs = fadeOutTime || 0;
+                console.log(`[Proj] Stop Request (Fade: ${fadeMs}ms)`);
                 if (fadeMs > 0) {
                     setPlayerA(prev => ({ ...prev, opacity: 0, fadeDuration: fadeMs }));
                     setPlayerB(prev => ({ ...prev, opacity: 0, fadeDuration: fadeMs }));
@@ -124,8 +117,8 @@ const ProjectionWindow: React.FC = () => {
                         const stop = { src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false };
                         setPlayerA(stop);
                         setPlayerB(stop);
-                        setDebugInfo('Stopped (Faded)')
-                    }, fadeMs);
+                        setDebugInfo('Stopped')
+                    }, fadeMs + 50);
                 } else {
                     const stop = { src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false };
                     setPlayerA(stop);
@@ -168,7 +161,7 @@ const ProjectionWindow: React.FC = () => {
 
             const sendStatusUpdate = () => {
                 const targetId = deviceId || (window as any).projectionDeviceId;
-                const activeRef = getActiveRef();
+                const activeRef = activePlayerRef.current === 'A' ? videoRefA : videoRefB;
                 if (activeRef.current && targetId) {
                     ipcRenderer.send('media-status-update', {
                         deviceId: targetId,
@@ -184,7 +177,6 @@ const ProjectionWindow: React.FC = () => {
                         }
                     });
                 } else if (targetId) {
-                    // Even if no video, send idle status
                     ipcRenderer.send('media-status-update', {
                         deviceId: targetId,
                         status: { playing: false, lastUpdated: Date.now() }
@@ -210,7 +202,39 @@ const ProjectionWindow: React.FC = () => {
                 ipcRenderer.removeAllListeners('set-mode')
             }
         }
-    }, [activePlayer])
+    }, [])
+
+    const pendingFadeMs = useRef<number>(0);
+
+    const handleCanPlay = (id: 'A' | 'B') => {
+        // Only trigger swap if this is the player we are waiting for
+        const isNextPlayer = activePlayer !== id;
+        if (isNextPlayer && pendingFadeMs.current > 0) {
+            const fadeMs = pendingFadeMs.current;
+            pendingFadeMs.current = 0; // Reset
+
+            // Start crossfade: New player fades IN, old player fades OUT
+            setPlayerA(prev => ({ ...prev, opacity: id === 'A' ? 1 : 0, fadeDuration: fadeMs }));
+            setPlayerB(prev => ({ ...prev, opacity: id === 'B' ? 1 : 0, fadeDuration: fadeMs }));
+
+            // Delay z-index swap to middle of transition
+            setTimeout(() => {
+                setActivePlayer(id);
+            }, fadeMs / 2);
+
+            // Cleanup old player after fade
+            setTimeout(() => {
+                const cleanup = { src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false };
+                if (id === 'A') setPlayerB(cleanup); else setPlayerA(cleanup);
+            }, fadeMs + 100);
+
+            setDebugInfo(`Transitioning (${fadeMs}ms)`)
+        } else if (isNextPlayer && pendingFadeMs.current === 0) {
+            // Already handled by immediate swap or not meant to swap yet
+        } else if (!isNextPlayer && !playerA.src && !playerB.src) {
+            // Initial load?
+        }
+    }
 
     const renderVideo = (id: 'A' | 'B', ref: React.RefObject<HTMLVideoElement | null>, state: PlayerState) => {
         if (!state.src && state.opacity === 0) return null;
@@ -234,6 +258,10 @@ const ProjectionWindow: React.FC = () => {
                 } as React.CSSProperties}
                 playsInline
                 autoPlay
+                onCanPlay={() => handleCanPlay(id)}
+                onPlaying={() => {
+                    if (activePlayer === id) setDebugInfo(null);
+                }}
                 onLoadedMetadata={(e) => {
                     const video = e.target as HTMLVideoElement;
                     video.volume = state.volume;

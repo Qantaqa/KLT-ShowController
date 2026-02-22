@@ -9325,6 +9325,13 @@ const {
   mergeConfig
 } = axios$1;
 class NetworkManager {
+  /**
+   * Doel: Verstuurt een JSON commando naar een WLED apparaat.
+   * Input: command (WledCommand object met IP en parameters).
+   * Output: Void.
+   * Condities: Gebruikt HTTP POST naar de /json/state endpoint. Timeout van 1s.
+   * Integriteit: Foutafhandeling vangt netwerkproblemen op zonder het hoofdproces te blokkeren.
+   */
   async sendWledCommand(command) {
     const { ip, ...params } = command;
     const url = `http://${ip}/json/state`;
@@ -9335,6 +9342,14 @@ class NetworkManager {
       console.error(`WLED command failed for ${ip}:`, error.message);
     }
   }
+  /**
+   * Doel: Verstuurt een commando naar een WiZ lamp via het UDP protocol.
+   * Input: ip (target), method (setPilot/getPilot), params (parameters voor de lamp).
+   * Output: Promise met het resultaat van de lamp.
+   * Condities: Gebruikt UDP poort 38899. Wacht op antwoord bij 'getPilot'.
+   * Integriteit: Sluit de socket altijd af na verzending of timeout om resources vrij te maken.
+   * Protocol-Strict: Volgt het WiZ JSON-over-UDP protocol.
+   */
   async sendWizCommand(ip, method, params) {
     return new Promise((resolve, reject) => {
       const socket = dgram.createSocket("udp4");
@@ -9370,6 +9385,13 @@ class NetworkManager {
       });
     });
   }
+  /**
+   * Doel: Haalt de huidige status en informatie op van een WLED apparaat.
+   * Input: ip van het apparaat.
+   * Output: Object met info en state, of null bij falen.
+   * Condities: Twee HTTP GET requests (info en state).
+   * Integriteit: Gebruikt timeouts om vertraging bij offline apparaten te beperken.
+   */
   async getWledInfo(ip) {
     try {
       const response = await axios$1.get(`http://${ip}/json/info`, { timeout: 2e3 });
@@ -9380,6 +9402,12 @@ class NetworkManager {
       return null;
     }
   }
+  /**
+   * Doel: Haalt de lijst met beschikbare effecten op van een WLED apparaat.
+   * Input: ip.
+   * Output: Array van effectnamen.
+   * Integriteit: Retourneert lege array bij fout.
+   */
   async getWledEffects(ip) {
     try {
       const response = await axios$1.get(`http://${ip}/json/eff`, { timeout: 2e3 });
@@ -9389,6 +9417,11 @@ class NetworkManager {
       return [];
     }
   }
+  /**
+   * Doel: Haalt de lijst met beschikbare kleurenpaletten op van een WLED apparaat.
+   * Input: ip.
+   * Output: Array van paletnamen.
+   */
   async getWledPalettes(ip) {
     try {
       const response = await axios$1.get(`http://${ip}/json/pal`, { timeout: 2e3 });
@@ -9398,7 +9431,16 @@ class NetworkManager {
       return [];
     }
   }
-  // Handle various show event types
+  /**
+   * Doel: Verwerkt een ShowEvent en vertaalt deze naar specifieke hardware commando's.
+   * Input: event (ShowEvent object uit de show runner).
+   * Output: Void.
+   * Condities: Alleen voor 'light' events. Zoekt bijbehorende IP in de database.
+   * Logica: 
+   *  - Als type 'wiz' is: Gebruik sendWizCommand met RGB conversie.
+   *  - Als type 'wled' is: Gebruik sendWledCommand met segment-ondersteuning.
+   * Integriteit: Valt terug op statische IP mapping als database device niet gevonden wordt.
+   */
   processEvent(event) {
     if (event.type?.toLowerCase() === "light" && event.fixture) {
       const ipMap = {
@@ -9457,6 +9499,12 @@ class NetworkManager {
       }
     }
   }
+  /**
+   * Doel: Test de verbinding met een apparaat door een visuele feedback (kleurwissel) te geven.
+   * Input: device object.
+   * Condities: Voor WLED: Flash R-G-B. Voor WiZ: Directe RGB wissel via UDP.
+   * Integriteit: Wordt gebruikt in de configuratie-portal om hardware te identificeren.
+   */
   async testDevice(device) {
     console.log("Testing device:", device.name, device.ip, device.type);
     if (device.type === "wled") {
@@ -9486,6 +9534,13 @@ class NetworkManager {
       });
     }
   }
+  /**
+   * Doel: Converteert HEX kleur naar RGB array voor hardware protocols.
+   * Input: hex string (bijv. "#FF0000").
+   * Output: [r, g, b] array.
+   * Condities: Handelt 'Black' en ontbrekende '#' af.
+   * Integriteit: Voorkomt NaN errors door fallback naar 0.
+   */
   hexToRgb(hex) {
     if (!hex || hex === "Black" || !hex.startsWith("#")) return [0, 0, 0];
     const r = parseInt(hex.slice(1, 3), 16) || 0;
@@ -9724,6 +9779,74 @@ const fileServer = http.createServer((req, res) => {
       console.error("[Main] Agent package not found at:", zipPath);
       res.writeHead(404);
       res.end("Agent package not found");
+    }
+    return;
+  }
+  if (url.pathname.startsWith("/wled/effects/")) {
+    const effectId = url.pathname.split("/").pop()?.replace(".gif", "");
+    if (effectId) {
+      const paddedId = effectId.padStart(3, "0");
+      const projectRoot = path.join(__dirname$1, "../../");
+      const possiblePaths = [
+        path.join(projectRoot, "database", "Effects", `FX_${effectId}.gif`),
+        path.join(projectRoot, "database", "Effects", `FX_${paddedId}.gif`),
+        path.join(projectRoot, "database", "Effects", `FX_${effectId.padStart(2, "0")}.gif`)
+      ];
+      const foundPath = possiblePaths.find((p) => fs.existsSync(p));
+      if (foundPath) {
+        res.writeHead(200, { "Content-Type": "image/gif", "Access-Control-Allow-Origin": "*" });
+        fs.createReadStream(foundPath).pipe(res);
+        return;
+      }
+    }
+    res.writeHead(404);
+    res.end("Effect preview not found");
+    return;
+  }
+  if (url.pathname.startsWith("/wled/palettes/")) {
+    const paletteId = url.pathname.split("/").pop()?.replace(".gif", "");
+    if (paletteId) {
+      const paddedId = paletteId.padStart(2, "0");
+      const projectRoot = path.join(__dirname$1, "../../");
+      const possiblePaths = [
+        path.join(projectRoot, "database", "Palettes", `PAL_${paletteId}.gif`),
+        path.join(projectRoot, "database", "Palettes", `PAL_${paddedId}.gif`)
+      ];
+      const foundPath = possiblePaths.find((p) => fs.existsSync(p));
+      if (foundPath) {
+        res.writeHead(200, { "Content-Type": "image/gif", "Access-Control-Allow-Origin": "*" });
+        fs.createReadStream(foundPath).pipe(res);
+        return;
+      }
+    }
+    res.writeHead(404);
+    res.end("Palette preview not found");
+    return;
+  }
+  if (url.pathname === "/media") {
+    const filePath = url.searchParams.get("path");
+    if (filePath && fs.existsSync(filePath)) {
+      const ext = path.extname(filePath).toLowerCase();
+      const mimeTypes2 = {
+        ".mp4": "video/mp4",
+        ".webm": "video/webm",
+        ".ogg": "video/ogg",
+        ".mov": "video/quicktime",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".gif": "image/gif"
+      };
+      const contentType = mimeTypes2[ext] || "application/octet-stream";
+      res.writeHead(200, {
+        "Content-Type": contentType,
+        "Access-Control-Allow-Origin": "*",
+        "Accept-Ranges": "bytes"
+      });
+      fs.createReadStream(filePath).pipe(res);
+    } else {
+      res.writeHead(404);
+      res.end("Not found");
     }
     return;
   }
@@ -10031,10 +10154,13 @@ ipcMain.on("test-flash", (event) => {
   }
 });
 ipcMain.handle("get-displays", () => {
-  return screen.getAllDisplays().map((d, i) => ({
+  const displays = screen.getAllDisplays();
+  const primaryId = screen.getPrimaryDisplay().id;
+  return displays.map((d, i) => ({
     id: d.id,
     index: i,
-    label: `${i + 1}: ${d.size.width}x${d.size.height}${i === 0 ? " (Hoofdscherm)" : ""}`,
+    isPrimary: d.id === primaryId,
+    label: `${i + 1}: ${d.size.width}x${d.size.height}${d.id === primaryId ? " (Hoofdscherm)" : ""}`,
     bounds: d.bounds
   }));
 });
@@ -10062,7 +10188,9 @@ function ensureProjectionWindow(deviceId, monitorIndex) {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      webSecurity: false
+      webSecurity: false,
+      backgroundThrottling: false,
+      autoplayPolicy: "no-user-gesture-required"
     },
     title: `Projection - Device ${deviceId}`
   });

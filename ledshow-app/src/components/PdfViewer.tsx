@@ -1,13 +1,8 @@
-import React from 'react'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { ChevronLeft, ChevronRight, Link as LinkIcon, Sun, Moon } from 'lucide-react'
 import { useShowStore } from '../store/useShowStore'
 import { getPdfFileUrl, getPdfCleanUrl } from '../services/pdf-service'
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs))
-}
+import { cn } from '../lib/utils'
 
 const PdfViewer: React.FC = () => {
     const activeShow = useShowStore((state) => state.activeShow)
@@ -19,17 +14,17 @@ const PdfViewer: React.FC = () => {
     const updateEvent = useShowStore((state) => state.updateEvent)
     const addToast = useShowStore((state) => state.addToast)
 
-    const [shouldInvert, setShouldInvert] = React.useState<boolean>(activeShow?.invertScriptColors || true)
-    const [isDragging, setIsDragging] = React.useState(false)
-    const [hoverPage, setHoverPage] = React.useState<number | null>(null)
-    const [scrubValue, setScrubValue] = React.useState(pageNumber)
+    const [shouldInvert, setShouldInvert] = useState<boolean>(activeShow?.invertScriptColors || true)
+    const [isDragging, setIsDragging] = useState(false)
+    const [hoverPage, setHoverPage] = useState<number | null>(null)
+    const [scrubValue, setScrubValue] = useState(pageNumber)
     const totalPages = activeShow?.totalPages || 0
 
-    const scrollRef = React.useRef<HTMLDivElement>(null)
-    const lastWheelTime = React.useRef(0)
+    const scrollRef = useRef<HTMLDivElement>(null)
+    const lastWheelTime = useRef(0)
 
     // Sync scrub value when page changes externally
-    React.useEffect(() => {
+    useEffect(() => {
         if (!isDragging) setScrubValue(pageNumber)
     }, [pageNumber, isDragging])
 
@@ -38,12 +33,12 @@ const PdfViewer: React.FC = () => {
     const fileUrl = getPdfFileUrl(pdfPath, isElectron, appSettings)
     const cleanUrl = getPdfCleanUrl(fileUrl, isDragging ? scrubValue : pageNumber)
 
-    const handleNextPage = React.useCallback(() => {
+    const handleNextPage = useCallback(() => {
         if (totalPages > 0 && pageNumber >= totalPages) return
         setCurrentScriptPage(pageNumber + 1)
     }, [pageNumber, setCurrentScriptPage, totalPages])
 
-    const handlePrevPage = React.useCallback(() => {
+    const handlePrevPage = useCallback(() => {
         if (pageNumber > 1) {
             setCurrentScriptPage(pageNumber - 1)
         }
@@ -193,7 +188,7 @@ const PdfViewer: React.FC = () => {
             </div>
 
             {/* Script Toolbar */}
-            <div className="h-12 bg-[#0a0a0a] border-t border-white/10 px-4 flex items-center justify-between shrink-0">
+            <div className="h-12 bg-background border-t border-white/10 px-4 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1 bg-black/20 rounded-xl border border-white/10 p-0.5 shadow-inner">
                         <button

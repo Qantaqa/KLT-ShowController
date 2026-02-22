@@ -2,12 +2,8 @@ import React, { useEffect, useRef } from 'react'
 import { X, Camera } from 'lucide-react'
 import { useShowStore } from '../store/useShowStore'
 import { networkService } from '../services/network-service'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
 
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs))
-}
+import { cn } from '../lib/utils'
 
 const CameraStreamer: React.FC = () => {
     const { isCameraActive, setCameraActive, updateCameraFrame, isSelfPreviewVisible } = useShowStore()

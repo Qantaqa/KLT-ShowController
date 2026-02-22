@@ -29,7 +29,13 @@
   --color-input: hsl(240 3.7% 15.9%);
   --color-ring: hsl(240 4.9% 83.9%);
 
+  --color-success: hsl(142.1 70.6% 45.3%);
+  --color-warning: hsl(24.6 95% 53.1%);
+  --color-info: hsl(217.2 91.2% 59.8%);
+
   --radius-lg: 0.75rem;
+  --radius-md: calc(0.75rem - 2px);
+  --radius-sm: calc(0.75rem - 4px);
 }
 
 @layer base {
@@ -199,4 +205,34 @@
 
 .crash-reload-button:hover {
   background-color: #2563eb;
+}
+
+/* Projection Window Styles */
+.projection-video {
+  opacity: var(--video-opacity, 0);
+  transition: opacity var(--video-fade-duration, 0ms) ease-in-out;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.idle-fallback {
+  @apply flex flex-col items-center justify-center opacity-20;
+}
+
+.debug-overlay {
+  @apply absolute bottom-4 left-4 px-3 py-1.5 rounded-lg text-[10px] font-mono z-[100] border backdrop-blur-md;
+}
+
+.debug-info {
+  @apply bg-black/60 border-white/10 text-white/60;
+}
+
+.debug-error {
+  @apply bg-red-500/80 border-red-500 text-white font-bold animate-pulse;
+}
+
+.disconnected-status {
+  @apply absolute top-4 right-4 px-2 py-1 bg-red-500 text-white text-[9px] font-bold rounded uppercase flex items-center gap-1 z-[100];
 }

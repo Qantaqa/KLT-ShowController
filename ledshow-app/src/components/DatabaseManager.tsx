@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { X, Database, Table as TableIcon, Search, RefreshCw, Layers } from 'lucide-react'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs))
-}
-
+import { cn } from '../lib/utils'
 import { useShowStore } from '../store/useShowStore'
 
 interface DatabaseManagerProps {
@@ -114,8 +108,8 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
     const columns = tableData.length > 0 ? Object.keys(tableData[0]) : []
 
     return (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-8 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-            <div className="w-full h-full max-w-7xl bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,1)] flex flex-col overflow-hidden">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-8 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+            <div className="glass w-full h-full max-w-7xl flex flex-col rounded-2xl shadow-2xl overflow-hidden">
 
                 {/* Header */}
                 <div className="h-16 border-b border-white/10 flex items-center justify-between px-6 bg-white/5">
@@ -153,7 +147,7 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
                                     className={cn(
                                         "w-full px-3 py-2.5 rounded-lg text-left text-xs flex items-center gap-3 transition-all",
                                         selectedTable === table
-                                            ? "bg-primary/20 border border-primary/40 text-primary font-bold shadow-[0_0_15px_rgba(34,197,94,0.1)]"
+                                            ? "bg-primary/20 border border-primary/40 text-primary font-bold shadow-lg shadow-primary/10"
                                             : "hover:bg-white/5 text-muted-foreground border border-transparent"
                                     )}
                                 >
@@ -249,8 +243,8 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
             {/* Edit Modal */}
             {
                 editingRow && (
-                    <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-12">
-                        <div className="bg-[#0a0a0a] border border-white/10 rounded-xl shadow-2xl w-full max-w-2xl max-h-full flex flex-col">
+                    <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-12">
+                        <div className="glass bg-card w-full max-w-2xl max-h-full flex flex-col rounded-xl shadow-2xl">
                             <div className="p-4 border-b border-white/10 flex items-center justify-between">
                                 <h3 className="font-bold text-white">Rij Bewerken</h3>
                                 <button onClick={() => setEditingRow(null)}><X className="w-5 h-5 text-muted-foreground hover:text-white" /></button>
@@ -275,7 +269,7 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
                             <div className="p-4 border-t border-white/10 flex items-center justify-between bg-white/5">
                                 <button
                                     onClick={handleDelete}
-                                    className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded text-xs font-bold uppercase tracking-wider transition-colors"
+                                    className="px-4 py-2 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
                                 >
                                     Verwijderen
                                 </button>
@@ -288,7 +282,7 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
                                     </button>
                                     <button
                                         onClick={handleSave}
-                                        className="px-4 py-2 bg-primary text-black rounded text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors"
+                                        className="px-6 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
                                     >
                                         Opslaan
                                     </button>

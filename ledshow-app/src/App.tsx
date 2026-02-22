@@ -30,8 +30,6 @@ import {
   Download
 } from 'lucide-react'
 import { useShowStore } from './store/useShowStore'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
 import SequenceGrid from './components/SequenceGrid'
 import ProjectSettings from './components/ProjectSettings'
 import PdfViewer from './components/PdfViewer'
@@ -41,9 +39,7 @@ import SimpleModal from './components/SimpleModal'
 import CameraStreamer from './components/CameraStreamer'
 import { networkService } from './services/network-service'
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+import { cn } from './lib/utils'
 
 const formatTime = (seconds: number) => {
   const m = Math.floor(seconds / 60)
