@@ -1,0 +1,447 @@
+import React, { useState, useEffect, useRef } from 'react'
+import { X, Upload, Save, Shield, Globe, Code, Monitor, Laptop, Settings2, Check } from 'lucide-react'
+import { useShowStore } from '../store/useShowStore'
+import DevicesSettings from './DevicesSettings'
+import { cn } from '../lib/utils'
+
+interface AppSettingsProps {
+    isOpen: boolean
+    onClose: () => void
+    isDeveloperMode: boolean
+    setIsDeveloperMode: (value: boolean) => void
+    serverIp: string
+}
+
+const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperMode, setIsDeveloperMode, serverIp }) => {
+    const { appSettings, updateAppSettings, addToast } = useShowStore()
+    const [localSettings, setLocalSettings] = useState(appSettings)
+    const [isSaving, setIsSaving] = useState(false)
+    const [displays, setDisplays] = useState<any[]>([])
+    const [activeTab, setActiveTab] = useState<'general' | 'devices' | 'workstations'>('general')
+    const logoInputRef = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        if (isOpen) {
+            setLocalSettings(appSettings)
+            if ((window as any).require) {
+                const { ipcRenderer } = (window as any).require('electron')
+                ipcRenderer.invoke('get-displays').then(setDisplays)
+            }
+        }
+    }, [isOpen, appSettings])
+
+    if (!isOpen) return null
+
+    const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (file && (window as any).require) {
+            try {
+                const { ipcRenderer } = (window as any).require('electron');
+                const arrayBuffer = await file.arrayBuffer();
+                const persistentUrl = await ipcRenderer.invoke('db:save-logo', { arrayBuffer });
+                setLocalSettings(prev => ({ ...prev, defaultLogo: persistentUrl }));
+            } catch (err) {
+                console.error('Failed to save logo', err);
+            }
+        }
+    }
+
+    const handleSelectTestVideo = async () => {
+        if ((window as any).require) {
+            const { ipcRenderer } = (window as any).require('electron')
+            try {
+                const result = await ipcRenderer.invoke('select-file', {
+                    title: 'Selecteer Test Video',
+                    properties: ['openFile'],
+                    filters: [{ name: 'Videos', extensions: ['mp4', 'webm'] }]
+                })
+                if (!result.canceled && result.filePaths.length > 0) {
+                    setLocalSettings(prev => ({ ...prev, testVideoPath: result.filePaths[0] }))
+                }
+            } catch (error) {
+                console.error("Error selecting file:", error)
+            }
+        }
+    }
+
+    const handleSave = async (shouldClose: boolean) => {
+        if (isSaving) return
+        setIsSaving(true)
+        try {
+            await updateAppSettings(localSettings)
+            addToast('App instellingen succesvol opgeslagen', 'info')
+            if (shouldClose) onClose()
+        } catch (error: any) {
+            console.error('Failed to save app settings:', error)
+            addToast(`Fout bij opslaan: ${error.message || 'Onbekende fout'}`, 'error')
+        } finally {
+            setIsSaving(false)
+        }
+    }
+
+    return (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="w-full max-w-6xl max-h-[90vh] glass border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+                {/* Header */}
+                <div className="h-14 px-6 border-b border-white/10 flex items-center justify-between bg-white/5">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 rounded bg-primary/20 text-primary">
+                            <Shield className="w-5 h-5" />
+                        </div>
+                        <h2 className="text-lg font-bold tracking-tight">App Instellingen</h2>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        title="Sluiten"
+                        className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                    >
+                        <X className="w-5 h-5 opacity-60" />
+                    </button>
+                </div>
+
+                {/* Tab Navigation */}
+                <div className="flex px-6 border-b border-white/5 bg-white/[0.02]">
+                    <button
+                        onClick={() => setActiveTab('general')}
+                        className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-all border-b-2 flex items-center gap-2 ${activeTab === 'general' ? 'border-primary text-primary' : 'border-transparent opacity-40 hover:opacity-100'}`}
+                    >
+                        <Settings2 className="w-3.5 h-3.5" /> Algemeen
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('devices')}
+                        className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-all border-b-2 flex items-center gap-2 ${activeTab === 'devices' ? 'border-primary text-primary' : 'border-transparent opacity-40 hover:opacity-100'}`}
+                    >
+                        <Laptop className="w-3.5 h-3.5" /> Apparaten
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('workstations')}
+                        className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-all border-b-2 flex items-center gap-2 ${activeTab === 'workstations' ? 'border-primary text-primary' : 'border-transparent opacity-40 hover:opacity-100'}`}
+                    >
+                        <Globe className="w-3.5 h-3.5" /> Workstations
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-auto custom-scrollbar">
+                    {activeTab === 'general' ? (
+                        <div className="p-6 space-y-8">
+                            {/* Default Logo */}
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-sm font-bold uppercase tracking-widest opacity-60">Standaard Logo</label>
+                                    {localSettings.defaultLogo && (
+                                        <button
+                                            onClick={() => setLocalSettings(prev => ({ ...prev, defaultLogo: '' }))}
+                                            className="text-[10px] text-red-500 hover:underline"
+                                        >
+                                            Verwijderen
+                                        </button>
+                                    )}
+                                </div>
+                                <div className="flex items-center gap-6">
+                                    <div className="w-48 h-24 rounded-xl border border-white/10 bg-black/40 flex items-center justify-center overflow-hidden relative group">
+                                        {localSettings.defaultLogo ? (
+                                            <img
+                                                src={localSettings.defaultLogo}
+                                                alt="Default Logo"
+                                                className="w-full h-full object-contain p-2"
+                                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                                            />
+                                        ) : (
+                                            <span className="text-[10px] opacity-20 italic">Geen logo</span>
+                                        )}
+                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer" onClick={() => logoInputRef.current?.click()}>
+                                            <Upload className="w-6 h-6 text-white" />
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 space-y-2">
+                                        <p className="text-xs opacity-40 leading-relaxed">
+                                            Dit logo wordt gebruikt wanneer een project geen specifiek logo heeft ingesteld.
+                                        </p>
+                                        <button
+                                            onClick={() => logoInputRef.current?.click()}
+                                            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold transition-colors flex items-center gap-2"
+                                        >
+                                            <Upload className="w-3.5 h-3.5" /> Upload Nieuw Logo
+                                        </button>
+                                        <input
+                                            ref={logoInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            title="Upload logo"
+                                            className="hidden"
+                                            onChange={handleLogoUpload}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-white/5" />
+
+                            {/* Security Settings */}
+                            <div className="space-y-4">
+                                <label className="text-sm font-bold uppercase tracking-widest opacity-60 flex items-center gap-2">
+                                    <Shield className="w-3.5 h-3.5" /> Beveiliging & Netwerk
+                                </label>
+
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label htmlFor="accessPin" className="text-xs opacity-60 font-bold uppercase tracking-widest">Toegangspincode</label>
+                                        <input
+                                            id="accessPin"
+                                            type="text"
+                                            value={localSettings.accessPin || ''}
+                                            onChange={(e) => {
+                                                setLocalSettings(prev => ({ ...prev, accessPin: e.target.value }))
+                                            }}
+                                            placeholder="Bijv. 1234"
+                                            title="Toegangspincode"
+                                            className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono tracking-widest focus:border-primary/50 outline-none"
+                                        />
+                                        <p className="text-[10px] opacity-30 italic font-medium tracking-tight">
+                                            Vereist voor externe verbindingen en het vergrendelen van de host.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label htmlFor="serverPort" className="text-xs opacity-60 flex items-center gap-2"><Globe className="w-3 h-3" /> Server Port</label>
+                                        <input
+                                            id="serverPort"
+                                            type="number"
+                                            value={localSettings.serverPort}
+                                            onChange={(e) => setLocalSettings(prev => ({ ...prev, serverPort: parseInt(e.target.value) || 3001 }))}
+                                            title="Server Poort"
+                                            className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono focus:border-primary/50 outline-none"
+                                        />
+                                        <p className="text-[10px] opacity-30">
+                                            Herstart vereist na wijziging.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label htmlFor="serverIpDisplay" className="text-xs opacity-60 flex items-center gap-2"><Globe className="w-3 h-3" /> Machine IP</label>
+                                        <input
+                                            id="serverIpDisplay"
+                                            type="text"
+                                            value={serverIp}
+                                            readOnly
+                                            title="Machine IP Adres (Alleen Lezen)"
+                                            className="w-full bg-white/5 border border-white/5 rounded-lg px-3 py-2 text-sm font-mono opacity-50 cursor-default outline-none"
+                                        />
+                                        <p className="text-[9px] opacity-30">
+                                            Gedetecteerd IP adres van deze machine.
+                                        </p>
+                                    </div>
+
+                                    <div className="space-y-2 col-span-2">
+                                        <label htmlFor="geminiApiKey" className="text-xs opacity-60 flex items-center gap-2"><Code className="w-3 h-3" /> Gemini API Key</label>
+                                        <input
+                                            id="geminiApiKey"
+                                            type="password"
+                                            value={localSettings.geminiApiKey || ''}
+                                            onChange={(e) => {
+                                                setLocalSettings(prev => ({ ...prev, geminiApiKey: e.target.value }))
+                                            }}
+                                            placeholder="Voer je Google Gemini API key in..."
+                                            title="Gemini API Key"
+                                            className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-primary/50 outline-none"
+                                        />
+                                        <p className="text-[10px] opacity-30 italic">
+                                            Vereist voor AI-gestuurde script herkenning. Je kunt je key vinden op de Google AI Studio website.
+                                        </p>
+                                    </div>
+
+                                    {(window as any).require && (
+                                        <div className="space-y-2 col-span-2">
+                                            <label htmlFor="monitorIndex" className="text-xs opacity-60 flex items-center gap-2"><Monitor className="w-3 h-3" /> Show Controller Monitor</label>
+                                            <select
+                                                id="monitorIndex"
+                                                value={localSettings.controllerMonitorIndex || 0}
+                                                onChange={(e) => setLocalSettings(prev => ({ ...prev, controllerMonitorIndex: parseInt(e.target.value) }))}
+                                                className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-primary/50 outline-none"
+                                            >
+                                                {[0, 1, 2].map(idx => {
+                                                    const d = displays.find(disp => disp.index === idx);
+                                                    return (
+                                                        <option key={idx} value={idx} className="bg-[#111]">
+                                                            Scherm {idx + 1}: {d ? `${d.index === 0 ? '(Hoofdscherm) ' : ''}${d.bounds.width}x${d.bounds.height}` : '(Niet verbonden)'}
+                                                        </option>
+                                                    )
+                                                })}
+                                            </select>
+                                            <p className="text-[10px] opacity-30">
+                                                Het scherm waarop de bediening van LedShow wordt geopend.
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-white/5" />
+
+                            {/* Media Testing */}
+                            <div className="space-y-4">
+                                <label className="text-sm font-bold uppercase tracking-widest opacity-60 flex items-center gap-2">
+                                    <Monitor className="w-3.5 h-3.5" /> Media & Testen
+                                </label>
+                                <div className="space-y-2">
+                                    <label className="text-xs opacity-60">Standaard Test Video</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={localSettings.testVideoPath || ''}
+                                            readOnly
+                                            className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono opacity-60"
+                                            placeholder="Standaard testbeeld (intern)"
+                                        />
+                                        <button onClick={handleSelectTestVideo} className="px-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold">Kies...</button>
+                                    </div>
+                                    <p className="text-[10px] opacity-30">Video die wordt afgespeeld bij het testen van lokale monitoren.</p>
+                                </div>
+                            </div>
+
+                            <div className="h-px bg-white/5" />
+
+                            {/* Developer Mode */}
+                            <div className="space-y-3">
+                                <label className="text-sm font-bold uppercase tracking-widest opacity-60 flex items-center gap-2">
+                                    <Code className="w-3.5 h-3.5" /> Geavanceerd
+                                </label>
+                                <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5">
+                                    <div className="space-y-1">
+                                        <span className="text-xs font-bold">Developer Mode</span>
+                                        <p className="text-[10px] opacity-30 leading-relaxed">
+                                            Activeert geavanceerde opties zoals database beheer. Wordt niet opgeslagen.
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsDeveloperMode(!isDeveloperMode)}
+                                        title="Developer Mode aan/uit"
+                                        className={cn(
+                                            "w-10 h-5 rounded-full relative transition-all duration-500 p-1 border border-white/10",
+                                            isDeveloperMode ? "bg-primary/20 shadow-[inset_0_0_10px_rgba(var(--primary-rgb),0.1)]" : "bg-white/5 shadow-inner"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "w-2.5 h-2.5 rounded-full transition-all duration-500 shadow-lg",
+                                            isDeveloperMode ? "ml-auto bg-primary shadow-[0_0_8px_#f97316]" : "mr-auto bg-white/20"
+                                        )} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : activeTab === 'devices' ? (
+                        <div className="p-6">
+                            <DevicesSettings
+                                devices={localSettings.devices || []}
+                                onChange={(devices) => setLocalSettings(prev => ({ ...prev, devices }))}
+                            />
+                        </div>
+                    ) : (
+                        <div className="p-6 space-y-6">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-bold uppercase tracking-widest opacity-60">Geregistreerde Stations</h3>
+                                <p className="text-[10px] opacity-30 italic">Identiteit en beveiliging van remote apparaten</p>
+                            </div>
+
+                            <div className="grid gap-3">
+                                {useShowStore.getState().connectedClients.length === 0 ? (
+                                    <div className="p-8 text-center bg-white/5 rounded-xl border border-dashed border-white/10">
+                                        <p className="text-xs opacity-40">Geen stations geregistreerd</p>
+                                    </div>
+                                ) : useShowStore.getState().connectedClients.map((client) => {
+                                    const isHostClient = client.type === 'HOST'
+                                    return (
+                                        <div key={client.uuid} className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group">
+                                            <div className="flex items-center gap-4">
+                                                <div className={cn(
+                                                    "w-10 h-10 rounded-lg flex items-center justify-center border",
+                                                    isHostClient ? "bg-orange-500/20 border-orange-500/20 text-orange-500" : "bg-primary/20 border-primary/20 text-primary"
+                                                )}>
+                                                    {isHostClient ? <Shield className="w-5 h-5" /> : <Monitor className="w-5 h-5" />}
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="text"
+                                                            defaultValue={client.friendlyName}
+                                                            title="Pas station naam aan"
+                                                            onBlur={async (e) => {
+                                                                if (e.target.value !== client.friendlyName && (window as any).require) {
+                                                                    const { ipcRenderer } = (window as any).require('electron')
+                                                                    await ipcRenderer.invoke('db:create-update-remote-client', { ...client, friendlyName: e.target.value })
+                                                                    // Trigger a refresh/broadcast somehow
+                                                                    // The host can send a command to itself or just wait for next sync
+                                                                }
+                                                            }}
+                                                            className="bg-transparent border-none focus:ring-0 font-bold text-sm p-0 w-48 focus:text-primary transition-colors"
+                                                        />
+                                                        {isHostClient && <span className="text-[8px] bg-orange-500/20 text-orange-500 px-1.5 py-0.5 rounded uppercase font-black tracking-widest">HOST</span>}
+                                                    </div>
+                                                    <div className="flex items-center gap-3 text-[10px] opacity-40">
+                                                        <span className="font-mono">{client.uuid.slice(0, 8)}...</span>
+                                                        <span>•</span>
+                                                        <span className={client.isAuthorized ? "text-green-500" : "text-yellow-500"}>
+                                                            {client.isAuthorized ? 'Geautoriseerd' : 'Wacht op PIN'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                {!isHostClient && (
+                                                    <button
+                                                        onClick={async () => {
+                                                            if ((window as any).require) {
+                                                                const { ipcRenderer } = (window as any).require('electron')
+                                                                if (confirm(`Weet je zeker dat je station '${client.friendlyName}' wilt verwijderen uit de database?`)) {
+                                                                    await ipcRenderer.invoke('db:delete-remote-client', client.uuid)
+                                                                }
+                                                            }
+                                                        }}
+                                                        className="p-2 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
+                                                        title="Station verwijderen"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="px-6 py-4 bg-white/[0.02] border-t border-white/10 flex items-center justify-between">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 rounded-lg hover:bg-white/10 text-xs font-bold uppercase transition-all text-white/60 hover:text-white"
+                    >
+                        Annuleren
+                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => handleSave(false)}
+                            disabled={isSaving}
+                            className="px-6 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold uppercase transition-all flex items-center gap-2 disabled:opacity-50"
+                        >
+                            <Save className="w-4 h-4 opacity-60" /> {isSaving ? 'Opslaan...' : 'Opslaan'}
+                        </button>
+                        <button
+                            onClick={() => handleSave(true)}
+                            disabled={isSaving}
+                            className="px-6 py-2 rounded-lg bg-primary hover:bg-primary/80 text-white text-xs font-bold uppercase shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                        >
+                            <Check className="w-4 h-4" /> {isSaving ? 'Opslaan...' : 'Opslaan & Sluiten'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default AppSettings
