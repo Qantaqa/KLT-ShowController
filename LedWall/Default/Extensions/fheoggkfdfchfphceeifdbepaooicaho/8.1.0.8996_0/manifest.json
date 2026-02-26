@@ -1,0 +1,43 @@
+{
+   "action": {
+      "default_icon": {
+         "16": "images/browser_action/disabled_16.png",
+         "32": "images/browser_action/disabled_32.png"
+      },
+      "default_title": "__MSG_res_PRODUCT_NAME_TRADEMARKED__"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "scripts/content_navigate_complete.js" ],
+      "matches": [ "http://*/*", "https://*/*" ],
+      "run_at": "document_end"
+   } ],
+   "content_security_policy": {
+      "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' 'wasm-unsafe-eval'; default-src 'self'; style-src 'self' 'unsafe-inline'; style-src-elem 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' data: https://fonts.gstatic.com; img-src data:; connect-src 'self' https://publicsuffix.org https://data.iana.org/ https://sadownload.mcafee.com https://mip.api.mcafeewebadvisor.com https://us.search.yahoo.com https://cu1pehnswadext.servicebus.windows.net https://threat.api.mcafee.com https://csptoken.ccs.mcafee.com https://analytics.qa.apis.mcafee.com https://analytics.apis.mcafee.com https://report.api.mcafee.com/ https://auth.api.mcafee.com/auth/v1/jwt ws://127.0.0.1:* https://einstein-core.awscommon.mcafee.com https://securitymgmt.unifiedapis.mcafee.com https://securitymgmt.qa.unifiedapis.mcafee.com https://securitymgmt.staging.unifiedapis.mcafee.com https://einstein-qa-core.awscommon.mcafee.com https://einstein-stg-core.awscommon.mcafee.com"
+   },
+   "default_locale": "en",
+   "description": "__MSG_res_PRODUCT_NAME_TRADEMARKED__",
+   "externally_connectable": {
+      "ids": [ "*" ],
+      "matches": [ "https://*.mcafee.com/*" ]
+   },
+   "host_permissions": [ "\u003Call_urls>" ],
+   "icons": {
+      "128": "images/webadvisor.png"
+   },
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCrOrksCVomv4HZxXZu6eb3fMbFPlYcSWHnBa0eGSLlBx4YJU3hgqATLB9FrVu1I2kjEKU02kDNejzwnooAjAMpQLMN6rDnVLt/xgvBvwfUcqVOX2vmJvzBFUNhrShiAco662ZtJRD2B4MshsjoggFtWvpBDi3VXRzpr1I0jA0tUwIDAQAB",
+   "manifest_version": 3,
+   "minimum_chrome_version": "88.0",
+   "name": "__MSG_res_PRODUCT_NAME_TRADEMARKED__",
+   "permissions": [ "activeTab", "alarms", "declarativeNetRequest", "downloads", "nativeMessaging", "scripting", "storage", "tabs", "unlimitedStorage", "webRequest" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "8.1.0.8996",
+   "web_accessible_resources": [ {
+      "extension_ids": [ "fheoggkfdfchfphceeifdbepaooicaho" ],
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "html/*.html", "images/*.png", "images/*.gif", "images/*.svg", "json/*.json", "fonts/*.ttf", "css/*.css", "txt/*.txt", "MockingBird-Package/scripts/worklet_processor.js", "wasm_feature.wasm" ]
+   } ]
+}

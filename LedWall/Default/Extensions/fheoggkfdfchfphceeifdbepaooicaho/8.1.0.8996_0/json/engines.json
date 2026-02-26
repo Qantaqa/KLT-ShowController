@@ -1,0 +1,1517 @@
+{
+  "searchengines": [
+    {
+      "name": "yahoo",
+      "enabled": true,
+      "sourcetype": 2,
+      "enginetype": 0,
+      "secureurlre": [
+        "^http(s)?:\\/\\/(([a-z][a-z]|chfr|chit|malaysia|espanol)\\.)?(yhs[0-9]\\.)?(www|search|myweb|myweb2|news\\.search|espanol\\.search|search\\.cn|one\\.cn)\\.yahoo\\.[a-z\\.]+\\/(search|custom|s|404handler|yhs).*fr=(mcafee|mcasa|mcsaoffblock|slv8-mc).*"
+      ],
+      "urlre": [
+        "^http(s)?:\\/\\/(([a-z][a-z]|chfr|chit|malaysia|espanol)\\.)?(yhs[0-9]\\.)?(www|search|myweb|myweb2|news\\.search|espanol\\.search|search\\.cn|one\\.cn)\\.yahoo\\.[a-z\\.]+\\/(search|custom|s|404handler|yhs)"
+      ],
+      "selectors": [
+        {
+          "selector": "div.algo div>h3>a",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "filterURI": {
+            "filterType": 0,
+            "startsWith": "/ru=",
+            "endsWith": "/rk="
+          },
+          "styles": {
+            "top": "0px",
+            "height": "16px"
+          },
+          "description": "Non-Ads Search Result Tile (main annotation urls)"
+        },
+        {
+          "selector": "ul.compArticleList > li > a",
+          "parent": true,
+          "matched": 0,
+          "inline": false,
+          "styles": {
+            "top": "0px",
+            "width": "16px"
+          },
+          "insertAfterSelector": "div:nth-child(2) > h4",
+          "description": "Top Stories First Article (jan 2026)"
+        },
+        {
+          "selector": "div.s-card-wrap a",
+          "parent": true,
+          "matched": 0,
+          "inline": false,
+          "styles": {
+            "top": "0px",
+            "padding-left": "4px"
+          },
+          "insertAfterSelector": "div.s-card-bot > p:nth-child(3)",
+          "description": "Top Stories Card Carousel (jan 2026)"
+        },
+        {
+          "selector": "div .s-title",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "filterURI": {
+            "filterType": 0,
+            "startsWith": "/ru=",
+            "endsWith": "/rk="
+          },
+          "styles": {
+            "top": "3px",
+            "margin": "0px 0px 4px 0px"
+          },
+          "insertIntoMobileStyle" : "margin: 0px 0px 3px 3px;"
+        },
+        {
+          "selector": "div.algo div.compList li a",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "styles": {
+            "top": "0px",
+            "margin": "0px 2px"
+          },
+          "description": "Non-Ads Search Result Sub-Title links"
+        },
+        {
+          "selector": "div.CrisisGlobalNews > div > ul > li p > a",
+          "parent": false,
+          "matched": 0,
+          "inline": false,
+          "insertIntoLink": true,
+          "styles": {
+            "top": "0px",
+            "bottom": "2px"
+          },
+          "description": "Links within Yahoo Global Crisis News"
+        },
+        {
+          "selector": "div.compCardList li div.triTxt a",
+          "parent": false,
+          "matched": 0,
+          "inline": false,
+          "insertIntoLink": true,
+          "styles": {
+            "top": "0px",
+            "bottom": "2px"
+          },
+          "description": "List Catalog News (\"What you need to know\")"
+        },
+        {
+          "selector": "div.sw-Card__title > a",
+          "parent": false,
+          "matched": 0,
+          "inline": false,
+          "insertIntoSelector": "div.sw-Card__titleCiteWrapper",
+          "styles": {
+            "top": "0px",
+            "bottom": "2px"
+          },
+          "description": "Japan Yahoo: main URL selector (adding to header url)"
+        },
+        {
+          "selector": "div.Contents__innerSubGroupBody div.sw-Card__section > div > ul > li > a",
+          "parent": false,
+          "matched": 0,
+          "inline": false,
+          "insertIntoLink": true,
+          "styles": {
+            "top": "0px",
+            "bottom": "2px"
+          },
+          "description": "Japan Yahoo: Right side section (ie Wiki page)"
+        },
+        {
+          "selector": "li div.layoutMiddle div.compTitle a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "li div.layoutMiddle div.compTitle a h3 span",
+          "styles": {
+            "top": "0px",
+            "bottom": "2px"
+          },
+          "description": "Update Yahoo Ads on 2025-04-16"
+        },
+        {
+          "selector": "li div.algo div.compTitle a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "li div.algo div.compTitle a h3 span",
+          "styles": {
+            "top": "0px",
+            "bottom": "2px"
+          },
+          "description": "Add new main annotation urls for search.yahoo.com on 2025-04-16"
+        },
+        {
+          "selector": "li div.layoutMiddle div.layoutCenter div.compList a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "styles": {
+            "top": "0px",
+            "bottom": "2px"
+          },
+          "description": "Yahoo Ads' sub-header links"
+        }
+      ]
+    },
+    {
+      "name": "google",
+      "enabled": true,
+      "sourcetype": 1,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(w+|america|news|encrypted|www\\.l)\\.google\\.[a-z\\.]+\\/search"
+      ],
+      "selectors": [
+        {
+          "selector": "div.yuRUbf>a",
+          "parent": true,
+          "matched": 0,
+          "inline": true
+        },
+        {
+          "selector": "h3.r>a",
+          "parent": true,
+          "matched": 0,
+          "inline": true
+        },
+        {
+          "selector": "div.rc>div.r>a",
+          "parent": false,
+          "matched": 0,
+          "child": "h3.LC20lb",
+          "inline": true
+        },
+        {
+          "selector": "li>h3>a:nth-child(2)",
+          "parent": true,
+          "matched": 0,
+          "inline": true
+        },
+        {
+          "selector": "div._I2>a",
+          "parent": true,
+          "matched": 0,
+          "directLinkLocation": {
+            "hrefattr": "data-href"
+          },
+          "inline": false
+        },
+        {
+          "selector": "g-section-with-header g-link a",
+          "parent": true,
+          "matched": 0,
+          "inline": true,
+          "description": "Google X results"
+        },
+        {
+          "selector": "div[data-hveid] span[jsaction] > a",
+          "parent": true,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "h3",
+          "description": "New Google Search Result - Main results (July 2025)"
+        },
+        {
+          "selector": "a[href]:has(div[role=heading]>div:first-child>div>span)",
+          "parent": true,
+          "matched": 0,
+          "insertIntoSelector": "a[href]>div[role=heading]>div:first-child>div",
+          "description": "Google Main Search - Video results"
+        },
+        {
+          "selector": "a[href]:has(div>div[role=heading]>div:first-child>div>span)",
+          "parent": true,
+          "matched": 0,
+          "insertIntoSelector": "a[href]>div>div[role=heading]>div:first-child>div",
+          "description": "Google Main Search - Video results with an extra div"
+        },
+        {
+          "selector": "div[data-async-rclass=\"search\"] span[role=\"link\"] a",
+          "parent": true,
+          "matched": 0,
+          "inline": true,
+          "description": "New Google Search Result - More Search Results After Scrolling (Sep 2023)"
+        },
+        {
+          "selector": "div[data-hveid] span[jscontroller] > a",
+          "parent": true,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "h3",
+          "description": "New Google Search Result - More Search Results After Scrolling Variation 2 (Mar 2024)"
+        },
+        {
+          "selector": "g-section-with-header >div a",
+          "parent": true,
+          "matched": 0,
+          "inline": false,
+          "insertAfterSelector": "div > div > div[role=heading]",
+          "description": "New Google Search Result - Top Stories"
+        },
+        {
+          "selector": "div.wDYxhc div > a.ellip",
+          "parent": true,
+          "matched": 0,
+          "inline": true,
+          "styles": {
+            "verticalAlign": "super"
+          },
+          "description": "New Google Search Result - Right Panel Wiki Info"
+        },
+        {
+          "selector": "div.v5yQqb > a.sVXRqc",
+          "parent": true,
+          "matched": 0,
+          "inline": false,
+          "insertIntoSelector": "div.v5yQqb > a.sVXRqc > div.CCgQ5",
+          "description": "Top of Google Seach Ads Main Pages",
+          "insertIntoMobileSelectorStyle" : "display: flex; align-items: center",
+          "insertIntoMobileStyle" : "top:0px;"
+        },
+        {
+          "selector": "a.l",
+          "parent": true,
+          "matched": 0,
+          "inline": true,
+          "styles": {
+            "verticalAlign": "super"
+          },
+          "description": "Google Search Sub Pages"
+        },
+        {
+          "selector": "div .cz3goc",
+          "parent": true,
+          "inline": false,
+          "matched": 0,
+          "filterURI": {
+            "filterType": 0,
+            "startsWith": "/ru=",
+            "endsWith": "/rk="
+          },
+          "insertIntoSelector": "div .cz3goc > div.y0NFKc > div:nth-child(2) > div",
+          "insertIntoMobileSelectorStyle" : "display: flex; align-items: center",
+          "insertIntoMobileStyle" : "top:0px;",
+          "description": "IOS Safari Google Search"
+        },
+        {
+          "selector": "div .ygih0",
+          "parent": true,
+          "inline": false,
+          "matched": 0,
+          "filterURI": {
+            "filterType": 0,
+            "startsWith": "/ru=",
+            "endsWith": "/rk="
+          },
+          "insertIntoSelector": "div .ygih0 > div.H7IfUd >div:nth-child(2) > div.o5sVue",
+          "insertIntoMobileSelectorStyle" : "display: flex; align-items: center",
+          "insertIntoMobileStyle" : "top:0px;",
+          "description": "IOS Safari Google Search Related Youtube Video"
+        },
+        {
+          "selector": "div .WlydOe",
+          "parent": true,
+          "inline": false,
+          "matched": 0,
+          "filterURI": {
+            "filterType": 0,
+            "startsWith": "/ru=",
+            "endsWith": "/rk="
+          },
+          "insertIntoSelector": "div .WlydOe > div > div:nth-child(2) > div.MgUUmf",
+          "insertIntoMobileSelectorStyle" : "display: flex; align-items: center",
+          "insertIntoMobileStyle" : "top:0px;",
+          "description": "IOS Safari Google Search Related Top Stories & News"
+        },
+        {
+          "selector": "div .lh9H8",
+          "parent": true,
+          "inline": false,
+          "matched": 0,
+          "filterURI": {
+            "filterType": 0,
+            "startsWith": "/ru=",
+            "endsWith": "/rk="
+          },
+          "insertIntoSelector": "div .lh9H8 > div .QkcpZ > div.d8lRkd",
+          "insertIntoMobileSelectorStyle" : "display: flex; align-items: center",
+          "insertIntoMobileStyle" : "top:0px;",
+          "description": "IOS Safari Google Search Sponsored Ad"
+        }
+      ]
+    },
+    {
+      "name": "brave",
+      "enabled": true,
+      "sourcetype": 33,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?(search.brave\\.com)"
+      ],
+      "selectors": [
+        {
+          "selector": "div#results > div[data-type='web'] a:not(.thumbnail)",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoLink": true,
+          "styles": {
+            "padding": "0px",
+            "top": "0px"
+          },
+          "description": "Main items from search results (Jan 14 2026)"
+        },
+        {
+          "selector": "div.video-cluster-grid > a",
+          "parent": false,
+          "matched": 0,
+          "inline": false,
+          "insertIntoLink": true,
+          "description": "Video links from search results (Jan 14 2026)"
+        },
+        {
+          "selector": "div.discussions-item a.source",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Discussion links from search results (Jan 14 2026)"
+        },
+        {
+          "selector": "div.news-cluster-carousel a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoLink": true,
+          "styles": {
+            "padding": "0px"
+          },
+          "description": "News links from search results (Jan 14 2026)"
+        },
+        {
+          "selector": "div.video-snippet > div.video-content a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoLink": true,
+          "styles": {
+            "padding": "0px",
+            "top": "0px"
+          },
+          "description": "results from video search results (july 28 2025)"
+        },
+        {
+          "selector": "div#search-ad a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "div.title",
+          "redirectURLExtraction": {
+            "targetParam": "click_url",
+            "decodingSteps": [1]
+          },
+          "description": "sponsored search results (july 28 2025)"
+        }
+      ]
+    },
+    {
+      "name": "ecosia",
+      "enabled": true,
+      "sourcetype": 34,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?(ecosia\\.org)"
+      ],
+      "selectors": [
+        {
+          "selector": "div.result__title > a[data-test-id='result-link']",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "h2[data-test-id='result-title']",
+          "styles": {
+            "padding": "0px"
+          },
+          "description": "main items from search results (june 30 2025)"
+        },
+        {
+          "selector": "div[data-test-id='videos-snippet'] ul a[data-test-id='videos-snippet-link']",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoLink": true,
+          "styles": {
+            "padding": "0px"
+          },
+          "description": "video links from search results (june 30 2025)"
+        },
+        {
+          "selector": "div[data-test-id='news-snippet'] ul a[data-test-id='news-snippet-card']",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "time[data-test-id='news-snippet-date']",
+          "styles": {
+            "padding": "0px"
+          },
+          "description": "news links from search results (july 28 2025)"
+        }
+      ]
+    },
+    {
+      "name": "baidu",
+      "enabled": true,
+      "sourcetype": 35,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?(baidu\\.com)"
+      ],
+      "selectors": [
+        {
+          "selector": "div#content_left div[tpl='www_index'] h3 > a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "div > div",
+          "directLinkLocation": {
+            "selector": "div#content_left div.result",
+            "hrefattr": "mu"
+          },
+          "description": "main items from search results (june 30 2025)"
+        },
+        {
+          "selector": "div#content_left div[tpl='ai_search_recommend'] h3 > a, div#content_left div[tpl='sg_kg_entity_san'] h3 > a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "span > span",
+          "directLinkLocation": {
+            "selector": "div#content_left div.result-op, div#content_left div.result",
+            "hrefattr": "mu"
+          },
+          "description": "certain main items from search results (june 30 2025)"
+        },
+        {
+          "selector": "div#content_left div[tpl='note_lead'] h3 > a, div#content_left div[tpl='image_grid_san'] h3 > a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "span > div",
+          "directLinkLocation": {
+            "selector": "div#content_left div.result-op, div#content_left div.result",
+            "hrefattr": "mu"
+          },
+          "description": "image and news grids from search results (july 29 2025)"
+        },
+        {
+          "selector": "div#content_left div[tpl='ai_agent_qa_recommend'] h3 > a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "span",
+          "directLinkLocation": {
+            "selector": "div#content_left div.result-op, div#content_left div.result",
+            "hrefattr": "mu"
+          },
+          "description": "image and news grids from search results (july 29 2025)"
+        },
+        {
+          "selector": "div#content_left > div:not([class]) h3 a:first-of-type",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoLink": true,
+          "directLinkLocation": {
+            "hrefattr": "data-landurl"
+          },
+          "description": "different type of search result (july 29 2025)"
+        },
+        {
+          "selector": "div#content_left div[tpl] h3 > a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoLink": true,
+          "directLinkLocation": {
+            "selector": "div#content_left div.result-op, div#content_left div.result",
+            "hrefattr": "mu"
+          },
+          "description": "remaining types of search result (july 29 2025)"
+        }
+      ]
+    },
+    {
+      "name": "bing",
+      "enabled": true,
+      "sourcetype": 23,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?(bing\\.com)"
+      ],
+      "selectors": [
+        {
+          "selector": "ol#b_results > li.b_algo h2 > a",
+          "insertIntoLink": true,
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "redirectURLExtraction": {
+            "targetParam": "u",
+            "decodingSteps": [0, 1]
+          },
+          "description": "main items from search results (sept 2025)"
+        },
+        {
+          "selector": "div.b_vlist2col ul li a",
+          "insertIntoLink": true,
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "nested links from main results (jan 2026)"
+        },
+        {
+          "selector": "li.b_ad > ul h2 > a[role='link']",
+          "insertIntoLink": true,
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "redirectURLExtraction": {
+            "targetParam": "u",
+            "decodingSteps": [0, 1]
+          },
+          "description": "sponsored search results (sept 2025)"
+        },
+        {
+          "selector": "div.b_vlist2col ul li h3 > a[role='link']",
+          "insertIntoLink": true,
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "redirectURLExtraction": {
+            "targetParam": "u",
+            "decodingSteps": [0, 1]
+          },
+          "description": "sponsored sub search results (jan 2026)"
+        },
+        {
+          "selector": "div.rn_sec div.na_ti a.nws_itm_link",
+          "insertIntoSelector": "div.na_t",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "main news section article (july 29 2025)"
+        },
+        {
+          "selector": "div.ans_nws div.b_slidesContainer div.slide a.na_ccw",
+          "insertIntoSelector": "div.b_cap",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "styles": {
+            "padding": "0px"
+          },
+          "description": "nested news section articles (july 29 2025)"
+        },
+        {
+          "selector": "div#relatedQnAListDisplay div.slide a.df_alsocon_link",
+          "insertIntoSelector": "div.b_attribution > div",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "people also ask links (july 29 2025)"
+        },
+        {
+          "selector": "div.mmlist div.mc_vtvc > a",
+          "insertIntoSelector": "div.mc_vtvc_meta > div.mc_vtvc_title",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "videos of __{search term}__ (jan 2026)"
+        },
+        {
+          "selector": "div.nslist_card > a.nslist_card_link",
+          "insertIntoSelector": "div.nslist_card_main > div.nslist_card_cap > div.nslist_card_title",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "news about __{search term}__ first article (jan 2026)"
+        },
+        {
+          "selector": "div.nslite_card > a.nslite_card_link",
+          "insertIntoSelector": "div.nscardlite_main > div.nscardlite_cap > div.nscardlite_title",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "news about __{search term}__ other article (jan 2026)"
+        },
+        {
+          "selector": "div.b_slidebar > div.slide h2 > a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Bing Copilot Search main links (jan 2026)"
+        },
+        {
+          "selector": "div.b_slidebar > div.slide ul.b_vList div.b_gwaDl > a",
+          "insertIntoSelector": "div.b_gwaDlTitle",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Bing Copilot Search nested links (jan 2026)"
+        }
+      ]
+    },
+    {
+      "name": "duckduckgo",
+      "enabled": true,
+      "sourcetype": 30,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?(duckduckgo\\.com)"
+      ],
+      "selectors": [
+        {
+          "selector": "div#links h2 > a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "main items from search results"
+        },
+        {
+          "selector": "div#react-layout h2 > a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "main items from search results (updated may 15 2023)"
+        },
+        {
+          "selector": "div#ads h2 > a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "ad items"
+        },
+        {
+          "selector": "div#react-layout div[data-testid=news-carousel-module] a",
+          "parent": false,
+          "matched": 0,
+          "inline": false,
+          "styles": {
+            "top": "-3px",
+            "padding": "0px"
+          },
+          "description": "news carousel (updated 02/11 2025)"
+        }
+      ]
+    },
+    {
+      "name": "so",
+      "enabled": true,
+      "sourcetype": 28,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?(so\\.com)\\/s"
+      ],
+      "selectors": [
+        {
+          "selector": "li.res-list>h3>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        }
+      ]
+    },
+    {
+      "name": "sogou",
+      "enabled": true,
+      "sourcetype": 19,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?(sogou\\.com)\\/web"
+      ],
+      "selectors": [
+        {
+          "selector": "h2.pz-head-title>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        },
+        {
+          "selector": "h3.pt>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        },
+        {
+          "selector": "h3.vrTitle>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        }
+      ]
+    },
+    {
+      "name": "info",
+      "enabled": true,
+      "sourcetype": 24,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?(info\\.com)\\/serp"
+      ],
+      "selectors": [
+        {
+          "selector": "div.ads-bing-top>span.ads-bing-top__label>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        },
+        {
+          "selector": "div.web-bing__result>a.web-bing__title",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        },
+        {
+          "selector": "div.web-yahoo__result > a",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        },
+        {
+          "selector": "div.ads-yahoo-top >a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "span.ads-yahoo-top__title"
+        },
+        {
+          "selector": "div.ads-yahoo-bottom >a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoSelector": "span.ads-yahoo-bottom__title"
+        }
+      ]
+    },
+    {
+      "name": "daum",
+      "enabled": true,
+      "sourcetype": 32,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(search\\.daum\\.net)\\/search"
+      ],
+      "selectors": [
+        {
+          "selector": "c-title>strong>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Search results from the entire section"
+        },
+        {
+          "selector": "div.item-title>strong>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Search results from the news and videos section"
+        }
+      ]
+    },
+    {
+      "name": "facebook",
+      "socialMediaType": 8,
+      "sourcetype": 101,
+      "enginetype": 1,
+      "enabled": false,
+      "urlre": [
+        "^http(s)?:\\/\\/(www|m)\\.facebook\\.com"
+      ],
+      "selectors": [
+        {
+          "selector": "div[role=article] span > a",
+          "hrefqstring": "u",
+          "excluderegex": "^http(s)?:\\/\\/.*\\.facebook\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Main Feed Story Wall (Header description)"
+        },
+        {
+          "selector": "div[id=pagelet_timeline_main_column] div > p > a",
+          "hrefqstring": "u",
+          "excluderegex": "^http(s)?:\\/\\/.*\\.facebook\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Main Feed Story Wall (Header description - Logged Out - PRE-render)"
+        },
+        {
+          "selector": "div[role=article] div > p > a",
+          "hrefqstring": "u",
+          "excluderegex": "^http(s)?:\\/\\/.*\\.facebook\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Main Feed Story Wall (Header description - Logged Out - POST-render)"
+        },
+        {
+          "selector": "div[role=article] div[id] > div > div> a",
+          "hrefqstring": "u",
+          "excluderegex": "^http(s)?:\\/\\/.*\\.facebook\\.com",
+          "parent": false,
+          "matched": 0,
+          "insertIntoSelector": "span span",
+          "description": "Main Feed Story Wall (Image Post - Footer link)"
+        },
+        {
+          "selector": "div[role=article] div[id] > div> a",
+          "hrefqstring": "u",
+          "excluderegex": "^http(s)?:\\/\\/.*\\.facebook\\.com",
+          "parent": false,
+          "matched": 0,
+          "insertIntoSelector": "span span",
+          "description": "Main Feed Story Wall (Image Post - Footer link - SPONSORED)"
+        },
+        {
+          "selector": "div[role=article] span > div > div > a",
+          "hrefqstring": "u",
+          "excluderegex": "^http(s)?:\\/\\/.*\\.facebook\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Comments"
+        },
+        {
+          "selector": "div[role=article] li span> span > a",
+          "hrefqstring": "u",
+          "excluderegex": "^http(s)?:\\/\\/.*\\.facebook\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Comments (Logged Out)"
+        },
+        {
+          "selector": "div[data-testid=mwchat-tab] span[role=gridcell] > a",
+          "hrefqstring": "u",
+          "excluderegex": "^http(s)?:\\/\\/.*\\.facebook\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Chat Box"
+        },
+        {
+          "selector": "span.html-span > a[target=_blank]",
+          "hrefqstring": "u",
+          "excluderegex": "^http(s)?:\\/\\/.*\\.facebook\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Posts"
+        }
+      ]
+    },
+    {
+      "name": "ask",
+      "enabled": true,
+      "sourcetype": 4,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/((www|search|ru|fr|de|uk|it|nl|es|eu|jp|br|ca|mx|pl|no|dk|se|us|au|in|ar|pt)\\.)?(uk\\.)?ask\\.(com|jp)\\/(web|pictures|news|videos|ref|ans)(\\.asp)?\\?"
+      ],
+      "selectors": [
+        {
+          "selector": "div[class=result-title]>a",
+          "parent": true,
+          "matched": 0,
+          "inline": true,
+          "styles": {
+            "zIndex": "0"
+          },
+          "description": "Main Search Results"
+        }
+      ]
+    },
+    {
+      "name": "aol",
+      "enabled": true,
+      "sourcetype": 3,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(recherche|suche|search|search\\.cn)\\.aol\\.(jp|cn|fr|ca|com\\.mx|co\\.uk|de|in|com|com\\.au)\\/"
+      ],
+      "selectors": [
+        {
+          "selector": "div[class$=options-toggle]>h3>a",
+          "parent": true,
+          "inline": true,
+          "matched": 0,
+          "filterURI": {
+            "filterType": 0,
+            "startsWith": "/ru=",
+            "endsWith": "/rk="
+          }
+        },
+        {
+          "selector": "li[class^=mb-12]>a",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "filterURI": {
+            "filterType": 0,
+            "startsWith": "/ru=",
+            "endsWith": "/rk="
+          }
+        }
+      ]
+    },
+    {
+      "name": "docomo",
+      "enabled": true,
+      "sourcetype": 6,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/service\\.smt\\.docomo\\.ne\\.jp\\/portal\\/search\\/(web|movie)\\/result\\.html\\?q"
+      ],
+      "selectors": [
+        {
+          "selector": "section#Web_Contents div.gsc-thumbnail-inside a.gs-title",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoLink": true,
+          "description": "main search results (july 31 2025)"
+        },
+        {
+          "selector": "ul.movie_search_result li.item > a",
+          "parent": false,
+          "matched": 0,
+          "insertIntoSelector": "h4.item_ttl",
+          "description": "video search results on vides page (july 31 2025)"
+        },
+        {
+          "selector": "div#adBlock[aria-label='Ads by Google'] div.clicktrackedAd_js a.p_",
+          "parent": false,
+          "matched": 0,
+          "insertIntoSelector": "span",
+          "redirectURLExtraction": {
+            "targetParam": "adurl",
+            "decodingSteps": []
+          },
+          "description": "sponsored search results on videos page (july 31 2025)"
+        }
+      ]
+    },
+    {
+      "name": "terra",
+      "enabled": true,
+      "sourcetype": 8,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/www\\.terra\\.com\\.(br|mx|pe|co|ec|ve|es|ar)"
+      ],
+      "selectors": [
+        {
+          "selector": "div[class=gs-title]>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        }
+      ]
+    },
+    {
+      "name": "web",
+      "enabled": true,
+      "sourcetype": 9,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/suche\\.web\\.de\\/web"
+      ],
+      "selectors": [
+        {
+          "selector": "div[class^=eMd]>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        }
+      ]
+    },
+    {
+      "name": "gmx",
+      "enabled": true,
+      "sourcetype": 11,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/suche\\.gmx\\.net\\/web"
+      ],
+      "selectors": [
+        {
+          "selector": "div[class^=eMd]>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        }
+      ]
+    },
+    {
+      "name": "excite",
+      "enabled": true,
+      "sourcetype": 12,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/websearch\\.excite\\.co\\.jp"
+      ],
+      "selectors": [
+        {
+          "selector": "section>div.item>h3.item_title>a",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        },
+        {
+          "selector": "div#adBlock[aria-label='Ads by Google'] div.clicktrackedAd_js a.p_",
+          "parent": false,
+          "matched": 0,
+          "insertIntoSelector": "span",
+          "redirectURLExtraction": {
+            "targetParam": "adurl",
+            "decodingSteps": []
+          },
+          "description": "sponsored search results (Ads by Google)"
+        }
+      ]
+    },
+    {
+      "name": "naver",
+      "enabled": true,
+      "sourcetype": 14,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(web\\.)?search\\.naver\\.com\\/search\\.naver\\?"
+      ],
+      "selectors": [
+        {
+          "selector": "div.sds-comps-vertical-layout:nth-of-type(2) > div.sds-comps-horizontal-layout > a",
+          "excluderegex": "^http(s)?:\\/\\/(web\\.)?search\\.naver\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "styles": {
+            "top": "0px"
+          },
+          "description": "Main search result (second link - in blue) - July 2025"
+        },
+        {
+          "selector": "div.main_area > a.main_title",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "styles": {
+            "top": "0px"
+          },
+          "description": "Main title (first item) - July 2025"
+        },
+        {
+          "selector": "div.ad_section  span.lnk_url_area > a",
+          "excluderegex": "^http(s)?:\\/\\/(web\\.)?search\\.naver\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "styles": {
+            "top": "0px"
+          },
+          "description": "Ad section results - July 2025"
+        },
+        {
+          "selector": "a[class*='productTitle-pc-module']",
+          "excluderegex": "^http(s)?:\\/\\/(web\\.)?search\\.naver\\.com",
+          "insertIntoLink": true,
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "styles": {
+            "top": "0px"
+          },
+          "description": "Shopping results - July 2025"
+        },
+        {
+          "selector": "div.fds-ugc-block-mod-list div.fds-comps-right-image-text-container a:nth-of-type(1)",
+          "excluderegex": "^http(s)?:\\/\\/(web\\.)?search\\.naver\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "styles": {
+            "top": "0px"
+          },
+          "description": "Articles - July 2025"
+        }
+      ]
+    },
+    {
+      "name": "nifty",
+      "enabled": true,
+      "sourcetype": 15,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/search\\.nifty\\.com\\/searchlist\\/web\\?",
+        "^http(s)?:\\/\\/(azby\\.)?search\\.nifty\\.com\\/websearch\\/search"
+      ],
+      "selectors": [
+        {
+          "selector": "div#search-container div.gsc-thumbnail-inside a.gs-title",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "insertIntoLink": true,
+          "description": "main items from search results (august 12 2025)"
+        }
+      ]
+    },
+    {
+      "name": "rakuten",
+      "enabled": true,
+      "sourcetype": 16,
+      "enginetype": 0,
+      "urlre": [
+        "^http(s)?:\\/\\/(websearch|search)\\.rakuten\\.co\\.jp"
+      ],
+      "selectors": [
+        {
+          "selector": "ul.web-result>li>a.window",
+          "parent": false,
+          "matched": 0,
+          "inline": true
+        }
+      ]
+    },
+    {
+      "name": "linkedin",
+      "socialMediaType": 1,
+      "enginetype": 1,
+      "sourcetype": 100,
+      "enabled": false,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?linkedin\\.com"
+      ],
+      "selectors": [
+        {
+          "selector": "div[class*=feed] span a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?linkedin\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Post's heading URL"
+        },
+        {
+          "selector": "div section dl dd a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?linkedin\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Company's 'About' page Website link"
+        },
+        {
+          "selector": "p.feed-shared-main-content > a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?linkedin\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Post's reply comments URL"
+        },
+        {
+          "selector": "p.msg-s-event-listitem__body > a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?linkedin\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Chat and Message Page Links"
+        },
+        {
+          "selector": "div.msg-spinmail-thread__message-body-container a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?linkedin\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Overlaying Chat"
+        },
+        {
+          "selector": "section.updates p > a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?linkedin\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Post's heading URL (logged out)"
+        },
+        {
+          "selector": "section.core-rail section[data-test-id='about-us'] a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?linkedin\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "hrefqstring": "url",
+          "description": "Process all URLs from the Company's page - About Us (Logged out)"
+        },
+        {
+          "selector": "article div[class*=feed-shared-article__description-container] div a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?linkedin\\.com",
+          "parent": false,
+          "matched": 0,
+          "inline": true,
+          "description": "Share post on main feed wall"
+        }
+      ]
+    },
+    {
+      "name": "instagram",
+      "socialMediaType": 2,
+      "enabled": false,
+      "sourcetype": 103,
+      "enginetype": 1,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?instagram\\.com"
+      ],
+      "selectors": [
+        {
+          "selector": "main > div > header > section a[role='link']",
+          "insertIntoLink": true,
+          "parent": false,
+          "inline": false,
+          "styles": {
+            "display": "inline"
+          },
+          "matched": 0,
+          "hrefqstring": "u",
+          "description": "Profile Page Header Threads Link (if any)"
+        },
+        {
+          "selector": "main > div > header > section a:not([role='link'])",
+          "parent": true,
+          "matched": 0,
+          "inline": false,
+          "insertIntoSelector": "span > span",
+          "hrefqstring": "u",
+          "description": "Profile Page Header Bio Link (if any)"
+        }
+      ]
+    },
+    {
+      "name": "X",
+      "socialMediaType": 16,
+      "enabled": false,
+      "sourcetype": 105,
+      "enginetype": 1,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?x\\.com"
+      ],
+      "selectors": [
+        {
+          "selector": "article div a",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "inTagUrl": true,
+          "excluderegex": "^http(s)?:\/\/([a-z0-9]+[.])*x.com|^http(s)?:\/\/t.co",
+          "description": "X Feeds - target URLs that are in the 'a' tag's body"
+        },
+        {
+          "selector": "div[data-testid=UserDescription] a",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "inTagUrl": true,
+          "excluderegex": "^http(s)?:\/\/([a-z0-9]+[.])*X.com|^http(s)?:\/\/t.co",
+          "description": "X Channel Header - Page's Description"
+        },
+        {
+          "selector": "div[data-testid=UserProfileHeader_Items] a",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "inTagUrl": true,
+          "ignoreInTagUrlHttp": true,
+          "styles": {
+            "padding": "0px",
+            "left": "-10px"
+          },
+          "excluderegex": "^http(s)?:\/\/([a-z0-9]+[.])*X.com|^http(s)?:\/\/t.co",
+          "description": "X Channel Header - Account's external link"
+        }
+      ]
+    },
+    {
+      "name": "youtube",
+      "socialMediaType": 4,
+      "enabled": false,
+      "sourcetype": 102,
+      "enginetype": 1,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?youtube\\.com"
+      ],
+      "selectors": [
+        {
+          "selector": "div[id=content] yt-attributed-string[id=content-text] a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?youtube\\.com",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "insertIntoLink": true,
+          "reProcessAnchor": true,
+          "hrefqstring": "q",
+          "description": "Comments"
+        },
+        {
+          "selector": "div[id=description] yt-formatted-string a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?youtube\\.com",
+          "parent": false,
+          "inline": true,
+          "insertIntoLink": true,
+          "reProcessAnchor": true,
+          "hrefqstring": "q",
+          "matched": 0,
+          "description": "Video Description"
+        },
+        {
+          "selector": "div[id=description] yt-attributed-string a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?youtube\\.com",
+          "parent": false,
+          "inline": true,
+          "insertIntoLink": true,
+          "reProcessAnchor": true,
+          "hrefqstring": "q",
+          "matched": 0,
+          "description": "Video Description New Mar 2023"
+        },
+        {
+          "selector": "div[id=contents] > ytd-channel-video-player-renderer yt-formatted-string a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?youtube\\.com",
+          "parent": false,
+          "inline": true,
+          "hrefqstring": "q",
+          "insertIntoLink": true,
+          "reProcessAnchor": true,
+          "matched": 0,
+          "description": "Channel's Home Page Video Description"
+        },
+        {
+          "selector": "div[id=contents] > ytd-about-channel-renderer yt-channel-external-link-view-model a",
+          "excluderegex": "^http(s)?:\\/\\/(www\\.)?youtube\\.com",
+          "parent": false,
+          "inline": true,
+          "hrefqstring": "q",
+          "insertIntoLink": true,
+          "reProcessAnchor": true,
+          "matched": 0,
+          "description": "Channel's Home Page Profile About Popup page"
+        }
+      ]
+    },
+    {
+      "name": "reddit",
+      "socialMediaType": 32,
+      "enabled": false,
+      "sourcetype": 104,
+      "enginetype": 1,
+      "urlre": [
+        "^http(s)?:\\/\\/(www\\.)?reddit\\.com"
+      ],
+      "selectors": [
+        {
+          "selector": "div a.styled-outbound-link",
+          "excluderegex": "^http(s)?:\\/\\/(.*\\.)?reddit\\.com",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "description": "URL added by Reddit for each Post"
+        },
+        {
+          "selector": "div[data-testid=\"comment\"] p > a",
+          "excluderegex": "^http(s)?:\\/\\/(.*\\.)?reddit\\.com",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "description": "URL in comments"
+        },
+        {
+          "selector": "[id=\"comment-tree\"] p > a",
+          "excluderegex": "^http(s)?:\\/\\/(.*\\.)?reddit\\.com",
+          "parent": false,
+          "inline": true,
+          "insertIntoLink": true,
+          "matched": 0,
+          "description": "URL in comments updated reddit UI April 2023"
+        },
+        {
+          "selector": "div[data-test-id=\"post-content\"] p > a",
+          "excluderegex": "^http(s)?:\\/\\/(.*\\.)?reddit\\.com",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "description": "Main Post's urls"
+        },
+        {
+          "selector": "shreddit-post div > a",
+          "excluderegex": "^http(s)?:\\/\\/(.*\\.)?reddit\\.com",
+          "parent": false,
+          "inline": false,
+          "styles": {
+            "display": "flex",
+            "margin": "0px 0px 4px 0px",
+            "width": "fit-content"
+          },
+          "matched": 0,
+          "description": "Main Post's urls for updated reddit UI March 2024"
+        },
+        {
+          "selector": "shreddit-post div[slot=text-body] a",
+          "excluderegex": "^http(s)?:\\/\\/(.*\\.)?reddit\\.com",
+          "parent": false,
+          "inline": false,
+          "matched": 0,
+          "description": "Post detail page updated 02/2025"
+        },
+        {
+          "selector": "shreddit-post div a.post-link",
+          "excluderegex": "^http(s)?:\\/\\/(.*\\.)?reddit\\.com",
+          "parent": false,
+          "inline": false,
+          "matched": 0,
+          "description": "Home page Post link updated 02/2025"
+        },
+        {
+          "selector": "div.scrollerItem p a",
+          "excluderegex": "^http(s)?:\\/\\/(.*\\.)?reddit\\.com",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "description": "Main Post - Additional Post (Post Description URLs)"
+        },
+        {
+          "selector": "div.scrollerItem>div>div>div>div>div>a",
+          "excluderegex": "^http(s)?:\\/\\/(.*\\.)?reddit\\.com",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "description": "Posts from a sub-reddit channel (URL in description, similar to selector above)"
+        },
+        {
+          "selector": "shreddit-post div[data-post-click-location=text-body] a",
+          "excluderegex": "^http(s)?:\\/\\/(.*\\.)?reddit\\.com",
+          "parent": false,
+          "inline": true,
+          "matched": 0,
+          "description": "Main post page textbody link updated 03/2025"
+        }
+      ]
+    }
+  ]
+}

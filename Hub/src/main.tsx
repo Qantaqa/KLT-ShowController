@@ -4,6 +4,10 @@ import './index.css'
 import App from './App'
 import ProjectionWindow from './components/ProjectionWindow'
 
+/**
+ * Catches unhandled JavaScript errors in the React component tree.
+ * Prevents the entire application from going white by showing a recovery UI.
+ */
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean, error: any }> {
   constructor(props: { children: ReactNode }) {
     super(props)
@@ -11,10 +15,12 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 
   static getDerivedStateFromError(error: any) {
+    // Update state so the next render will show the fallback UI.
     return { hasError: true, error }
   }
 
   componentDidCatch(error: any, errorInfo: any) {
+    // Log the error to the console for developers to inspect in production
     console.error("CRITICAL UI ERROR:", error, errorInfo)
   }
 
@@ -44,18 +50,26 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 }
 
+/**
+ * Application Entry Point
+ * Orchestrates the React boot sequence and handles dual-routing for the Main Control UI
+ * and the secondary Projection Windows.
+ */
 console.log('--- main.tsx: Booting root element ---')
 const rootElement = document.getElementById('root')
 
-
-
-// Check for projection mode via hash
+/**
+ * Route Detection:
+ * The application uses a URL hash to differentiate between the control interface and projection windows.
+ * The Electron main process spawns projection windows with 'index.html#projection' to trigger this.
+ */
 const isProjection = window.location.hash.startsWith('#projection')
 
 if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
       <ErrorBoundary>
+        {/* Simple hash-based router for Electron multi-window support */}
         {isProjection ? <ProjectionWindow /> : <App />}
       </ErrorBoundary>
     </StrictMode>

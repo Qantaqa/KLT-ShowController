@@ -1,0 +1,1808 @@
+{
+   "annotation_balloon_color_green": {
+      "message": "Länken är säker"
+   },
+   "annotation_balloon_color_grey": {
+      "message": "Länken är okänd"
+   },
+   "annotation_balloon_color_red": {
+      "message": "Länken är farlig"
+   },
+   "annotation_balloon_color_yellow": {
+      "message": "Länken är misstänkt"
+   },
+   "annotation_balloon_view_site_report": {
+      "message": "Visa webbplatsrapport"
+   },
+   "aps_expanded_shield_site_ecommerce": {
+      "message": "Vi har gjort en kontroll av webbplatsen och den är säker. Du kan lugnt shoppa vidare."
+   },
+   "aps_expanded_shield_site_email": {
+      "message": "Vi har sökt igenom webbplatsen efter nätfiske – den verkar säker att använda."
+   },
+   "aps_expanded_shield_site_financial": {
+      "message": "Den här webbplatsen är säker att använda. Vi har gjort en kontroll – det är en autentisk ekonomisk webbplats."
+   },
+   "aps_expanded_shield_site_signup": {
+      "message": "Det är säkert att ange din information här. Vi har gjort en kontroll efter nätfiske och andra risker."
+   },
+   "aps_expanded_shield_site_unknown": {
+      "message": "Vi har inte bedömt webbplatsens säkerhet än. Ange personlig information endast om du litar på den."
+   },
+   "aps_toast_button": {
+      "message": "OK"
+   },
+   "aps_toast_list_bullet_four": {
+      "message": "Andra webbplatser du besöker"
+   },
+   "aps_toast_list_bullet_one": {
+      "message": "Bankwebbplatser och ekonomiska webbplatser"
+   },
+   "aps_toast_list_bullet_three": {
+      "message": "Formulär för onlineregistrering"
+   },
+   "aps_toast_list_bullet_two": {
+      "message": "Sidor för kassa och betalning"
+   },
+   "aps_toast_paragraph": {
+      "message": "När du ser vår gröna \"Det är säkert\"-ikon kan du känna dig lugn och veta att alla webbplatser du besöker inte innehåller farliga och riskabla länkar."
+   },
+   "aps_toast_title": {
+      "message": "Vi söker igenom alla webbplatser åt dig"
+   },
+   "category_id_103_name": {
+      "message": "Vuxna ämnen"
+   },
+   "category_id_ac_description": {
+      "message": "Webbsidor kan innehålla virtuella konstgallerier, artistwebbplatser (inklusive skulptur och fotografi), museum, etniska sedvanor och landsspecifika sedvanor."
+   },
+   "category_id_ac_name": {
+      "message": "Konst/kultur/kulturarv"
+   },
+   "category_id_al_description": {
+      "message": "Webbplatser som huvudsakligen säljer, gör reklam för eller förespråkar användning av alkohol, exempelvis öl, vin och sprit. I den här kategorin ingår även cocktailrecept och anvisning om hembryggning."
+   },
+   "category_id_al_name": {
+      "message": "Alkohol"
+   },
+   "category_id_an_description": {
+      "message": "Webbsidor som avsiktligt tillåter användare att söka på webben genom att dölja deras IP-adress, eller annan personligt identifierbar information, för att kringgå lokala filtreringspolicyer och få åtkomst till alla webbsidor. Anonymiseringswebbsidor blockerar även spårningstekniker som cookies eller webbläsarhistorik. Vissa metoder förhindrar även att historik från OS-versioner och webbsidor vidarebefordras till webbsidan. I denna kategori ingår sidor som tillhandahåller fria proxy-IP-adresser eller beskriver hur filtrering kan kringgås."
+   },
+   "category_id_an_name": {
+      "message": "Anonymiserare"
+   },
+   "category_id_au_description": {
+      "message": "Webbsidor som resulterar i anonym webbsökning utan explicit avsikt att tillhandahålla en sådan tjänst. I denna kategori ingår URL-översättare, cachelagring av webbsidor och andra verktyg som kan fungera som anonymiserare, men utan uttryckligt syfte att kringgå filtreringsprogramvara."
+   },
+   "category_id_au_name": {
+      "message": "Anonymiseringsverktyg"
+   },
+   "category_id_be_description": {
+      "message": "Ett webbläsarutnyttjande är ett kodextrakt som exploaterar ett kryphål i en webbläsare så att koden får webbläsaren att göra något oväntat, däribland att stoppa, läsa eller skriva lokala filer, sprida ett virus eller installera spionprogram. Skadlig kod kan utnyttja HTML, JavaScript, bilder, ActiveX, Java och andra webbtekniker. Utnyttjanden, som ibland kallas ofrivilliga hämtningar, kan installera sig själva på oskyddade datorer ofta utan användarens vetskap, där koden kan installera loggningsprogram för tangenttryckningar (för att stjäla lösenord) och Trojan-program (för att ändra datorn till en bot). I denna kategori ingår webbadresser som distribuerar eller kör ett webbläsarutnyttjande."
+   },
+   "category_id_be_name": {
+      "message": "Webbläsarutnyttjanden"
+   },
+   "category_id_bl_description": {
+      "message": "Webbsidor med dynamiskt innehåll som ofta ändras eftersom användare kan publicera eller redigera innehållet när som helst. Denna kategori täcker riskerna med dynamiskt innehåll som kan omfatta allt från harmlöst till stötande. Många bloggar och wikisidor fokuserar på ett tema eller ämne. Denna kategori är ofta använd med andra, exempelvis Kontroversiella åsikter, Utbildning/Referens, Sport, Politik/Åsikt eller Nakenhet, beroende på fokus eller ämne för webbplatsen. Visst innehåll kan vara stötande."
+   },
+   "category_id_bl_name": {
+      "message": "Bloggar/wiki"
+   },
+   "category_id_bu_description": {
+      "message": "Webbsidor som tillhandahåller företagsrelaterad information, exempelvis översikter över bolaget eller affärsplanering och -strategier. I denna kategori ingår även information, tjänster eller produkter som hjälper andra företag att planera, hantera och marknadsföra sina företag. I kategorin ingår marknadsspekulationer på flera nivåer med fokus på att driva verksamheten. I kategorin ingår inte personliga sidor och webbvärdssidor."
+   },
+   "category_id_bu_name": {
+      "message": "Företagsinformation"
+   },
+   "category_id_ch_description": {
+      "message": "Webbsidor som tillhandahåller webbaserade, realtidstjänster för sociala meddelanden i offentliga och privata chattrum. I denna kategori ingår IRC. Kategorin inkluderar inte snabbmeddelanden. Riskerna inkluderar stötande innehåll, skadliga effekter på produktiviteten och läckage av känsligt information."
+   },
+   "category_id_ch_name": {
+      "message": "Chatt"
+   },
+   "category_id_cm_description": {
+      "message": "Webbsidor med allmän referensinformation som leverantörer av offentliga tjänster, regional information, transporttidtabeller, kartor eller väderrapporter."
+   },
+   "category_id_cm_name": {
+      "message": "Offentlig information"
+   },
+   "category_id_co_description": {
+      "message": "Webbsidor som innehåller åsikter som troligen förolämpar politisk eller social medvetenhet eller sporrar kontroverser. En stor del av detta innehåll är extremt för den allmänna opinionen. Bland exemplen finns självmordspakter, uppmuntrande av anorexi, främlingsfientlighet, etnocentriskt synsätt, fundamentalistiska synpunkter, desinformation eller kritisk undersökning av en folkgrupp."
+   },
+   "category_id_co_name": {
+      "message": "Kontroversiella åsikter"
+   },
+   "category_id_cp_description": {
+      "message": "Webbplatser som försöker råna eller lura kunder. Exempel på deras aktiviteter är försäljning av förfalskade produkter, försäljning av produkter som ursprungligen var gratis eller oriktig användning av ett annat företags varumärke. I denna kategori ingår webbplatser som utnyttjar vänlighet eller okunskap, exempelvis falsk insamling av pengar för välgörenhet eller erbjuder bedrägliga investeringsplaner. Kategorin inkluderar även webbplatser där många kunder har rapporterat att de blivit lurade eller inte fått tjänsterna."
+   },
+   "category_id_cp_name": {
+      "message": "Konsumentskydd"
+   },
+   "category_id_cs_description": {
+      "message": "Webbplatser, vilka McAfee anser tillhandahåller instruktioner att utföra olagliga eller kriminella aktiviteter. Instruktionerna inkluderar mord eller självmord, sabotage, tillverka bomber, låsdyrkning, stöld av tjänst, kringgå lagstiftning eller förfalskning av drogtester. Denna kategori kan även inkludera information om hur illegalt innehåll sprids, utföra bedrägerier eller svindla konsumenter."
+   },
+   "category_id_cs_name": {
+      "message": "Potentiellt kriminella handlingar"
+   },
+   "category_id_cv_description": {
+      "message": "Webbsidor med fantiserat eller fiktivt våld i spel, serier, tecknade filmer eller grafiska romaner. I kategorin ingår bilder och textuella beskrivningar av fysiska angrepp eller slagsmål, och grava skador och förstörelse orsakade av vapen och bomber."
+   },
+   "category_id_cv_name": {
+      "message": "Spel/tecknat våld"
+   },
+   "category_id_dc_description": {
+      "message": "Webbplatser som tillåter människor att skicka och ta emot digitala vykort och kort med personliga hälsningar via Internet. Digitala vykort innehåller meddelanden med en hälsning eller specifik önskan, vanligtvis för särskilda tillfällen som födelsedagar eller helger. Vissa digitala vykortswebbplatser har en speciell katalog för vuxenhumor. Dessa webbplatser kan även ge upphov till oro för läckage av känslig eller upphovsrättsskyddad information, stötande innehåll, malware eller skadliga filbilagor."
+   },
+   "category_id_dc_name": {
+      "message": "Digitala vykort"
+   },
+   "category_id_dl_description": {
+      "message": "Webbplatser som tillåter användare att oavsiktligt hämta kod som är skadlig eller irriterande. Denna kategori inkluderar hämtningsbara filer som skärmsläckare, verktygsfält och fildelningsprogram som innehåller reklamprogram, spionprogram, virus och annan skadlig datorkod. Ibland läggs malware till utan användarens vetskap, som när de klickar \"Ja\" eller \"Jag godkänner\" utan att läsa de fullständiga villkoren. Detta kan medföra olika effekter som långsammare dator, stöld av lösenord och förlust av, eller skadade, värdefulla personliga filer."
+   },
+   "category_id_dl_name": {
+      "message": "Skadliga nedladdningar"
+   },
+   "category_id_dp_description": {
+      "message": "Webbsidor som tillhandahåller nätverk för onlinedejting, kontaktskapande, eskorttjänster eller presentation av möjlig partner. I kategorin ingår webbplatser med personliga profiler eller grupprofiler, och som tillåter sina medlemmar att interagera via realtidskommunikation, publicering av meddelanden, offentliga bulletiner och delning av media. Webbplatser i denna kategori kan även möjliggöra kontakt med oönskade parter och medlemsprofiler som innehåller olämplig information."
+   },
+   "category_id_dp_name": {
+      "message": "Dejting/personligt"
+   },
+   "category_id_dr_description": {
+      "message": "Webbplatser som tillhandahåller information om inköp, tillverkning och användning av illegala droger eller partydroger. Denna kategori inkluderar visning, försäljning eller beskrivning av hur drogtillbehör används, och tips om legala droger (s.k. legal highs), exempelvis limsniffning, missbruk av receptbelagda mediciner eller missbruk av andra lagliga substanser."
+   },
+   "category_id_dr_name": {
+      "message": "Droger"
+   },
+   "category_id_eb_description": {
+      "message": "Webbsidor som tillhandahåller onlineanbud och -försäljning av föremål eller tjänster. I denna kategori ingår webbsidor som fokuserar på anbud och försäljning. Onlineauktioner övervakas sällan. Dessa webbplatser kan exponera användarna för material som också återfinns i kategorier som Pornografi, Vapen, Nakenhet eller Våld."
+   },
+   "category_id_eb_name": {
+      "message": "Auktioner/radannonser"
+   },
+   "category_id_ed_description": {
+      "message": "Webbsidor avsedda för akademiskt innehåll som akademiska ämnen (matematik, historia), skol- eller universitetswebbsidor och sidor för utbildningsadministration (skolstyrelser, lärares utbildningsplan)."
+   },
+   "category_id_ed_name": {
+      "message": "Utbildning/Referens"
+   },
+   "category_id_et_description": {
+      "message": "Webbsidor som tillhandahåller information om bio, teater, musik, television, infotainment, skvaller i underhållningsbranschen och webbplatser om kändisar som skådespelare och musiker. I denna kategori ingår även webbplatser där innehållet ägnas åt att tillhandahålla underhållning på webben, som horoskop och fanklubbar."
+   },
+   "category_id_et_name": {
+      "message": "Underhållning"
+   },
+   "category_id_ex_description": {
+      "message": "Kategorin används tillsammans med kategorier för Äckligt innehåll, Diskriminering, Pornografi, Våld eller Spel/Tecknat våld för att identifiera webbadresser som är ytterligheter i dessa kategorier. Ett exempel är illegal pornografi, som finns i kategorierna för Pornografi, Potentiellt kriminella handlingar och Extremt."
+   },
+   "category_id_ex_name": {
+      "message": "Extremt"
+   },
+   "category_id_fb_description": {
+      "message": "Webbsidor som marknadsför kläder, kosmetika, smycken och andra modeorienterade produkter, accessoarer eller tjänster. Kategorin inkluderar även produktgranskningar, jämförelser och allmän konsumentinformation, samt tjänster som frisörsalonger, solarier, tatueringsstudior och piercingstudior."
+   },
+   "category_id_fb_name": {
+      "message": "Mode/skönhet"
+   },
+   "category_id_fi_description": {
+      "message": "Webbsidor som tillhandahåller finansiell information eller åtkomst till finansiella konton online. I den här kategorin ingår webbsidor som tillhandahåller finansiell information inklusive nyheter eller tjänster för förvaltning av pengar, men som inte ger åtkomst till känslig finansiell kontoinformation, exempelvis finansiell statistik eller konsultation inom områden som skatter, lån, försäkring, ackreditering eller investering. Åtkomst till finansiella konton online inkluderar personliga eller företagsrelaterade bankärenden, penningförvaltning, skattekonsultation, gemensamma fonder, kreditkort, kreditföretag, försäkringar, övriga finansiella publikationer och tjänster. Denna kategori inkluderar aktieinformation (men inte aktiehandel), hemfinans och myndighetsrelaterad finansiell information."
+   },
+   "category_id_fi_name": {
+      "message": "Finans/Bankärende"
+   },
+   "category_id_fk_description": {
+      "message": "Webbsidor som är familjesäkra, särskilt för barn ungefär i åldern tio år och yngre."
+   },
+   "category_id_fk_name": {
+      "message": "För barn"
+   },
+   "category_id_gb_description": {
+      "message": "Webbsidor som tillåter användare att slå vad eller spela online, eller tillhandahålla spelprogramvara som gör vadslagning online möjligt, t.ex. kasinospel, vadslagningspooler, sportvadhållning och lotterier. Kategorin inkluderar lotterier om du kan köpa lotter och spela online."
+   },
+   "category_id_gb_name": {
+      "message": "Spel med pengainsats"
+   },
+   "category_id_gm_description": {
+      "message": "Webbsidor som erbjuder onlinespel och relaterad information som bedrägeri, koder, demonstrationer, emulatorer, onlinetävlingar eller rollspel, spelklaner, webbplatser för speltillverkning, fantasiligor eller virtuella sportligor och andra spelwebbplatser utan chanser att vinna. I denna kategori ingår spelkonsoler som Microsoft Xbox® och Sony PlayStation®."
+   },
+   "category_id_gm_name": {
+      "message": "Spel"
+   },
+   "category_id_gr_description": {
+      "message": "Webbsidor som erbjuder information om spel, utan att tillhandahålla möjligheter att spela. Denna kategori inkluderar kasinorelaterade webbsidor som inte erbjuder onlinespel, spellänkar, tips, sportvadslaging, lotteriresultat och hästkapplöpning, bil- eller båtracing."
+   },
+   "category_id_gr_name": {
+      "message": "Relaterat till spel med pengainsats"
+   },
+   "category_id_gv_description": {
+      "message": "Webbsidor med innehåll som administreras av myndigheter eller militära organisationer, som myndighetsförvaltningar eller agenturer, polismyndigheter, brandmyndigheter, civilförsvar, terrorismbekämpande organisationer eller överstatliga organisationer, som Förenta nationerna eller Europiska unionen. I denna kategori ingår sjukvård för militärer och veteraner."
+   },
+   "category_id_gv_name": {
+      "message": "Regering/militär"
+   },
+   "category_id_hi_description": {
+      "message": "Webbsidor som innehåller historiska fakta. I denna kategori ingår lämpligt innehåll för högre utbildning, men kategorin Utbildning inkluderar primär utbildningsinformation. Exempelvis kan en webbplats med foton från förintelsen vara stötande men ha ett akademiskt värde."
+   },
+   "category_id_hi_name": {
+      "message": "Historik"
+   },
+   "category_id_hk_description": {
+      "message": "Webbsidor vilka McAfee anser innehålla instruktioner om, eller annars möjliggöra, bedrägeri, brott eller andra datororienterade skadliga aktiviteter. Denna kategori inkluderar webbsidor relaterade till datorbrottslighet, däribland skadlig hackningsinformation eller verktyg som hjälper enskilda personer att få otillåten åtkomst till datorer och nätverk (rootkit, kiddyskript). I kategorin ingår även andra områden av elektroniskt bedrägeri som uppringningsprogram och olaglig manipulation av elektroniska enheter."
+   },
+   "category_id_hk_name": {
+      "message": "Potentiella hackningar/datorbrott"
+   },
+   "category_id_hl_description": {
+      "message": "Webbsidor som täcker all hälsorelaterad information och alla hälsovårdstjänster. Hälsoinformation inkluderar ämnen för att förbättra hälsan för enskilda personer, både fysisk och mental hälsa (diet, näringslära, kondition eller föräldraskap). Hälsovårdstjänster inkluderar leverantörer av sjukförsäkringar, sjukhus, kliniker och oberoende läkare."
+   },
+   "category_id_hl_name": {
+      "message": "Hälsa"
+   },
+   "category_id_hm_description": {
+      "message": "Webbsidor med humor eller roligt innehåll. I denna kategori ingår webbplatser med skämt, sketcher, serier och satir. Kategorin kan även innehålla grafiskt innehåll från romaner som oftast associeras med serier."
+   },
+   "category_id_hm_name": {
+      "message": "Humor/serier"
+   },
+   "category_id_hr_description": {
+      "message": "Webbsidor som annonserar eller erbjuder olika tolkningar av signifikanta historiska fakta som förnekande av förintelsen. I denna kategori ingår webbplatser som kan ha legitimt akademiskt värde, men många av dessa webbplatser inkluderar olaglig manipulation av historien för politiska syften. Vissa webbadresser i den här kategorin kan ha innehåll som anses olagligt eller stötande i vissa länder."
+   },
+   "category_id_hr_name": {
+      "message": "Historierevisionism"
+   },
+   "category_id_hs_description": {
+      "message": "Webbsidor vilka McAfee tror innehåller information som explicit uppmuntrar förtryck eller diskriminering av en specifik grupp av personer. Denna kategori inkluderar förespråkande av en agenda mot grupper baserat på ras, religion, nationalitet, kön, ålder, handikapp eller sexuell orientering. Kategorin kan inkludera politiska partier och organisationer med en specifik hatbaserad agenda och nätmobbning när den är extrem."
+   },
+   "category_id_hs_name": {
+      "message": "Diskriminering"
+   },
+   "category_id_hw_description": {
+      "message": "Webbplatser relaterade till databehandlingsprogram och maskinvara, inklusive leverantörer, marknadsföring av produkter och recensioner, distribution och underhåll av programvara och maskinvara, och programuppdateringar och tillägg som skript, plugin-program eller drivrutiner. Maskinvara inkluderar datordelar, tillbehör och elektronisk utrustning som används med datorer och nätverk. Denna kategori inkluderar marknadsföring av programvara och maskinvara, samt tidskrifter som fokuserar på programvara och maskinvara eller trender i branschen."
+   },
+   "category_id_hw_name": {
+      "message": "Programvara/maskinvara"
+   },
+   "category_id_ia_description": {
+      "message": "Webbsidor som ger åtkomst till webbprogram live eller interaktivt, som webbaserade kontorspaket och grupprogram. I denna kategori ingår webbplatser med fokus på företag, akademier eller enskilda personer."
+   },
+   "category_id_ia_name": {
+      "message": "Interaktiva webbprogram"
+   },
+   "category_id_il_description": {
+      "message": "Webbsidor vilka McAfee tror erbjuder information om potentiell piratprogramvara eller illegal distribution av programvara eller elektroniska media, t.ex. upphovsrättsskyddad musik eller film, distribution av illegala licensnyckelgeneratorer, knäckt programvara och serienummer."
+   },
+   "category_id_il_name": {
+      "message": "Potentiellt olaglig programvara"
+   },
+   "category_id_im_description": {
+      "message": "Webbsidor med programvara för realtidskommunikation via nätverk exklusivt för användare som anslöt sig till en medlemskontaktlista eller snabbmeddelandesession. De flesta snabbmeddelandeprogram inkluderar funktioner som filöverföring, telefonsamtal mellan datorer och kan spåra när andra personer loggar in eller ut. Dessa webbplatser kan även ge upphov till oro för läckage av känslig information, stötande innehåll eller fildelning."
+   },
+   "category_id_im_name": {
+      "message": "Snabbmeddelanden"
+   },
+   "category_id_in_description": {
+      "message": "Webbsidor som erbjuder köp, försäljning eller handel med aktier online. I kategorin ingår även banderoller med information som gör det möjligt att visa aktiepriser i realtid och finansiell spread-vadslagning på aktiemarknaden. Annan vadslagning finns i kategorin Spel med pengainsats. Denna kategori inkluderar inte webbplatser som erbjuder information om aktier, och erbjuder inte köp, försäljning eller handel med andelar."
+   },
+   "category_id_in_name": {
+      "message": "Aktiehandel"
+   },
+   "category_id_io_description": {
+      "message": "Webbsidor som får tillhandahålla information om dataskydd. Denna kategori inkluderar detaljerad information om skydd av verksamhet eller personliga data, immateriell egendom, integritet och infrastruktur på Internet, i privata nätverk eller andra bandbreddstjänster som telekommunikation. Möjliga risker inkluderar Potentiella hackningar/Datorbrott. Webbplatser med högriskinnehåll och ingen tydlig urskiljning mellan \"svart hatt\" och \"vit hatt\" kan också finnas i denna kategori, och i Potentiella hackningar/Datorbrott. Visst innehåll kan utnyttjas för att bryta säkerheten eller utföra olagliga åtgärder."
+   },
+   "category_id_io_name": {
+      "message": "Informationssäkerhet"
+   },
+   "category_id_ir_description": {
+      "message": "Webbsidor som tillhandahåller programvara eller åtkomst till fortlöpande ljud- eller videosändning, som Internetradio, TV-program eller podsändning."
+   },
+   "category_id_ir_name": {
+      "message": "Internetradio/-tv"
+   },
+   "category_id_is_description": {
+      "message": "Webbadresser till servrar som är värd för bilder, mediefiler eller JavaScript för en eller flera webbplatser och är avsedda att ge snabbare hämtning av innehåll för befintliga webbservrar, som Apache. Innehållsservrar i allmänhet har inget publicerat innehåll eller navigering genom webbplatsen för webbsurfare. Innehållsservrar för bilder tillåter inte användarna att bläddra bland fotona."
+   },
+   "category_id_is_name": {
+      "message": "Innehållsserver"
+   },
+   "category_id_it_description": {
+      "message": "Webbsidor som tillhandahåller tjänster för publicering och underhåll av Internet-webbplatser som webbdesign, domänregistrering, leverantörer av Internettjänster och bredbands- och telekommunikationsföretag som levererar webbtjänster."
+   },
+   "category_id_it_name": {
+      "message": "Internettjänster"
+   },
+   "category_id_js_description": {
+      "message": "Webbsidor relaterade till en jobbsökning inklusive webbplatser för hjälp att skriva en resumé, intervjuer, karriärbyten, klassificerad annonsering och stora jobbdatabaser. I denna kategori ingår även företagswebbsidor med tillgängliga jobb, webbsidor för lönejämförelse, tillfällig anställning och rekryteringswebbplatser för företag."
+   },
+   "category_id_js_name": {
+      "message": "Jobbsökning"
+   },
+   "category_id_mb_description": {
+      "message": "Webbsidor som ger åtkomst (http://) till Usenet-nyhetsgrupper eller innehåller diskussioner eller innehåll som användare publicerar senare, exempelvis inlägg i realtid för en intressegrupp. I denna kategori ingår även arkiv med filer som laddats upp i nyhetsgrupper."
+   },
+   "category_id_mb_name": {
+      "message": "Forum/anslagstavlor"
+   },
+   "category_id_md_description": {
+      "message": "Webbsidor som tillåter användare att ladda upp, söka efter och dela mediefiler och foton, exempelvis fotoalbum online. Denna kategori täcker allmänna risker med mediedelning, men avser inget specifikt innehåll. En del webbadresser kan också innehålla stötande material."
+   },
+   "category_id_md_name": {
+      "message": "Mediedelning"
+   },
+   "category_id_mg_description": {
+      "message": "Webbsidor som tillhandahåller textmeddelanden. Exempel på dessa är textmeddelande till mobiltelefoner, handdatorer, faxmaskiner och interna webbplatser för meddelanden mellan användare eller mellan webbplatser."
+   },
+   "category_id_mg_name": {
+      "message": "Meddelandetjänster"
+   },
+   "category_id_mk_description": {
+      "message": "Webbplatser som främjar enskilda produkter eller företagsprodukter eller -tjänster på webben, men inte säljer sina produkter eller tjänster online. I denna kategori ingår webbplatser som allmänt är en företagsöversikt, och beskriver tjänster eller produkter som inte kan köpas direkt från dessa webbplatser. Exempelvis webbplatser för biltillverkare, bröllopsfotografering eller grafiska designtjänster."
+   },
+   "category_id_mk_name": {
+      "message": "Marknadsföring/försäljning"
+   },
+   "category_id_mm_description": {
+      "message": "Webbsidor som fokuserar på social interaktion som onlinedejting, vänskap, klassträffar, brevvänner, eskorttjänster eller presentation av möjlig partner. I kategorin ingår många webbplatser som tillåter medlemmarna att kommunicera socialt via publicering av meddelanden i realtid. Webbplatser i denna kategori kan även möjliggöra kontakt med oönskade parter och medlemsprofiler som innehåller olämplig information."
+   },
+   "category_id_mm_name": {
+      "message": "Dejting/Sociala nätverk"
+   },
+   "category_id_mn_description": {
+      "message": "Webbsidor som innehåller icke-pornografiska bilder av den nakna människokroppen, som klassiska skulpturer och målningar eller medicinska bilder."
+   },
+   "category_id_mn_name": {
+      "message": "Tillfällig nakenhet"
+   },
+   "category_id_mo_description": {
+      "message": "Webbplatser som säljer media, programvara eller tillbehör för mobiltelefoner som kan hämtas och levereras till mobiltelefoner. Exempelvis ringtoner, logotyper/skal, spel, skärmsläckare, textbaserade sånger och programvara för SMS, MMS, WAP och andra mobila telefonprotokoll."
+   },
+   "category_id_mo_name": {
+      "message": "Mobiltelefon"
+   },
+   "category_id_mp_description": {
+      "message": "Webbsidor som tillhandahåller ljud- eller videofiler för nedladdning som MP3-, WAV-, AVI- och MPEG-format. Filerna sparas på, och spelas från användarens dator."
+   },
+   "category_id_mp_name": {
+      "message": "Medienedladdningar"
+   },
+   "category_id_mr_description": {
+      "message": "Anslagstavlor, chattrum, sökmotorer eller webbaserade e-postplatser som övervakas av en enskild person eller grupp som har behörighet att blockera meddelanden eller innehåll som anses olämpligt."
+   },
+   "category_id_mr_name": {
+      "message": "Modererade"
+   },
+   "category_id_ms_description": {
+      "message": "Webbsidor som distribuerar kod specifikt designad för att kapa datorns inställningar eller aktiviteter. I denna kategori ingår självinstallerande program (kallas \"ofrivillig hämtning\" av körbara filer), trojaner och virus som utnyttjar säkerhetssårbarheter i webbläsare eller andra program. En webbsida kan senare bli fri från sin status som skadlig sida och flyttas till en annan kategori. Skadliga webbplatser försöker aktivera åtgärder på en annan dator för att orsaka skada."
+   },
+   "category_id_ms_name": {
+      "message": "Skadliga webbplatser"
+   },
+   "category_id_mv_description": {
+      "message": "Webbplatser för tillverkare och återförsäljare av transportfordon för konsumenter, som bilar, skåpbilar, lastbilar, stadsjeepar, motorcyklar och skotrar. I denna kategori ingår även webbplatser som tillhandahåller produktmarknadsföring, granskningar, jämförelser, prisinformation, bilutställningar, bilmässor och allmän konsumentinformation om motorfordon."
+   },
+   "category_id_mv_name": {
+      "message": "Motorfordon"
+   },
+   "category_id_na_description": {
+      "message": "Webbsidor som ger åtkomst (http://) till Usenet-nyhetsgrupper och arkiv med filer som laddats upp i nyhetsgrupper. I denna kategori ingår även onlinegrupper som erbjuder liknande publicering av gemenskapsorienterat innehåll. Webbadresserna i denna kategori kan innehålla stötande material."
+   },
+   "category_id_na_name": {
+      "message": "Usenet-nyheter"
+   },
+   "category_id_nd_description": {
+      "message": "Webbsidor som innehåller icke-pornografiska bilder av den nakna människokroppen. Denna kategori inkluderar klassiska skulpturer och målningar, artistiska nakenfotografier, vissa nudistbilder och detaljerade medicinska illustrationer."
+   },
+   "category_id_nd_name": {
+      "message": "Nakenhet"
+   },
+   "category_id_np_description": {
+      "message": "Webbsidor från grupper för välgörenhet eller utbildning som uppfyller ett angivet mål, gynnar en större gemenskap, exempelvis klubbar, lobbyer, gemenskaper, ideella organisationer, arbetarföreningar och stödgrupper. Exempelvis Frimurarna, Scouterna eller Lottorna."
+   },
+   "category_id_np_name": {
+      "message": "Ideella organisationer/Intresseorganisationer/Icke-statliga organisationer"
+   },
+   "category_id_ns_description": {
+      "message": "Webbsidor som tillåter användare att ladda upp mappar och filer till en nätverksserver online för att säkerhetskopiera, dela, redigera eller hämta filer eller mappar från någon webbläsare."
+   },
+   "category_id_ns_name": {
+      "message": "Personlig nätverkslagring"
+   },
+   "category_id_nt_description": {
+      "message": "Webbplatser med sociala nätverk exklusivt för professionella syften eller affärssyften. I denna kategori ingår webbplatser med personliga profiler eller grupprofiler, och gör det möjligt för medlemmarna att interagera via realtidskommunikation, publicering av meddelande, offentliga bulletiner och mediedelning. Denna kategori innehåller även alumniwebbplatser som har en nätverksfunktion."
+   },
+   "category_id_nt_name": {
+      "message": "Professionella nätverk"
+   },
+   "category_id_nw_description": {
+      "message": "Webbsidor som innehåller nyhetsmedier online, exempelvis internationella eller regionala nyhetssändningar och publikationer. I kategorin ingår portalwebbplatser med nyhetsinnehåll."
+   },
+   "category_id_nw_name": {
+      "message": "Allmänna nyheter"
+   },
+   "category_id_os_description": {
+      "message": "Webbsidor som säljer produkter eller tjänster online. Webbsidor som säljer ett brett utbud av produkter kan utgöra en risk för användare genom att erbjuda åtkomst till objekt som vanligtvis hänförs till andra kategorier som Pornografi, Vapen, Nakenhet eller Våld. Vissa webbplatser kan erbjuda åtkomst till objekt i andra kategorier som Pornografi och Vapen."
+   },
+   "category_id_os_name": {
+      "message": "Onlineshopping"
+   },
+   "category_id_pa_description": {
+      "message": "Webbsidor med lockande eller avslöjande bilder på kläder, underkläder och baddräkter, eller samlingar av foton på supermodeller eller kändisar, men som inte involverar nakenhet."
+   },
+   "category_id_pa_name": {
+      "message": "Utmanande klädsel"
+   },
+   "category_id_pc_description": {
+      "message": "IP-adresser (och andra domäner som hör ihop med dem) som får åtkomst till Internet via DSL-modem eller kabelmodem. Eftersom detta innehåll i allmänhet inte är avsett för Internetåtkomst via HTTP, kan åtkomst till Internet via dessa IP-adresser indikera ett misstänkt beteende. Det här beteendet kan vara kopplat till malware som finns på datorn i hemmet eller egna gateways som konfigureras för att ge anonym internetåtkomst."
+   },
+   "category_id_pc_name": {
+      "message": "Privata IP-adresser"
+   },
+   "category_id_pd_description": {
+      "message": "Webbsidor som tidigare tillhandahöll innehåll, men deras domäner har sålts eller övergetts och är inte längre registrerade. Parkerade domäner är inte värdar för sitt eget innehåll, utan omdirigerar vanligtvis användarna till en generisk sida som anger att domännamnet kan köpas, eller omdirigerar användare till en generisk sökmotor och portalsida, där vissa av dem levererar giltiga sökresultat."
+   },
+   "category_id_pd_name": {
+      "message": "Parkerad domän"
+   },
+   "category_id_ph_description": {
+      "message": "Länkar till webbsidor som vanligtvis medföljer hoaxmeddelanden, som etablerats för att stjäla information från användarkontot. Dessa webbplatser representerar falskeligen sig själva och utger sig för att vara riktiga företagswebbsidor med syfte att lura till sig information från användarkontot för att utföra bedrägerier och stöld."
+   },
+   "category_id_ph_name": {
+      "message": "Nätfiske"
+   },
+   "category_id_pm_description": {
+      "message": "Webbsidor med recensioner, beskrivningar och marknadsföring eller försäljning av receptbelagda läkemedel, receptfria läkemedel eller kosttillskott."
+   },
+   "category_id_pm_name": {
+      "message": "Apotek"
+   },
+   "category_id_pn_description": {
+      "message": "Webbsidor som tillåter utbyte av filer mellan datorer och användare för personlig användning eller i företag, exempelvis hämtning av musik. P2P-klienter tillåter användare att söka efter och byta filer i peer-användarnätverk. Där ingår ofta spionprogram eller möjligheter att chatta i realtid. Denna kategori inkluderar BitTorrent-webbsidor."
+   },
+   "category_id_pn_name": {
+      "message": "Peer-to-peer/fildelning"
+   },
+   "category_id_po_description": {
+      "message": "Webbsidor för politiska partier, enskilda personer inom politiken och åsikter om varierande ämnen. Denna kategori kan även avse lagar och politiska åsikter om droger. Denna kategori inkluderar webbadresser till politiska partier, politiska kampanjer och åsikter om varierande ämnen, däribland politiska debatter."
+   },
+   "category_id_po_name": {
+      "message": "Politik/åsikt"
+   },
+   "category_id_pp_description": {
+      "message": "Personliga hemsidor som delar en allmän domän som de som finns på värdservrar hos tjänsteleverantörer (ISP), universitets-/utbildningsservrar eller kostnadsfria webbsidesvärdar. Denna kategori inkluderar även domäner som innehåller personlig information, exempelvis en hemsida. Personliga hemsidor kan innehålla stötande material."
+   },
+   "category_id_pp_name": {
+      "message": "Personliga sidor"
+   },
+   "category_id_pr_description": {
+      "message": "Webbplatser som innehåller rått, vulgärt eller obscent språk eller gester."
+   },
+   "category_id_pr_name": {
+      "message": "Svordomar"
+   },
+   "category_id_ps_description": {
+      "message": "Webbsidor som fungerar som huvudgatewayer eller kataloger för innehåll på webben. Många portalwebbplatser tillhandahåller även en variation av interna webbplatsfunktioner eller -tjänster som sökmotorer, e-post, nyheter och underhållning. Webbplatser för e-postlistor med en variation av innehåll finns i denna kategori."
+   },
+   "category_id_ps_name": {
+      "message": "Portalwebbplatser"
+   },
+   "category_id_pu_description": {
+      "message": "Webbsidor som innehåller eventuell oönskade program, s.k. PUP-program (Potentially Unwanted Programs). PUP-program är oftast designade med förmånligt syfte, men de ändrar säkerheten för datorn eller användarens integritet. Datoranvändare som oroar sig för säkerheten eller integriteten kanske vill bli informerade om denna programvara och i vissa fall, kanske de vill ta bort detta program från sin dator."
+   },
+   "category_id_pu_name": {
+      "message": "PUP"
+   },
+   "category_id_ra_description": {
+      "message": "Webbsidor som ger fjärråtkomst till ett program, en onlinetjänst eller ett helt datorsystem. Även om fjärråtkomst ofta används lagenligt för att köra en dator från annan plats, skapar det en säkerhetsrisk, exempelvis åtkomst via en bakdörr. Åtkomst via en bakdörr, skriven av den ursprungliga programmeraren, tillåter att systemet styrs av en annan part utan användarens vetskap."
+   },
+   "category_id_ra_name": {
+      "message": "Fjärråtkomst"
+   },
+   "category_id_rb_description": {
+      "message": "Webbsidor som ger information om restauranger, barer, catering, hämtning och leverans, inklusive beställning online. I denna kategori ingår webbplatser som innehåller information om plats, tid, priser, menyer och relaterad kostinformation. Här ingår även restaurangguider och recensioner, kaféer och butiker."
+   },
+   "category_id_rb_name": {
+      "message": "Restauranger"
+   },
+   "category_id_re_description": {
+      "message": "Webbsidor som innehåller tjänster och information om kommersiella eller privata fastigheter. Tjänster och information inkluderar försäljning och uthyrning av boende eller butikslokaler och guider för lägenheter, hus och egendom, samt information om värderingar och mäklare. I denna kategori ingår webbplatser där du kan söka bland visningslägenheter eller -hus."
+   },
+   "category_id_re_name": {
+      "message": "Fastigheter"
+   },
+   "category_id_rh_description": {
+      "message": "Webbsidor för fritidsorganisationer och faciliteter som inkluderar innehåll avsett för fritidsaktiviteter och hobbyer. I den här kategorin ingår information om offentliga simhallar, djurparker, utställningar, festivaler, nöjesparker, fritidsguider, fotvandring, fiske, fågelskådning eller frimärkssamling."
+   },
+   "category_id_rh_name": {
+      "message": "Fritid/hobby"
+   },
+   "category_id_rl_description": {
+      "message": "Webbsidor med innehåll relaterat till religiösa ämnen och övertygelser om människans andlighet som inte omfattas av de större religionerna. I den här kategorin ingår religiös diskussion, övertygelser, artiklar och information för lokala församlingar eller grupper som hemsidor för kyrkor, såvida webbplatsen inte redan ingår i kategorin Större världsreligioner. Denna kategori inkluderar även jämförande religion, eller webbplatser som inkluderar religioner och ideologier."
+   },
+   "category_id_rl_name": {
+      "message": "Religion/ideologi"
+   },
+   "category_id_rm_description": {
+      "message": "Webbsidor med innehåll om religiösa ämnen och information relaterad till de större religionerna. I denna kategori ingår webbplatser som täcker religiöst innehåll som diskussioner, religiös övertygelse, icke-kontroversiella kommentarer, artiklar och information om lokala församlingar som hemsidor för kyrkor och synagogor. Religionerna i denna kategori är bahá'í, buddism, kinesisk folkreligion, kristendom, hinduism, islam, jainism, judendom, shinto, sikhism, tenrikyo, zoroastrism."
+   },
+   "category_id_rm_name": {
+      "message": "Större världsreligioner"
+   },
+   "category_id_rs_description": {
+      "message": "Webbsidor som använder vilande eller oanvända datorresurser för att fokusera på en vanlig uppgift. Uppgiften kan vara på företagsbas eller internationell bas. Välkända exempel är SETI-programmet och Human Genome-projektet som använder vilolägestid i tusentals frivilliga datorer för att analysera data."
+   },
+   "category_id_rs_name": {
+      "message": "Resursdelning"
+   },
+   "category_id_sc_description": {
+      "message": "Webbsidor som gör reklam för plagiering eller fusk genom att, gratis eller mot en avgift, tillhandahålla inlämningsuppgifter, skrivna uppsatser eller examenssvar."
+   },
+   "category_id_sc_name": {
+      "message": "Skolfuskinformation"
+   },
+   "category_id_se_description": {
+      "message": "Webbsidor som tillhandahåller sökresultat som gör det möjligt att hitta information på Internet utifrån nyckelord."
+   },
+   "category_id_se_name": {
+      "message": "Sökmotorer"
+   },
+   "category_id_sm_description": {
+      "message": "Webbsidor som beskriver eller avbildar sexuella akter, men inte är avsedda att vara eggande eller erotiska. Exempel på sexuella material inkluderar sexutbildning, sexuella anspelningar, humor eller sexrelaterade varor."
+   },
+   "category_id_sm_name": {
+      "message": "Sexuellt innehåll"
+   },
+   "category_id_sn_description": {
+      "message": "Webbsidor med sociala nätverk för en rad olika syften, exempelvis vänskap, dejting, yrken eller för intressanta ämnen. Dessa webbplatser innehåller personliga profiler eller grupprofiler och möjliggör interaktion mellan medlemmarna via realtidskommunikation, publicering av meddelanden, offentliga bulletiner och mediedelning. Webbplatser i denna kategori kan även möjliggöra kontakt med oönskade parter och medlemsprofiler som innehåller olämplig information."
+   },
+   "category_id_sn_name": {
+      "message": "Sociala nätverk"
+   },
+   "category_id_sp_description": {
+      "message": "Webbsidor relaterade till professionella eller organiserade fritidssporter. I denna kategori ingår sportnyheter, händelser och information som speltips, strategier, resultat eller spelarövergångar."
+   },
+   "category_id_sp_name": {
+      "message": "Sport"
+   },
+   "category_id_st_description": {
+      "message": "Webbsidor som tillhandahåller strömmande media, eller innehåller plugin-program för visning av ljud- och bilddata innan hela filen har överförts."
+   },
+   "category_id_st_name": {
+      "message": "Strömmande media"
+   },
+   "category_id_su_description": {
+      "message": "Länkar till webbsidor som skickas i oönskad skräppost. Innehållet i skräppostwebbadresser omfattar marknadsföring av produkter till potentiellt stötande eller bedrägliga webbplatser. Denna kategori inkluderar webbplatser som endast skapats i syfte att skicka skräppost, exempelvis skräpbloggar eller skräpkommentarer."
+   },
+   "category_id_su_name": {
+      "message": "Skräppost-URL:er"
+   },
+   "category_id_sw_description": {
+      "message": "Webbsidor som är lagringsplatser för hämtningsbara kopior av shareware och gratisprogram. Shareware distribueras i ett betrott system där shareware kan erhållas utan avgift, men författaren begär ett litet bidrag om programmet fungerar och används regelbundet. Gratisprogram är programvara som är tillgänglig utan någon kostnad."
+   },
+   "category_id_sw_name": {
+      "message": "Shareware/gratisprogram"
+   },
+   "category_id_sx_description": {
+      "message": "Webbsidor vilka McAfee anser innehåller material avsett för sexuell eggning eller erotik. I denna kategori ingår fetischsidor, animation, tecknade serier, berättelser och illegal pornografi."
+   },
+   "category_id_sx_name": {
+      "message": "Pornografi"
+   },
+   "category_id_sy_description": {
+      "message": "Webbsidor som överträder sekretess och säkerhet för personer eller företag. I denna kategori ingår:\u003Cbr/>\u003Cbr/>\u003Cul>\u003Cli>Webbadresser som hämtar programvara eller kör program som samlar in användarinformation och skickar den till en tredje part utan användarens uttryckliga vetskap eller samtycke.\u003C/li>\u003Cli>Programvara som övervakar eller spårar aktivitet på andras datorer genom att registrera tangenttryckningar (registreringsprogram för tangenttryckningar).\u003C/li>\u003Cli>Webbplatser som distribuerar programvara som är känd för att innehålla spionprogram eller reklamprogram.\u003C/li>\u003C/ul>Den här kategorin skiljer sig från kategorin Skadliga webbplatser på grund av uppsåtet. Spionprogram och registreringsprogram för tangenttryckningar som samlar in information i smyg och skickar den till annan part. En skadlig webbplats avser att installera programvara eller vidta en åtgärd utan användarens godkännande eller vetskap."
+   },
+   "category_id_sy_name": {
+      "message": "Spionprogram/reklamprogram/registreringsprogram för tangenttryckningar"
+   },
+   "category_id_tb_description": {
+      "message": "Webbsidor som säljer, gör reklam för eller förespråkar användning av tobaksprodukter, tillbehör för tobaksvaror, däribland cigaretter, cigarrer, pipor, snus och tuggtobak."
+   },
+   "category_id_tb_name": {
+      "message": "Tobak"
+   },
+   "category_id_tf_description": {
+      "message": "Webbsidor med fokus på teknik eller företag som tillhandahåller publicering av meddelanden eller chatt i realtid online, exempelvis teknisk support eller interaktiv affärskommunikation. Även om användare kan publicera alla typer av innehåll, tenderar dessa forum att utgöra mindre risk för stötande innehåll. Webbplatser som erbjuder varierande forum med teman, inklusive tekniskt innehåll eller företagsinnehåll, finns endast i kategorierna Forum/Anslagstavlor eller Chatt. Forum med övervägande fokus på teknik och företag finns endast i kategorin Forum för teknik/företagsinformation."
+   },
+   "category_id_tf_name": {
+      "message": "Forum för teknik/företagsinformation"
+   },
+   "category_id_tg_description": {
+      "message": "Webbsidor med innehåll som kan anses smaklöst, grovt, chockerande eller fasansfullt. I denna kategori ingår smaklös humor, kroppsliga utsöndringsfunktioner, grafiska fotografier av medicinska scener eller olyckor (visar blod eller sår), extrema former av kroppsmodifiering (styckning, brännmärkning eller genital piercing), eller chockerande skildringar av inhuman hantering av djur."
+   },
+   "category_id_tg_name": {
+      "message": "Äckligt innehåll"
+   },
+   "category_id_ti_description": {
+      "message": "Webbsidor som innehåller databehandlingsinformation med fokus på utbildning inom områden som informationsteknologi, datorprogrammering och certifiering. Exempel på dessa är Linux-användargrupper, UNIX-kommandon, självstudiekurser för programvara eller ordböcker med tekniska termer. De flesta webbplatser i denna kategori kan vara underkataloger för större domäner."
+   },
+   "category_id_ti_name": {
+      "message": "Teknisk information"
+   },
+   "category_id_to_description": {
+      "message": "Innehåll som endast är text eller ljud och inte innehåller bilder. Denna kategori kan användas som undantag för att tillåta explicit åtkomst till text och inspelat material när du vill blockera bilder från kategorierna Pornografi, Våld eller Sexuellt innehåll. Bibliotek eller universitet kan använda denna kategori för att förhindra visning av stötande grafik på sina offentliga platser."
+   },
+   "category_id_to_name": {
+      "message": "Endast text/tal"
+   },
+   "category_id_tr_description": {
+      "message": "Webbsidor som gör reklam för personliga resor eller företagsresor, exempelvis hotell, turistanläggningar, flygbolag, landtransport, biluthyrning, resebyråer och allmän turist- och reseinformation. I den här kategorin ingår även webbplatser för köp av biljetter eller logi."
+   },
+   "category_id_tr_name": {
+      "message": "Resor"
+   },
+   "category_id_tt_description": {
+      "message": "Webbsidor som tillåter användare att skriva fraser eller ett textblock för att översätta det från ett språk till ett annat. I denna kategori ingår även webbsidor för språkidentifiering."
+   },
+   "category_id_tt_name": {
+      "message": "Textöversättare"
+   },
+   "category_id_uk_description": {
+      "message": "Webbsidor som innehåller sexuella övergrepp på barn någonstans i världen, och kriminellt obscent innehåll med incitament för rashat på värddatorer i Storbritannien."
+   },
+   "category_id_uk_name": {
+      "message": "Olagligt i Storbritannien"
+   },
+   "category_id_vi_description": {
+      "message": "Webbsidor som innehåller verkliga eller verklighetsnära bilder eller text som porträtterar, beskriver eller förespråkar fysiska övergrepp mot personer, djur eller institutioner, exempelvis avbildningar av krig, självmord, lemlästning eller styckning."
+   },
+   "category_id_vi_name": {
+      "message": "Våld"
+   },
+   "category_id_vs_description": {
+      "message": "Webbsidor som tillhandahåller bildspecifika sökresultat som miniatyrbilder."
+   },
+   "category_id_vs_name": {
+      "message": "Grafisk sökmotor"
+   },
+   "category_id_wa_description": {
+      "message": "Webbsidor som är värddatorer för annonser eller program som skapar annonser. Bland exemplen finns länkar, källkod eller appletar för informationstext, popup-fönster och andra typer av statiska eller dynamiskt genererade annonser som visas på webbsidor. Denna kategori är avsedd att blockera annonser på webbsidor, inte företagen som tillhandahåller annonserna eller reklamtjänsterna."
+   },
+   "category_id_wa_name": {
+      "message": "Webbannonser"
+   },
+   "category_id_we_description": {
+      "message": "Webbsidor med information om köp, tillverkning, modifiering eller användning av vapen som pistoler, knivar, svärd, paintball-vapen och ammunition, sprängämnen och vapentillbehör."
+   },
+   "category_id_we_name": {
+      "message": "Vapen"
+   },
+   "category_id_wm_description": {
+      "message": "Webbsidor som gör det möjligt att skicka eller ta emot e-post via Internet. Dessa webbplatser kan utsätta användare för skadligt innehåll som levereras via e-postbilagor, eller kan utgöra en säkerhetsrisk som läckage eller förlust av skyddad information."
+   },
+   "category_id_wm_name": {
+      "message": "Webbaserad e-post"
+   },
+   "category_id_wp_description": {
+      "message": "Webbsidor som gör det möjligt för användare att ringa telefonsamtal via Internet eller erhålla information eller programvara för detta syfte. Webbtelefontjänster som även kallas Internettelefoni eller VoIP. Webbtelefontjänster inkluderar PC-till-PC, PC-till-telefon och telefon-till-telefontjänster anslutna via TCP-/IP-nätverk."
+   },
+   "category_id_wp_name": {
+      "message": "Webbtelefon"
+   },
+   "category_id_wx_description": {
+      "message": "Webbsidor som är värdar för live-möten, videokonferenser och interaktiva presentationer huvudsakligen för företag. Webbmöten inkluderar vanligtvis strömning av ljud och video och tillåter dataöverföring eller kontorsorienterad programdelning som onlinepresentationer. Webbadresser i denna kategori kan utgöra risker för bandbredden och säkerhetsrisker som förlust eller läckage av skyddad information."
+   },
+   "category_id_wx_name": {
+      "message": "Webbmöten"
+   },
+   "dfd_landing_desc1": {
+      "message": "Utforska och titta på videor på webbplatser som YouTube och Facebook"
+   },
+   "dfd_landing_desc2": {
+      "message": "Vi meddelar dig inom några sekunder om en deepfake upptäcks"
+   },
+   "dfd_landing_desc3": {
+      "message": "Du kommer då att kunna se en realtidsanalys av resultaten"
+   },
+   "dfd_landing_home_btn": {
+      "message": "Gå till Hem"
+   },
+   "dfd_landing_title": {
+      "message": "Du är nu skyddad mot bedrägerier på den här enheten"
+   },
+   "download_scan_popup_expanded_descriptions": {
+      "message": "Nedladdningen söks igenom. Vi meddelar dig om eventuella problem."
+   },
+   "dws_do_not_ask_again_btn": {
+      "message": "Fråga inte igen"
+   },
+   "dws_do_not_ask_again_close_btn": {
+      "message": "Tack"
+   },
+   "dws_do_not_ask_again_title": {
+      "message": "Vi frågar inte igen när du använder den här e-postadressen."
+   },
+   "dws_email_input_error": {
+      "message": "Den ser inte korrekt ut."
+   },
+   "dws_email_input_label": {
+      "message": "E-postadress"
+   },
+   "dws_remind_later_btn": {
+      "message": "Påminn mig nästa gång"
+   },
+   "dws_remind_later_title": {
+      "message": "Vi frågar igen nästa gång du använder den här e-postadressen."
+   },
+   "dws_scan_btn": {
+      "message": "Sök efter min e-postadress"
+   },
+   "dws_scan_btn_first_time": {
+      "message": "Sök efter min e-postadress"
+   },
+   "dws_scan_email_description": {
+      "message": "Vår tjänst gör kontroller i databaser på darknet för att se om personlig information har stulits. Vill du söka efter din e-postadress?"
+   },
+   "dws_scan_email_title": {
+      "message": "Skydda din identitet"
+   },
+   "dws_thanks_btn": {
+      "message": "Tack"
+   },
+   "efficacy_meter_excellent": {
+      "message": "Utmärkt"
+   },
+   "efficacy_meter_fair": {
+      "message": "Okej"
+   },
+   "efficacy_meter_good": {
+      "message": "Bra"
+   },
+   "efficacy_meter_poor": {
+      "message": "Dålig"
+   },
+   "efficacy_meter_title": {
+      "message": "Säkerhetsgradering"
+   },
+   "ffpolicy_accept_prompt": {
+      "message": "* Godkänn uppmaning att aktivera"
+   },
+   "ffpolicy_activity_main_title": {
+      "message": "Andra sätt på vilka vi använder dina uppgifter för att hjälpa till att skydda dig online:"
+   },
+   "ffpolicy_activity_message": {
+      "message": "Vi använder den här informationen för att förstå vilka WebAdvisor-funktioner som är mest användbara för dig."
+   },
+   "ffpolicy_activity_title": {
+      "message": "Insamling av aktivitetsuppgifter"
+   },
+   "ffpolicy_header_message": {
+      "message": "Aktivera insamling av personlig information så att vi kan hjälpa till att skydda dig mot hot när du surfar på webben. Annars måste du avinstallera McAfee® WebAdvisor."
+   },
+   "ffpolicy_header_message_2": {
+      "message": "Aktivera tilläggsbehörigheter så att vi kan hjälpa till att skydda dig mot hot när du surfar på webben."
+   },
+   "ffpolicy_header_message_uninstall": {
+      "message": "avinstallera"
+   },
+   "ffpolicy_header_title": {
+      "message": "Du är inte skyddad"
+   },
+   "ffpolicy_header_title_protected": {
+      "message": "Nu skyddas du av McAfee® WebAdvisor"
+   },
+   "ffpolicy_page_tab_title": {
+      "message": "McAfee – ett steg till"
+   },
+   "ffpolicy_permissions_accept_button": {
+      "message": "Bevilja behörighet"
+   },
+   "ffpolicy_permissions_message": {
+      "message": "Vi behöver läsa och ändra information på webbplatser du besöker så att vi kan identifiera och meddela dig gällande säkerhetsrisker. De här inställningen krävs för att vi ska kunna skydda dig när du surfar på nätet."
+   },
+   "ffpolicy_permissions_message_line_2": {
+      "message": "Initiera behörighetsförfrågan genom att klicka på ”Bevilja behörighet” nedan och välja ”Tillåt” i popup-fönstret."
+   },
+   "ffpolicy_permissions_on": {
+      "message": "PÅ"
+   },
+   "ffpolicy_permissions_title": {
+      "message": "Tilläggsbehörigheter (krävs)"
+   },
+   "ffpolicy_personal_data_accept_button": {
+      "message": "Ja, samla in min personliga information i enlighet med McAfees integritetspolicy"
+   },
+   "ffpolicy_personal_data_decline_button": {
+      "message": "Nej, samla inte in min personliga information"
+   },
+   "ffpolicy_personal_message_intro": {
+      "message": "Vi skickar adresserna för de webbplatser du besöker till våra experter så att de kan kontrollera säkerhetsstatusen. Du kan vara säker på att vi aldrig säljer din information. Kan vi samla in följande data som identifierar dig personligen:"
+   },
+   "ffpolicy_personal_message_outro": {
+      "message": "Om du väljer att inte tillåta oss att samla in din personliga information kommer McAfee® WebAdvisor inte att kunna tillhandahålla sina säkerhetsfunktioner, och du kommer att behöva avinstallera det."
+   },
+   "ffpolicy_personal_message_outro_line_2": {
+      "message": "Mer om den personliga information som vi samlar in, och vad vi gör med den, finns i $link$",
+      "placeholders": {
+         "link": {
+            "content": "$1"
+         }
+      }
+   },
+   "ffpolicy_personal_message_point_1": {
+      "message": "Webbadresserna (URL) till sidorna du besöker. Vi samlar in dem för att kontrollera deras säkerhetsstatus och förse dig med uppdaterad säkerhet."
+   },
+   "ffpolicy_personal_message_point_2": {
+      "message": "Webbadresserna (URL) till sidorna som finns i dina sökresultat. Vi samlar in dem för att kontrollera deras säkerhetsstatus och förse dig med säkerhetsanteckningar."
+   },
+   "ffpolicy_personal_message_point_3": {
+      "message": "Din nuvarande webbläsarversion. Vi samlar in denna information för att diagnostisera eventuella problem med McAfee® WebAdvisors säkerhetstjänst."
+   },
+   "ffpolicy_personal_message_point_4": {
+      "message": "Versionen av McAfee® WebAdvisor som du använder. Vi samlar in denna information för att diagnostisera eventuella problem med dess säkerhetstjänst."
+   },
+   "ffpolicy_personal_title": {
+      "message": "Insamling av personliga uppgifter"
+   },
+   "ffpolicy_personal_title_required": {
+      "message": "(Obligatoriskt)"
+   },
+   "ffpolicy_privacy_policy_link": {
+      "message": "vår integritetspolicy"
+   },
+   "ffpolicy_privacy_text": {
+      "message": "Mer information om hur vi samlar in, använder och delar personliga data finns i vår"
+   },
+   "ffpolicy_privacy_text_link": {
+      "message": "sekretesspolicy för McAfee® WebAdvisor"
+   },
+   "ffpolicy_required_suffix_1": {
+      "message": "1/2"
+   },
+   "ffpolicy_required_suffix_2": {
+      "message": "2/2"
+   },
+   "ffpolicy_see_settings": {
+      "message": "Visa inställningar"
+   },
+   "ffpolicy_uninstall_popup_message": {
+      "message": "Utan den angivna personliga informationen fungerar inte McAfee® WebAdvisor eftersom den uppdaterade säkerhetsinformationen för att tillhandahålla säkerhetsfunktioner saknas.  Om du inte vill överväga att tillåta att McAfee® WebAdvisor samlar in information rekommenderar vi att du tar bort McAfee® WebAdvisor."
+   },
+   "howitworks_about": {
+      "message": "Om"
+   },
+   "howitworks_about_careers": {
+      "message": "Karriär"
+   },
+   "howitworks_about_contact": {
+      "message": "Kontakta oss"
+   },
+   "howitworks_about_legal": {
+      "message": "Sekretess och juridiska villkor"
+   },
+   "howitworks_about_map": {
+      "message": "Webbplatskarta"
+   },
+   "howitworks_about_mcafee": {
+      "message": "Om McAfee"
+   },
+   "howitworks_about_req": {
+      "message": "Systemkrav"
+   },
+   "howitworks_address": {
+      "message": "Corporate Headquarters 6220 America Center Drive San Jose, CA 95002 USA"
+   },
+   "howitworks_description": {
+      "message": "McAfee är din första försvarslinje när du surfar på webben. Vi hjälper dig att undvika malware- och nätfiskeattacker innan de inträffar."
+   },
+   "howitworks_download_description": {
+      "message": "Skydda datorn mot virus och andra hot. Vi varnar dig om du hämtar en misstänkt fil och blockerar malware som är gömd på webbsidor.*"
+   },
+   "howitworks_download_title": {
+      "message": "Säkrare hämtningar"
+   },
+   "howitworks_legal": {
+      "message": "Prenumerationen omfattas av vårt $howitworks_legal_license$ och vår $howitworks_legal_notice$ och den är för personlig användning på det antal tillåtna enheter som stöds under prenumerationen. Prenumerationer som täcker \"alla\" enheter är begränsade till enheter som stöds och som du äger. Produktfunktioner kan läggas till, ändras eller tas bort under prenumerationsperioden och alla funktioner är inte tillgängliga i alla operativsystem. Se $howitworks_legal_req$ för enheter som stöds. Programvara garanterar inte skydd mot alla tänkbara hot.",
+      "placeholders": {
+         "howitworks_legal_license": {
+            "content": "1 USD"
+         },
+         "howitworks_legal_notice": {
+            "content": "2 USD"
+         },
+         "howitworks_legal_req": {
+            "content": "3 USD"
+         }
+      }
+   },
+   "howitworks_legal_license": {
+      "message": "Licensavtal"
+   },
+   "howitworks_legal_notice": {
+      "message": "Sekretesspolicy"
+   },
+   "howitworks_legal_req": {
+      "message": "Systemkrav"
+   },
+   "howitworks_lets_connect": {
+      "message": "Låt oss ansluta."
+   },
+   "howitworks_page_title": {
+      "message": "McAfee – så här fungerar det"
+   },
+   "howitworks_phishing_description": {
+      "message": "Hackare försöker stjäla din information via e-postmeddelanden som ser officiella ut eller lockande sökresultat. Vi hjälper till att skydda din personliga information genom att se till att du inte nappar på betet."
+   },
+   "howitworks_phishing_title": {
+      "message": "Skydd mot nätfiske"
+   },
+   "howitworks_products": {
+      "message": "Produkter"
+   },
+   "howitworks_products_identity": {
+      "message": "McAfee® Identity Theft Protection"
+   },
+   "howitworks_products_livesafe": {
+      "message": "McAfee® LiveSafe"
+   },
+   "howitworks_products_totalprotection": {
+      "message": "McAfee® Total Protection"
+   },
+   "howitworks_refund_trademark": {
+      "message": "McAfee och McAfee-logotypen är varumärken eller registrerade varumärken som tillhör McAfee, LLC eller dess dotterbolag i USA och andra länder. Övriga namn och varumärken tillhör respektive rättighetsinnehavare. Copyright © $year$ McAfee, LLC",
+      "placeholders": {
+         "year": {
+            "content": "1 USD"
+         }
+      }
+   },
+   "howitworks_share": {
+      "message": "Vi delar nyheter och tips som skyddar och gör dig uppmärksam."
+   },
+   "howitworks_social_description": {
+      "message": "Skrolla tryggt igenom dina flöden på sociala medier på webbplatser som Facebook, LinkedIn, Reddit med flera – vi färgkodar länkarna så att du vet vilka det är säkert att klicka på.*"
+   },
+   "howitworks_social_title": {
+      "message": "Skydd på sociala medier"
+   },
+   "howitworks_star_message": {
+      "message": "* Endast tillgängligt på Windows"
+   },
+   "howitworks_support": {
+      "message": "Support"
+   },
+   "howitworks_support_consumer": {
+      "message": "Kundsupport"
+   },
+   "howitworks_tech_scam": {
+      "message": "Skydd mot teknikbedrägeri"
+   },
+   "howitworks_tech_scam_description": {
+      "message": "Behåll kontrollen och överlista bedragare som försöker få fjärråtkomst till datorn och din personliga information med tydliga säkerhetsvarningar."
+   },
+   "howitworks_title": {
+      "message": "McAfee står på din sida"
+   },
+   "howitworks_url_description": {
+      "message": "Hackare skapar skadliga webbplatser med hjälp av adresser som är förvillande lika äkta vara. Vi leder dig tillbaka till säkerheten om ett stavfel i webbadressen eller en vilseledande länk för dig på villovägar.*"
+   },
+   "howitworks_url_title": {
+      "message": "Skydd mot kapning av webbadresser"
+   },
+   "iframe_banner_message": {
+      "message": "Vi testade sidan och blockerade innehåll som kommer från potentiellt farliga eller riskabla webbplatser. Tillåt endast detta innehåll om du är säker på att det kommer från en säker webbplats."
+   },
+   "iframe_banner_view_all_btn": {
+      "message": "Se allt blockerat innehåll"
+   },
+   "mb_back_btn_message": {
+      "message": "Tillbaka"
+   },
+   "mb_banner_learn_more": {
+      "message": "Mer information"
+   },
+   "mb_banner_manage_settings": {
+      "message": "Hantera inställningar"
+   },
+   "mb_faq_back_btn_message": {
+      "message": "Tillbaka"
+   },
+   "mb_faq_description": {
+      "message": "Lär dig mer om deepfakeljud, hur vi upptäcker det och vilka risker det kan medföra."
+   },
+   "mb_faq_title": {
+      "message": "Vanliga frågor om skydd mot videobedrägerier"
+   },
+   "mb_graph_error": {
+      "message": "Vi kan inte visa ljuddata just nu. Försök igen senare."
+   },
+   "mb_graph_feature_off": {
+      "message": "Deepfake Detector är avstängd"
+   },
+   "mb_graph_label_detected": {
+      "message": "Deepfake har upptäckts"
+   },
+   "mb_graph_label_scanning": {
+      "message": "Söker efter deepfakes …"
+   },
+   "mb_graph_no_audio": {
+      "message": "Inget ljud spelas upp just nu"
+   },
+   "mb_graph_no_video": {
+      "message": "Ingen video spelas upp just nu"
+   },
+   "mb_info_link_need_help": {
+      "message": "Behöver du hjälp?"
+   },
+   "mb_info_link_need_support": {
+      "message": "Kontakta support"
+   },
+   "mb_main_audio_detection_off": {
+      "message": "Av"
+   },
+   "mb_main_audio_detection_on": {
+      "message": "På"
+   },
+   "mb_main_audio_detection_title": {
+      "message": "Bedrägeriskydd"
+   },
+   "mb_main_cur_video": {
+      "message": "Aktuell video"
+   },
+   "mb_main_deepfake": {
+      "message": "deepfake"
+   },
+   "mb_main_deepfakes": {
+      "message": "deepfakes"
+   },
+   "mb_main_faq_message": {
+      "message": "Läs om hur skydd mot videobedrägerier fungerar och hur vi hjälper till att hålla dig säker."
+   },
+   "mb_main_faq_title": {
+      "message": "Vanliga frågor om skydd mot videobedrägerier"
+   },
+   "mb_main_feedback_btn": {
+      "message": "Skicka in"
+   },
+   "mb_main_feedback_message": {
+      "message": "Dela din feedback"
+   },
+   "mb_main_feedback_text": {
+      "message": "Hade vi rätt?"
+   },
+   "mb_main_feedback_thank_you": {
+      "message": "Tack!"
+   },
+   "mb_main_hr_flagged": {
+      "message": "tim. flaggad"
+   },
+   "mb_main_hr_scanned": {
+      "message": "tim. skannad"
+   },
+   "mb_main_hrs_flagged": {
+      "message": "tim. flaggade"
+   },
+   "mb_main_hrs_scanned": {
+      "message": "tim. skannade"
+   },
+   "mb_main_min_flagged": {
+      "message": "min. flaggad"
+   },
+   "mb_main_min_scanned": {
+      "message": "min. skannade"
+   },
+   "mb_main_mins_flagged": {
+      "message": "min. flaggade"
+   },
+   "mb_main_mins_scanned": {
+      "message": "genomsökta minuter"
+   },
+   "mb_main_my_data": {
+      "message": "Mina detekteringsdata"
+   },
+   "mb_main_pause_day": {
+      "message": "$day$ dag",
+      "placeholders": {
+         "day": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_hour": {
+      "message": "$hour$  timme",
+      "placeholders": {
+         "hour": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_hours": {
+      "message": "$hours$  timmar",
+      "placeholders": {
+         "hours": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_notification": {
+      "message": "Pausa aviseringar"
+   },
+   "mb_main_snooze": {
+      "message": "Snooza"
+   },
+   "mb_main_snooze_until": {
+      "message": "Snoozat till $time$",
+      "placeholders": {
+         "time": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_subscription_banner_buy": {
+      "message": "Köp nu"
+   },
+   "mb_main_title": {
+      "message": "Videobedrägeri"
+   },
+   "mb_main_trial_end_in_hours_text": {
+      "message": "Provversionen upphör om 24 timmar"
+   },
+   "mb_main_trial_end_in_plural_text": {
+      "message": "Provversionen upphör om $days$ dagar",
+      "placeholders": {
+         "days": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_trial_end_in_single_text": {
+      "message": "Provversionen upphör om $day$ dag",
+      "placeholders": {
+         "day": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_trial_expired_text": {
+      "message": "Provversionen har upphört"
+   },
+   "mb_main_what_we_found": {
+      "message": "Det här har vi hittat hittills"
+   },
+   "mb_prompt_banner_desc": {
+      "message": "McAfees skydd mot videobedrägeri är nu aktiverat. $mb_banner_learn_more$",
+      "placeholders": {
+         "mb_banner_learn_more": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_prompt_banner_desc_page": {
+      "message": "Skydd mot videobedrägeri är aktiverat. $mb_banner_manage_settings$",
+      "placeholders": {
+         "mb_banner_manage_settings": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_sidebar_faq_a1": {
+      "message": "Skydd mot videobedrägerier skannar allt AI-genererat ljud som spelas upp i din webbläsare. \u003Cbr>\u003Cbr> Vi meddelar dig om vi upptäcker AI-ljud i något du tittar på. När vi gör det kan du få veta vilka delar av ljudet som är falska. \u003Cbr>\u003Cbr> Även om vi skannar ljud i videoinnehåll identifierar skydd mot videobedrägerier endast AI-ljud och inte AI-genererade videor eller bilder."
+   },
+   "mb_sidebar_faq_a2": {
+      "message": "Vi måste skanna ljudet som spelas upp i din webbläsare för att identifiera deepfakes. Men eftersom skydd mot videobedrägerier läses in direkt på din enhet sker all ljudbearbetning och genomsökning lokalt. \u003Cbr>\u003Cbr> Detta innebär att informationen som skannas inte samverkar med våra servrar eller molnet. Vi samlar inte in eller spelar in ditt ljud på något sätt, och du kan stänga av ljuddetektering när du vill ha mer integritet. \u003Cbr>\u003Cbr> Se vår $mb_sidebar_faq_privacy_notice$ för mer info.",
+      "placeholders": {
+         "mb_sidebar_faq_privacy_notice": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_sidebar_faq_a3": {
+      "message": "En deepfake är ett ljudklipp, en video eller en bild som använder AI för att kopiera en persons röst eller utseende – eller för att skapa en falsk person från grunden. \u003Cbr>\u003Cbr> Till exempel kan en deepfake av en kändis visa att denne stödjer en produkt som de aldrig har hört talas om. Eller så kan en deepfake av en politisk ledare använda falskt ljud för att ändra ett tal som de höll. \u003Cbr>\u003Cbr> Eftersom deepfakes är så trovärdiga gör de det svårare att lita på äktheten i det du tittar på eller lyssnar på online. Detta kan göra dig mer sårbar för bedrägerier eller felaktig information."
+   },
+   "mb_sidebar_faq_a4": {
+      "message": "Vi använder AI-teknik som redan finns på din enhet för att köra en AI-modell som analyserar allt ljud som spelas upp i din webbläsare. Denna modell kontrollerar om ljudet har klonats eller fejkats av AI."
+   },
+   "mb_sidebar_faq_privacy_notice": {
+      "message": "Sekretesspolicy"
+   },
+   "mb_sidebar_faq_q1": {
+      "message": "Vad gör ett skydd mot videobedrägerier?"
+   },
+   "mb_sidebar_faq_q2": {
+      "message": "Är min integritet säker?"
+   },
+   "mb_sidebar_faq_q3": {
+      "message": "Vad är en deepfake och hur påverkar det mig?"
+   },
+   "mb_sidebar_faq_q4": {
+      "message": "Hur upptäcks deepfakes?"
+   },
+   "mb_video_banner_AI_audio_title": {
+      "message": "Deepfake har upptäckts"
+   },
+   "mb_video_banner_no_AI_audio_title": {
+      "message": "Söker efter deepfakes"
+   },
+   "overlay_accept_ss": {
+      "message": "Godkänn nu att vi ändrar din sökmotor till McAfee® säker sökning"
+   },
+   "overlay_add_ss": {
+      "message": "Lägg till McAfee® säker sökning i webbläsaren"
+   },
+   "overlay_form_button": {
+      "message": "Klart"
+   },
+   "overlay_form_question": {
+      "message": "Vad tråkigt att du inte tyckte att informationen var till hjälp. Berätta gärna vad som blev fel så att vi kan kategorisera detta korrekt."
+   },
+   "overlay_form_text": {
+      "message": "Textfält – skriv här"
+   },
+   "overlay_ss_description": {
+      "message": "Vi flaggar för riskfyllda webbplatser i sökresultaten så att du vet vilka webbplatser som är säkra att besöka och vilka som inte är det."
+   },
+   "overlay_step_1": {
+      "message": "STEG 1"
+   },
+   "overlay_step_2": {
+      "message": "STEG 2"
+   },
+   "overlay_thank_you_close_button": {
+      "message": "Stäng"
+   },
+   "overlay_thank_you_message": {
+      "message": "Tack! Vi uppskattar din feedback."
+   },
+   "page_title": {
+      "message": "McAfee Protection Center"
+   },
+   "phishingdesc": {
+      "message": "Hackare försöker komma åt din information genom att lägga ut beten via nätfiskemeddelanden och nätfiskewebbplatser som ser officiella ut. Vi skär av linan så att du inte fastnar på kroken."
+   },
+   "phishingtitle": {
+      "message": "Håll din personliga information skyddad"
+   },
+   "read_more_about_typosquatting": {
+      "message": "Läs mer om URL-kapning."
+   },
+   "res_PRODUCT_NAME": {
+      "message": "%PRODUCTNAME%"
+   },
+   "res_PRODUCT_NAME_NOT_TRADEMARKED": {
+      "message": "WebAdvisor"
+   },
+   "res_PRODUCT_NAME_TRADEMARKED": {
+      "message": "McAfee® WebAdvisor"
+   },
+   "search_engine_bing": {
+      "message": "Bing"
+   },
+   "search_engine_yahoo": {
+      "message": "Yahoo"
+   },
+   "search_suggest_input": {
+      "message": "Få färgkodade sökresultat"
+   },
+   "search_toast_body_text_compliant": {
+      "message": "Vill du lägga till säker sökning för att hålla dig steget före skurkarna?"
+   },
+   "search_toast_body_text_test": {
+      "message": "Vill du lägga till säker sökning och få veta vilka webbplatser som är säkra att besöka?"
+   },
+   "search_toast_done": {
+      "message": "Klart"
+   },
+   "search_toast_heading_compliant": {
+      "message": "Du har inte säker sökning – var försiktig"
+   },
+   "search_toast_heading_test": {
+      "message": "Få råd angående säkerhet i sökresultaten"
+   },
+   "search_toast_no_thanks": {
+      "message": "Nej tack"
+   },
+   "search_toast_ok": {
+      "message": "OK"
+   },
+   "search_toast_option_compliant": {
+      "message": "Ja, lägg till säker sökning till webbläsaren och ändra standardsökningen till $search_provider$.",
+      "placeholders": {
+         "search_provider": {
+            "content": "1 USD"
+         }
+      }
+   },
+   "search_toast_option_test": {
+      "message": "Ja, lägg till säker sökning och ändra standardsökningen till $search_provider$.",
+      "placeholders": {
+         "search_provider": {
+            "content": "1 USD"
+         }
+      }
+   },
+   "search_toast_sub_heading_compliant": {
+      "message": "Säker sökning håller dig borta från riskabla webbplatser i sökresultaten."
+   },
+   "search_toast_sub_heading_test": {
+      "message": "Säker sökning flaggar för riskabla webbplatser i sökresultaten."
+   },
+   "search_toast_yes": {
+      "message": "Ja"
+   },
+   "securesearchdesc": {
+      "message": "Surfa bekymmerslöst med färgkodade sökresultat – vi berättar vilka webbplatser som är säkra och vilka som är skumma."
+   },
+   "securesearchtitle": {
+      "message": "Undvik riskabla sökresultat"
+   },
+   "settings_about_block_download": {
+      "message": "Blockera riskabla hämtningar"
+   },
+   "settings_about_firewall_antivirus": {
+      "message": "Se till att brandväggen och antiviruset är aktiverade"
+   },
+   "settings_about_flag_website": {
+      "message": "Flagga för farliga webbplatser"
+   },
+   "settings_about_help_link_message": {
+      "message": "Få hjälp nu"
+   },
+   "settings_about_help_message": {
+      "message": "Vi behöver alla en hjälpande hand ibland."
+   },
+   "settings_about_help_title": {
+      "message": "Få hjälp och teknisk support"
+   },
+   "settings_about_privacy_link_message": {
+      "message": "Läs igenom sekretesspolicyn"
+   },
+   "settings_about_privacy_message": {
+      "message": "McAfee tar din sekretess på allvar."
+   },
+   "settings_about_privacy_title": {
+      "message": "Sekretesspolicy"
+   },
+   "settings_about_product_affid": {
+      "message": "Filial-ID: $affid$",
+      "placeholders": {
+         "affid": {
+            "content": "1 USD"
+         }
+      }
+   },
+   "settings_about_product_binary_version": {
+      "message": "Binärversion: $version$",
+      "placeholders": {
+         "version": {
+            "content": "1 USD"
+         }
+      }
+   },
+   "settings_about_product_extension_version": {
+      "message": "Tilläggsversion: $version$",
+      "placeholders": {
+         "version": {
+            "content": "1 USD"
+         }
+      }
+   },
+   "settings_about_product_title": {
+      "message": "Produktversion"
+   },
+   "settings_about_share_title": {
+      "message": "Dela %PRODUCTNAME% med vänner"
+   },
+   "settings_about_subtitle": {
+      "message": "%PRODUCTNAME% hjälper dig att ta bättre beslut gällande vad du gör online."
+   },
+   "settings_about_title": {
+      "message": "Om"
+   },
+   "settings_page_title": {
+      "message": "%PRODUCTNAME%"
+   },
+   "settings_preference_annotation_all": {
+      "message": "Informera mig om säkra sökresultat i samtliga sökmotorer."
+   },
+   "settings_preference_annotation_none": {
+      "message": "Informera mig inte om sökresultat."
+   },
+   "settings_preference_annotation_ss": {
+      "message": "Informera mig om säkra sökresultat, men endast vid säker sökning."
+   },
+   "settings_preference_annotation_ss_with_tip": {
+      "message": "Informera mig om ett sökresultat är säkert med säker sökning (tips: du kan komma åt säker sökning genom att söka i adressfältet)."
+   },
+   "settings_preference_annotation_subtitle": {
+      "message": "Vi färgkodar sökresultaten för att visa dig vilka webbplatser som är säkra."
+   },
+   "settings_preference_annotation_title": {
+      "message": "Säker sökning"
+   },
+   "settings_preference_aps_toggle_label_message": {
+      "message": "Surfa tryggt med tillförlitliga varningar som visar att webbplatser för ekonomi, shopping och annat är äkta och inte farliga."
+   },
+   "settings_preference_aps_toggle_label_title": {
+      "message": "Signal för avancerat skydd"
+   },
+   "settings_preference_aps_toggle_subtitle": {
+      "message": "Det hjälper oss att hålla dig säkrare om du har den här inställningen påslagen."
+   },
+   "settings_preference_aps_toggle_title": {
+      "message": "Signal för avancerat skydd"
+   },
+   "settings_preference_ffpolicy_activity_message": {
+      "message": "Vi använder den här informationen till att förstå vilka WebAdvisor-funktioner som är mest användbara för dig. "
+   },
+   "settings_preference_ffpolicy_activity_title": {
+      "message": "Insamling av aktivitetsuppgifter"
+   },
+   "settings_preference_ffpolicy_permissions__title": {
+      "message": "Tilläggsbehörigheter"
+   },
+   "settings_preference_ffpolicy_permissions_message": {
+      "message": "Vi behöver läsa och ändra information på webbplatser du besöker så att vi kan identifiera och meddela dig gällande säkerhetsrisker. De här inställningen krävs för att vi ska kunna skydda dig när du surfar på nätet."
+   },
+   "settings_preference_ffpolicy_permissions_on": {
+      "message": "PÅ"
+   },
+   "settings_preference_ffpolicy_permissions_toggle__title": {
+      "message": "Tilläggsbehörigheter (krävs)"
+   },
+   "settings_preference_ffpolicy_personal_message_intro": {
+      "message": "Vi skickar adresserna för de webbplatser du besöker till våra experter så att de kan kontrollera säkerhetsstatusen. Du kan vara säker på att vi aldrig säljer din information. Kan vi samla in följande data som identifierar dig personligen:"
+   },
+   "settings_preference_ffpolicy_personal_message_outro": {
+      "message": "Om du väljer att inte tillåta oss att samla in din personliga information kommer McAfee® WebAdvisor inte att kunna tillhandahålla sina säkerhetsfunktioner, och du kommer att behöva avinstallera det."
+   },
+   "settings_preference_ffpolicy_personal_message_outro_line_2": {
+      "message": "Mer om den personliga information som vi samlar in, och vad vi gör med den, finns i $link$",
+      "placeholders": {
+         "link": {
+            "content": "1 USD"
+         }
+      }
+   },
+   "settings_preference_ffpolicy_personal_message_point_1": {
+      "message": "Webbadresserna (URL) till sidorna du besöker. Vi samlar in dem för att kontrollera deras säkerhetsstatus och förse dig med uppdaterad säkerhet."
+   },
+   "settings_preference_ffpolicy_personal_message_point_2": {
+      "message": "Webbadresserna (URL) till sidorna som finns i dina sökresultat. Vi samlar in dem för att kontrollera deras säkerhetsstatus och förse dig med säkerhetsanteckningar."
+   },
+   "settings_preference_ffpolicy_personal_message_point_3": {
+      "message": "Din nuvarande webbläsarversion. Vi samlar in denna information för att diagnostisera eventuella problem med McAfee® WebAdvisors säkerhetstjänst."
+   },
+   "settings_preference_ffpolicy_personal_message_point_4": {
+      "message": "Versionen av McAfee® WebAdvisor som du använder. Vi samlar in denna information för att diagnostisera eventuella problem med dess säkerhetstjänst."
+   },
+   "settings_preference_ffpolicy_personal_title": {
+      "message": "Insamling av personliga uppgifter"
+   },
+   "settings_preference_ffpolicy_personal_title_required": {
+      "message": "(Obligatoriskt)"
+   },
+   "settings_preference_ffpolicy_privacy_policy_link": {
+      "message": "vår integritetspolicy"
+   },
+   "settings_preference_ffpolicy_subtitle": {
+      "message": "Att ha båda dessa inställningar aktiverade hjälper oss att skydda dig och ger en användbar upplevelse."
+   },
+   "settings_preference_ffpolicy_title": {
+      "message": "Databehörigheter"
+   },
+   "settings_preference_reset_button": {
+      "message": "Återställ"
+   },
+   "settings_preference_reset_subtitle": {
+      "message": "Ångrar du att du ignorerade en avisering från %PRODUCTNAME%? Återställ aviseringar för att börja få alla olika slags meddelanden från %PRODUCTNAME% igen."
+   },
+   "settings_preference_reset_title": {
+      "message": "Återställ inställningar"
+   },
+   "settings_preference_sma_facebook": {
+      "message": "Facebook"
+   },
+   "settings_preference_sma_facebook_label": {
+      "message": "Facebook"
+   },
+   "settings_preference_sma_instagram": {
+      "message": "Instagram"
+   },
+   "settings_preference_sma_instagram_label": {
+      "message": "Instagram"
+   },
+   "settings_preference_sma_linkedin": {
+      "message": "Linkedin"
+   },
+   "settings_preference_sma_linkedin_label": {
+      "message": "Linkedin"
+   },
+   "settings_preference_sma_message": {
+      "message": "Det här är de webbplatser vi kommenterar."
+   },
+   "settings_preference_sma_reddit": {
+      "message": "Reddit"
+   },
+   "settings_preference_sma_reddit_label": {
+      "message": "Reddit"
+   },
+   "settings_preference_sma_subtitle": {
+      "message": "Vi färgkodar länkar i dina flöden på sociala medier för att visa dig vilka som är säkra."
+   },
+   "settings_preference_sma_title": {
+      "message": "Skydd på sociala medier"
+   },
+   "settings_preference_sma_twitter": {
+      "message": "X"
+   },
+   "settings_preference_sma_twitter_label": {
+      "message": "X"
+   },
+   "settings_preference_sma_youtube": {
+      "message": "Youtube"
+   },
+   "settings_preference_sma_youtube_label": {
+      "message": "Youtube"
+   },
+   "settings_preference_title": {
+      "message": "YTTERLIGARE TJÄNSTER"
+   },
+   "settings_statistics_ads_blocked": {
+      "message": "störande annonser har blockerats"
+   },
+   "settings_statistics_downloads_blocked": {
+      "message": "osäkra hämtningar har blockerats"
+   },
+   "settings_statistics_downloads_scanned": {
+      "message": "hämtningar har genomsökts"
+   },
+   "settings_statistics_links_scanned": {
+      "message": "länkar har genomsökts"
+   },
+   "settings_statistics_message": {
+      "message": "Detta har vi gjort hittills:"
+   },
+   "settings_statistics_pages_blocked": {
+      "message": "farliga sidor har blockerats"
+   },
+   "settings_statistics_pages_scanned": {
+      "message": "sidor har genomsökts"
+   },
+   "settings_statistics_subtitle": {
+      "message": "Vi är här för att hålla dig säker online."
+   },
+   "settings_statistics_title": {
+      "message": "STATISTIK"
+   },
+   "settings_statistics_trackers_blocked": {
+      "message": "spårare blockerade"
+   },
+   "settings_subtitle": {
+      "message": "Anpassa webbskyddet."
+   },
+   "settings_tab_about": {
+      "message": "Om"
+   },
+   "settings_tab_preference": {
+      "message": "Inställningar"
+   },
+   "settings_tab_statistics": {
+      "message": "Statistik"
+   },
+   "settings_tab_whitelist": {
+      "message": "Betrodda webbplatser"
+   },
+   "settings_title": {
+      "message": "Webbskydd"
+   },
+   "settings_whitelist_input": {
+      "message": "Ange en webbadress..."
+   },
+   "settings_whitelist_title": {
+      "message": "BETRODDA WEBBPLATSER"
+   },
+   "sidebar_dangerous_blocked": {
+      "message": "farliga sidor har blockerats"
+   },
+   "sidebar_deepfake_found": {
+      "message": "deepfake har hittats"
+   },
+   "sidebar_deepfakes_found": {
+      "message": "deepfakes har hittats"
+   },
+   "sidebar_deepfakes_found_new": {
+      "message": "NY"
+   },
+   "sidebar_get_help": {
+      "message": "Hjälp"
+   },
+   "sidebar_pages_scanned": {
+      "message": "sidor har genomsökts"
+   },
+   "sidebar_privacy_terms": {
+      "message": "Sekretess och villkor"
+   },
+   "sidebar_rat_detection_got_it_btn_text": {
+      "message": "OK"
+   },
+   "sidebar_rat_detection_information_I": {
+      "message": "Programvara från den här webbplatsen ger andra åtkomst till din enhet. Hackare eller bedragare kan använda den för att i hemlighet få åtkomst till dina personuppgifter."
+   },
+   "sidebar_rat_detection_information_II": {
+      "message": "Ladda endast ner programvara eller ge ut din information till personer du litar på."
+   },
+   "sidebar_rat_detection_title": {
+      "message": "Webbplatsen tillåter andra att ta kontroll över din enhet"
+   },
+   "sidebar_rat_detection_whitelist_btn": {
+      "message": "Varna mig inte om den här webbplatsen igen"
+   },
+   "sidebar_subtitle": {
+      "message": "Detta har vi gjort hittills:"
+   },
+   "sidebar_title": {
+      "message": "Vi hjälper till att hålla dig säker online"
+   },
+   "sidebar_unsafe_blocked": {
+      "message": "osäkra objekt har blockerats"
+   },
+   "sidebar_version": {
+      "message": "Version"
+   },
+   "sidebar_view_site_report": {
+      "message": "Visa webbplatsrapport"
+   },
+   "site_status_block_page_accept_risk": {
+      "message": "Besök ändå"
+   },
+   "site_status_block_page_go_back": {
+      "message": "Gå tillbaka"
+   },
+   "site_status_body_text_danger": {
+      "message": "Webbplatsen innehåller potentiellt farligt innehåll som skulle kunna skada datorn. Vi har blockerat den så att du lugnt kan fortsätta surfa."
+   },
+   "site_status_body_text_site_report_danger": {
+      "message": "Vi genomsöker regelbundet webbplatser efter farlig eller riskabel aktivitet och den här webbplatsen kan ha innehåll som kan skada din dator."
+   },
+   "site_status_body_text_site_report_safe": {
+      "message": "Vi har sökt igenom webbplatsen och allt ser bra ut. Du är säker!"
+   },
+   "site_status_body_text_site_report_unknown": {
+      "message": "Det verkar som om vi inte har genomsökt den här webbplatsen än. Vi uppdaterar säkerhetsomdömet nästa gång vi kör en genomsökning."
+   },
+   "site_status_body_text_site_report_warning": {
+      "message": "Vi genomsöker regelbundet webbplatser efter farlig eller riskabel aktivitet och vi tycker att den här webbplatsen ser riskabel ut."
+   },
+   "site_status_body_text_typosquatting": {
+      "message": "Om du stavar fel i en webbadress kan du hamna på oönskade webbplatser. Dessa webbplatser kan bombardera dig med malware, begära personlig information med mera. Vi hjälper dig att undvika dessa webbplatser."
+   },
+   "site_status_body_text_warning": {
+      "message": "Webbplatsen ser lite riskabel ut så vi har flaggat den för säkerhets skull. Om du väljer att fortsätta bör du kontrollera om du har förtroende för webbplatsen. Det är bättre att ta det säkra före det osäkra!"
+   },
+   "site_status_feedback_question": {
+      "message": "Tyckte du att informationen var till hjälp?"
+   },
+   "site_status_footer_note": {
+      "message": "Om du väljer att besöka webbplatsen läggs den blockerade webbadressen till på listan över betrodda webbplatser."
+   },
+   "site_status_header_text": {
+      "message": "Webbplatsstatus:"
+   },
+   "site_status_search_input": {
+      "message": "Få färgkodade sökresultat"
+   },
+   "site_status_state_danger": {
+      "message": "Riskabel"
+   },
+   "site_status_state_safe": {
+      "message": "Säker"
+   },
+   "site_status_state_typosquatting": {
+      "message": "URL-kapning"
+   },
+   "site_status_state_unknown": {
+      "message": "Okänd"
+   },
+   "site_status_state_warning": {
+      "message": "Misstänkt"
+   },
+   "site_status_submit_ticket_text": {
+      "message": "Tror du att webbplatsen är säker? $submitTicketLink$.",
+      "placeholders": {
+         "submitTicketLink": {
+            "content": "$1"
+         }
+      }
+   },
+   "site_status_submit_ticket_text_link": {
+      "message": "Skicka in ett ärende"
+   },
+   "site_status_title": {
+      "message": "%PRODUCTNAME% – säkerhetsomdöme för webbplatser"
+   },
+   "site_status_typosquatting_go_back": {
+      "message": "Gå tillbaka"
+   },
+   "site_status_typosquatting_suggest_url_text": {
+      "message": "Menade du $suggestUrl$?",
+      "placeholders": {
+         "suggestUrl": {
+            "content": "1 USD"
+         }
+      }
+   },
+   "site_status_typosquatting_take_me_there": {
+      "message": "Ta mig dit"
+   },
+   "site_status_typosquatting_visit_anyway": {
+      "message": "Besök ändå"
+   },
+   "smadesc": {
+      "message": "Bläddra tryggt i flödet med färgkodade länkar som visar vilka det är säkert att klicka på."
+   },
+   "smatitle": {
+      "message": "Få veta vilka länkar på sociala medier som är säkra – och vilka som är riskabla"
+   },
+   "summarydesc": {
+      "message": "Vi visar en minutuppdaterad sammanfattning av alla åtgärder vi har vidtagit för att hjälpa till att skydda dig när du surfar, söker och handlar online."
+   },
+   "summarytitle": {
+      "message": "Realtidsinstrumentpanel för säkerhet"
+   },
+   "typodesc": {
+      "message": "Hackare skapar webbplatser med hjälp av adresser som är förvillande lika äkta vara – det kallas \"fulregistrering\". Vi leder dig tillbaka till säkerheten om ett stavfel i webbadressen för dig på villovägar. "
+   },
+   "typotitle": {
+      "message": "Parera farliga webbplatser som utger sig för att vara äkta"
+   },
+   "wb_container__right__cancel": {
+      "message": "Nej tack"
+   },
+   "wb_container__right__content": {
+      "message": "Bläddra snabbare med $ph1$. Vi stoppar videoklipp från att spelas automatiskt och sakta ner ditt webbsurfande.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   },
+   "wb_container__right__content_second": {
+      "message": "$ph1$ förhindrar videoklipp från att spelas automatiskt och sakta ner ditt webbsurfande. Vi frågar inte igen om du inte är intresserad av Web Boost.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   },
+   "wb_container__right__eula": {
+      "message": "Genom att klicka på $ph1$ godkänner du vårt $ph2$ och $ph3$.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         },
+         "ph2": {
+            "content": "$2"
+         },
+         "ph3": {
+            "content": "$3"
+         }
+      }
+   },
+   "wb_container__right__eula_licence_agreement": {
+      "message": "Licensavtal"
+   },
+   "wb_container__right__eula_privacy_notice": {
+      "message": "Sekretesspolicy"
+   },
+   "wb_container__right__submit": {
+      "message": "Hämta Web Boost"
+   },
+   "wb_container__right__title": {
+      "message": "Är datorn långsam på grund av störande automatiska videoklipp?"
+   },
+   "wb_container__right__title_second": {
+      "message": "Vi frågar för sista gången – vill du stoppa automatisk uppspelning av videoklipp?"
+   },
+   "wb_name_title": {
+      "message": "McAfee&reg; Web Boost"
+   },
+   "wb_top__body__action_message": {
+      "message": "Öka hastigheten på surfandet"
+   },
+   "wb_top_banner_left_text": {
+      "message": "Hämta $ph1$",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   }
+}

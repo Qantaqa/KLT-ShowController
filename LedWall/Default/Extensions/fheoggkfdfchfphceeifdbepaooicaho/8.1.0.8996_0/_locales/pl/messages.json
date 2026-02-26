@@ -1,0 +1,1808 @@
+{
+   "annotation_balloon_color_green": {
+      "message": "To łącze jest bezpieczne"
+   },
+   "annotation_balloon_color_grey": {
+      "message": "To łącze jest nieznane"
+   },
+   "annotation_balloon_color_red": {
+      "message": "To łącze jest niebezpieczne"
+   },
+   "annotation_balloon_color_yellow": {
+      "message": "To łącze jest podejrzane"
+   },
+   "annotation_balloon_view_site_report": {
+      "message": "Wyświetl raport o witrynie"
+   },
+   "aps_expanded_shield_site_ecommerce": {
+      "message": "Sprawdziliśmy tę witrynę. Jest bezpieczna. Możesz bez obaw robić zakupy."
+   },
+   "aps_expanded_shield_site_email": {
+      "message": "Przeskanowaliśmy tę witrynę pod kątem wyłudzania informacji — wygląda na bezpieczną."
+   },
+   "aps_expanded_shield_site_financial": {
+      "message": "Tej witryny można bezpiecznie używać. Sprawdziliśmy — to autentyczna witryna finansowa."
+   },
+   "aps_expanded_shield_site_signup": {
+      "message": "Możesz bezpiecznie wprowadzić tu swoje informacje. Sprawdziliśmy tę witrynę pod kątem wyłudzania danych i innych zagrożeń."
+   },
+   "aps_expanded_shield_site_unknown": {
+      "message": "Nie oceniliśmy jeszcze bezpieczeństwa tej witryny. Wprowadź swoje dane osobowe, tylko jeśli jej ufasz."
+   },
+   "aps_toast_button": {
+      "message": "Rozumiem"
+   },
+   "aps_toast_list_bullet_four": {
+      "message": "Wszelkie inne odwiedzane witryny"
+   },
+   "aps_toast_list_bullet_one": {
+      "message": "Witryny banków i instytucji finansowych"
+   },
+   "aps_toast_list_bullet_three": {
+      "message": "Formularze rejestracyjne online"
+   },
+   "aps_toast_list_bullet_two": {
+      "message": "Strony realizacji transakcji i płatności"
+   },
+   "aps_toast_paragraph": {
+      "message": "Gdy widzisz naszą zieloną ikonę bezpieczeństwa, możesz mieć pewność, że wyświetlane witryny są wolne od niebezpiecznych łączy."
+   },
+   "aps_toast_title": {
+      "message": "Skanujemy dla Ciebie każdą witrynę"
+   },
+   "category_id_103_name": {
+      "message": "Tematy dla dorosłych"
+   },
+   "category_id_ac_description": {
+      "message": "Strony internetowe będące wirtualnymi galeriami sztuki, witryny artystów (w tym rzeźby i fotografii), muzea, strony przedstawiające zwyczaje etniczne i zwyczaje poszczególnych krajów."
+   },
+   "category_id_ac_name": {
+      "message": "Sztuka/kultura/dziedzictwo"
+   },
+   "category_id_al_description": {
+      "message": "Strony internetowe, które służą głównie sprzedaży, reklamowaniu lub promocji spożycia alkoholu, takiego jak piwo, wino i napoje alkoholowe. Ta kategoria obejmuje również przepisy na koktajle i instrukcje dotyczące piwowarstwa domowego."
+   },
+   "category_id_al_name": {
+      "message": "Alkohol"
+   },
+   "category_id_an_description": {
+      "message": "Strony internetowe, które pozwalają użytkownikom przeglądać zasoby internetowe, ukrywając swój adres IP lub inne osobiste dane identyfikacyjne, w celu obejścia lokalnych zasad filtrowania i uzyskania dostępu do dowolnej strony internetowej. Witryny ukrywające tożsamość blokują również wszelkie technologie śledzenia, takie jak pliki cookie lub historia przeglądarki. Niektóre metody również uniemożliwiają przeniesienie wersji systemu operacyjnego i historii stron internetowych na stronę internetową. Ta kategoria obejmuje strony, które udostępniają darmowe adresy IP proxy lub opisują sposób obejścia filtrowania."
+   },
+   "category_id_an_name": {
+      "message": "Usługa ukrywająca tożsamość"
+   },
+   "category_id_au_description": {
+      "message": "Strony internetowe, które powodują anonimowe przeglądanie stron internetowych bez komunikowania wyraźnego zamiaru świadczenia takiej usługi. Ta kategoria obejmuje translatory adresów URL, buforowanie stron internetowych i inne narzędzia, które mogą działać jako usługi ukrywające tożsamość, ale bez wyraźnego celu obejścia oprogramowania filtrującego."
+   },
+   "category_id_au_name": {
+      "message": "Narzędzia do ukrywania tożsamości"
+   },
+   "category_id_be_description": {
+      "message": "Program wykorzystujący luki przeglądarki to fragment kodu, który wykorzystuje błąd oprogramowania w przeglądarce internetowej, dzięki czemu kod powoduje, że przeglądarka robi coś nieoczekiwanego, np. przestaje działać, odczytywać lub zapisywać lokalne pliki, rozpowszechnia wirusy lub instaluje oprogramowanie szpiegujące. Złośliwy kod może wykorzystywać protokół HTML, JavaScript, Obrazy, ActiveX, Java i inne technologie internetowe. Programy wykorzystujące luki w zabezpieczeniach, znane także jako ataki typu „drive-by-downloads”, mogą instalować się na niezabezpieczonych komputerach często bez wiedzy konsumenta, gdzie kod może instalować rejestratory klawiszy (w celu kradzieży haseł) i programy zawierające konie trojańskie (zamieniające komputer w „bota”). Ta kategoria obejmuje adresy URL rozpowszechniające lub wykonujące jakiekolwiek wykorzystywanie luk w zabezpieczeniach przeglądarki."
+   },
+   "category_id_be_name": {
+      "message": "Programy wykorzystujące luki w zabezpieczeniach przeglądarek"
+   },
+   "category_id_bl_description": {
+      "message": "Strony internetowe zawierające treści dynamiczne, które często się zmieniają, ponieważ użytkownicy mogą publikować lub edytować treści w dowolnym momencie. Ta kategoria obejmuje zagrożenia związane z treściami dynamicznymi, które mogą obejmować zakres od nieszkodliwego do obraźliwego. Wiele blogów i witryn typu wiki koncentruje się jednym temacie lub przedmiocie. Ta kategoria jest często używana z innymi, takimi jak Kontrowersyjne opinie, Edukacja/Informatory, Sport, Polityka/Opinie lub Nagość, w zależności od przedmiotu lub tematyki witryny. Niektóre treści mogą być obraźliwe."
+   },
+   "category_id_bl_name": {
+      "message": "Blogi/strony Wiki"
+   },
+   "category_id_bu_description": {
+      "message": "Strony internetowe zawierające informacje związane z biznesem, takie jak przeglądy korporacyjne lub strony poświęcone planowaniu i strategiom biznesowym. Ta kategoria obejmuje również informacje, usługi lub produkty, które pomagają innym firmom w planowaniu, zarządzaniu i promowaniu swoich przedsiębiorstw. Ta kategoria obejmuje wielopoziomowe przedsięwzięcia marketingowe, gdzie nacisk kładziony jest na prowadzenie biznesu. Ta kategoria nie obejmuje stron osobistych i stron internetowych służących do hostowania stron."
+   },
+   "category_id_bu_name": {
+      "message": "Biznes"
+   },
+   "category_id_ch_description": {
+      "message": "Strony internetowe zapewniające komunikację internetową w czasie rzeczywistym w publicznych i prywatnych czatach. Ta kategoria obejmuje usługę IRC. Ta kategoria nie obejmuje wiadomości błyskawicznych. Zagrożenia obejmują obraźliwe treści, szkodliwy wpływ na wydajność i wyciek poufnych informacji."
+   },
+   "category_id_ch_name": {
+      "message": "Czat"
+   },
+   "category_id_cm_description": {
+      "message": "Strony internetowe zawierające ogólne treści referencyjne, takie jak informacje na temat dostawców usług publicznych, informacje regionalne, rozkłady jazdy, mapy lub prognozy pogody."
+   },
+   "category_id_cm_name": {
+      "message": "Informacje publiczne"
+   },
+   "category_id_co_description": {
+      "message": "Strony internetowe zawierające opinie, które mogą urazić poglądy polityczne lub społeczne i wzbudzić kontrowersje. Wiele z tych treści prezentuje skrajne poglądy. Przykłady obejmują pakty samobójcze, treści propagujące anoreksję, ksenofobię, etnocentryczne oraz fundamentalistyczne poglądy, dezinformację lub krytyczną ocenę jednej grupy ludzi."
+   },
+   "category_id_co_name": {
+      "message": "Kontrowersyjne opinie"
+   },
+   "category_id_cp_description": {
+      "message": "Witryny sieci Web, które próbują okraść lub oszukać konsumentów. Niektóre przykłady ich działalności obejmują sprzedaż podrobionych produktów, sprzedawanie produktów, które pierwotnie dostarczono bezpłatnie lub niewłaściwie używanie marki innej firmy. Ta kategoria obejmuje witryny sieci Web, które wykorzystują ludzką dobroć lub ignorancję, takie jak oszukańcze zbieranie pieniędzy na cele charytatywne lub prowadzenie nieuczciwych programów inwestycyjnych. Ta kategoria obejmuje również witryny, w których wielu konsumentów zgłosiło oszustwo lub nie otrzymało świadczenia usług."
+   },
+   "category_id_cp_name": {
+      "message": "Ochrona konsumenta"
+   },
+   "category_id_cs_description": {
+      "message": "Strony internetowe, które zdaniem firmy McAfee zawierają instrukcje dotyczące nielegalnych lub przestępczych działań. Treści takie mogą obejmować instrukcje popełnienia zabójstwa lub samobójstwa, sabotażu, produkcji bomby, otwierania zamków, kradzieży usług, unikania egzekwowania prawa lub fałszowania testów narkotykowych. Ta kategoria może również zawierać informacje na temat sposobów rozpowszechniania nielegalnych treści, wyłudzeń lub oszustw konsumenckich."
+   },
+   "category_id_cs_name": {
+      "message": "Potencjalna działalność przestępcza"
+   },
+   "category_id_cv_description": {
+      "message": "Strony internetowe zawierające fikcyjne lub fantastyczne akty przemocy w kontekście gier, komiksów, kreskówek lub powieści graficznych. Ta kategoria obejmuje obrazy i opisy tekstowe napaści fizycznych lub walki wręcz, a także poważnych obrażeń i zniszczeń spowodowanych bronią lub materiałami wybuchowymi."
+   },
+   "category_id_cv_name": {
+      "message": "Przemoc w grach/kreskówkach"
+   },
+   "category_id_dc_description": {
+      "message": "Strony internetowe, które umożliwiają użytkownikom wysyłanie i odbieranie kartek elektronicznych i kartek z pozdrowieniami przez Internet. Kartki elektroniczne to kartki z życzeniami, zwykle na specjalne okazje, takie jak urodziny i święta. Niektóre witryny z kartkami elektronicznymi mają określony katalog humorystyczny dla dorosłych. Witryny te mogą również wzbudzać obawy związane z wyciekiem poufnych lub zastrzeżonych informacji, treści budzących zastrzeżenia, złośliwego oprogramowania lub szkodliwych załączników do plików."
+   },
+   "category_id_dc_name": {
+      "message": "Kartki elektroniczne"
+   },
+   "category_id_dl_description": {
+      "message": "Strony internetowe, które pozwalają użytkownikowi przypadkowo pobrać kod, który jest szkodliwy lub irytujący. Ta kategoria obejmuje pliki do pobrania, takie jak wygaszacze ekranu, paski narzędzi i programy do udostępniania plików, które zawierają oprogramowanie z reklamami, oprogramowanie szpiegujące, wirusy lub inny złośliwy kod komputerowy. Czasami złośliwe oprogramowanie dodawane jest bez wiedzy użytkownika, np. przy kliknięciu „Tak” lub „Zgadzam się” bez zapoznania się z pełnymi warunkami umowy. Efekty takiego działania mogą obejmować spowolnienie pracy komputera, kradzież haseł oraz utratę lub uszkodzenie cennych plików osobistych."
+   },
+   "category_id_dl_name": {
+      "message": "Złośliwe pliki do pobrania"
+   },
+   "category_id_dp_description": {
+      "message": "Strony internetowe, zapewniającej usługi sieciowe dla randek internetowych, kojarzenia par, usług towarzyskich lub przedstawiania potencjalnych małżonków. Ta kategoria obejmuje witryny, które udostępniają profile osobiste lub grupowe oraz umożliwiają swoim członkom interakcję za pośrednictwem komunikacji w czasie rzeczywistym, publikowanie wiadomości, publicznych biuletynów i udostępnianie multimediów. Witryny w tej kategorii mogą również umożliwiać kontakt z niepożądanymi stronami i profilami członków, które zawierają kontrowersyjne informacje."
+   },
+   "category_id_dp_name": {
+      "message": "Randki/ogłoszenia towarzyskie"
+   },
+   "category_id_dr_description": {
+      "message": "Witryny sieci Web zawierające informacje na temat zakupu, produkcji i używania nielegalnych lub rekreacyjnych narkotyków. Ta kategoria obejmuje wyświetlanie, sprzedawanie lub opisywanie używania akcesoriów związanych z narkotykami oraz wskazówki dotyczące dopalaczy, takich jak wąchanie kleju, niewłaściwe używanie leków na receptę lub nadużywanie innych substancji prawnie dozwolonych."
+   },
+   "category_id_dr_name": {
+      "message": "Narkotyki"
+   },
+   "category_id_eb_description": {
+      "message": "Strony internetowe umożliwiające licytowanie online i sprzedaż przedmiotów lub usług. Ta kategoria obejmuje strony internetowe, które opierają swoje funkcjonowanie na licytowaniu i sprzedaży. Aukcje internetowe są rzadko monitorowane. Witryny te mogą zawierać materiały, które są również w kategoriach takich jak Pornografia, Broń, Nagość lub Przemoc."
+   },
+   "category_id_eb_name": {
+      "message": "Aukcje/ogłoszenia drobne"
+   },
+   "category_id_ed_description": {
+      "message": "Strony internetowe poświęcone treściom akademickim, takim jak przedmioty akademickie (matematyka, historia), szkolne lub uniwersyteckie strony internetowe i strony administracji oświaty (tablice szkolne, program nauczania)."
+   },
+   "category_id_ed_name": {
+      "message": "Edukacja/informatory"
+   },
+   "category_id_et_description": {
+      "message": "Strony internetowe zawierające informacje o kinie, teatrze, muzyce, telewizji, rozrywce, przemyśle rozrywkowym, plotkach i wiadomości na temat celebrytów, takich jak aktorzy czy muzycy. Ta kategoria obejmuje także witryny, których treść poświęcona jest rozrywce w Internecie, takiej jak horoskopy czy fankluby."
+   },
+   "category_id_et_name": {
+      "message": "Rozrywka"
+   },
+   "category_id_ex_description": {
+      "message": "Ta kategoria jest używana w przypadku kategorii Treści drastyczne, Dyskryminacja, Pornografia, Przemoc lub Przemoc w grach/kreskówkach w celu identyfikacji adresów URL znajdujących się w obszarach granicznych tych kategorii. Przykładem jest nielegalna pornografia, która należy do kategorii Pornografia, Potencjalna działalność przestępcza i Ekstremalne."
+   },
+   "category_id_ex_name": {
+      "message": "Ekstremalne"
+   },
+   "category_id_fb_description": {
+      "message": "Strony internetowe sprzedające odzież, kosmetyki, biżuterię i inne produkty, akcesoria lub usługi powiązane z modą. Kategoria ta obejmuje również przeglądy produktów, porównania i ogólne informacje dla konsumentów oraz informacje o usługach takich jak salony fryzjerskie, solaria, studia tatuażu i studia body-piercing."
+   },
+   "category_id_fb_name": {
+      "message": "Moda/uroda"
+   },
+   "category_id_fi_description": {
+      "message": "Strony internetowe zawierające informacje finansowe lub dostęp do internetowych kont finansowych. Ta kategoria obejmuje strony internetowe, które zawierają informacje finansowe, takie jak wiadomości lub usługi zarządzania pieniędzmi, ale nie zapewniają dostępu do poufnych informacji o koncie finansowym, takich jak statystyki finansowe lub konsultacji w takich dziedzinach jak podatki, hipoteki, ubezpieczenia, akredytacje lub inwestycje. Dostęp do internetowych kont finansowych obejmuje bankowość osobistą lub biznesową, zarządzanie pieniędzmi, doradztwo podatkowe, fundusze inwestycyjne, karty kredytowe, unie kredytowe, ubezpieczenia, inne publikacje i usługi finansowe. Ta kategoria obejmuje informacje o akcjach (ale nie handlu akcjami), finansowanie domu i informacje finansowe związane z rządem."
+   },
+   "category_id_fi_name": {
+      "message": "Finanse/bankowość"
+   },
+   "category_id_fk_description": {
+      "message": "Strony internetowe, które są bezpieczne dla całej rodziny, szczególnie dla dzieci w wieku około 10 lat i młodszych."
+   },
+   "category_id_fk_name": {
+      "message": "Dla dzieci"
+   },
+   "category_id_gb_description": {
+      "message": "Strony internetowe umożliwiające użytkownikom obstawianie zakładów przez Internet lub oferowanie oprogramowania hazardowego umożliwiającego zakłady online, takie jak gry kasynowe, zakłady bukmacherskie, zakłady sportowe i loterie. Ta kategoria obejmuje loterie, jeśli można kupić bilety lub grać online."
+   },
+   "category_id_gb_name": {
+      "message": "Hazard"
+   },
+   "category_id_gm_description": {
+      "message": "Strony internetowe oferujące gry online i informacje powiązane, takie jak kody, cheaty, wersje demo, emulatory, konkursy online lub gry fabularne, klany gier, witryny producentów gier, fantastyczne lub wirtualne ligi sportowe i inne witryny z grami bez możliwości wygranych pieniężnych. Ta kategoria obejmuje konsole do gier, takie jak Microsoft Xbox® i Sony PlayStation®."
+   },
+   "category_id_gm_name": {
+      "message": "Gry"
+   },
+   "category_id_gr_description": {
+      "message": "Strony internetowe, które publikują informacje na temat hazardu bez umożliwiania jego uprawiania. Ta kategoria obejmuje strony internetowe związane z kasynami, które nie oferują gier hazardowych online, łączy do gier hazardowych, wskazówek, najciekawszych sportów, wyników loterii oraz wyścigów konnych, samochodowych lub regat."
+   },
+   "category_id_gr_name": {
+      "message": "Powiązane z hazardem"
+   },
+   "category_id_gv_description": {
+      "message": "Strony internetowe zawierające treści przechowywane przez organizacje rządowe lub wojskowe, takie jak oddziały lub agencje rządowe, departamenty policji, straż pożarną, obronę cywilną, organizacje antyterrorystyczne lub organizacje ponadkrajowe, takie jak Organizacja Narodów Zjednoczonych lub Unia Europejska. Ta kategoria obejmuje obiekty medyczne dla armii oraz weteranów wojskowych."
+   },
+   "category_id_gv_name": {
+      "message": "Rząd/Wojsko"
+   },
+   "category_id_hi_description": {
+      "message": "Strony internetowe zawierające treści dotyczące faktów historycznych. Ta kategoria obejmuje treści odpowiednie dla szkolnictwa wyższego, ale kategoria Edukacja obejmuje treści dla szkół podstawowych. Na przykład witryna ze zdjęciami Holokaustu może być uznana za obraźliwą, ale ma wartość akademicką."
+   },
+   "category_id_hi_name": {
+      "message": "Historia"
+   },
+   "category_id_hk_description": {
+      "message": "Strony internetowe, które zdaniem firmy McAfee zawierają instrukcje lub w inny sposób umożliwiają oszustwo, przestępstwo lub złośliwą aktywność mającą na celu uszkodzenie komputera. Ta kategoria obejmuje strony internetowe powiązane z przestępczością komputerową, które zawierają informacje na temat hakowania lub narzędzia, które pomagają uzyskać nieautoryzowany dostęp do komputerów i sieci (zestawy root, skrypty kiddy). Ta kategoria obejmuje również inne dziedziny oszustw elektronicznych, takie jak oszustwa związane z programami wybierającymi numery telefoniczne oraz nielegalne manipulowanie urządzeniami elektronicznymi."
+   },
+   "category_id_hk_name": {
+      "message": "Potencjalne przestępstwa komputerowe/hakerstwo"
+   },
+   "category_id_hl_description": {
+      "message": "Strony internetowe, które obejmują informacje związane ze zdrowiem i usługi opieki zdrowotnej. Materiały na temat zdrowia obejmują tematy mające na celu poprawę samopoczucia jednostki, czy to w obszarze zdrowia fizycznego, czy psychicznego (dieta, odżywianie, fitness lub rodzicielstwo). Usługi opieki zdrowotnej obejmują np. informacje na temat ubezpieczenia zdrowotnego, szpitali, klinik i niezależnych specjalistów."
+   },
+   "category_id_hl_name": {
+      "message": "Zdrowie"
+   },
+   "category_id_hm_description": {
+      "message": "Strony internetowe o treści mającej na celu rozśmieszenie czytelnika. Ta kategoria obejmuje witryny zawierające dowcipy, rysunki, komiksy i strony satyryczne. Ta kategoria może również zawierać treści powieści graficznych, które często kojarzą się z komiksami."
+   },
+   "category_id_hm_name": {
+      "message": "Humor/komiksy"
+   },
+   "category_id_hr_description": {
+      "message": "Strony internetowe, które potępiają lub proponują różne interpretacje istotnych faktów historycznych, np. negowanie Holokaustu. Ta kategoria obejmuje witryny, które mogą mieć uzasadnioną wartość akademicką, jednak wiele z nich zawiera nielegalną manipulację historią dla celów politycznych. Niektóre adresy URL w tej kategorii mogą zawierać treści uznane za nielegalne lub obraźliwe w niektórych krajach."
+   },
+   "category_id_hr_name": {
+      "message": "Rewizjonizm historyczny"
+   },
+   "category_id_hs_description": {
+      "message": "Strony internetowe, które zdaniem McAfee zawierają treści, które wyraźnie zachęcają do ucisku lub dyskryminacji określonej grupy osób. Ta kategoria obejmuje promowanie treści nastawionych przeciwko różnym grupom ze względu na ich rasę, wyznanie, narodowość, płeć, wiek, niepełnosprawność lub orientację seksualną. Ta kategoria może obejmować partie polityczne i organizacje, których program jest oparty na nienawiści, a także cyberprzemoc, jeśli nabiera ona ekstremalnych form."
+   },
+   "category_id_hs_name": {
+      "message": "Dyskryminacja"
+   },
+   "category_id_hw_description": {
+      "message": "Strony internetowe dotyczące oprogramowania komputerowego i sprzętu, w tym dostawców, marketingu produktów i recenzji, wdrażania i konserwacji oprogramowania i sprzętu oraz aktualizacji oprogramowania i dodatków takich jak skrypty, wtyczki lub sterowniki. Sprzęt obejmuje części komputerowe, akcesoria i sprzęt elektroniczny używany z komputerami i sieciami. Ta kategoria obejmuje marketing oprogramowania i sprzętu oraz czasopism koncentrujących się na przeglądach oprogramowania i sprzętu komputerowego lub trendach branżowych."
+   },
+   "category_id_hw_name": {
+      "message": "Oprogramowanie/sprzęt"
+   },
+   "category_id_ia_description": {
+      "message": "Strony internetowe zapewniające dostęp do aktywnych lub interaktywnych aplikacji sieci Web, takich jak pakiety biurowe oparte na przeglądarce i oprogramowanie do pracy grupowej. Ta kategoria obejmuje witryny o tematyce biznesowej, akademickiej lub treści indywidualne."
+   },
+   "category_id_ia_name": {
+      "message": "Interaktywne aplikacje sieci Web"
+   },
+   "category_id_il_description": {
+      "message": "Strony internetowe, które według firmy McAfee oferują informacje dotyczące działalności pirackiej lub nielegalnie rozpowszechniające oprogramowanie lub media elektroniczne, takie jak muzyka lub filmy chronione prawami autorskimi, nielegalne klucze licencyjne, numery seryjne lub instrukcje łamania zabezpieczeń w oprogramowaniu."
+   },
+   "category_id_il_name": {
+      "message": "Potencjalnie nielegalne oprogramowanie"
+   },
+   "category_id_im_description": {
+      "message": "Strony internetowe zapewniające oprogramowanie do komunikacji w czasie rzeczywistym przez sieć wyłącznie dla użytkowników, którzy dołączyli do członkowskiej listy kontaktów lub sesji wiadomości błyskawicznych. Większość komunikatorów internetowych obejmuje takie funkcje, jak przesyłanie plików, połączenia między komputerami PC i możliwość śledzenia, kiedy inni użytkownicy się logują i wyłączają. Witryny te mogą również wzbudzać obawy związane z wyciekiem poufnych informacji, kontrowersyjnych treści lub udostępnianiem plików."
+   },
+   "category_id_im_name": {
+      "message": "Wiadomości błyskawiczne"
+   },
+   "category_id_in_description": {
+      "message": "Strony internetowe, które umożliwiają kupowanie, sprzedawanie lub handel udziałami online. Ta kategoria obejmuje również informacje okalające, umożliwiające podgląd cen akcji w czasie rzeczywistym oraz obstawianie spreadów finansowych na giełdzie. Inne zakłady znajdują się w kategorii Hazard. Ta kategoria nie obejmuje witryn oferujących informacje o akcjach giełdowych, ale nie umożliwiających kupna, sprzedaży ani handlu akcjami."
+   },
+   "category_id_in_name": {
+      "message": "Transakcje giełdowe"
+   },
+   "category_id_io_description": {
+      "message": "Strony internetowe, które w sposób legalny dostarczają informacji o ochronie danych. Ta kategoria obejmuje szczegółowe informacje dotyczące ochrony danych biznesowych lub osobistych, własności intelektualnej, prywatności i infrastruktury w Internecie, sieciach prywatnych lub w innych usługach związanych z przepustowością, takich jak telekomunikacja. Możliwe zagrożenia obejmują Potencjalne przestępstwa komputerowe/hacking. Witryny z treściami wysokiego ryzyka i bez wyraźnego rozróżnienia między technikami „black hat” a „white hat” mogą również należeć do tej kategorii oraz kategorii Potencjalne przestępstwa komputerowe/hacking. Niektóre treści mogą zostać wykorzystane w celu naruszenia bezpieczeństwa lub popełnienia aktów bezprawnych."
+   },
+   "category_id_io_name": {
+      "message": "Bezpieczeństwo informacji"
+   },
+   "category_id_ir_description": {
+      "message": "Strony internetowe zapewniające oprogramowanie lub możliwość ciągłego nadawania audio lub wideo, takie jak radio internetowe, programy telewizyjne lub podcasty."
+   },
+   "category_id_ir_name": {
+      "message": "Radio internetowe/telewizja internetowa"
+   },
+   "category_id_is_description": {
+      "message": "Adresy URL serwerów obsługujących obrazy, pliki multimedialne lub JavaScript dla jednej lub wielu witryn i mające na celu przyspieszenie pobierania treści dla istniejących serwerów WWW, takich jak Apache. Serwery treści zazwyczaj nie mają opublikowanych treści ani nawigacji po witrynie dla internautów. Serwery zawierające obrazy nie pozwalają użytkownikom przeglądać zdjęć."
+   },
+   "category_id_is_name": {
+      "message": "Serwer zawartości"
+   },
+   "category_id_it_description": {
+      "message": "Strony internetowe, które świadczą usługi publikowania i utrzymywania witryn internetowych, takich jak projektowanie stron internetowych, rejestracja domen, dostawcy usług internetowych oraz firmy świadczące usługi internetowe i telekomunikacyjne."
+   },
+   "category_id_it_name": {
+      "message": "Usługi internetowe"
+   },
+   "category_id_js_description": {
+      "message": "Strony internetowe związane z poszukiwaniem pracy, w tym witryny poświęcone przygotowywaniu CV, rozmowom kwalifikacyjnym, zmianą ścieżki kariery, ogłoszeniom niejawnym i dużym bazom danych. Ta kategoria obejmuje również strony firmowe, które zawierają listy ofert pracy, porównujące wynagrodzenia, oferujące tymczasowe zatrudnienie oraz witryny z ofertami pracy."
+   },
+   "category_id_js_name": {
+      "message": "Poszukiwanie pracy"
+   },
+   "category_id_mb_description": {
+      "message": "Strony internetowe zapewniające dostęp (http://) do grup dyskusyjnych Usenet lub prowadzą dyskusje i publikują treści tworzone przez użytkowników, takie jak wiadomości w czasie rzeczywistym dla grupy zainteresowań. Ta kategoria obejmuje również archiwa plików przesyłanych do grup dyskusyjnych."
+   },
+   "category_id_mb_name": {
+      "message": "Fora/elektroniczne biuletyny informacyjne"
+   },
+   "category_id_md_description": {
+      "message": "Strony internetowe, które umożliwiają użytkownikom przesyłanie, wyszukiwanie i udostępnianie plików multimedialnych i zdjęć, takich jak albumy zdjęć online. Ta kategoria obejmuje ogólne ryzyko związane z udostępnianiem multimediów, ale nie dotyczy konkretnych treści. Niektóre adresy URL mogą również zawierać obraźliwe treści."
+   },
+   "category_id_md_name": {
+      "message": "Udostępnianie multimediów"
+   },
+   "category_id_mg_description": {
+      "message": "Strony internetowe umożliwiające wysyłanie wiadomości tekstowych. Przykłady obejmują wiadomości tekstowe wysyłane na telefony komórkowe, urządzenia PDA, faksy i wewnętrzną komunikację między użytkownikami witryny lub przesyłanie wiadomości między witrynami."
+   },
+   "category_id_mg_name": {
+      "message": "Przesyłanie wiadomości"
+   },
+   "category_id_mk_description": {
+      "message": "Strony internetowe, które promują produkty lub usługi indywidualne lub biznesowe w Internecie, ale nie sprzedają produktów lub usług online. Ta kategoria obejmuje witryny sieci Web, które zazwyczaj stanowią stronę internetową przedsiębiorstwa i przedstawiają usługi lub produkty, których nie można kupić bezpośrednio z tych witryn. Przykłady obejmują witryny producentów samochodów, usługi fotografii ślubnej lub usługi projektowania graficznego."
+   },
+   "category_id_mk_name": {
+      "message": "Marketing/merchandising"
+   },
+   "category_id_mm_description": {
+      "message": "Strony internetowe, które koncentrują się na interakcjach społecznych, np. na randkach internetowych, nawiązywaniu nowych znajomości, spotkaniach absolwentów, korespondencji, usługach towarzyskich czy prezentacji potencjalnych małżonków. Ta kategoria obejmuje wiele witryn, które umożliwiają swoim członkom społeczną interakcję poprzez publikowanie wiadomości w czasie rzeczywistym. Witryny w tej kategorii mogą również umożliwiać kontakt z niepożądanymi stronami i profilami członków, które zawierają kontrowersyjne informacje."
+   },
+   "category_id_mm_name": {
+      "message": "Serwisy randkowe/społecznościowe"
+   },
+   "category_id_mn_description": {
+      "message": "Strony internetowe zawierające niepornograficzne obrazy nagiego ciała ludzkiego, takie jak te w klasycznej rzeźbie i obrazach lub ilustracjach medycznych."
+   },
+   "category_id_mn_name": {
+      "message": "Nagość (nie pornografia)"
+   },
+   "category_id_mo_description": {
+      "message": "Strony internetowe sprzedające media, oprogramowanie lub narzędzia do telefonów komórkowych, które można pobierać i wysyłać na telefony komórkowe. Przykładami mogą tu być dzwonki, logo/skórki, gry, wygaszacze ekranu, melodie tekstowe oraz oprogramowanie do obsługi wiadomości SMS, wiadomości MMS, WAP i innych protokołów telefonii komórkowej."
+   },
+   "category_id_mo_name": {
+      "message": "Telefony komórkowe"
+   },
+   "category_id_mp_description": {
+      "message": "Strony internetowe zawierające pliki audio lub wideo do pobrania w formacie MP3, WAV, AVI i MPEG. Pliki są zapisywane i odtwarzane z komputera użytkownika."
+   },
+   "category_id_mp_name": {
+      "message": "Multimedia do pobrania"
+   },
+   "category_id_mr_description": {
+      "message": "Tablice ogłoszeń, czaty, wyszukiwarki lub witryny poczty internetowej monitorowane przez osobę lub grupę, która ma uprawnienia do blokowania wiadomości lub treści uznanych za nieodpowiednie."
+   },
+   "category_id_mr_name": {
+      "message": "Moderowane"
+   },
+   "category_id_ms_description": {
+      "message": "Strony internetowe wdrażające kod zaprojektowany specjalnie w celu przejęcia ustawień lub działania komputera. Ta kategoria obejmuje aplikacje samoczynnie instalujące (pliki wykonywalne „drive-by”), konie trojańskie i wirusy wykorzystujące luki w zabezpieczeniach w przeglądarkach lub innych aplikacjach. Strona internetowa może później utracić swój złośliwy status i zostać przeniesiona do innej kategorii. Złośliwe witryny służą do podejmowania szkodliwych działań na innym komputerze."
+   },
+   "category_id_ms_name": {
+      "message": "Złośliwe witryny"
+   },
+   "category_id_mv_description": {
+      "message": "Witryny sieci Web dla producentów i dealerów pojazdów transportu konsumenckiego, takich jak samochody osobowe, dostawcze, ciężarówki, samochody typu SUV, motocykle i skutery. Ta kategoria obejmuje również witryny oferujące marketing produktów, recenzje, porównania, informacje o cenach, targach samochodowych, ekspozycje samochodów i ogólne informacje konsumenckie na temat pojazdów mechanicznych."
+   },
+   "category_id_mv_name": {
+      "message": "Pojazdy mechaniczne"
+   },
+   "category_id_na_description": {
+      "message": "Strony internetowe zapewniające dostęp (http://) do grup dyskusyjnych i archiwów Usenet przesłanych do grup dyskusyjnych. Ta kategoria obejmuje również grupy internetowe, które oferują podobny rodzaj publikowania treści społecznościowych. Adresy URL w tej kategorii mogą zawierać obraźliwe treści."
+   },
+   "category_id_na_name": {
+      "message": "Wiadomości grup dyskusyjnych"
+   },
+   "category_id_nd_description": {
+      "message": "Strony internetowe zawierające nie pornograficzne obrazy nagiego ciała ludzkiego. Ta kategoria obejmuje klasyczne rzeźby i obrazy, artystyczne nagie fotografie, niektóre zdjęcia naturystyczne i szczegółowe medyczne ilustracje."
+   },
+   "category_id_nd_name": {
+      "message": "Nagość"
+   },
+   "category_id_np_description": {
+      "message": "Strony internetowe grup charytatywnych lub edukacyjnych, które spełniają określoną misję z korzyścią dla większej społeczności, takiej jak kluby, lobby, społeczności, organizacje non-profit, związki zawodowe i grupy interesów. Przykładami są Masons, Elks, Boy and Girl Scouts lub Big Brothers."
+   },
+   "category_id_np_name": {
+      "message": "Organizacje non profit/grupy poparcia/organizacje pozarządowe"
+   },
+   "category_id_ns_description": {
+      "message": "Strony internetowe, które umożliwiają użytkownikom przesyłanie folderów i plików do serwera sieciowego online w celu tworzenia kopii zapasowych, udostępniania, edytowania lub pobierania plików lub folderów z dowolnej przeglądarki internetowej."
+   },
+   "category_id_ns_name": {
+      "message": "Osobisty magazyn sieciowy"
+   },
+   "category_id_nt_description": {
+      "message": "Strony internetowe udostępniające serwisy społecznościowe wyłącznie do celów zawodowych lub biznesowych. Ta kategoria obejmuje witryny, które udostępniają profile osobiste lub grupowe oraz umożliwiają swoim członkom interakcję za pośrednictwem komunikacji w czasie rzeczywistym, publikowanie wiadomości, publicznych biuletynów i udostępnianie multimediów. Ta kategoria zawiera także witryny absolwentów z funkcją sieci społecznościowej."
+   },
+   "category_id_nt_name": {
+      "message": "Serwisy branżowe"
+   },
+   "category_id_nw_description": {
+      "message": "Strony internetowe udostępniające internetowe media informacyjne, takie jak międzynarodowe lub regionalne wiadomości i publikacje. Ta kategoria obejmuje witryny podające wiadomości."
+   },
+   "category_id_nw_name": {
+      "message": "Wiadomości ogólne"
+   },
+   "category_id_os_description": {
+      "message": "Strony internetowe sprzedające produkty lub usługi online. Strony internetowe sprzedające szeroką gamę produktów mogą stanowić zagrożenie dla użytkowników, oferując dostęp do pozycji, które zwykle znajdują się w innych kategoriach, takich jak Pornografia, Broń, Nagość lub Przemoc. Niektóre witryny mogą oferować dostęp do elementów z innych kategorii, takich jak Pornografia i Broń."
+   },
+   "category_id_os_name": {
+      "message": "Zakupy online"
+   },
+   "category_id_pa_description": {
+      "message": "Strony internetowe ze zdjęciami, które przedstawiają kuszące, skąpe stroje, bieliznę, stroje kąpielowe, zdjęcia modelek lub celebrytek bez elementów nagości."
+   },
+   "category_id_pa_name": {
+      "message": "Prowokujący strój"
+   },
+   "category_id_pc_description": {
+      "message": "Adresy IP (i wszelkie powiązane z nimi domeny), które uzyskują dostęp do Internetu za pomocą modemów DSL lub modemów kablowych. Ponieważ te treści zasadniczo nie są przeznaczone do dostępu do Internetu przez protokół HTTP, dostęp do Internetu za pośrednictwem tych adresów IP może wskazywać na podejrzane zachowanie. To zachowanie może być związane ze złośliwym oprogramowaniem zlokalizowanym na komputerze domowym lub w lokalnych bramkach skonfigurowanych w celu umożliwienia anonimowego dostępu do Internetu."
+   },
+   "category_id_pc_name": {
+      "message": "Lokalne adresy IP"
+   },
+   "category_id_pd_description": {
+      "message": "Strony internetowe, które kiedyś zawierały treści, ale ich domeny zostały sprzedane lub porzucone i nie są już rejestrowane. Zaparkowane domeny nie przechowują własnych treści, ale zwykle przekierowują użytkowników na ogólną stronę z nazwą domeny przeznaczoną do sprzedaży lub przekierowują użytkowników do ogólnej wyszukiwarki i strony portalu, z których niektóre zawierają prawidłowe wyniki wyszukiwania."
+   },
+   "category_id_pd_name": {
+      "message": "Zaparkowana domena"
+   },
+   "category_id_ph_description": {
+      "message": "Łącza do stron internetowych, które zazwyczaj pojawiają się w fałszywych wiadomościach e-mail, ustanowionych w celu kradzieży informacji o koncie użytkownika. Witryny te wyświetlają się fałszywie jako legalne strony firmowe, aby wprowadzić użytkownika w błąd i uzyskać informacje o koncie użytkownika w celu popełnienia oszustwa lub kradzieży."
+   },
+   "category_id_ph_name": {
+      "message": "Wyłudzanie informacji"
+   },
+   "category_id_pm_description": {
+      "message": "Strony internetowe zawierające opinie na temat leków i opisy ich działania, a także oferujące promocję i sprzedaż leków na receptę lub dostępnych bez recepty, środków antykoncepcyjnych lub suplementów diety."
+   },
+   "category_id_pm_name": {
+      "message": "Farmacja"
+   },
+   "category_id_pn_description": {
+      "message": "Strony internetowe, które umożliwiają wymianę plików między komputerami i użytkownikami w celach biznesowych lub osobistych, takich jak muzyka do pobrania. Klienci P2P pozwalają użytkownikom wyszukiwać i wymieniać pliki w sieci typu „peer-user”. Często zawierają funkcje oprogramowanie szpiegujące lub czat w czasie rzeczywistym. Ta kategoria obejmuje strony internetowe BitTorrent."
+   },
+   "category_id_pn_name": {
+      "message": "Sieci P2P/wymiana plików"
+   },
+   "category_id_po_description": {
+      "message": "Strony internetowe dotyczące partii politycznych, jednostek w życiu politycznym i opinii na różne tematy. Ta kategoria może również obejmować prawa i opinie polityczne dotyczące narkotyków. Ta kategoria obejmuje adresy URL partii politycznych, kampanii politycznych i opinii na różne tematy, w tym debaty polityczne."
+   },
+   "category_id_po_name": {
+      "message": "Polityka/opinie"
+   },
+   "category_id_pp_description": {
+      "message": "Osobiste strony główne, które mają wspólną domenę, na przykład hostowane przez ISP, serwery uniwersyteckie/edukacyjne lub bezpłatne hosty stron. Ta kategoria obejmuje także unikalne domeny zawierające dane osobowe, takie jak osobista strona główna. Prywatne strony główne mogą zawierać obraźliwe treści."
+   },
+   "category_id_pp_name": {
+      "message": "Strony osobiste"
+   },
+   "category_id_pr_description": {
+      "message": "Strony internetowe o treściach zawierających obsceniczny, wulgarny lub nieprzyzwoity język lub gesty."
+   },
+   "category_id_pr_name": {
+      "message": "Wulgaryzmy"
+   },
+   "category_id_ps_description": {
+      "message": "Strony internetowe, które służą jako główne kanały wymiany lub katalogi treści w Internecie. Wiele witryn portalu udostępnia również szereg wewnętrznych funkcji lub usług, takich jak wyszukiwarki, wiadomości e-mail, wiadomości i rozrywka. W tej kategorii znajdują się witryny list mailingowych zawierających różnorodne treści."
+   },
+   "category_id_ps_name": {
+      "message": "Portale"
+   },
+   "category_id_pu_description": {
+      "message": "Strony internetowe zawierające potencjalnie niepożądane programy. Potencjalnie niepożądane programy są często użyteczne, ale wprowadzają zmiany w statusie bezpieczeństwa komputera lub prywatności użytkownika komputera. Użytkownicy komputerów, którzy obawiają się o bezpieczeństwo lub prywatność, mogą chcieć uzyskać informacje o tym oprogramowaniu, a w niektórych przypadkach mogą chcieć usunąć to oprogramowanie ze swoich komputerów."
+   },
+   "category_id_pu_name": {
+      "message": "Potencjalnie niepożądane programy"
+   },
+   "category_id_ra_description": {
+      "message": "Strony internetowe zapewniające dostęp zdalny do programu, usługi online lub całego systemu komputerowego. Chociaż dostęp zdalny jest często wykorzystywany w celu uruchomienia komputera z lokalizacji zdalnej, stwarza on zagrożenie bezpieczeństwa. Tylne wejście do komputera, stworzone przez programistę, pozwala na kontrolowanie systemu przez strony trzecie bez wiedzy użytkownika."
+   },
+   "category_id_ra_name": {
+      "message": "Dostęp zdalny"
+   },
+   "category_id_rb_description": {
+      "message": "Strony internetowe zawierające informacje na temat restauracji, barów, cateringu, jedzenia na wynos i z dowozem, a także możliwość zamawiania online. Ta kategoria obejmuje witryny zawierające informacje na temat lokalizacji, godzin otwarcia, cen, menu itp. Ta kategoria obejmuje również przewodniki i recenzje restauracji oraz informacje dotyczące kawiarni."
+   },
+   "category_id_rb_name": {
+      "message": "Restauracje"
+   },
+   "category_id_re_description": {
+      "message": "Strony internetowe, które świadczą usługi w zakresie nieruchomości komercyjnych i mieszkaniowych oraz udostępniają powiązane z nimi informacje. Usługi i informacje obejmują sprzedaż i wynajem powierzchni mieszkalnej lub powierzchni handlowej oraz przewodniki po mieszkaniach i nieruchomościach oraz informacje na temat wyceny i pośrednictwa. Ta kategoria obejmuje witryny, które pozwalają przeglądać domy modelowe."
+   },
+   "category_id_re_name": {
+      "message": "Nieruchomości"
+   },
+   "category_id_rh_description": {
+      "message": "Strony internetowe organizacji i obiektów rekreacyjnych, które zawierają treści poświęcone zajęciom rekreacyjnym i hobby. Ta kategoria obejmuje informacje o publicznych basenach, ogrodach zoologicznych, targach, festiwalach, parkach rozrywki, przewodnikach rekreacyjnych, wędrówkach, wędkowaniu, obserwowaniu ptaków lub zbieraniu znaczków."
+   },
+   "category_id_rh_name": {
+      "message": "Czas wolny/hobby"
+   },
+   "category_id_rl_description": {
+      "message": "Strony internetowe z treściami związanymi z zagadnieniami religijnymi i wierzeniami, które nie należą do głównych religii. Ta kategoria obejmuje dyskusje religijne, opinie, artykuły i informacje dla lokalnych zborów lub grup, takich jak strona główna kościoła, chyba że witryna znajduje się już w kategorii Wielkie religie świata. Ta kategoria obejmuje także tematykę religioznawstwa, witryny dotyczące religii i ideologii."
+   },
+   "category_id_rl_name": {
+      "message": "Religia/ideologie"
+   },
+   "category_id_rm_description": {
+      "message": "Strony internetowe zawierające treści dotyczące tematów religijnych i informacji związanych z głównymi religiami. Ta kategoria obejmuje witryny zawierające treści religijne, takie jak dyskusje, opinie, komentarze bez kontrowersji, artykuły i informacje dla lokalnych zborów, takie jak strona główna kościoła lub synagogi. Religie w tej kategorii to bahaizm, buddyzm, tradycyjne wierzenia chińskie, chrześcijaństwo, hinduizm, islam, dżinizm, judaizm, shinto, sikhizm, tenrikyo, zoroastrianizm."
+   },
+   "category_id_rm_name": {
+      "message": "Wielkie religie świata"
+   },
+   "category_id_rs_description": {
+      "message": "Strony internetowe wykorzystujące nieaktywne lub niewykorzystane zasoby komputera w celu skupienia się na typowym zadaniu. Zadanie może być wykonywane na poziomie firmy lub na poziomie międzynarodowym. Dobrze znanymi przykładami są program SETI i Human Genome Project, które wykorzystują czas nieaktywny tysięcy komputerów udostępnionych przez ochotników do analizy danych."
+   },
+   "category_id_rs_name": {
+      "message": "Współużytkowanie zasobów"
+   },
+   "category_id_sc_description": {
+      "message": "Strony internetowe, które promują plagiat lub oszukiwanie poprzez udostępnianie bezpłatnych lub płatnych dokumentów, pisemnych esejów lub odpowiedzi egzaminacyjnych."
+   },
+   "category_id_sc_name": {
+      "message": "Materiały ułatwiające ściąganie"
+   },
+   "category_id_se_description": {
+      "message": "Strony internetowe zawierające wyniki wyszukiwania, które umożliwiają użytkownikom wyszukiwanie informacji w Internecie na podstawie słów kluczowych."
+   },
+   "category_id_se_name": {
+      "message": "Wyszukiwarki"
+   },
+   "category_id_sm_description": {
+      "message": "Strony internetowe, które opisują lub przedstawiają akty seksualne, ale nie mają na celu wywoływania podniecenia seksualnego. Przykłady materiałów o charakterze seksualnym obejmują treści związane z edukacją seksualną, podteksty erotyczne, humor erotyczny lub prezentację produktów związanych z seksem."
+   },
+   "category_id_sm_name": {
+      "message": "Materiały o charakterze seksualnym"
+   },
+   "category_id_sn_description": {
+      "message": "Strony internetowe, które umożliwiają tworzenie serwisów społecznościowych dla różnych celów, takich jak nawiązywanie przyjaźni, randki, prezentacja tematyki zawodowej i inne. Witryny te umożliwiają tworzenie profili osobistych lub grupowych oraz interakcję między ich członkami poprzez komunikację w czasie rzeczywistym, publikowanie wiadomości, publiczne biuletyny i udostępnianie multimediów. Witryny w tej kategorii mogą również umożliwiać kontakt z niepożądanymi stronami i profilami członków, które zawierają kontrowersyjne informacje."
+   },
+   "category_id_sn_name": {
+      "message": "Serwisy społecznościowe"
+   },
+   "category_id_sp_description": {
+      "message": "Strony internetowe związane z zawodowymi lub zorganizowanymi sportami rekreacyjnymi. Ta kategoria obejmuje prezentację wiadomości sportowych, wydarzeń i informacji, takich jak wskazówki, strategie, wyniki gier lub transakcje gracza."
+   },
+   "category_id_sp_name": {
+      "message": "Sport"
+   },
+   "category_id_st_description": {
+      "message": "Strony internetowe zawierające multimedia strumieniowe lub wtyczki oprogramowania do wyświetlania danych dźwiękowych i wizualnych zanim cały plik zostanie przesłany."
+   },
+   "category_id_st_name": {
+      "message": "Multimedia strumieniowe"
+   },
+   "category_id_su_description": {
+      "message": "Łącza do stron internetowych, które pojawiają się w niepożądanych wiadomościach spamowych. Treść spamu obejmuje zakres od marketingu produktu do stron o treściach potencjalnie obraźliwych lub oszukańczych. Ta kategoria obejmuje witryny zbudowane wyłącznie w celu spamowania, takie jak blogi spamowe lub spam w komentarzach."
+   },
+   "category_id_su_name": {
+      "message": "Adresy URL stron rozsyłających spam"
+   },
+   "category_id_sw_description": {
+      "message": "Strony internetowe będące repozytoriami dostępnych do pobrania kopii shareware i freeware. Oprogramowanie typu shareware jest dystrybuowane w systemie honorowym, dzięki któremu jest udostępniane bezpłatnie, ale autor żąda niewielkiej opłaty, jeśli program jest odpowiedni i jest regularnie używany. Freeware to oprogramowanie dostępne bez żadnych kosztów."
+   },
+   "category_id_sw_name": {
+      "message": "Shareware/freeware"
+   },
+   "category_id_sx_description": {
+      "message": "Strony internetowe, które zdaniem firmy McAfee zawierają materiały przeznaczone do wywoływania podniecenia seksualnego lub erotycznego. Ta kategoria obejmuje strony fetyszy, animacje, komiksy, opowiadania i nielegalną pornografię."
+   },
+   "category_id_sx_name": {
+      "message": "Pornografia"
+   },
+   "category_id_sy_description": {
+      "message": "Strony internetowe, które naruszają prywatność i bezpieczeństwo osobiste lub firmowe. Ta kategoria obejmuje:\u003Cbr/>\u003Cbr/>\u003Cul>\u003Cli>Adresy URL, które pobierają oprogramowanie lub uruchamiają programy gromadzące informacje o użytkowniku i wysyłają je stronom trzecim bez wyraźnej wiedzy lub zgody użytkownika.\u003C/li>\u003Cli>Oprogramowanie, które monitoruje lub śledzi aktywność na komputerze innych osób poprzez rejestrację naciśnięć klawiszy (programy do przechwytywania znaków wprowadzanych za pomocą klawiatury).\u003C/li>\u003Cli>Witryny rozpowszechniające oprogramowanie szpiegujące lub oprogramowanie z reklamami.\u003C/li>\u003C/ul>Kategoria ta różni się od kategorii Złośliwe witryny z powodu celu, do jakiego są przeznaczone. Oprogramowanie szpiegujące i programy do przechwytywania znaków wprowadzanych za pomocą klawiatury w ukryty sposób gromadzą i wysyłają informacje stronom trzecim. Złośliwa witryna zamierza zainstalować oprogramowanie lub podjąć działanie bez zgody lub wiedzy użytkownika."
+   },
+   "category_id_sy_name": {
+      "message": "Oprogramowanie szpiegujące/z reklamami/do przechwytywania znaków wprowadzanych za pomocą klawiatury"
+   },
+   "category_id_tb_description": {
+      "message": "Strony internetowe, które sprzedają, promują lub popierają używanie wyrobów tytoniowych, akcesoriów tytoniowych, w tym papierosów, cygar, fajek czy tytoniu do żucia."
+   },
+   "category_id_tb_name": {
+      "message": "Wyroby tytoniowe"
+   },
+   "category_id_tf_description": {
+      "message": "Strony internetowe o charakterze technicznym lub biznesowym, które umożliwiają publikowanie wiadomości w trybie online lub czat w czasie rzeczywistym, takie jak pomoc techniczna lub interaktywna komunikacja biznesowa. Chociaż użytkownicy mogą publikować dowolne treści, na tych forach występuje mniejsze ryzyko obraźliwych treści. Witryny oferujące różne fora tematyczne, w tym treści techniczne i biznesowe, znajdują się wyłącznie w kategoriach Fora/elektroniczne biuletyny informacyjne lub Czat. Fora o tematyce technicznej lub biznesowej znajdują się wyłącznie w kategorii Fora techniczne/biznesowe."
+   },
+   "category_id_tf_name": {
+      "message": "Fora techniczne/biznesowe"
+   },
+   "category_id_tg_description": {
+      "message": "Strony internetowe z treściami, które można uznać za pozbawione smaku, obrzydliwe, szokujące lub makabryczne. Ta kategoria obejmuje humor najniższych lotów, treści dotyczące funkcji wydalania, zdjęcia medyczne lub z wypadków (ukazujące krew lub rany), ekstremalne formy deformacji ciała (cięcie, skaryfikacja lub kolczykowanie narządów płciowych) lub szokujące obrazy nieludzkiego traktowania zwierząt."
+   },
+   "category_id_tg_name": {
+      "message": "Treści drastyczne"
+   },
+   "category_id_ti_description": {
+      "message": "Strony internetowe, które dostarczają informacji o charakterze edukacyjnym w dziedzinach, takich jak informatyka, programowanie komputerowe i certyfikacja. Przykłady obejmują grupy użytkowników systemu Linux, polecenia systemu UNIX, samouczki oprogramowania lub słowniki terminów technicznych. Większość witryn w tej kategorii może być podkatalogami większych domen."
+   },
+   "category_id_ti_name": {
+      "message": "Informacje techniczne"
+   },
+   "category_id_to_description": {
+      "message": "Treści, które zawierają wyłącznie tekst lub dźwięk i nie zawierają zdjęć. Ta kategoria może być używana jako wyjątek, aby umożliwić dostęp do tekstu i nagranego materiału gdy użytkownik chce, aby zdjęcia były blokowane przy użyciu kategorii Pornografia, Przemoc lub Materiały o charakterze seksualnym. Biblioteki i uniwersytety mogą używać tej kategorii, aby zapobiec wyświetlaniu obraźliwej grafiki w obiektach użyteczności publicznej."
+   },
+   "category_id_to_name": {
+      "message": "Tylko tekst/dźwięk"
+   },
+   "category_id_tr_description": {
+      "message": "Strony internetowe promujące podróże osobiste lub służbowe, udostępniające informacje na temat hoteli, kurortów, linii lotniczych, transportu naziemnego, wypożyczalni samochodów, biur podróży oraz ogólne informacje turystyczne. Ta kategoria obejmuje również witryny umożliwiające zakup biletów lub rezerwację zakwaterowania."
+   },
+   "category_id_tr_name": {
+      "message": "Podróże"
+   },
+   "category_id_tt_description": {
+      "message": "Strony internetowe, które pozwalają użytkownikom wpisać zdanie lub fragment tekstu, aby przetłumaczyć je z jednego języka na inny. Ta kategoria obejmuje także strony internetowe z identyfikatorem języka."
+   },
+   "category_id_tt_name": {
+      "message": "Translatory tekstu"
+   },
+   "category_id_uk_description": {
+      "message": "Strony internetowe, które zawierają treści dotyczące wykorzystywania seksualnego dzieci w dowolnym miejscu na świecie, a także obsceniczne i podżegające do nienawiści na tle rasowym w Wielkiej Brytanii."
+   },
+   "category_id_uk_name": {
+      "message": "Nielegalne — Wielka Brytania"
+   },
+   "category_id_vi_description": {
+      "message": "Strony internetowe zawierające rzeczywiste lub realistyczne obrazy lub tekst, które przedstawiają, opisują lub zalecają fizyczne napaści na ludzi, zwierzęta lub instytucje, np. obrazy wojny, samobójstwa, okaleczenia lub rozbicia."
+   },
+   "category_id_vi_name": {
+      "message": "Przemoc"
+   },
+   "category_id_vs_description": {
+      "message": "Strony internetowe, które udostępniają wyniki wyszukiwania związane z obrazem, takie jak miniatury zdjęć."
+   },
+   "category_id_vs_name": {
+      "message": "Wyszukiwarka wizualna"
+   },
+   "category_id_wa_description": {
+      "message": "Strony internetowe, które zapewniają hosting reklam lub programy tworzące reklamy. Przykłady obejmują łącza, kody źródłowe lub aplety do banerów, wyskakujących okienek i innych rodzajów statycznych lub dynamicznie generowanych reklam, które pojawiają się na stronach internetowych. Ta kategoria ma na celu blokowanie reklam na stronach internetowych, a nie firm oferujących reklamy lub usługi reklamowe."
+   },
+   "category_id_wa_name": {
+      "message": "Reklamy internetowe"
+   },
+   "category_id_we_description": {
+      "message": "Strony internetowe zawierające informacje na temat kupowania, wytwarzania, modyfikowania lub używania broni, takiej jak broń palna, noże, miecze, pistolety do paintballa i amunicja, materiały wybuchowe oraz akcesoria do broni."
+   },
+   "category_id_we_name": {
+      "message": "Broń"
+   },
+   "category_id_wm_description": {
+      "message": "Strony internetowe, które umożliwiają użytkownikom wysyłanie lub odbieranie wiadomości e-mail przez Internet. Witryny te mogą narazić użytkowników na szkodliwe treści dostarczane w załącznikach plików wiadomości e-mail lub mogą stanowić ryzyko bezpieczeństwa, takie jak wyciek lub utrata zastrzeżonych danych."
+   },
+   "category_id_wm_name": {
+      "message": "Poczta internetowa"
+   },
+   "category_id_wp_description": {
+      "message": "Strony internetowe umożliwiające użytkownikom wykonywanie połączeń telefonicznych przez Internet lub uzyskiwanie w tym celu informacji lub oprogramowania. Usługa telefonii internetowej jest również nazywana Telefonią internetową lub VoIP. Usługa telefonii internetowej obejmuje między innymi usługi komputer-komputer, komputer-telefon i telefon-telefon za pośrednictwem sieci TCP/IP."
+   },
+   "category_id_wp_name": {
+      "message": "Telefonia internetowa"
+   },
+   "category_id_wx_description": {
+      "message": "Strony internetowe hostujące spotkania na żywo, konferencje wideo i interaktywne prezentacje głównie dla firm. Spotkania w sieci Web zazwyczaj obejmują przesyłanie strumieniowe audio i wideo oraz umożliwiają przesyłanie danych lub udostępnianie aplikacji w biurze, np. prezentacji online. Adresy URL w tej kategorii mogą przedstawiać ryzyko związane z przepustowością oraz stanowić ryzyko dla bezpieczeństwa, takie jak utrata lub wyciek zastrzeżonych danych."
+   },
+   "category_id_wx_name": {
+      "message": "Spotkania w sieci Web"
+   },
+   "dfd_landing_desc1": {
+      "message": "Odkrywaj i oglądaj wideo w serwisach takich, jak YouTube i Facebook."
+   },
+   "dfd_landing_desc2": {
+      "message": "Ostrzeżemy Cię w kilka sekund, jeśli wykryjemy deepfake."
+   },
+   "dfd_landing_desc3": {
+      "message": "Będziesz mieć wówczas możliwość przejrzenia analizy wyników w czasie rzeczywistym."
+   },
+   "dfd_landing_home_btn": {
+      "message": "Przejdź do strony głównej"
+   },
+   "dfd_landing_title": {
+      "message": "Masz teraz ochronę przed oszustwami na tym urządzeniu"
+   },
+   "download_scan_popup_expanded_descriptions": {
+      "message": "Trwa skanowanie pobranego pliku. Powiadomimy Cię w razie pojawienia się problemu."
+   },
+   "dws_do_not_ask_again_btn": {
+      "message": "Nie pytaj ponownie"
+   },
+   "dws_do_not_ask_again_close_btn": {
+      "message": "Dziękujemy"
+   },
+   "dws_do_not_ask_again_title": {
+      "message": "Nie spytamy Cię, gdy następnym razem użyjesz tego adresu e-mail."
+   },
+   "dws_email_input_error": {
+      "message": "Coś jest nie tak."
+   },
+   "dws_email_input_label": {
+      "message": "Adres e-mail"
+   },
+   "dws_remind_later_btn": {
+      "message": "Przypomnij mi następnym razem"
+   },
+   "dws_remind_later_title": {
+      "message": "Spytamy Cię, gdy następnym razem użyjesz tego adresu e-mail."
+   },
+   "dws_scan_btn": {
+      "message": "Sprawdź mój adres e-mail"
+   },
+   "dws_scan_btn_first_time": {
+      "message": "Sprawdź mój adres e-mail"
+   },
+   "dws_scan_email_description": {
+      "message": "Nasza usługa przeszukuje bazy danych sieci dark web, aby sprawdzić, czy nie doszło do kradzieży danych osobowych. Chcesz sprawdzić swój adres e-mail?"
+   },
+   "dws_scan_email_title": {
+      "message": "Chroń swoją tożsamość"
+   },
+   "dws_thanks_btn": {
+      "message": "Dziękujemy"
+   },
+   "efficacy_meter_excellent": {
+      "message": "Świetne"
+   },
+   "efficacy_meter_fair": {
+      "message": "Średnie"
+   },
+   "efficacy_meter_good": {
+      "message": "Dobre"
+   },
+   "efficacy_meter_poor": {
+      "message": "Słabe"
+   },
+   "efficacy_meter_title": {
+      "message": "Ocena bezpieczeństwa"
+   },
+   "ffpolicy_accept_prompt": {
+      "message": "* Zaakceptuj monit, aby aktywować"
+   },
+   "ffpolicy_activity_main_title": {
+      "message": "Inne sposoby wykorzystywania Twoich danych w celu zapewniania Ci lepszej ochrony online:"
+   },
+   "ffpolicy_activity_message": {
+      "message": "Używamy tych informacji, aby zrozumieć, które funkcje programu WebAdvisor są dla Ciebie najbardziej przydatne."
+   },
+   "ffpolicy_activity_title": {
+      "message": "Gromadzenie danych dotyczących aktywności"
+   },
+   "ffpolicy_header_message": {
+      "message": "Włącz opcję gromadzenia danych osobowych, abyśmy mogli lepiej chronić Cię przed zagrożeniami podczas przeglądania Internetu. W przeciwnym razie trzeba będzie odinstalować McAfee® WebAdvisor."
+   },
+   "ffpolicy_header_message_2": {
+      "message": "Włącz zezwolenia rozszerzeń, abyśmy mogli lepiej chronić Cię przed zagrożeniami podczas przeglądania Internetu."
+   },
+   "ffpolicy_header_message_uninstall": {
+      "message": "odinstalować"
+   },
+   "ffpolicy_header_title": {
+      "message": "Nie masz ochrony"
+   },
+   "ffpolicy_header_title_protected": {
+      "message": "Korzystasz teraz z ochrony McAfee® WebAdvisor"
+   },
+   "ffpolicy_page_tab_title": {
+      "message": "McAfee - Jeszcze jeden krok"
+   },
+   "ffpolicy_permissions_accept_button": {
+      "message": "Udziel zezwolenia"
+   },
+   "ffpolicy_permissions_message": {
+      "message": "Musimy odczytywać i zmieniać dane w odwiedzanych przez Ciebie witrynach, aby móc rozpoznawać zagrożenia bezpieczeństwa i powiadamiać Cię o nich. Wymagamy tego ustawienia, aby chronić Cię podczas przeglądania Internetu."
+   },
+   "ffpolicy_permissions_message_line_2": {
+      "message": "Aby rozpocząć, kliknij przycisk „Udziel zezwolenia” poniżej i wybierz opcję „Zezwól” w wyskakującym okienku."
+   },
+   "ffpolicy_permissions_on": {
+      "message": "WŁ."
+   },
+   "ffpolicy_permissions_title": {
+      "message": "Zezwolenia rozszerzeń (Wymagane)"
+   },
+   "ffpolicy_personal_data_accept_button": {
+      "message": "Tak, zezwalam na gromadzenie moich danych osobowych zgodnie z Polityką prywatności McAfee"
+   },
+   "ffpolicy_personal_data_decline_button": {
+      "message": "Nie, nie zezwalam na gromadzenie moich danych osobowych"
+   },
+   "ffpolicy_personal_message_intro": {
+      "message": "Przesyłamy naszym ekspertom adresy internetowe odwiedzanych przez Ciebie witryn w celu sprawdzenia stanu ich zabezpieczeń. Nie obawiaj się – nigdy nie sprzedajemy Twoich danych. Czy możemy gromadzić następujące dane umożliwiające identyfikację?"
+   },
+   "ffpolicy_personal_message_outro": {
+      "message": "Jeśli nie zezwolisz nam na gromadzenie danych osobowych, korzystanie z funkcji zabezpieczeń produktu McAfee® WebAdvisor nie będzie możliwe i trzeba go będzie odinstalować."
+   },
+   "ffpolicy_personal_message_outro_line_2": {
+      "message": "Wszystkie szczegóły dotyczące gromadzonych przez nas danych osobowych i sposobów ich wykorzystywania są podane w $link$",
+      "placeholders": {
+         "link": {
+            "content": "$1"
+         }
+      }
+   },
+   "ffpolicy_personal_message_point_1": {
+      "message": "Adresy internetowe (URL) odwiedzanych witryn, które gromadzimy w celu sprawdzania stanu ich zabezpieczeń i zapewniania Ci aktualnej ochrony."
+   },
+   "ffpolicy_personal_message_point_2": {
+      "message": "Adresy internetowe (URL) witryn wymienionych w wynikach wyszukiwania, które gromadzimy w celu sprawdzania stanu ich zabezpieczeń i dodawania oznaczeń dotyczących bezpieczeństwa."
+   },
+   "ffpolicy_personal_message_point_3": {
+      "message": "Bieżąca wersja przeglądarki, której gromadzenie pozwala nam diagnozować potencjalne problemy z usługą zabezpieczeń McAfee® WebAdvisor."
+   },
+   "ffpolicy_personal_message_point_4": {
+      "message": "Używana wersja produktu McAfee® WebAdvisor, której gromadzenie pozwala nam diagnozować potencjalne problemy z jego usługą zabezpieczeń."
+   },
+   "ffpolicy_personal_title": {
+      "message": "Gromadzenie danych osobowych"
+   },
+   "ffpolicy_personal_title_required": {
+      "message": "(Wymagane)"
+   },
+   "ffpolicy_privacy_policy_link": {
+      "message": "naszej Polityce prywatności"
+   },
+   "ffpolicy_privacy_text": {
+      "message": "Więcej informacji na temat sposobów, w jaki gromadzimy, wykorzystujemy i udostępniamy Twoje dane osobowe można znaleźć w"
+   },
+   "ffpolicy_privacy_text_link": {
+      "message": "Informacjach o ochronie prywatności McAfee® WebAdvisor"
+   },
+   "ffpolicy_required_suffix_1": {
+      "message": "1/2"
+   },
+   "ffpolicy_required_suffix_2": {
+      "message": "2/2"
+   },
+   "ffpolicy_see_settings": {
+      "message": "Wyświetl ustawienia"
+   },
+   "ffpolicy_uninstall_popup_message": {
+      "message": "Niestety, produkt McAfee® WebAdvisor nie będzie działać bez wymienionych danych osobowych, ponieważ nie będzie miał aktualnych informacji na temat bezpieczeństwa potrzebnych do dostarczania funkcji zabezpieczeń.  Rozważ przyznanie McAfee® WebAdvisor zezwolenia na gromadzenie określonych danych. W przeciwnym razie zalecamy usunięcie produktu McAfee® WebAdvisor."
+   },
+   "howitworks_about": {
+      "message": "Informacje"
+   },
+   "howitworks_about_careers": {
+      "message": "Praca"
+   },
+   "howitworks_about_contact": {
+      "message": "Skontaktuj się z nami"
+   },
+   "howitworks_about_legal": {
+      "message": "Prywatność i warunki prawne"
+   },
+   "howitworks_about_map": {
+      "message": "Mapa witryny"
+   },
+   "howitworks_about_mcafee": {
+      "message": "Informacje o firmie McAfee"
+   },
+   "howitworks_about_req": {
+      "message": "Wymagania systemowe"
+   },
+   "howitworks_address": {
+      "message": "Siedziba firmy 6220 America Center Drive San Jose, CA 95002 USA"
+   },
+   "howitworks_description": {
+      "message": "Ochrona McAfee to pierwsza linia obrony podczas przeglądania Internetu. Pomaga uniknąć ataków złośliwego oprogramowania i wyłudzania informacji, zanim nastąpią."
+   },
+   "howitworks_download_description": {
+      "message": "Zabezpiecz komputer przed wirusami i innymi zagrożeniami pochodzącymi z Internetu. Ostrzeżemy Cię, jeśli pobierzesz podejrzany plik i zablokujemy złośliwe oprogramowanie ukryte na stronach*."
+   },
+   "howitworks_download_title": {
+      "message": "Bezpieczniejsze pobieranie"
+   },
+   "howitworks_legal": {
+      "message": "Twoja subskrypcja podlega postanowieniom dokumentów $howitworks_legal_license$ oraz $howitworks_legal_notice$ i jest przeznaczona do użytku prywatnego na takiej liczbie obsługiwanych urządzeń, na jaką zezwala subskrypcja. Subskrypcje obejmujące „wszystkie” urządzenia są ograniczone do obsługiwanych urządzeń, będących Twoją własnością. W okresie obowiązywania subskrypcji funkcje produktu mogą zostać dodane, zmienione lub usunięte. Nie wszystkie funkcje są dostępne w każdym systemie operacyjnym. Lista obsługiwanych urządzeń podana jest w dokumencie $howitworks_legal_req$. Oprogramowanie nie gwarantuje ochrony przed wszystkimi możliwymi zagrożeniami.",
+      "placeholders": {
+         "howitworks_legal_license": {
+            "content": "$1"
+         },
+         "howitworks_legal_notice": {
+            "content": "$2"
+         },
+         "howitworks_legal_req": {
+            "content": "$3"
+         }
+      }
+   },
+   "howitworks_legal_license": {
+      "message": "Umowa licencyjna"
+   },
+   "howitworks_legal_notice": {
+      "message": "Informacje o ochronie prywatności"
+   },
+   "howitworks_legal_req": {
+      "message": "Wymagania systemowe"
+   },
+   "howitworks_lets_connect": {
+      "message": "Dołącz do nas."
+   },
+   "howitworks_page_title": {
+      "message": "McAfee - Jak to działa"
+   },
+   "howitworks_phishing_description": {
+      "message": "Hakerzy próbują kraść informacje za pomocą wiadomości e-mail wyglądających na oficjalne lub zachęcających wyników wyszukiwania. Pomagamy Ci uniknąć tych pułapek, zabezpieczając tym samym dane osobowe."
+   },
+   "howitworks_phishing_title": {
+      "message": "Ochrona przed wyłudzaniem informacji"
+   },
+   "howitworks_products": {
+      "message": "Produkty"
+   },
+   "howitworks_products_identity": {
+      "message": "McAfee® Identity Theft Protection"
+   },
+   "howitworks_products_livesafe": {
+      "message": "McAfee® LiveSafe"
+   },
+   "howitworks_products_totalprotection": {
+      "message": "McAfee® Total Protection"
+   },
+   "howitworks_refund_trademark": {
+      "message": "McAfee i logo McAfee są znakami towarowymi lub zarejestrowanymi znakami towarowymi firmy McAfee, LLC lub jej spółek zależnych w USA i innych krajach. Pozostałe nazwy i marki mogą być własnością innych podmiotów. Copyright © $year$ McAfee, LLC",
+      "placeholders": {
+         "year": {
+            "content": "$1"
+         }
+      }
+   },
+   "howitworks_share": {
+      "message": "Nasze informacje i wskazówki pomogą ci zyskać świadomość i bezpieczeństwo."
+   },
+   "howitworks_social_description": {
+      "message": "Spokojnie przeglądaj kanały w witrynach takich jak Facebook, LinkedIn, Reddit i nie tylko. Oznaczymy łącza kolorami, aby poinformować Cię, w które można bezpiecznie kliknąć*."
+   },
+   "howitworks_social_title": {
+      "message": "Ochrona w mediach społecznościowych"
+   },
+   "howitworks_star_message": {
+      "message": "*Dostępne tylko w systemie Windows"
+   },
+   "howitworks_support": {
+      "message": "Pomoc techniczna"
+   },
+   "howitworks_support_consumer": {
+      "message": "Obsługa konsumenta"
+   },
+   "howitworks_tech_scam": {
+      "message": "Ochrona przed poszywaniem się pod pomoc techniczną"
+   },
+   "howitworks_tech_scam_description": {
+      "message": "Zachowaj kontrolę i nie daj się podejść oszustom próbującym uzyskać dostęp zdalny do Twojego komputera i danych osobowych, dzięki klarownym alertom bezpieczeństwa."
+   },
+   "howitworks_title": {
+      "message": "Program McAfee chroni Cię"
+   },
+   "howitworks_url_description": {
+      "message": "Hakerzy tworzą złośliwe witryny, korzystając z adresów wyglądających prawie tak samo, jak prawdziwe. Przekierujemy Cię z powrotem na bezpieczną stronę, jeśli literówka w adresie URL lub fałszywe łącze źle cię poprowadzi*."
+   },
+   "howitworks_url_title": {
+      "message": "Ochrona przed przechwytywaniem adresów URL"
+   },
+   "iframe_banner_message": {
+      "message": "Sprawdziliśmy tę stronę i zablokowaliśmy treści pochodzące z potencjalnie niebezpiecznych witryn. Zezwól na te treści, mając pewność, że pochodzą one z bezpiecznych witryn."
+   },
+   "iframe_banner_view_all_btn": {
+      "message": "Wyświetl wszystkie zablokowane treści"
+   },
+   "mb_back_btn_message": {
+      "message": "Wstecz"
+   },
+   "mb_banner_learn_more": {
+      "message": "Dowiedz się więcej"
+   },
+   "mb_banner_manage_settings": {
+      "message": "Zarządzaj ustawieniami"
+   },
+   "mb_faq_back_btn_message": {
+      "message": "Wstecz"
+   },
+   "mb_faq_description": {
+      "message": "Dowiedz się więcej o deepfake'ach dźwiękowych, sposobach ich wykrywania i ryzyku, jakie mogą stwarzać."
+   },
+   "mb_faq_title": {
+      "message": "Ochrona przed oszustwami z użyciem nagrań wideo – często zadawane pytania"
+   },
+   "mb_graph_error": {
+      "message": "Nie możemy obecnie wyświetlić danych ścieżki dźwiękowej. Spróbuj ponownie później."
+   },
+   "mb_graph_feature_off": {
+      "message": "Wykrywacz deepfake'ów jest wyłączony"
+   },
+   "mb_graph_label_detected": {
+      "message": "Wykryto deepfake"
+   },
+   "mb_graph_label_scanning": {
+      "message": "Skanowanie w poszukiwaniu deepfake'ów..."
+   },
+   "mb_graph_no_audio": {
+      "message": "Żadna ścieżka dźwiękowa nie jest obecnie odtwarzana"
+   },
+   "mb_graph_no_video": {
+      "message": "Żadne wideo nie jest obecnie odtwarzane"
+   },
+   "mb_info_link_need_help": {
+      "message": "Potrzebujesz pomocy?"
+   },
+   "mb_info_link_need_support": {
+      "message": "Skontaktuj się z pomocą techniczną"
+   },
+   "mb_main_audio_detection_off": {
+      "message": "Wył."
+   },
+   "mb_main_audio_detection_on": {
+      "message": "Wł."
+   },
+   "mb_main_audio_detection_title": {
+      "message": "Ochrona przed oszustwami"
+   },
+   "mb_main_cur_video": {
+      "message": "Bieżące wideo"
+   },
+   "mb_main_deepfake": {
+      "message": "deepfake"
+   },
+   "mb_main_deepfakes": {
+      "message": "deepfaki"
+   },
+   "mb_main_faq_message": {
+      "message": "Dowiedz się, jak działa ochrona przed oszustwami z użyciem nagrań wideo i jak pomagamy Cię chronić."
+   },
+   "mb_main_faq_title": {
+      "message": "Ochrona przed oszustwami z użyciem nagrań wideo – często zadawane pytania"
+   },
+   "mb_main_feedback_btn": {
+      "message": "Prześlij"
+   },
+   "mb_main_feedback_message": {
+      "message": "Podziel się opinią."
+   },
+   "mb_main_feedback_text": {
+      "message": "Jak nam poszło?"
+   },
+   "mb_main_feedback_thank_you": {
+      "message": "Dziękujemy!"
+   },
+   "mb_main_hr_flagged": {
+      "message": "oznaczona godz."
+   },
+   "mb_main_hr_scanned": {
+      "message": "przeskanowana godz."
+   },
+   "mb_main_hrs_flagged": {
+      "message": "oznaczone godz."
+   },
+   "mb_main_hrs_scanned": {
+      "message": "przeskanowane godz."
+   },
+   "mb_main_min_flagged": {
+      "message": "oznaczona min"
+   },
+   "mb_main_min_scanned": {
+      "message": "przeskanowana min"
+   },
+   "mb_main_mins_flagged": {
+      "message": "oznaczone min"
+   },
+   "mb_main_mins_scanned": {
+      "message": "przeskanowane min"
+   },
+   "mb_main_my_data": {
+      "message": "Moje dane do analizy"
+   },
+   "mb_main_pause_day": {
+      "message": "$day$ dzień",
+      "placeholders": {
+         "day": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_hour": {
+      "message": "$hour$ godz.",
+      "placeholders": {
+         "hour": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_hours": {
+      "message": "$hours$ godz.",
+      "placeholders": {
+         "hours": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_notification": {
+      "message": "Wstrzymaj powiadomienia"
+   },
+   "mb_main_snooze": {
+      "message": "Odłóż"
+   },
+   "mb_main_snooze_until": {
+      "message": "Odłóż do $time$",
+      "placeholders": {
+         "time": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_subscription_banner_buy": {
+      "message": "Kup teraz"
+   },
+   "mb_main_title": {
+      "message": "Oszustwa z użyciem nagrań wideo"
+   },
+   "mb_main_trial_end_in_hours_text": {
+      "message": "Okres próbny kończy się za 24 godziny"
+   },
+   "mb_main_trial_end_in_plural_text": {
+      "message": "Okres próbny kończy się za $days$ dni",
+      "placeholders": {
+         "days": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_trial_end_in_single_text": {
+      "message": "Okres próbny kończy się za $day$ dzień",
+      "placeholders": {
+         "day": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_trial_expired_text": {
+      "message": "Wersja próbna wygasła"
+   },
+   "mb_main_what_we_found": {
+      "message": "Zobacz, co wykryliśmy do tej pory"
+   },
+   "mb_prompt_banner_desc": {
+      "message": "Ochrona przed oszustwami z użyciem nagrań wideo McAfee jest teraz włączona. $mb_banner_learn_more$",
+      "placeholders": {
+         "mb_banner_learn_more": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_prompt_banner_desc_page": {
+      "message": "Ochrona przed oszustwami z użyciem nagrań wideo jest włączona. $mb_banner_manage_settings$",
+      "placeholders": {
+         "mb_banner_manage_settings": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_sidebar_faq_a1": {
+      "message": "Ochrona przed oszustwami z użyciem nagrań wideo skanuje treści odtwarzane w przeglądarce w poszukiwaniu dźwięku wygenerowanego przez AI. \u003Cbr>\u003Cbr> Powiadomimy Cię, jeśli wykryjemy dźwięk AI w oglądanych przez Ciebie materiałach. Gdy otrzymasz powiadomienie, możesz sprawdzić, które części nagrania są fałszywe. \u003Cbr>\u003Cbr> Mimo że skanujemy dźwięk w treściach wideo, ochrona przed oszustwami z użyciem nagrań wideo rozpoznaje tylko dźwięk AI i nie wyszukuje wygenerowanych przez AI wideo lub obrazów."
+   },
+   "mb_sidebar_faq_a2": {
+      "message": "Aby wykryć deepfaki, musimy przeskanować dźwięk odtwarzany w przeglądarce. Ale ponieważ ochrona przed oszustwami z użyciem nagrań wideo działa bezpośrednio na urządzeniu, analizowanie i przetwarzanie dźwięku odbywa się w całości lokalnie. \u003Cbr>\u003Cbr> Oznacza to, że skanowane informacje nie są przesyłane na nasze serwery ani do chmury. Nie gromadzimy ani nie nagrywamy dźwięku. W dowolnym momencie możesz także wyłączyć analizę dźwięku, aby zwiększyć swoją prywatność. \u003Cbr>\u003Cbr> Więcej informacji zawiera nasza $mb_sidebar_faq_privacy_notice$.",
+      "placeholders": {
+         "mb_sidebar_faq_privacy_notice": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_sidebar_faq_a3": {
+      "message": "Deepfake to klip dźwiękowy, film lub obraz wykorzystujący sztuczną inteligencję do skopiowania głosu lub wyglądu konkretnej osoby albo stworzenia całkowicie fikcyjnej postaci. \u003Cbr>\u003Cbr> Na przykład, deepfake może przedstawiać znaną osobę promującą produkt, z którym ta w rzeczywistości nie ma nic wspólnego. Albo deepfake z przywódcą politycznym może wykorzystywać zmanipulowane audio, aby zmienić wygłoszone przez niego przemówienie. \u003Cbr>\u003Cbr> Ponieważ deepfaki są tak przekonujące, coraz trudniej jest odróżnić, czy to, co oglądamy lub słyszymy w Internecie jest prawdziwe. Z tego powodu możemy być bardziej narażeni na oszustwa lub dezinformację."
+   },
+   "mb_sidebar_faq_a4": {
+      "message": "Używamy technologii sztucznej inteligencji znajdującej się już na urządzeniu, aby uruchomić model AI analizujący dźwięk odtwarzany w przeglądarce. Model sprawdza, czy dźwięk został sklonowany lub sfałszowany za pomocą sztucznej inteligencji."
+   },
+   "mb_sidebar_faq_privacy_notice": {
+      "message": "Informacje o ochronie prywatności"
+   },
+   "mb_sidebar_faq_q1": {
+      "message": "Jak działa ochrona przed oszustwami z użyciem nagrań wideo?"
+   },
+   "mb_sidebar_faq_q2": {
+      "message": "Czy moja prywatność jest bezpieczna?"
+   },
+   "mb_sidebar_faq_q3": {
+      "message": "Czym są deepfaki i jaki mają na mnie wpływ?"
+   },
+   "mb_sidebar_faq_q4": {
+      "message": "Jak działa wykrywanie deepfake'ów?"
+   },
+   "mb_video_banner_AI_audio_title": {
+      "message": "Wykryto deepfake"
+   },
+   "mb_video_banner_no_AI_audio_title": {
+      "message": "Skanowanie w poszukiwaniu deepfake'ów"
+   },
+   "overlay_accept_ss": {
+      "message": "Teraz wyraź zgodę na zmianę wyszukiwarki na Bezpieczne wyszukiwanie McAfee®"
+   },
+   "overlay_add_ss": {
+      "message": "Dodaj do przeglądarki Bezpieczne wyszukiwanie McAfee®"
+   },
+   "overlay_form_button": {
+      "message": "Gotowe"
+   },
+   "overlay_form_question": {
+      "message": "Przykro nam, że te informacje nie okazały się przydatne. Powiedz nam, gdzie popełniliśmy błąd, abyśmy mogli poprawnie skategoryzować tę witrynę."
+   },
+   "overlay_form_text": {
+      "message": "Pole tekstowe. Wpisz tutaj"
+   },
+   "overlay_ss_description": {
+      "message": "Oznaczamy niebezpieczne witryny w wynikach wyszukiwania, aby poinformować Cię, które z nich można bezpiecznie odwiedzać."
+   },
+   "overlay_step_1": {
+      "message": "KROK 1"
+   },
+   "overlay_step_2": {
+      "message": "KROK 2"
+   },
+   "overlay_thank_you_close_button": {
+      "message": "Zamknij"
+   },
+   "overlay_thank_you_message": {
+      "message": "Dziękujemy za pomocną opinię!"
+   },
+   "page_title": {
+      "message": "Centrum ochrony McAfee"
+   },
+   "phishingdesc": {
+      "message": "Hakerzy próbują wykraść informacje, zarzucając przynętę w postaci wyglądających na oficjalne wiadomości i witryn wyłudzających informacje. Odetniemy linkę, zanim złapiesz przynętę."
+   },
+   "phishingtitle": {
+      "message": "Chroń swoje dane osobowe"
+   },
+   "read_more_about_typosquatting": {
+      "message": "Więcej informacji o porywaniu adresów URL."
+   },
+   "res_PRODUCT_NAME": {
+      "message": "%PRODUCTNAME%"
+   },
+   "res_PRODUCT_NAME_NOT_TRADEMARKED": {
+      "message": "WebAdvisor"
+   },
+   "res_PRODUCT_NAME_TRADEMARKED": {
+      "message": "McAfee® WebAdvisor"
+   },
+   "search_engine_bing": {
+      "message": "Bing"
+   },
+   "search_engine_yahoo": {
+      "message": "Yahoo"
+   },
+   "search_suggest_input": {
+      "message": "Otrzymuj wyniki wyszukiwania oznaczone kolorami"
+   },
+   "search_toast_body_text_compliant": {
+      "message": "Chcesz dodać funkcję bezpieczne wyszukiwanie do przeglądarki i uprzedzić zagrożenia?"
+   },
+   "search_toast_body_text_test": {
+      "message": "Chcesz dodać Bezpieczne wyszukiwanie i dowiedzieć się, które witryny można bezpiecznie odwiedzać?"
+   },
+   "search_toast_done": {
+      "message": "Gotowe"
+   },
+   "search_toast_heading_compliant": {
+      "message": "Uwaga, nie masz funkcji Bezpieczne wyszukiwanie"
+   },
+   "search_toast_heading_test": {
+      "message": "Otrzymuj porady dotyczące bezpieczeństwa w wynikach wyszukiwania"
+   },
+   "search_toast_no_thanks": {
+      "message": "Nie, dziękuję"
+   },
+   "search_toast_ok": {
+      "message": "OK"
+   },
+   "search_toast_option_compliant": {
+      "message": "Tak. Dodaj funkcję bezpieczne wyszukiwanie do przeglądarki i zmień domyślne wyszukiwanie na $search_provider$.",
+      "placeholders": {
+         "search_provider": {
+            "content": "$1"
+         }
+      }
+   },
+   "search_toast_option_test": {
+      "message": "Tak. Dodaj funkcję bezpieczne wyszukiwanie i zmień domyślne wyszukiwanie na $search_provider$.",
+      "placeholders": {
+         "search_provider": {
+            "content": "$1"
+         }
+      }
+   },
+   "search_toast_sub_heading_compliant": {
+      "message": "Funkcja bezpiecznego wyszukiwania eliminuje niebezpieczne witryny sieci Web z wyników wyszukiwania."
+   },
+   "search_toast_sub_heading_test": {
+      "message": "Usługa Bezpiecznego wyszukiwania oznacza potencjalnie niebezpieczne witryny w wynikach wyszukiwania."
+   },
+   "search_toast_yes": {
+      "message": "Tak"
+   },
+   "securesearchdesc": {
+      "message": "Spokojnie przeglądaj dzięki oznaczonym kolorami wynikom wyszukiwania. Powiemy Ci, które witryny są bezpieczne, a które podejrzane."
+   },
+   "securesearchtitle": {
+      "message": "Trzymaj się z dala od niebezpiecznych wyników wyszukiwania"
+   },
+   "settings_about_block_download": {
+      "message": "Blokowanie pobierania niebezpiecznych plików"
+   },
+   "settings_about_firewall_antivirus": {
+      "message": "Pilnowanie, czy zapora i antywirus są włączone"
+   },
+   "settings_about_flag_website": {
+      "message": "Oznaczanie niebezpiecznych witryn"
+   },
+   "settings_about_help_link_message": {
+      "message": "Uzyskaj pomoc teraz"
+   },
+   "settings_about_help_message": {
+      "message": "Wszyscy czasem potrzebujemy pomocy."
+   },
+   "settings_about_help_title": {
+      "message": "Uzyskaj wsparcie i pomoc techniczną"
+   },
+   "settings_about_privacy_link_message": {
+      "message": "Przeczytaj informacje o ochronie prywatności"
+   },
+   "settings_about_privacy_message": {
+      "message": "Firma McAfee traktuje poważnie prywatność swoich użytkowników."
+   },
+   "settings_about_privacy_title": {
+      "message": "Informacje o ochronie prywatności"
+   },
+   "settings_about_product_affid": {
+      "message": "Identyfikator partnera: $affid$",
+      "placeholders": {
+         "affid": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_binary_version": {
+      "message": "Wersja pliku binarnego: $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_extension_version": {
+      "message": "Wersja rozszerzenia: $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_title": {
+      "message": "Wersja produktu"
+   },
+   "settings_about_share_title": {
+      "message": "Udostępnij program %PRODUCTNAME% znajomym"
+   },
+   "settings_about_subtitle": {
+      "message": "Program %PRODUCTNAME% pomaga podejmować rozsądne decyzje podczas przeglądania Internetu."
+   },
+   "settings_about_title": {
+      "message": "INFORMACJE"
+   },
+   "settings_page_title": {
+      "message": "%PRODUCTNAME%"
+   },
+   "settings_preference_annotation_all": {
+      "message": "Pokazuj oceny bezpieczeństwa wyników wyszukiwania w każdej wyszukiwarce."
+   },
+   "settings_preference_annotation_none": {
+      "message": "Nie pokazuj ocen wyników wyszukiwania."
+   },
+   "settings_preference_annotation_ss": {
+      "message": "Pokazuj oceny bezpieczeństwa wyników wyszukiwania tylko w wyszukiwarce Bezpieczne wyszukiwanie."
+   },
+   "settings_preference_annotation_ss_with_tip": {
+      "message": "Powiedz mi, czy wynik wyszukiwania jest bezpieczny za pomocą Bezpiecznego wyszukiwania (Wskazówka: aby użyć Bezpiecznego wyszukiwania, wyszukuj w pasku adresu)."
+   },
+   "settings_preference_annotation_subtitle": {
+      "message": "Oznaczymy wyniki wyszukiwania kolorami, by pokazać Ci, które witryny są bezpieczne."
+   },
+   "settings_preference_annotation_title": {
+      "message": "Bezpieczne wyszukiwanie"
+   },
+   "settings_preference_aps_toggle_label_message": {
+      "message": "Przeglądaj spokojnie dzięki alertom informującym Cię, że określone witryny finansowe, sklepowe i inne są autentyczne i bezpieczne."
+   },
+   "settings_preference_aps_toggle_label_title": {
+      "message": "Sygnały wczesnej ochrony"
+   },
+   "settings_preference_aps_toggle_subtitle": {
+      "message": "Włączenie tego ustawienie pomoże nam Cię chronić."
+   },
+   "settings_preference_aps_toggle_title": {
+      "message": "Sygnał wczesnej ochrony"
+   },
+   "settings_preference_ffpolicy_activity_message": {
+      "message": "Będziemy używać tych informacji, aby zrozumieć, które funkcje programu WebAdvisor są dla Ciebie najbardziej przydatne. "
+   },
+   "settings_preference_ffpolicy_activity_title": {
+      "message": "Gromadzenie danych dotyczących aktywności"
+   },
+   "settings_preference_ffpolicy_permissions__title": {
+      "message": "Zezwolenia rozszerzeń"
+   },
+   "settings_preference_ffpolicy_permissions_message": {
+      "message": "Musimy odczytywać i zmieniać dane w odwiedzanych przez Ciebie witrynach, aby móc rozpoznawać zagrożenia bezpieczeństwa i powiadamiać Cię o nich. Wymagamy tego ustawienia, aby chronić Cię podczas przeglądania Internetu."
+   },
+   "settings_preference_ffpolicy_permissions_on": {
+      "message": "WŁ."
+   },
+   "settings_preference_ffpolicy_permissions_toggle__title": {
+      "message": "Zezwolenia rozszerzeń (Wymagane)"
+   },
+   "settings_preference_ffpolicy_personal_message_intro": {
+      "message": "Przesyłamy naszym ekspertom adresy internetowe odwiedzanych przez Ciebie witryn w celu sprawdzenia stanu ich zabezpieczeń. Nie obawiaj się – nigdy nie sprzedajemy Twoich danych. Czy możemy gromadzić następujące dane umożliwiające identyfikację?"
+   },
+   "settings_preference_ffpolicy_personal_message_outro": {
+      "message": "Jeśli nie zezwolisz nam na gromadzenie danych osobowych, korzystanie z funkcji zabezpieczeń produktu McAfee® WebAdvisor nie będzie możliwe i trzeba go będzie odinstalować."
+   },
+   "settings_preference_ffpolicy_personal_message_outro_line_2": {
+      "message": "Wszystkie szczegóły dotyczące gromadzonych przez nas danych osobowych i sposobów ich wykorzystywania są podane w $link$",
+      "placeholders": {
+         "link": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_preference_ffpolicy_personal_message_point_1": {
+      "message": "Adresy internetowe (URL) odwiedzanych witryn, które gromadzimy w celu sprawdzania stanu ich zabezpieczeń i zapewniania Ci aktualnej ochrony."
+   },
+   "settings_preference_ffpolicy_personal_message_point_2": {
+      "message": "Adresy internetowe (URL) witryn wymienionych w wynikach wyszukiwania, które gromadzimy w celu sprawdzania stanu ich zabezpieczeń i dodawania oznaczeń dotyczących bezpieczeństwa."
+   },
+   "settings_preference_ffpolicy_personal_message_point_3": {
+      "message": "Bieżąca wersja przeglądarki, której gromadzenie pozwala nam diagnozować potencjalne problemy z usługą zabezpieczeń McAfee® WebAdvisor."
+   },
+   "settings_preference_ffpolicy_personal_message_point_4": {
+      "message": "Używana wersja produktu McAfee® WebAdvisor, której gromadzenie pozwala nam diagnozować potencjalne problemy z jego usługą zabezpieczeń."
+   },
+   "settings_preference_ffpolicy_personal_title": {
+      "message": "Gromadzenie danych osobowych"
+   },
+   "settings_preference_ffpolicy_personal_title_required": {
+      "message": "(Wymagane)"
+   },
+   "settings_preference_ffpolicy_privacy_policy_link": {
+      "message": "naszej Polityce prywatności"
+   },
+   "settings_preference_ffpolicy_subtitle": {
+      "message": "Włączenie obu tych ustawień pomoże nam dbać o Twoje bezpieczeństwo i dostarczać Ci przydatne usługi."
+   },
+   "settings_preference_ffpolicy_title": {
+      "message": "Zezwolenia dotyczące danych"
+   },
+   "settings_preference_reset_button": {
+      "message": "Resetuj"
+   },
+   "settings_preference_reset_subtitle": {
+      "message": "Czy chcesz przywrócić zignorowane powiadomienie rozszerzenia %PRODUCTNAME%? Zresetuj powiadomienia, aby znowu otrzymywać wszystkie rodzaje komunikatów programu %PRODUCTNAME%."
+   },
+   "settings_preference_reset_title": {
+      "message": "Zresetuj ustawienia"
+   },
+   "settings_preference_sma_facebook": {
+      "message": "Facebook"
+   },
+   "settings_preference_sma_facebook_label": {
+      "message": "Facebook"
+   },
+   "settings_preference_sma_instagram": {
+      "message": "Instagram"
+   },
+   "settings_preference_sma_instagram_label": {
+      "message": "Instagram"
+   },
+   "settings_preference_sma_linkedin": {
+      "message": "LinkedIn"
+   },
+   "settings_preference_sma_linkedin_label": {
+      "message": "LinkedIn"
+   },
+   "settings_preference_sma_message": {
+      "message": "Oto witryny, w których dodamy oznaczenia."
+   },
+   "settings_preference_sma_reddit": {
+      "message": "Reddit"
+   },
+   "settings_preference_sma_reddit_label": {
+      "message": "Reddit"
+   },
+   "settings_preference_sma_subtitle": {
+      "message": "Oznaczymy łącza w kanałach społecznościowych różnymi kolorami, aby pokazać, które z nich są bezpieczne."
+   },
+   "settings_preference_sma_title": {
+      "message": "Ochrona w mediach społecznościowych"
+   },
+   "settings_preference_sma_twitter": {
+      "message": "X"
+   },
+   "settings_preference_sma_twitter_label": {
+      "message": "X"
+   },
+   "settings_preference_sma_youtube": {
+      "message": "YouTube"
+   },
+   "settings_preference_sma_youtube_label": {
+      "message": "YouTube"
+   },
+   "settings_preference_title": {
+      "message": "DODATKOWE USŁUGI"
+   },
+   "settings_statistics_ads_blocked": {
+      "message": "zablokowane natarczywe reklamy"
+   },
+   "settings_statistics_downloads_blocked": {
+      "message": "zablokowane niebezpieczne pobrane pliki"
+   },
+   "settings_statistics_downloads_scanned": {
+      "message": "przeskanowane pobrane pliki"
+   },
+   "settings_statistics_links_scanned": {
+      "message": "przeskanowane łącza"
+   },
+   "settings_statistics_message": {
+      "message": "Oto, co zrobiliśmy do tej pory:"
+   },
+   "settings_statistics_pages_blocked": {
+      "message": "zablokowane niebezpieczne strony"
+   },
+   "settings_statistics_pages_scanned": {
+      "message": "przeskanowane strony"
+   },
+   "settings_statistics_subtitle": {
+      "message": "Nasz cel to zapewnienie Ci bezpieczeństwa w Internecie."
+   },
+   "settings_statistics_title": {
+      "message": "STATYSTYKI"
+   },
+   "settings_statistics_trackers_blocked": {
+      "message": "zablokowane śledzenia reklam"
+   },
+   "settings_subtitle": {
+      "message": "Dostosuj swoją ochronę w sieci Web."
+   },
+   "settings_tab_about": {
+      "message": "Informacje"
+   },
+   "settings_tab_preference": {
+      "message": "Preferencje"
+   },
+   "settings_tab_statistics": {
+      "message": "Statystyki"
+   },
+   "settings_tab_whitelist": {
+      "message": "Zaufane witryny"
+   },
+   "settings_title": {
+      "message": "Ochrona w sieci Web"
+   },
+   "settings_whitelist_input": {
+      "message": "Wpisz adres internetowy..."
+   },
+   "settings_whitelist_title": {
+      "message": "ZAUFANE WITRYNY"
+   },
+   "sidebar_dangerous_blocked": {
+      "message": "Zablokowano: niebezpieczne strony"
+   },
+   "sidebar_deepfake_found": {
+      "message": "Wykryto: deepfake"
+   },
+   "sidebar_deepfakes_found": {
+      "message": "Wykryto: deepfake"
+   },
+   "sidebar_deepfakes_found_new": {
+      "message": "NOWOŚĆ"
+   },
+   "sidebar_get_help": {
+      "message": "Uzyskaj pomoc"
+   },
+   "sidebar_pages_scanned": {
+      "message": "Przeskanowano: strony"
+   },
+   "sidebar_privacy_terms": {
+      "message": "Prywatność i warunki"
+   },
+   "sidebar_rat_detection_got_it_btn_text": {
+      "message": "Rozumiem"
+   },
+   "sidebar_rat_detection_information_I": {
+      "message": "Oprogramowanie z tej witryny daje innym osobom dostęp do Twojego urządzenia. Hakerzy i oszuści mogą go użyć, aby potajemnie uzyskać dostęp do Twoich danych osobowych."
+   },
+   "sidebar_rat_detection_information_II": {
+      "message": "Pobieraj oprogramowanie lub podawaj swoje dane tylko wówczas, gdy ufasz danej osobie."
+   },
+   "sidebar_rat_detection_title": {
+      "message": "Ta witryna umożliwia innym kontrolowanie Twojego urządzenia"
+   },
+   "sidebar_rat_detection_whitelist_btn": {
+      "message": "Nie ostrzegaj mnie już o tej witrynie"
+   },
+   "sidebar_subtitle": {
+      "message": "Oto, co zrobiliśmy do tej pory:"
+   },
+   "sidebar_title": {
+      "message": "Pomagamy zapewniać Ci ochronę w Internecie"
+   },
+   "sidebar_unsafe_blocked": {
+      "message": "Zablokowano: niebezpieczne pliki"
+   },
+   "sidebar_version": {
+      "message": "Wersja"
+   },
+   "sidebar_view_site_report": {
+      "message": "Wyświetl raport o witrynie"
+   },
+   "site_status_block_page_accept_risk": {
+      "message": "Odwiedź mimo to"
+   },
+   "site_status_block_page_go_back": {
+      "message": "Wróć"
+   },
+   "site_status_body_text_danger": {
+      "message": "Witryna ma potencjalnie niebezpieczną zawartość, która może uszkodzić Twój komputer. Zablokowaliśmy ją, aby można było dalej przeglądać bez obaw."
+   },
+   "site_status_body_text_site_report_danger": {
+      "message": "Regularnie skanujemy witryny pod kątem niebezpiecznej aktywności. Ta witryna może mieścić zawartość potencjalnie szkodliwą dla Twojego komputera."
+   },
+   "site_status_body_text_site_report_safe": {
+      "message": "Sprawdziliśmy tę witrynę i wszystko wygląda w porządku. Nic Ci nie grozi!"
+   },
+   "site_status_body_text_site_report_unknown": {
+      "message": "Wygląda na to, że jeszcze nie przeskanowaliśmy tej witryny. Zaktualizujemy ocenę bezpieczeństwa przy następnym skanowaniu."
+   },
+   "site_status_body_text_site_report_warning": {
+      "message": "Regularnie skanujemy witryny pod kątem niebezpiecznej aktywności, a ta witryna wygląda na podejrzaną."
+   },
+   "site_status_body_text_typosquatting": {
+      "message": "Jeżeli zrobisz literówkę w adresie, możesz trafić do innej witryny niż ta, którą chcesz odwiedzić. Te witryny mogą instalować złośliwe oprogramowanie, żądać podania danych osobowych i nie tylko. Pomożemy Ci unikać tych witryn."
+   },
+   "site_status_body_text_warning": {
+      "message": "Ta witryna wygląda na niebezpieczną, dlatego na wszelki wypadek ją oznaczyliśmy. Upewnij się, że ufasz tej witrynie, zanim do niej przejdziesz. Lepiej dmuchać na zimne!"
+   },
+   "site_status_feedback_question": {
+      "message": "Czy te informacje okazały się przydatne?"
+   },
+   "site_status_footer_note": {
+      "message": "Jeśli odwiedzisz tę witrynę, jej adres URL zostanie dodany do listy zaufanych witryn."
+   },
+   "site_status_header_text": {
+      "message": "Status witryny:"
+   },
+   "site_status_search_input": {
+      "message": "Otrzymuj wyniki wyszukiwania oznaczone kolorami"
+   },
+   "site_status_state_danger": {
+      "message": "Niebezpieczna"
+   },
+   "site_status_state_safe": {
+      "message": "Bezpieczna"
+   },
+   "site_status_state_typosquatting": {
+      "message": "Porywanie URL"
+   },
+   "site_status_state_unknown": {
+      "message": "Nieznana"
+   },
+   "site_status_state_warning": {
+      "message": "Podejrzana"
+   },
+   "site_status_submit_ticket_text": {
+      "message": "Sądzisz, że ta witryna jest bezpieczna? $submitTicketLink$.",
+      "placeholders": {
+         "submitTicketLink": {
+            "content": "$1"
+         }
+      }
+   },
+   "site_status_submit_ticket_text_link": {
+      "message": "Wyślij zgłoszenie"
+   },
+   "site_status_title": {
+      "message": "%PRODUCTNAME% - Oceny bezpieczeństwa witryn"
+   },
+   "site_status_typosquatting_go_back": {
+      "message": "Wróć"
+   },
+   "site_status_typosquatting_suggest_url_text": {
+      "message": "Czy chodziło Ci o „$suggestUrl$”?",
+      "placeholders": {
+         "suggestUrl": {
+            "content": "$1"
+         }
+      }
+   },
+   "site_status_typosquatting_take_me_there": {
+      "message": "Przejdź"
+   },
+   "site_status_typosquatting_visit_anyway": {
+      "message": "Odwiedź mimo to"
+   },
+   "smadesc": {
+      "message": "Spokojnie przeglądaj swoje kanały dzięki kolorowym łączom informującym, które z nich można klikać bezpiecznie."
+   },
+   "smatitle": {
+      "message": "Dowiedz się, które łącza w mediach społecznościowych są bezpieczne, a które nie"
+   },
+   "summarydesc": {
+      "message": "Pokażemy Ci stale aktualizowane podsumowanie wszystkich kroków, które podejmujemy, aby chronić Cię podczas przeglądania, wyszukiwania i robienia zakupów w Internecie."
+   },
+   "summarytitle": {
+      "message": "Twój pulpit nawigacyjny w czasie rzeczywistym"
+   },
+   "typodesc": {
+      "message": "Hakerzy tworzą witryny, korzystając z adresów wyglądających prawie tak samo, jak prawdziwe – nazywa się to „porywaniem adresów URL”. Przekierujemy Cię z powrotem na bezpieczną witrynę, jeśli literówka w adresie URL źle cię poprowadzi. "
+   },
+   "typotitle": {
+      "message": "Omijaj niebezpieczne witryny udające wiarygodne"
+   },
+   "wb_container__right__cancel": {
+      "message": "Nie, dziękuję."
+   },
+   "wb_container__right__content": {
+      "message": "Szybciej przeglądaj Internet dzięki programowi $ph1$. Powstrzymamy automatyczne odtwarzanie filmów, które spowalnia przeglądanie sieci.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   },
+   "wb_container__right__content_second": {
+      "message": "Program $ph1$ powstrzymuje automatyczne odtwarzanie filmów, które spowalnia przeglądanie sieci. Jeśli nie interesuje Cię program Web Boost, nie spytamy ponownie.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   },
+   "wb_container__right__eula": {
+      "message": "Kliknięcie przycisku $ph1$ oznacza zgodę na nasze $ph2$ i $ph3$.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         },
+         "ph2": {
+            "content": "$2"
+         },
+         "ph3": {
+            "content": "$3"
+         }
+      }
+   },
+   "wb_container__right__eula_licence_agreement": {
+      "message": "Umowa licencyjna"
+   },
+   "wb_container__right__eula_privacy_notice": {
+      "message": "Informacje o ochronie prywatności"
+   },
+   "wb_container__right__submit": {
+      "message": "Pobierz program Web Boost"
+   },
+   "wb_container__right__title": {
+      "message": "Irytujące automatycznie odtwarzane filmy spowalniają Ci pracę?"
+   },
+   "wb_container__right__title_second": {
+      "message": "Sprawdzamy po raz ostatni – chcesz powstrzymać filmy przed automatycznym odtwarzaniem?"
+   },
+   "wb_name_title": {
+      "message": "McAfee&reg; Web Boost"
+   },
+   "wb_top__body__action_message": {
+      "message": "Przyspiesz przeglądanie Internetu"
+   },
+   "wb_top_banner_left_text": {
+      "message": "Pobierz produkt $ph1$",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   }
+}

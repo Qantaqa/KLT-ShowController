@@ -21,7 +21,8 @@
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
-      "package.json"
+      "package.json",
+      "electron/*.zip"
     ],
     "directories": {
       "output": "release"

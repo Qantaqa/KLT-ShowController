@@ -1,23 +1,26 @@
-import type { AppSettingsProfile } from '../store/useShowStore'
+import type { AppSettingsProfile } from '../types/show'
 
+/**
+ * Returns an HTTP URL for the PDF file served by the Electron file server.
+ * Used for backward compatibility (e.g. any code that still needs a URL).
+ * 
+ * The PdfViewer component in Electron loads PDFs directly via fs.readFileSync
+ * and does NOT use this function. Remote clients receive a placeholder UI.
+ */
 export const getPdfFileUrl = (pdfPath: string, isElectron: boolean, appSettings: AppSettingsProfile) => {
     if (!pdfPath) return ''
-    const normalizedUrl = pdfPath.replace(/\\/g, '/')
-
-    if (normalizedUrl.startsWith('data:') || normalizedUrl.startsWith('ledshow-file:')) {
-        return normalizedUrl
+    if (pdfPath.startsWith('data:') || pdfPath.startsWith('http://') || pdfPath.startsWith('https://')) {
+        return pdfPath
     }
-
-    if (isElectron) {
-        return `ledshow-file:///${normalizedUrl.replace(/^\/+/, '')}`
-    } else {
-        const socketHost = window.location.hostname
-        const socketPort = appSettings?.serverPort || 3001
-        const filePort = socketPort + 1
-        return `http://${socketHost}:${filePort}/script?path=${encodeURIComponent(pdfPath)}`
-    }
+    const socketHost = isElectron ? 'localhost' : window.location.hostname
+    const socketPort = appSettings?.serverPort || 3001
+    const filePort = socketPort + 1
+    return `http://${socketHost}:${filePort}/script?path=${encodeURIComponent(pdfPath)}`
 }
 
+/**
+ * Builds an iframe-compatible PDF URL with page anchors (kept for backward compat).
+ */
 export const getPdfCleanUrl = (fileUrl: string, page: number) => {
     if (!fileUrl) return ''
     const separator = fileUrl.includes('#') ? '&' : '#'

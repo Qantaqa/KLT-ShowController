@@ -13,6 +13,7 @@ const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net } = require('
 const http = require('http');
 const { Server } = require('socket.io');
 const fs = require('node:fs');
+const os = require('node:os');
 const axios = require('axios');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -22,8 +23,32 @@ const _initSettings = dbManager.getAppSettings();
 const SOCKET_PORT: number = _initSettings?.serverPort || 3001;
 const FILE_PORT: number = SOCKET_PORT + 1; // Separate port for file serving (logo, PDFs)
 
-// Socket.io Server Setup (dedicated server, no HTTP file handling)
-const server = http.createServer();
+// Socket.io Server Setup — also handles HTTP file requests on the same port
+// so remote clients don't need a second firewall port open
+const server = http.createServer((req: any, res: any) => {
+    if (!req.url) { res.writeHead(400); res.end(); return; }
+
+    let url: URL;
+    try { url = new URL(req.url, `http://localhost`); }
+    catch { res.writeHead(400); res.end('Bad request'); return; }
+
+    // Serve script PDFs — used by browser remote clients
+    if (url.pathname === '/script') {
+        const filePath = url.searchParams.get('path');
+        if (filePath && fs.existsSync(filePath)) {
+            res.writeHead(200, { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': '*' });
+            fs.createReadStream(filePath).pipe(res);
+        } else {
+            console.warn('[Main] /script not found:', filePath);
+            res.writeHead(404); res.end('Not found');
+        }
+        return;
+    }
+
+    // All other HTTP requests are handled by Socket.IO internally
+    res.writeHead(404); res.end();
+});
+
 const io = new Server(server, {
     cors: {
         origin: "*",
@@ -86,16 +111,16 @@ const fileServer = http.createServer((req: any, res: any) => {
 
     // Serve Agent Package
     if (url.pathname === '/agent-package') {
-        let zipPath = path.join(__dirname, './ledshow-agent.zip');
+        let zipPath = path.join(__dirname, './VideoWall-agent-v1.1.0.zip');
         if (!fs.existsSync(zipPath)) {
-            zipPath = path.join(__dirname, '../electron/ledshow-agent.zip'); // Fallback for dev
+            zipPath = path.join(__dirname, '../electron/VideoWall-agent-v1.1.0.zip'); // Fallback for dev
         }
 
         if (fs.existsSync(zipPath)) {
             res.writeHead(200, {
                 'Content-Type': 'application/zip',
                 'Access-Control-Allow-Origin': '*',
-                'Content-Disposition': 'attachment; filename="ledshow-agent.zip"'
+                'Content-Disposition': 'attachment; filename="VideoWall-agent-v1.1.0.zip"'
             });
             fs.createReadStream(zipPath).pipe(res);
         } else {
@@ -451,7 +476,7 @@ ipcMain.handle('db:parse-script', async (_e: any, filePath: string) => {
 
 ipcMain.handle('db:get-devices', (_e: any, showId: string) => {
     const devices = dbManager.getDevices(showId);
-    console.log(`--- DB: get-devices for ${showId}, found ${devices.length} devices. IDs: ${devices.map(d => d.id).join(', ')}`);
+    console.log(`--- DB: get-devices for ${showId}, found ${devices.length} devices. IDs: ${devices.map((d: any) => d.id).join(', ')}`);
     return devices;
 });
 ipcMain.handle('db:save-devices', (_e: any, { showId, devices }: any) => dbManager.saveDevices(showId, devices));
@@ -463,6 +488,8 @@ ipcMain.handle('db:get-remote-clients', () => dbManager.getRemoteClients());
 ipcMain.handle('db:get-remote-client', (_e: any, id: string) => dbManager.getRemoteClient(id));
 ipcMain.handle('db:upsert-remote-client', (_e: any, client: any) => dbManager.upsertRemoteClient(client));
 ipcMain.handle('db:update-remote-client-status', (_e: any, { id, updates }: any) => dbManager.updateRemoteClientStatus(id, updates));
+ipcMain.handle('db:get-keyboard-bindings', () => dbManager.getKeyboardBindings());
+ipcMain.handle('db:save-keyboard-bindings', (_e: any, bindings: any[]) => dbManager.saveKeyboardBindings(bindings));
 ipcMain.handle('db:cleanup', () => dbManager.cleanupDatabase());
 
 ipcMain.handle('get-ip-address', () => {
@@ -513,6 +540,10 @@ ipcMain.handle('scan-devices', (event: any) => {
     });
 });
 
+ipcMain.handle('scan-agents-only', () => {
+    return deviceScanner.scanAgentsOnly();
+});
+
 const getTestVideoPath = () => {
     const settings = dbManager.getAppSettings();
     let resourcePath = settings?.testVideoPath;
@@ -561,6 +592,24 @@ ipcMain.handle('test-device', (_e: any, device: any) => {
 ipcMain.handle('wled:get-info', (_e: any, ip: string) => networkManager.getWledInfo(ip));
 ipcMain.handle('wled:get-effects', (_e: any, ip: string) => networkManager.getWledEffects(ip));
 ipcMain.handle('wled:get-palettes', (_e: any, ip: string) => networkManager.getWledPalettes(ip));
+
+ipcMain.handle('wled:read-config', async (_e: any, { ip, deviceId }: { ip: string, deviceId: string }) => {
+    const data = await networkManager.getWledInfo(ip);
+    if (data && data.state && data.state.seg) {
+        dbManager.saveWledSegments(deviceId, data.state.seg);
+        return { success: true, segments: data.state.seg };
+    }
+    return { success: false, error: 'Kon geen segmenten van apparaat lezen' };
+});
+
+ipcMain.handle('wled:get-stored-config', (_e: any, deviceId: string) => {
+    return dbManager.getWledSegments(deviceId);
+});
+
+ipcMain.handle('wled:send-command', (_e: any, { ip, payload }: { ip: string, payload: any }) => {
+    return networkManager.sendWledCommand({ ip, ...payload });
+});
+
 ipcMain.handle('wiz:get-pilot', (_e: any, ip: string) => networkManager.sendWizCommand(ip, 'getPilot', {}));
 
 // Clipboard Handlers
@@ -694,6 +743,17 @@ ipcMain.on('projection-ready', (event: any, rendererDeviceId?: string) => {
     }
 });
 
+// Media ended notification from a projection window
+ipcMain.on('media-ended', (_e: any, { deviceId, src }: any) => {
+    console.log(`[Main] Media ended on device ${deviceId}: ${src}`);
+    io.emit('execute', {
+        type: 'MEDIA_FINISHED',
+        deviceId,
+        src,
+        timestamp: Date.now()
+    });
+});
+
 // Status updates from Projection Window
 ipcMain.on('media-status-update', (_e: any, { deviceId, status }: any) => {
     if (!deviceId) return;
@@ -768,21 +828,95 @@ ipcMain.handle('wiz-command', async (_e: any, { ip, method, params }: any) => {
     return await networkManager.sendWizCommand(ip, method, params);
 });
 
-ipcMain.handle('upload-to-agent', async (_e: any, { url, filePath }: { url: string, filePath: string }) => {
-    console.log(`[Main] Uploading ${filePath} to ${url}...`);
+ipcMain.handle('upload-to-agent', async (event: any, { url, filePath, deviceId, fieldName }: { url: string, filePath: string, deviceId?: string, fieldName?: string }) => {
+    console.log(`[Main] Uploading ${filePath} to ${url} (field: ${fieldName || 'video'})...`);
     try {
-        const formData = new (require('form-data'))();
-        formData.append('video', fs.createReadStream(filePath));
+        const FormData = require('form-data');
+        const formData = new FormData();
+        const stat = fs.statSync(filePath);
+        const totalSize = stat.size;
+        formData.append(fieldName || 'video', fs.createReadStream(filePath));
 
         const response = await axios.post(url, formData, {
             headers: {
                 ...formData.getHeaders()
+            },
+            maxBodyLength: Infinity,
+            maxContentLength: Infinity,
+            onUploadProgress: (progressEvent: any) => {
+                const percent = totalSize > 0 ? Math.round((progressEvent.loaded / totalSize) * 100) : 0;
+                // Send progress back to renderer
+                try {
+                    event.sender.send('upload-progress', {
+                        deviceId: deviceId || 'unknown',
+                        filename: path.basename(filePath),
+                        percent,
+                        loaded: progressEvent.loaded,
+                        total: totalSize
+                    });
+                } catch (e) {
+                    // sender may be destroyed
+                }
             }
         });
-        return response.status === 200 || response.status === 201;
+        return { success: response.status === 200 || response.status === 201 };
+    } catch (error: any) {
+        console.error('[Main] Upload failed:', error.message);
+        const errorMsg = error.response?.data?.error || error.response?.data || error.message || 'Onbekende fout';
+        const errorString = typeof errorMsg === 'object' ? JSON.stringify(errorMsg) : String(errorMsg);
+        return { success: false, error: errorString };
+    }
+});
+
+ipcMain.handle('compute-file-checksum', async (_e: any, { filePath }: { filePath: string }) => {
+    try {
+        const crypto = require('node:crypto');
+        const hash = crypto.createHash('md5');
+        const stream = fs.createReadStream(filePath);
+
+        return new Promise<string>((resolve, reject) => {
+            stream.on('data', (chunk: Buffer) => hash.update(chunk));
+            stream.on('end', () => resolve(hash.digest('hex')));
+            stream.on('error', reject);
+        });
     } catch (error) {
-        console.error('[Main] Upload failed:', error);
-        return false;
+        console.error('[Main] Checksum computation failed:', error);
+        throw error;
+    }
+});
+
+// --- Agent Update IPC Handlers ---
+
+ipcMain.handle('get-latest-agent-version', async () => {
+    try {
+        const pkgPath = path.join('c:', 'Antigravity', 'Projects', 'ShowController', 'VideoWall Agent', 'package.json');
+        if (fs.existsSync(pkgPath)) {
+            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+            return pkg.version || '1.0.0';
+        }
+    } catch (e) {
+        console.error('[Main] Failed to read agent version:', e);
+    }
+    return '1.0.0';
+});
+
+ipcMain.handle('prepare-agent-update', async () => {
+    try {
+        const agentPath = path.join('c:', 'Antigravity', 'Projects', 'ShowController', 'VideoWall Agent');
+        const distPath = path.join(agentPath, 'dist');
+        const tempZipPath = path.join(os.tmpdir(), `agent_update_${Date.now()}.zip`);
+
+        const child_process = require('node:child_process');
+
+        // Windows: use PowerShell to compress-archive
+        // We move to the dist directory and zip its content
+        const cmd = `powershell -Command "cd '${distPath}'; Compress-Archive -Path '*' -DestinationPath '${tempZipPath}' -Force"`;
+        child_process.execSync(cmd);
+
+        return tempZipPath;
+    } catch (error) {
+        console.error('[Main] Failed to prepare agent update:', error);
+        throw error;
     }
 });
 

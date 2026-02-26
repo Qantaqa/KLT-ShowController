@@ -1,0 +1,1808 @@
+{
+   "annotation_balloon_color_green": {
+      "message": "Bu bağlantı güvenli"
+   },
+   "annotation_balloon_color_grey": {
+      "message": "Bu bağlantı bilinmiyor"
+   },
+   "annotation_balloon_color_red": {
+      "message": "Bu bağlantı tehlikeli"
+   },
+   "annotation_balloon_color_yellow": {
+      "message": "Bu bağlantı şüpheli"
+   },
+   "annotation_balloon_view_site_report": {
+      "message": "Site Raporunu Görüntüle"
+   },
+   "aps_expanded_shield_site_ecommerce": {
+      "message": "Siteyi kontrol ettik ve site güvenli. Devam edin ve güvenle alışveriş yapın."
+   },
+   "aps_expanded_shield_site_email": {
+      "message": "Kimlik avı açısından siteyi taradık ve site güvenli görünüyor."
+   },
+   "aps_expanded_shield_site_financial": {
+      "message": "Bu siteyi güvenle kullanabilirsiniz. Kontrol ettik ve gerçek bir finans sitesi olduğunu tespit ettik."
+   },
+   "aps_expanded_shield_site_signup": {
+      "message": "Bilgilerinizi buraya girmeniz güvenli. Kimlik avı ve diğer riskler açısından kontrol ettik."
+   },
+   "aps_expanded_shield_site_unknown": {
+      "message": "Bu sitenin güvenliğini henüz değerlendirmedik. Kişisel bilgilerinizi yalnızca siteye güveniyorsanız girin."
+   },
+   "aps_toast_button": {
+      "message": "Anladım"
+   },
+   "aps_toast_list_bullet_four": {
+      "message": "Ziyaret ettiğiniz diğer yerler"
+   },
+   "aps_toast_list_bullet_one": {
+      "message": "Bankacılık ve finans siteleri"
+   },
+   "aps_toast_list_bullet_three": {
+      "message": "Çevrim içi kayıt formları"
+   },
+   "aps_toast_list_bullet_two": {
+      "message": "Kasa ve ödeme sayfaları"
+   },
+   "aps_toast_paragraph": {
+      "message": "Yeşil renkli \"Güvenlidir\" simgemizi gördüğünüzde, görüntülediğiniz sayfanın tehlikelerden ve riskli bağlantılardan uzak olduğu konusunda rahat olun. "
+   },
+   "aps_toast_title": {
+      "message": "Her siteyi sizin için tarıyoruz"
+   },
+   "category_id_103_name": {
+      "message": "Yetişkinler için İçerikler"
+   },
+   "category_id_ac_description": {
+      "message": "Sanal sanat galerileri, sanatçı siteleri (heykeltıraşlık ve fotoğrafçılık dahil), müzeler, etnik gelenekler ve ülke geleneklerini içeren web sayfalarıdır."
+   },
+   "category_id_ac_name": {
+      "message": "Sanat/Kültür/Miras"
+   },
+   "category_id_al_description": {
+      "message": "Ağırlıklı olarak bira, şarap ve likör gibi alkol ürünlerini satan, teşvik eden veya kullanımını destekleyen web sayfalarıdır. Bu kategoride kokteyl tarifleri ve evde alkol üretme talimatları da bulunmaktadır."
+   },
+   "category_id_al_name": {
+      "message": "Alkol"
+   },
+   "category_id_an_description": {
+      "message": "Yerel filtreleme ilkelerini atlatmak ve herhangi bir web sayfasına erişmek için kullanıcıların IP adresini veya diğer kişisel kimlik bilgilerini gizleyerek web'de gezmelerini sağlayan web sayfalarıdır. İsimsizleştirici web sayfaları, tanımlama bilgileri veya tarayıcı geçmişi gibi izleme teknolojilerini de engeller. Bazı yöntemler, İşletim Sistemi sürümünün ve web sayfası geçmişinin de web sayfasına iletilmesini engeller. Bu kategori, ücretsiz proxy IP adresleri sağlayan veya filtrelemenin nasıl atlanacağını açıklayan sayfaları içerir."
+   },
+   "category_id_an_name": {
+      "message": "İsimsizleştiriciler"
+   },
+   "category_id_au_description": {
+      "message": "Açıkça böyle bir hizmet sağlama amacı taşımadan isimsiz web'de gezinmeye neden olan web sayfalarıdır. Bu kategori URL çeviriciler, web sayfası önbelleğe alma ve açıkça filtreleme yazılımını atlatmayı amaçlamadan isimsizleştirici işlevi görebilecek diğer yardımcı programları içerir."
+   },
+   "category_id_au_name": {
+      "message": "İsimsizleştirme Yardımcı Programları"
+   },
+   "category_id_be_description": {
+      "message": "Tarayıcı açıklardan faydalanma, bir web tarayıcısındaki yazılım hatasından yararlanarak kodun tarayıcının çalışmayı durdurması, yerel dosyaları okuması veya yazması, virüsü yayması veya casus yazılımı yüklemesi gibi beklenmeyen bir şey yapmasını sağlayan bir kod parçasıdır. Kötü amaçlı kod; HTML, JavaScript, Images, ActiveX, Java ve diğer web teknolojilerinden yararlanabilir. İstenmeyen indirme olarak da adlandırılan açıklardan faydalanma, kullanıcının bilgisi olmadan korunmasız bilgisayarlara kendini yükleyebilir ve kod, tuş vuruşu kaydediciler (parola çalmak için) ve Truva atı programları (bilgisayarı 'bot’a dönüştürmek için) yükleyebilir. Bu kategori, tarayıcı açıklardan faydalanmayı dağıtan veya uygulayan URL'leri içerir."
+   },
+   "category_id_be_name": {
+      "message": "Tarayıcı Açıklarından Faydalanan Programlar"
+   },
+   "category_id_bl_description": {
+      "message": "İçeriği kullanıcılar tarafından her zaman yayımlanabildiği veya düzenlenebildiği için sık sık değişen dinamik içerikli web sayfalarıdır. Bu kategori, zararsızdan saldırgana kadar değişebilen dinamik içerikli riskleri kapsar. Çoğu blog ve wiki, bir temaya veya konuya odaklanır. Bu kategori, sitenin odak noktasına veya konusuna bağlı olarak Tartışmalı Görüşler, Eğitim/Referans, Spor, Politika/Görüş veya Çıplaklık gibi diğer kategorilerle birlikte kullanılır. Bazı içerikler rahatsız edici olabilir."
+   },
+   "category_id_bl_name": {
+      "message": "Bloglar/Wiki"
+   },
+   "category_id_bu_description": {
+      "message": "Kurumsal tanıtımlar veya iş planlaması ve stratejileri gibi işletmeyle ilgili bilgiler sağlayan web sayfalarıdır. Bu kategori, başka işletmelerin girişimlerini planlamasına, yönetmesine ve pazarlamasına yardımcı olan bilgileri, hizmetleri ve ürünleri de içerir. Bu kategori, odak konusu şirketin işletilmesi olduğunda çok katmanlı pazarlama girişimleri içerir. Bu kategoride kişisel sayfalar ve web barındıran web sayfaları bulunmaz."
+   },
+   "category_id_bu_name": {
+      "message": "İş"
+   },
+   "category_id_ch_description": {
+      "message": "Genel ve özel sohbet odalarında web tabanlı, gerçek zamanlı sosyal mesajlaşma sağlayan web sayfalarıdır. Bu kategori IRC'yi içerir. Bu kategori, anlık mesajlaşmayı içermez. Rahatsız edici içerik, üretkenlik üzerinde olumsuz etkiler ve hassas bilgilerin sızdırılması risklerini içerir."
+   },
+   "category_id_ch_name": {
+      "message": "Sohbet"
+   },
+   "category_id_cm_description": {
+      "message": "Kamu hizmeti sağlayıcıları, bölgesel bilgiler, ulaşım çizelgeleri, haritalar veya hava durumu raporları gibi genel referans bilgilerini sağlayan web sayfalarıdır."
+   },
+   "category_id_cm_name": {
+      "message": "Kamuya Yönelik Genel Bilgiler"
+   },
+   "category_id_co_description": {
+      "message": "Politik veya sosyal hassasiyetleri tahrik edebilecek veya tartışmalara neden olabilecek fikirler içeren web sayfalarıdır. Bu içeriğin çoğu kamuoyunun aşırı uçlarındadır. Toplu intiharlar, anoreksi taraftarı, yabancı düşmanı, fundamentalist bakış açıları, dezenformasyon veya bir grup kişinin eleştirel olarak incelenmesi bunlara örnek verilebilir."
+   },
+   "category_id_co_name": {
+      "message": "Tartışmalı Görüşler"
+   },
+   "category_id_cp_description": {
+      "message": "Tüketicileri soymaya veya aldatmaya çalışan web sayfalarıdır. Sahte ürünlerin satılması, başlangıçta ücretsiz temin edilen ürünlerin satılması veya başka bir şirketin markasının uygunsuz bir şekilde kullanılması faaliyetlerinden bazı örneklerdir. Bu kategori, bir vakıf için hileli olarak para toplanması veya sahte yatırım planları gibi iyilikseverlikten veya bilgisizlikten faydalanan web sitelerini içerir. Bu kategori, birçok tüketicinin dolandırıldığını veya sunulan hizmeti alamadığını belirttiği siteleri de içerir."
+   },
+   "category_id_cp_name": {
+      "message": "Tüketiciyi Koruma"
+   },
+   "category_id_cs_description": {
+      "message": "McAfee'nin yasa dışı veya suç faaliyetlerine karışmaya yönelik talimatlar sağladığına inandığı web sayfalarıdır. Talimatlar, cinayet işlemeyi veya intihar, sabotaj, bomba yapımı, özel anahtar, hizmet hırsızlığı, kanunlardan kaçma ya da sahte uyuşturucu testlerini içerir. Bu kategoride yasa dışı içeriğin dağıtımı, sahtekarlık yapılması veya müşteri dolandırıcılığı işlerinin nasıl yapılacağı hakkında bilgiler de bulunabilir."
+   },
+   "category_id_cs_name": {
+      "message": "Olası Suç Faaliyetleri"
+   },
+   "category_id_cv_description": {
+      "message": "Oyunlar, karikatürler, çizgi filmler veya çizgi romanlar bağlamında şiddetin fantezi veya hayali temsillerini sağlayan web sayfalarıdır. Bu kategoride fiziksel saldırılar ya da yumruk yumruğa dövüş ile silahların veya patlayıcıların neden olduğu ölümcül yaralanmalar ve tahribatın resimleri ve metinsel açıklamaları bulunur."
+   },
+   "category_id_cv_name": {
+      "message": "Şiddet İçeren Oyun/Çizgi Film"
+   },
+   "category_id_dc_description": {
+      "message": "İnsanların dijital kartpostalları ve tebrik kartlarını İnternet üzerinden göndermesine ve almasına olanak tanıyan web sayfalarıdır. Dijital kartpostallar, genellikle doğum günleri ve bayram günleri gibi özel durumlar için tebrik veya duygu mesajları verir. Bazı dijital kartpostal sitelerinde belirli bir yetişkin mizah dizini bulunur. Bu siteler ayrıca hassas veya kişiye özel bilgi sızdırılması, sakıncalı içerik, kötü amaçlı ya da zararlı ekler hakkında kaygılar uyandırabilir."
+   },
+   "category_id_dc_name": {
+      "message": "Dijital Kartpostallar"
+   },
+   "category_id_dl_description": {
+      "message": "Bir kullanıcının zararlı veya rahatsız edici kodu farkında olmadan indirmesine neden olan web sayfalarıdır. Bu kategori; reklam yazılımı, casus yazılım, virüsler ve diğer kötü amaçlı bilgisayar kodu içeren ekran koruyucular, araç çubukları ve dosya paylaşım programları gibi indirilebilir dosyaları kapsar. Bazen şart ve koşulların tamamını okumadan “Evet” veya “Kabul ediyorum”a tıklandığında zararlı yazılım, kullanıcının bilgisi olmadan eklenir. Bilgisayar hızının yavaşlaması, parolaların çalınması ve değerli kişisel dosyaların kaybolması veya hasar görmesi gibi etkiler görülebilir."
+   },
+   "category_id_dl_name": {
+      "message": "Kötü Amaçlı İndirmeler"
+   },
+   "category_id_dp_description": {
+      "message": "Çevrimiçi flört, çöpçatanlık, eskort hizmetleri için ağ veya potansiyel eşlere yönelik bilgiler sağlayan web sayfalarıdır. Bu kategori, kişisel veya grup profilleri sağlayan ve üyelerinin gerçek zamanlı iletişim, mesaj gönderme, genel bültenler ve medya paylaşımı yoluyla etkileşimde bulunmalarına olanak tanıyan siteleri içerir. Bu kategorideki siteler, istenmeyen taraflarla ve sakıncalı bilgiler içeren üye profilleriyle bağlantı kurulmasını da sağlayabilir."
+   },
+   "category_id_dp_name": {
+      "message": "Flört/Arkadaşlık Siteleri"
+   },
+   "category_id_dr_description": {
+      "message": "Yasa dışı veya keyif verici uyuşturucuların satın alınması, üretimi ve kullanımı hakkında bilgiler sağlayan web siteleridir. Bu kategori, uyuşturucu tertibatı kullanımının görüntülenmesi, satılması veya açıklanmasını ve tutkal koklama, reçeteli ilaçları kötüye kullanma ya da diğer yasal malzemelerin suistimali gibi yasal yollarla edinilebilecek uyuşturucular hakkında ipuçları içerir."
+   },
+   "category_id_dr_name": {
+      "message": "Uyuşturucular"
+   },
+   "category_id_eb_description": {
+      "message": "Eşya veya hizmetlere çevrimiçi teklif verilmesini veya satılmasını sağlayan web sayfalarıdır. Bu kategori, teklif verme ve satış odaklı web sayfalarını içerir. Çevrimiçi açık artırma işlemleri nadiren izlenir. Bu siteler, kullanıcıları Pornografi, Silahlar, Çıplaklık veya Şiddet gibi kategorilerde bulunan materyallere de maruz bırakabilir."
+   },
+   "category_id_eb_name": {
+      "message": "Müzayedeler/İlanlar"
+   },
+   "category_id_ed_description": {
+      "message": "Akademik konular (matematik, tarih), okul veya üniversite web sayfaları ve eğitim yönetimi sayfaları (okul duyuruları, öğretmen ders programı) gibi akademik konularla ilgili içeriğe ayrılmış web sayfalarıdır."
+   },
+   "category_id_ed_name": {
+      "message": "Eğitim/Referans"
+   },
+   "category_id_et_description": {
+      "message": "Sinema, tiyatro, müzik, televizyon, bilgi-eğlence, eğlence sektöründen dedikodu haberleri ve aktörler ve müzisyenler gibi ünlüler hakkında bilgi veren web sayfalarıdır. Bu kategori, burçlar veya fan kulüpler gibi web üzerinden eğlence sağlamayı amaçlayan içeriğe sahip siteleri de içerir."
+   },
+   "category_id_et_name": {
+      "message": "Eğlence"
+   },
+   "category_id_ex_description": {
+      "message": "Bu kategori Ürkütücü İçerik, Ayrımcılık, Pornografi, Şiddet, Şiddet İçeren Oyun/Çizgi Film kategorileriyle birlikte kullanılarak söz konusu kategorilerin aşırı uçlarındaki URL'ler tanımlanır. Pornografi, Olası Suç Faaliyetleri ve Aşırılık kategorilerinde yer alan yasa dışı pornografi buna bir örnektir."
+   },
+   "category_id_ex_name": {
+      "message": "Aşırılık"
+   },
+   "category_id_fb_description": {
+      "message": "Giysi, kozmetik, mücevher ve diğer moda içerikli ürünler, aksesuarlar veya hizmetler pazarlayan web sayfalarıdır. Bu kategoride ürün incelemeleri, karşılaştırmalar ve genel tüketici bilgileri ile kuaför salonları, bronzlaşma salonları, dövme stüdyoları ve vücut delici stüdyolar gibi hizmetler de bulunmaktadır."
+   },
+   "category_id_fb_name": {
+      "message": "Moda/Güzellik"
+   },
+   "category_id_fi_description": {
+      "message": "Finansal bilgiler veya çevrimiçi finansal hesaplara erişim sağlayan web sayfalarıdır. Bu kategoride, paranın yönetimiyle ilgili haberleri veya hizmetleri içeren finansal bilgilerin sağlandığı; ancak finansal istatistikler veya vergiler, ipotek, sigorta, akreditasyon ya da yatırım alanlarında danışmanlık gibi hassas finansal hesap bilgilerine erişim sağlamayan web sayfaları bulunur. Çevrimiçi finansal hesaplara erişim; kişisel veya ticari bankacılık, para yönetimi, vergi danışmanlığı, yatırım fonları, kredi kartları, kredi birlikleri, sigorta, diğer finansal yayınlar ve hizmetleri içerir. Bu kategori, hisse senedi bilgilerini (ancak hisse senedi alım satımı dahil değil), ev finansmanını ve kamusal finans bilgilerini içerir."
+   },
+   "category_id_fi_name": {
+      "message": "Finans/Bankacılık"
+   },
+   "category_id_fk_description": {
+      "message": "Özellikle on yaş ve altındaki çocuklar için aile koruması olan web sayfalarıdır."
+   },
+   "category_id_fk_name": {
+      "message": "Çocuklar İçin"
+   },
+   "category_id_gb_description": {
+      "message": "Kullanıcılara bahis tutma veya çevrimiçi bahse girme olanağı tanıyan ya da kumarhane oyunları, bahis parası koyma, spor bahisleri ve piyangolar gibi çevrimiçi bahse izin veren kumar yazılımları sağlayan web sayfalarıdır. Bu kategori, bilet alabiliyorsanız veya çevrimiçi oynayabiliyorsanız piyangoları içerir."
+   },
+   "category_id_gb_name": {
+      "message": "Kumar"
+   },
+   "category_id_gm_description": {
+      "message": "Çevrimiçi oyunlar ve hileler, kodlar, demolar, taklitler, çevrimiçi yarışmalar gibi ilgili bilgileri veya rol yapma oyunları, oyun klanları, oyun üreticisi siteleri, fantezi veya sanal spor ligleri ve para kazanma ihtimali olmayan diğer oyun sitelerini sunan web sayfalarıdır. Bu kategori, Microsoft Xbox® ve Sony PlayStation® gibi oyun konsollarını içerir."
+   },
+   "category_id_gm_name": {
+      "message": "Oyunlar"
+   },
+   "category_id_gr_description": {
+      "message": "Kumar oynamak için araçlar sunmadan kumar hakkında bilgi sunan web sayfalarıdır. Bu kategori; çevrimiçi kumar oynama, kumar bağlantıları, tüyolar, spor tahminleri, piyango sonuçları ve at, araba ya da bot yarışları sunmayan kumarla ilgili web sayfalarını içerir."
+   },
+   "category_id_gr_name": {
+      "message": "Kumarla İlgili"
+   },
+   "category_id_gv_description": {
+      "message": "Resmi şubeler veya daireler, polis merkezleri, itfaiyeler, sivil savunma, terörle mücadele gibi devlete ait ya da askeri organizasyonlarca veya Birleşmiş Milletler veya Avrupa Birliği gibi ülkeler üstü organizasyonlarca içerik sağlanan web sayfalarıdır. Bu kategoride askeri ve gazilere ait tıbbi tesisler bulunur."
+   },
+   "category_id_gv_name": {
+      "message": "Hükümet/Ordu"
+   },
+   "category_id_hi_description": {
+      "message": "Tarihi gerçekler hakkında içerik sağlayan web sayfalarıdır. Bu kategoride yüksek eğitim için uygun içerik bulunabilir ancak Eğitim kategorisinde birincil eğitime yönelik içerik bulunur. Örneğin, Soykırım fotoğraflarını içeren bir site rahatsız edici olabilir ancak akademik değere sahiptir."
+   },
+   "category_id_hi_name": {
+      "message": "Geçmiş"
+   },
+   "category_id_hk_description": {
+      "message": "McAfee'nin bilgisayar odaklı dolandırıcılık, suç veya kötü amaçlı faaliyetlerle ilgili talimat sağladığına veya başka bir şekilde bunlara imkan tanıdığına inandığı web sayfalarıdır. Bu kategori; insanların bilgisayar ve ağlara izinsiz erişim sağlamasına yardımcı olan kötü amaçlı korsanlık bilgileri ve araçlarını (rootkit'ler, script kiddie) içeren bilgisayar suçlarıyla ilgili web sayfalarını kapsar. Bu kategori, numara çevirici aldatmacaları ve elektronik cihazların yasa dışı manipülasyonu gibi başka elektronik dolandırıcılık alanlarını kapsar."
+   },
+   "category_id_hk_name": {
+      "message": "Olası Korsanlık/Bilgisayar Suçları"
+   },
+   "category_id_hl_description": {
+      "message": "Tüm sağlıkla ilgili bilgileri ve sağlık hizmetlerini kapsayan web sayfalarıdır. Sağlık bilgilerinde bireylerin fiziksel veya zihinsel sağlık (diyet, beslenme, fitnes veya ebeveynlik) durumlarını iyileştirmek için konular bulunur. Sağlık hizmetlerinde sağlık sigortası, hastaneler, klinikler ve bağımsız fizik tedaviciler gibi hizmet sağlayıcılar yer alır."
+   },
+   "category_id_hl_name": {
+      "message": "Sağlık"
+   },
+   "category_id_hm_description": {
+      "message": "Komik veya eğlenceli içerik sağlayan web sayfalarıdır. Bu kategoride şakalar, skeçler, çizgi romanlar ve hiciv sayfaları olan siteler bulunur. Bu kategoride çoğu zaman çizgi romanlarla ilişkilendirilen grafik roman içeriği de bulunabilir."
+   },
+   "category_id_hm_name": {
+      "message": "Mizah/Çizgi Roman"
+   },
+   "category_id_hr_description": {
+      "message": "Soykırım inkarı gibi önemli tarihi gerçeklerin aleyhinde haberler yapan ya da farklı yorumlar sunan web sayfalarıdır. Bu kategoride meşru akademik değeri olan siteler bulunabilir ancak bu sitelerin çoğu politik amaçlarla tarihin hatalı bir şekilde manipüle edilmesini içerir. Bu kategoride yer alan bazı URL'ler bazı ülkelerde yasa dışı veya rahatsız edici olarak değerlendirilebilir."
+   },
+   "category_id_hr_name": {
+      "message": "Alternatif Tarih"
+   },
+   "category_id_hs_description": {
+      "message": "McAfee'nin belirli bir grup insana baskı veya ayrımcılığı açıkça teşvik eden bilgiler sağladığına inandığı web sayfalarıdır. Bu kategori; ırk, din, milliyet, cinsiyet, yaş, engellilik veya cinsel yönelime dayalı olarak gruplara karşı bir gündemin teşvik edilmesini kapsar. Bu kategori belirli bir nefrete dayalı gündemi olan ve aşırı siber zorbalığın yaşandığı siyasi partiler ve organizasyonları kapsayabilir."
+   },
+   "category_id_hs_name": {
+      "message": "Ayrımcılık"
+   },
+   "category_id_hw_description": {
+      "message": "Satıcılar, ürün pazarlaması ve incelemeleri, yazılım ve donanımın dağıtımı ve bakımı ile yazılım güncellemeleri ve komut dosyaları, eklentiler veya sürücüler gibi eklentileri kapsayan bilgisayar yazılımı ve donanımı ile ilgili web sayfalarıdır. Donanım; bilgisayar parçalarını, aksesuarları ve bilgisayarlar ve ağlarla kullanılan elektronik ekipmanları içerir. Bu kategori; yazılım ve donanımın pazarlanmasını, yazılım veya donanım ürünlerinin incelenmesi veya sektör trendlerine odaklanan dergileri içerir."
+   },
+   "category_id_hw_name": {
+      "message": "Yazılım/Donanım"
+   },
+   "category_id_ia_description": {
+      "message": "Tarayıcı tabanlı office paketleri ve grup yazılım programları gibi canlı veya interaktif web uygulamalarına erişim sağlayan web sayfalarıdır. Bu kategori; iş, akademik veya bireysel odaklı siteleri içerir."
+   },
+   "category_id_ia_name": {
+      "message": "Etkileşimli Web Uygulamaları"
+   },
+   "category_id_il_description": {
+      "message": "McAfee'nin yazılım veya telif hakkıyla korunan müzik veya film gibi elektronik ortamların 'korsan' veya yasa dışı şekilde dağıtılması ile ilgili bilgi sunduğunu veya yasa dışı lisans anahtarı üreticileri, kırılmış yazılımları ve seri numaralarını dağıttığını düşündüğü web sayfalarıdır."
+   },
+   "category_id_il_name": {
+      "message": "Olası Yasa Dışı Yazılım"
+   },
+   "category_id_im_description": {
+      "message": "Bir üyenin rehberine veya anlık mesajlaşma oturumuna katılan kullanıcılara yönelik bir ağ üzerinden gerçek zamanlı iletişim için yazılım sağlayan web sayfalarıdır. Çoğu anlık mesajlaşma yazılımı dosya aktarımı, PC'den PC'ye telefon konuşmaları ve diğer insanların oturum açıp kapamalarını izleme gibi özellikler içerir. Bu siteler ayrıca hassas bilgi sızdırılması, sakıncalı içerik veya dosya paylaşımı hakkında kaygılar uyandırabilir."
+   },
+   "category_id_im_name": {
+      "message": "Anlık Mesajlaşma"
+   },
+   "category_id_in_description": {
+      "message": "Hisselerin çevrimiçi satın alınması, satılması veya işlem yapılmasını sağlayan web sayfalarıdır. Bu kategoride gerçek zamanlı olarak borsada hisse senedi fiyatlarının ve finansal marj bahislerinin görülebilmesini sağlayan şerit tipi bilgiler de bulunur. Diğer bahisler Kumar kategorisindedir. Bu kategori hisse senetleri hakkında bilgi sunan ancak hisselerin satın alınması, satılması veya işlemini sağlayan siteleri içermez."
+   },
+   "category_id_in_name": {
+      "message": "Hisse Senedi Alım Satımı"
+   },
+   "category_id_io_description": {
+      "message": "Veri koruması hakkında yasal olarak bilgi sağlayan web sayfalarıdır. Bu kategori; işle ilgili veya kişisel verilerin, fikri mülkiyetin, gizliliğin korunması ve Internet altyapısı, özel ağlar ve telekomünikasyon gibi diğer bant genişliği hizmetleri ile ilgili ayrıntılı bilgi içerir. Olası Korsanlık/Bilgisayar Suçları riskleri bulunur. Yüksek riskli içeriğe sahip ve “siyah şapka” ile “beyaz şapka” arasında belirgin bir ayrım yapılmayan siteler de bu kategoride ve Olası Korsanlık/Bilgisayar Suçları kategorisinde olabilir. Bazı içerikten güvenliği ihlal edecek şekilde ve yasa dışı eylemler gerçekleştirmek amacıyla yararlanılabilir."
+   },
+   "category_id_io_name": {
+      "message": "Bilgi Güvenliği"
+   },
+   "category_id_ir_description": {
+      "message": "Internet radyosu, TV programı veya podcast gibi sürekli ses veya görüntü yayınına erişim veya yazılım sağlayan web sayfalarıdır."
+   },
+   "category_id_ir_name": {
+      "message": "Internet Radyosu/Televizyonu"
+   },
+   "category_id_is_description": {
+      "message": "Bir veya daha fazla site için görüntülerin, ortam dosyalarının veya JavaScript'in barındırıldığı ve Apache gibi mevcut web sunucularından içerik bulmanın hızlandırılmasını amaçlayan URL'lerdir. İçerik sunucularında genellikle web gezginleri için yayınlanan içerik veya site içi gezinme bulunmaz. Görüntülerin barındırıldığı içerik sunucuları kullanıcıların fotoğraflara göz atmasına imkan tanımaz."
+   },
+   "category_id_is_name": {
+      "message": "İçerik Sunucusu"
+   },
+   "category_id_it_description": {
+      "message": "Web tasarımı, etki alanı kaydı, Internet Servis Sağlayıcıları ile web servisleri sağlayan geniş bant ve telekomünikasyon şirketlerinin Internet sitelerinin yayınlanması ve bakımı için hizmet sağlayan web sayfalarıdır."
+   },
+   "category_id_it_name": {
+      "message": "Internet Hizmetleri"
+   },
+   "category_id_js_description": {
+      "message": "Özgeçmiş yazma, iş görüşmesi, kariyer değiştirme, seri ilanlar ve büyük iş veritabanları ile ilgili siteleri kapsayan iş aramayla ilgili web sayfalarıdır. Bu kategori; açık pozisyonların duyurulduğu kurumsal web sayfaları, maaş karşılaştırma siteleri, geçici istihdam ve şirket iş ilanları sitelerini kapsar."
+   },
+   "category_id_js_name": {
+      "message": "İş Arama"
+   },
+   "category_id_mb_description": {
+      "message": "Usenet haber gruplarına erişim sağlayan (http://) veya tartışma başlatarak bir ilgi grubu için gerçek zamanlı mesaj gönderilmesi gibi kullanıcı tarafından oluşturulan içeriğin yayımlanmasını sağlayan web sayfalarıdır. Bu kategori, haber gruplarına yüklenen dosya arşivlerini de içerir."
+   },
+   "category_id_mb_name": {
+      "message": "Forum/Duyuru Panoları"
+   },
+   "category_id_md_description": {
+      "message": "Kullanıcıların çevrimiçi fotoğraf albümleri gibi fotoğraflar ve ortam dosyaları yüklemesine, aramasına ve paylaşmasına imkan tanıyan web sayfalarıdır. Bu kategori genel ortam paylaşma risklerini kapsar ancak belirli içeriği hedef almaz. Bazı URL'ler rahatsız edici içerik de içerebilir."
+   },
+   "category_id_md_name": {
+      "message": "Ortam Paylaşımı"
+   },
+   "category_id_mg_description": {
+      "message": "Kısa mesajlaşma sağlayan web sayfalarıdır. Cep telefonlarına kısa mesaj, PDA'lar, faks makineleri ve dahili web sitesi kullanıcılar arası mesajlaşma veya siteler arası mesajlaşma örnek gösterilebilir."
+   },
+   "category_id_mg_name": {
+      "message": "Mesajlaşma"
+   },
+   "category_id_mk_description": {
+      "message": "Bireysel veya iş ürünlerini ya da hizmetlerini webde tanıtan ancak ürün veya hizmetlerini çevrimiçi olarak satmayan web sayfalarıdır. Bu kategori; doğrudan bu sitelerden satın alınamayan hizmet veya ürünleri açıklayan genellikle şirket özeti şeklindeki web sitelerini içerir. Otomobil üreticisi siteleri, düğün fotoğrafçılığı hizmetleri veya grafik tasarım hizmetleri bunlara örnek verilebilir."
+   },
+   "category_id_mk_name": {
+      "message": "Pazarlama/Satış Geliştirme"
+   },
+   "category_id_mm_description": {
+      "message": "Çevrimiçi flört, arkadaşlık, mezun buluşmaları, mektup arkadaşlığı, eskort hizmetleri gibi sosyal etkileşimlere veya potansiyel eşlere yönelik bilgilere odaklanan web sayfalarıdır. Bu kategori, üyelerinin gerçek zamanlı mesaj göndermeleri vasıtasıyla sosyal olarak etkileşime girmesine olanak tanıyan birçok site içerir. Bu kategorideki siteler, istenmeyen taraflarla ve sakıncalı bilgiler içeren üye profilleriyle bağlantı kurulmasını da sağlayabilir."
+   },
+   "category_id_mm_name": {
+      "message": "Flört/Sosyal Ağlar"
+   },
+   "category_id_mn_description": {
+      "message": "Klasik mimari ve resimde veya tıbbi görüntülerde olduğu gibi çıplak insan vücudunun pornografik olmayan görüntülerini içeren web sayfalarıdır."
+   },
+   "category_id_mn_name": {
+      "message": "Rastlantısal Çıplaklık"
+   },
+   "category_id_mo_description": {
+      "message": "Cep telefonları için indirilebilen ve cep telefonlarına teslim edilebilen ortam, yazılım veya yardımcı programlar satan web sayfalarıdır. Zil sesi tonları, logolar/dış görünümle, oyunlar, ekran koruyucular, metin tabanlı melodiler ve SMS, MMS, WAP ve diğer cep telefonu protokollerinin yazılımları örnek gösterilebilir."
+   },
+   "category_id_mo_name": {
+      "message": "Cep Telefonu"
+   },
+   "category_id_mp_description": {
+      "message": "MP3, WAV, AVI ve MPEG formatları gibi indirilebilecek ses veya video dosyaları sağlayan web sayfalarıdır. Bu dosyalar kullanıcının bilgisayarına kaydedilir ve buradan çalınır."
+   },
+   "category_id_mp_name": {
+      "message": "Ortam İndirmeleri"
+   },
+   "category_id_mr_description": {
+      "message": "Uygun olmadığı düşünülen mesaj veya içeriği engelleme yetkisine sahip bir kişi veya grup tarafından izlenen duyuru panoları, sohbet odaları, arama motorları veya web mail siteleridir."
+   },
+   "category_id_mr_name": {
+      "message": "Yönetilen"
+   },
+   "category_id_ms_description": {
+      "message": "Bilgisayar ayarlarını veya işlemlerini kontrol etmek üzere özellikle tasarlanan kodu dağıtan web sayfalarıdır. Bu kategori; tarayıcılar veya diğer uygulamalardaki güvenlik açıklardan faydalanan kendi kendini genişleten uygulamalar (“istenmeyen” yürütülebilir dosya indirmeleri), Truva atları ve virüsleri kapsar. Bir web sayfası daha sonra kötü amaçlı statüsünü kaybedebilir ve başka bir kategoriye geçebilir. Kötü amaçlı siteler, hasara neden olmak için başka bir bilgisayarda eylemde bulunmayı amaçlar."
+   },
+   "category_id_ms_name": {
+      "message": "Kötü Amaçlı Siteler"
+   },
+   "category_id_mv_description": {
+      "message": "Otomobil, kamyonet, kamyon, SUV, motosiklet ve scooter gibi tüketici taşıma araçlarının üreticilerinin ve bayilerinin web siteleridir. Bu kategori; ürün pazarlama, değerlendirme, karşılaştırma, fiyat bilgisi, otomobil fuarı, otomobil sergisi bilgileri ve motorlu araçlar hakkında genel tüketici bilgileri sağlayan siteleri de kapsar."
+   },
+   "category_id_mv_name": {
+      "message": "Motorlu Taşıtlar"
+   },
+   "category_id_na_description": {
+      "message": "Usenet haber gruplarına ve dosya arşivlerine erişim sağlayan (http://) web sayfaları haber gruplarına yüklendi. Bu kategori, benzer topluluk odaklı içerik yayını sunan çevrimiçi grupları da içerir. Bu kategorideki URL'ler rahatsız edici içeriğe sahip olabilir."
+   },
+   "category_id_na_name": {
+      "message": "Usenet Haberleri"
+   },
+   "category_id_nd_description": {
+      "message": "Çıplak insan vücudunun pornografik olmayan görüntülerini içeren web sayfalarıdır. Bu kategori; klasik mimari ve resim, sanatsal nü fotoğraflar, bazı natürizm resimleri ve ayrıntılı tıbbi illüstrasyonları kapsar."
+   },
+   "category_id_nd_name": {
+      "message": "Çıplaklık"
+   },
+   "category_id_np_description": {
+      "message": "Belirtilen bir misyonu gerçekleştirerek, kulüpler, lobiler, topluluklar, kar amacı gütmeyen kuruluşlar, sendikalar ve savunma grupları gibi daha büyük bir topluluğa fayda sağlayan yardımsever veya eğitim gruplarının web sayfalarıdır. Örneğin Masonlar, Elks, İzci Erkekler ve İzci Kızlar veya Big Brothers."
+   },
+   "category_id_np_name": {
+      "message": "Kar Amacı Gütmeyen/Savunuculuk/STK"
+   },
+   "category_id_ns_description": {
+      "message": "Kullanıcıların herhangi bir tarayıcıdan dosya veya klasörleri yedeklemek, paylaşmak, düzenlemek veya erişmek üzere bir çevrimiçi ağ sunucusuna yüklemesine imkan tanıyan web sayfalarıdır."
+   },
+   "category_id_ns_name": {
+      "message": "Ağ Üzerinde Kişisel Depolama"
+   },
+   "category_id_nt_description": {
+      "message": "Sadece profesyonel veya işle ilgili amaçlara yönelik sosyal ağ sağlayan web sayfalarıdır. Bu kategori, kişisel veya grup profilleri sağlayan ve üyelerinin gerçek zamanlı iletişim, mesaj gönderme, genel bültenler ve medya paylaşımı yoluyla etkileşimde bulunmalarını sağlayan siteleri içerir. Bu kategoride bir ağ işlevine sahip olan mezun siteleri de bulunur."
+   },
+   "category_id_nt_name": {
+      "message": "İş Amaçlı Ağlar"
+   },
+   "category_id_nw_description": {
+      "message": "Uluslararası veya bölgesel haber yayımı ve dağıtımı gibi çevrimiçi haber aracı sağlayan web sayfalarıdır. Bu kategoride haber içeriği sağlayan portal siteleri bulunur."
+   },
+   "category_id_nw_name": {
+      "message": "Genel Haberler"
+   },
+   "category_id_os_description": {
+      "message": "Çevrimiçi ürün veya hizmet satan web sayfalarıdır. Geniş bir dizi ürün satan web sayfaları, normalde Pornografi, Silahlar, Çıplaklık veya Şiddet gibi başka kategorilerde bulunan öğelere erişim sunarak kullanıcılar açısından risk oluşturabilir. Bazı siteler, Pornografi ve Silahlar gibi diğer kategorilerdeki öğelere erişim sunabilir."
+   },
+   "category_id_os_name": {
+      "message": "Çevrimiçi Alışveriş"
+   },
+   "category_id_pa_description": {
+      "message": "Açık kıyafetler, gecelik ve mayo içeren veya çıplaklık içermeyen manken ya da ünlü fotoğraf koleksiyonlarının bulunduğu web sayfalarıdır."
+   },
+   "category_id_pa_name": {
+      "message": "Tahrik Edici Giyim"
+   },
+   "category_id_pc_description": {
+      "message": "Internet'e DSL modemler veya kablolu modemlerle erişim sağlayan IP adresleridir (veya bunlarla ilişkili etki alanlarıdır). Bu içeriğin genellikle HTTP üzerinden Internet erişimine yönelik olmasından dolayı bu IP adreslerinden Internet'e erişim şüpheli davranış belirtebilir. Bu davranış, ev bilgisayarında yer alan zararlı yazılımla veya isimsiz Internet erişimine imkan tanımak amacıyla oluşturulan ev ağı geçitleriyle ilgili olabilir."
+   },
+   "category_id_pc_name": {
+      "message": "Konutlara Ait IP Adresleri"
+   },
+   "category_id_pd_description": {
+      "message": "Bir zamanlar içerik sunan ancak etki alanları satılmış veya terk edilmiş olan ve artık kayıtlı olmayan web sayfalarıdır. Park edilmiş etki alanları, genellikle içerik barındırmaz ancak genellikle kullanıcıları alan adının satılık olduğunu belirten genel bir sayfaya yeniden yönlendirir veya kullanıcıları, bazıları geçerli arama motoru sonuçları sağlayan genel arama motoru ve portal sayfasına yeniden yönlendirir."
+   },
+   "category_id_pd_name": {
+      "message": "Park Edilmiş Etki Alanı"
+   },
+   "category_id_ph_description": {
+      "message": "Kullanıcı hesabı bilgilerini çalmak amacıyla oluşturulan sahte e-postayla gelen web sayfalarının bağlantılarıdır. Bu siteler kendilerini yanlış bir şekilde tanıtır ve sahtekarlık veya hırsızlık gerçekleştirmek amacıyla aldatmak ve kullanıcı hesabı bilgilerini elde etmek için meşru şirket web sayfaları gibi görünür."
+   },
+   "category_id_ph_name": {
+      "message": "Kimlik Avı"
+   },
+   "category_id_pm_description": {
+      "message": "Reçeteli ilaçlar, reçetesiz ilaçlar, doğum kontrolü veya gıda takviyeleri ile ilgili değerlendirme, açıklamalar sağlayan ve bunları pazarlayan veya satan web sayfalarıdır."
+   },
+   "category_id_pm_name": {
+      "message": "Eczacılık"
+   },
+   "category_id_pn_description": {
+      "message": "İndirilebilir müzik gibi iş amacıyla veya kişisel amaçla bilgisayar ve kullanıcılar arasında dosya alışverişine imkan tanıyan web sayfalarıdır. P2P istemciler, kullanıcıların eş düzeyler arası kullanıcı ağından dosya aramasına ve paylaşmasına imkan tanır. Bunlar genellikle casus yazılım veya gerçek zamanlı sohbet özelliklerini de kapsar. Bu kategori, BitTorrent web sayfalarını içerir."
+   },
+   "category_id_pn_name": {
+      "message": "P2P/Dosya Paylaşımı"
+   },
+   "category_id_po_description": {
+      "message": "Siyasi partiler, siyasi yaşamdaki bireyler ve farklı konularda görüşleri kapsayan web sayfalarıdır. Bu kategori uyuşturucularla ilgili yasalar ve siyasi görüşleri de kapsayabilir. Bu kategori; siyasi partiler, siyasi kampanyalar ile siyasi tartışmalar dahil çeşitli konulardaki görüşlerle ilgili URL'ler içerir."
+   },
+   "category_id_po_name": {
+      "message": "Politika/Görüş"
+   },
+   "category_id_pp_description": {
+      "message": "ISP'ler, üniversite/eğitim sunucuları veya ücretsiz web sayfası barındırıcılar tarafından barındırılan ortak bir etki alanına sahip kişisel ana sayfalardır. Bu kategori, kişisel ana sayfa gibi kişisel bilgiler içeren özel etki alanlarını kapsar. Kişisel ana sayfalar rahatsız edici içeriğe sahip olabilir."
+   },
+   "category_id_pp_name": {
+      "message": "Kişisel Sayfalar"
+   },
+   "category_id_pr_description": {
+      "message": "Kaba, terbiyesiz veya müstehcen dil veya hareketler içeren web sayfalarıdır."
+   },
+   "category_id_pr_name": {
+      "message": "Küfür Kullanımı"
+   },
+   "category_id_ps_description": {
+      "message": "Webdeki içeriğe önemli bir geçit oluşturan veya dizin sunan web sayfalarıdır. Çok sayıda portal sitesi; arama motorları, e-posta, haber ve eğlence gibi çeşitli dahili site özellikleri veya hizmetleri de sağlar. Farklı içeriklerin bulunduğu posta listesi siteleri bu kategoriye girer."
+   },
+   "category_id_ps_name": {
+      "message": "Portal Siteleri"
+   },
+   "category_id_pu_description": {
+      "message": "Olası İstenmeyen Programlar (PUP'lar) içeren web sayfalarıdır. PUP'lar genellikle faydalı bir amaç için yapılır ancak bir bilgisayarın veya bilgisayar kullanıcısının gizliliğinin güvenliğini değiştirir. Güvenlik veya gizlilik hususlarında endişe duyan bilgisayar kullanıcıları, bu yazılım hakkında bilgilendirilmek isteyebilir ve bazı durumlarda bu yazılımı bilgisayarlarından kaldırmak isteyebilirler."
+   },
+   "category_id_pu_name": {
+      "message": "Olası İstenmeyen Programlar"
+   },
+   "category_id_ra_description": {
+      "message": "Bir program, çevrimiçi hizmet veya tüm bilgisayar sistemine uzaktan erişim sağlayan web sayfalarıdır. Uzaktan erişim genellikle uzak bir konumdan bir bilgisayarı çalıştırmak için meşru olarak kullanılmasına rağmen arka kapı erişimi gibi bir güvenlik riski oluşturur. Orijinal programcı tarafından yazılan arka kapı erişimi, kullanıcının bilgisi olmadan sistemin başka bir tarafça kullanılmasına olanak sağlar."
+   },
+   "category_id_ra_name": {
+      "message": "Uzaktan Erişim"
+   },
+   "category_id_rb_description": {
+      "message": "Çevrimiçi sipariş dahil restoranlar, barlar, yemek hizmetleri, paket siparişi ve teslimatı hakkında bilgiler sağlayan web sayfalarıdır. Bu kategoride konum, saatler, fiyatlar, menüler ve ilgili beslenme bilgileri hakkında bilgi sağlayan siteler bulunur. Bu kategoride restoran rehberleri ve incelemeleri ile kafeler ve kahve dükkanları da bulunur."
+   },
+   "category_id_rb_name": {
+      "message": "Lokantalar"
+   },
+   "category_id_re_description": {
+      "message": "Ticari veya konut gayrimenkul hizmetleri ve bilgileri sağlayan web sayfalarıdır. Yaşam alanı veya perakende alanı satışı ve kiralanması ile ilgili bilgi ve hizmetler ile apartmanlar, konut ve emlak ile ilgili kılavuzlar ve fiyat değerlendirmesi ve aracılık ile ilgili hizmet ve bilgiler yer alabilir. Bu kategori, model evlere göz atmanıza olanak tanıyan siteleri içerir."
+   },
+   "category_id_re_name": {
+      "message": "Gayrimenkul"
+   },
+   "category_id_rh_description": {
+      "message": "Eğlence faaliyetlerine ve hobilere yönelik içeriğe sahip eğlence organizasyonları ve tesisler için hazırlanan web sayfalarıdır. Bu kategoride; halka açık yüzme havuzları, hayvanat bahçeleri, fuarlar, festivaller, eğlence parkları, rekreasyon rehberlikleri, yürüyüş, balık tutma, kuş gözlemciliği veya pul koleksiyonculuğu hakkında bilgiler bulunur."
+   },
+   "category_id_rh_name": {
+      "message": "Dinlenme/Hobiler"
+   },
+   "category_id_rl_description": {
+      "message": "Büyük dinlerde yer almayan insanın maneviyatındaki dini konularla ve inançlarla ilgili içeriğe sahip web sayfalarıdır. Bu kategori, site Büyük Dinler kategorisinde olmadıkça bir kilisenin ana sayfası gibi yerel cemaatler ve gruplar için dini tartışmalar, inançlar, makaleler ve bilgiler içerir. Bu kategori, karşılaştırmalı dinleri veya dinleri ve ideolojileri içeren siteleri de kapsar."
+   },
+   "category_id_rl_name": {
+      "message": "Din/İdeoloji"
+   },
+   "category_id_rm_description": {
+      "message": "Dini konularla ilgili içerik ve büyük dinlerle ilgili bilgi içeren web sayfalarıdır. Bu kategori; tartışmalar, inançlar, tartışmasız tefsirler, makaleler gibi dini içerik ile kilise veya sinagog ana sayfası gibi yerel cemaate yönelik bilgiler içeren siteleri kapsar. Bu kategorideki dinler arasında Baha'I, Budizm, Klasik Çince, Hristiyanlık, Hinduizm, İslamiyet, Caynizm, Yahudilik, Şinto, Sihizm, Tenrikyo, Zerdüştlük bulunmaktadır."
+   },
+   "category_id_rm_name": {
+      "message": "Büyük Dinler"
+   },
+   "category_id_rs_description": {
+      "message": "Ortak bir göreve odaklanmak için boştaki veya kullanılmayan bilgisayar kaynaklarını kullanan web sayfalarıdır. Bu görev bir şirkette veya uluslararası bazda olabilir. Veri analizi için binlerce gönüllü bilgisayarın boşta kaldığı zamanı kullanan SETI programı ve İnsan Genom Projesi iyi bilinen örneklerdendir."
+   },
+   "category_id_rs_name": {
+      "message": "Kaynak Paylaşımı"
+   },
+   "category_id_sc_description": {
+      "message": "Ücretsiz veya ücretli yıllık ödevler, yazılı makaleler veya sınav cevapları sağlayarak intihali veya kopyayı teşvik eden web sayfalarıdır."
+   },
+   "category_id_sc_name": {
+      "message": "Okulda Kopya Çekme Bilgileri"
+   },
+   "category_id_se_description": {
+      "message": "Kullanıcıların anahtar kelimelerden yola çıkarak Internet'te bilgi bulmaları için arama sonuçları sağlayan web sayfalarıdır."
+   },
+   "category_id_se_name": {
+      "message": "Arama Motorları"
+   },
+   "category_id_sm_description": {
+      "message": "Cinsel eylemleri açıklayan veya tasvir eden ancak uyarmak veya erotizm amacı taşımayan web sayfalarıdır. Cinsel eğitim, cinsel ima, mizah veya cinsel ürünlerle ilgili cinsel materyaller örnek gösterilebilir."
+   },
+   "category_id_sm_name": {
+      "message": "Cinsel İçerikli Materyaller"
+   },
+   "category_id_sn_description": {
+      "message": "Arkadaşlık, flört, mesleki veya ilgi alanları gibi çeşitli amaçlar için sosyal ağlar sağlayan web sayfalarıdır. Bu siteler, kişisel veya grup profilleri sağlar ve üyelerinin gerçek zamanlı iletişim, mesaj gönderme, genel bültenler ve medya paylaşımı yoluyla etkileşimde bulunmalarına olanak tanır. Bu kategorideki siteler, istenmeyen taraflarla ve sakıncalı bilgiler içeren üye profilleriyle bağlantı kurulmasını da sağlayabilir."
+   },
+   "category_id_sn_name": {
+      "message": "Sosyal Ağlar"
+   },
+   "category_id_sp_description": {
+      "message": "Profesyonel veya organize eğlence sporlarıyla ilgili web sayfalarıdır. Bu kategoride oyun ipuçları, stratejiler, oyun skorları veya oyuncu transferleri gibi spor haberleri, olaylar ve bilgiler yer alır."
+   },
+   "category_id_sp_name": {
+      "message": "Spor"
+   },
+   "category_id_st_description": {
+      "message": "Ortam akışı sağlayan veya dosyanın tamamı aktarılmadan önce ses ve görsel verinin görüntülenmesi için yazılım eklentileri içeren web sayfalarıdır."
+   },
+   "category_id_st_name": {
+      "message": "Ortam Akışı"
+   },
+   "category_id_su_description": {
+      "message": "İstenmeyen spam e-postalarla gelen web sayfalarına bağlantılar. Spam URL içeriği, ürün pazarlamadan potansiyel olarak rahatsız edici veya hileli sitelere kadar değişir. Bu kategori, sadece spam bloglar veya yorum spam'i gibi spam oluşturma amaçlarıyla kurulmuş siteleri içerir."
+   },
+   "category_id_su_name": {
+      "message": "Spam URL'leri"
+   },
+   "category_id_sw_description": {
+      "message": "Paylaşım yazılımları ve ücretsiz yazılımların indirilebilir kopyalarının deposu olan web sayfalarıdır. Paylaşım yazılımı, yazılımın ücretsiz olarak temin edildiği bir kabul sistemi üzerinden dağıtılır ancak program uygun bulunursa ve düzenli olarak kullanılırsa yazar tarafından küçük bir ücret talep edilir. Ücretsiz yazılım herhangi bir ücret ödemeden temin edilebilen yazılımlardır."
+   },
+   "category_id_sw_name": {
+      "message": "Paylaşım Yazılımı/Ücretsiz Yazılım"
+   },
+   "category_id_sx_description": {
+      "message": "McAfee'nin cinsel olarak tahrik edici veya erotik materyaller içerdiğini düşündüğü web sayfalarıdır. Bu kategori; fetiş sayfalar, animasyon, karikatürler, hikayeler ve yasa dışı pornografiyi içerir."
+   },
+   "category_id_sx_name": {
+      "message": "Pornografi"
+   },
+   "category_id_sy_description": {
+      "message": "Kişisel veya kurumsal gizliliği ve güvenliği ihlal eden web sayfalarıdır. Bu kategori şu öğeleri içerir: \u003Cbr/>\u003Cbr/>\u003Cul>\u003Cli>Kullanıcının bilgisi veya izni olmaksızın yazılım indiren veya kullanıcı bilgisini toplayan programları çalıştırarak üçüncü taraflara gönderen URL'lerdir.\u003C/li>\u003Cli>Anahtar vuruşlarını kaydederek (tuş kaydediciler) başkalarının bilgisayar etkinliklerini izleyen veya takip eden yazılım.\u003C/li>\u003Cli>Casus yazılım veya reklam yazılımı içerdiği bilinen yazılımları yayan sitelerdir.\u003C/li>\u003C/ul>Bu kategori amacı nedeniyle Zararlı Siteler kategorisinden ayrılır. Casus yazılım ve tuş kaydediciler bilgileri gizlice toplar ve başka bir tarafa gönderir. Kötü amaçlı bir site, kullanıcının onayı ve bilgisi olmaksızın yazılım yüklemeyi veya bir işlem yapmayı amaçlar."
+   },
+   "category_id_sy_name": {
+      "message": "Casus Yazılım/Reklam Yazılımı/Tuş Kaydediciler"
+   },
+   "category_id_tb_description": {
+      "message": "Tütün ürünleri ve sigara, puro, pipo, enfiye ve çiğneme tütün gibi tütün ekipmanlarını satan, tanıtan veya savunan web sayfalarıdır."
+   },
+   "category_id_tb_name": {
+      "message": "Tütün"
+   },
+   "category_id_tf_description": {
+      "message": "Çevrimiçi mesaj yayınlama veya teknik destek ya da etkileşimli iş iletişimi gibi gerçek zamanlı sohbet sağlayan teknik veya iş odaklı web sayfalarıdır. Kullanıcıların her türlü içeriği yayınlayabilecek olmasına karşın bu forumların rahatsız edici içeriğe sahip olması riski daha düşüktür. Teknik ve iş içeriğine sahip temaları kapsayan çeşitli forumlar sunan siteler sadece Forum/Duyuru Panoları veya Sohbet kategorilerindedir. Başlık teknik veya iş odaklı forumlar Teknik Konular/İş Forumları kategorisindedir."
+   },
+   "category_id_tf_name": {
+      "message": "Teknik Konular/İş Forumları"
+   },
+   "category_id_tg_description": {
+      "message": "Zevksiz, berbat, şok edici veya ürkünç olarak değerlendirilebilecek içeriğe sahip web sayfalarıdır. Bu kategori; zevksiz mizah, boşaltım işlevleri, grafiksel tıbbi veya kaza yeri fotoğrafları (kan veya yara içeren), aşırı vücut değişiklik biçimleri (kesme, dağlama veya genital piercing) veya hayvanlara insanlık dışı muamelelerin şok edici görüntülerini içerir."
+   },
+   "category_id_tg_name": {
+      "message": "Ürkütücü İçerik"
+   },
+   "category_id_ti_description": {
+      "message": "Bilgi Teknolojisi, bilgisayar programlama ve sertifikalandırma gibi alanlarda eğitime odaklanan bilgileri sağlayan web sayfalarıdır. Linux kullanıcı grupları, UNIX komutları, yazılım eğitimleri veya teknik terimler sözlükleri bunlara örnek verilebilir. Bu kategorideki çoğu site, daha büyük etki alanlarının alt dizinleridir."
+   },
+   "category_id_ti_name": {
+      "message": "Teknik Bilgiler"
+   },
+   "category_id_to_description": {
+      "message": "İçerik sadece metin veya sestir ve görüntü içermez. Görüntülerin Pornografi, Şiddet veya Cinsel İçerikli Materyaller kategorilerini kullanarak engellenmesini istediğinizde bu kategori, müstehcen metin ve kayıtlı materyallere erişilebilmesine imkan tanımak amacıyla bir istisna olarak kullanılabilir. Kütüphaneler veya üniversiteler bu kategoriyi, halka açık tesislerinde rahatsız edici grafiklerin görüntülenmesini önlemek amacıyla kullanabilir."
+   },
+   "category_id_to_name": {
+      "message": "Yalnızca Metin/Ses"
+   },
+   "category_id_tr_description": {
+      "message": "Oteller, tatil mekanları, havayolu şirketleri, karayoluyla ulaşım, araç kiralama, seyahat acenteleri ile genel turist ve seyahat bilgileri gibi kişisel veya iş amaçlı seyahat tanıtımı yapan web sayfalarıdır. Bu kategori, bilet veya konaklama hizmeti satın alınan siteleri de içerir."
+   },
+   "category_id_tr_name": {
+      "message": "Seyahat"
+   },
+   "category_id_tt_description": {
+      "message": "Bir dilden başka bir dile çevirmek amacıyla kullanıcıların ifade veya metin öbekleri yazmasına imkan tanıyan web sayfalarıdır. Bu kategori, dil tanımlayıcı web sayfalarını da içerir."
+   },
+   "category_id_tt_name": {
+      "message": "Metin Çeviriciler"
+   },
+   "category_id_uk_description": {
+      "message": "Dünyanın herhangi bir yerindeki bir sunucuda yer alan çocukların cinsel istismarıyla ilgili içerik ve İngiltere'deki bir sunucuda yer alan ırkçı nefret içerikli tahrik ve suç teşkil edecek müstehcenlik içeren web sayfalarıdır."
+   },
+   "category_id_uk_name": {
+      "message": "Birleşik Krallık'ta Yasa Dışı"
+   },
+   "category_id_vi_description": {
+      "message": "İnsanlara, hayvanlara veya kuruluşlara karşı fiziksel saldırıları savaş tasvirleri, intihar, sakatlama veya parçalama şeklinde tasvir eden, açıklayan veya savunan gerçek veya gerçeğe yakın görüntü veya metinler içeren web sayfalarıdır."
+   },
+   "category_id_vi_name": {
+      "message": "Şiddet"
+   },
+   "category_id_vs_description": {
+      "message": "Küçük resimler gibi görüntüye özgü arama sonuçları sağlayan web sayfalarıdır."
+   },
+   "category_id_vs_name": {
+      "message": "Görsel Arama Motoru"
+   },
+   "category_id_wa_description": {
+      "message": "Eğlence barındıran ve reklam oluşturan programlar sağlayan web sayfalarıdır. Web sayfalarında görülen büyük başlıklar, açılı pencereler ve diğer türlü statik veya dinamik olarak üretilen reklamlara bağlantılar, kaynak kod ve küçük uygulamalar bunlara örnektir. Bu kategori, reklamları veya reklam hizmeti sağlayan şirketleri değil web sayfalarındaki reklamları engellemeyi amaçlar."
+   },
+   "category_id_wa_name": {
+      "message": "Web Reklamları"
+   },
+   "category_id_we_description": {
+      "message": "Tüfek, bıçak, kılıç, paintball tabancaları gibi silah ve mühimmat, patlayıcı ve silah aksesuarları satın alma, üretme, değiştirme veya kullanma hakkında bilgi sağlayan web sayfalarıdır."
+   },
+   "category_id_we_name": {
+      "message": "Silahlar"
+   },
+   "category_id_wm_description": {
+      "message": "Kullanıcıların Internet üzerinden e-posta göndermesine ve almasına imkan tanıyan web sayfalarıdır. Bu siteler, kullanıcıları e-posta dosya eklerinin oluşturduğu zararlı içeriğe maruz bırakır ve gizli bilgi kaybı veya sızması gibi güvenlik riskleri oluşturabilir."
+   },
+   "category_id_wm_name": {
+      "message": "Web Postası"
+   },
+   "category_id_wp_description": {
+      "message": "Kullanıcıların Internet üzerinden telefon görüşmeleri yapmasına ve bu amaçla bilgi veya yazılım almasına imkan tanıyan web sayfalarıdır. Web Telefonu hizmeti, Internet Telefonu veya VoIP olarak da adlandırılır. Web telefonu hizmeti; TCP/IP ağları üzerinden bağlanan PC'den PC'ye, PC'den telefona ve telefondan telefona hizmetleri kapsar."
+   },
+   "category_id_wp_name": {
+      "message": "Web Telefonu"
+   },
+   "category_id_wx_description": {
+      "message": "Başlıca iş amacıyla canlı toplantılar, video konferanslar ve interaktif sunumlar yayınlayan web sayfalarıdır. Web toplantıları genellikle ses ve görüntü akışı içerir ve veri aktarımına veya çevrimiçi sunum gibi ofis odaklı uygulama paylaşımına imkan tanır. Bu kategorideki URL'ler bant genişliği riskleri ve gizli bilgi kaybı veya sızması gibi güvenlik riskleri oluşturabilir."
+   },
+   "category_id_wx_name": {
+      "message": "Web Toplantıları"
+   },
+   "dfd_landing_desc1": {
+      "message": "Youtube ve Facebook gibi web sitelerinde videoları keşfedin ve izleyin"
+   },
+   "dfd_landing_desc2": {
+      "message": "Yapay montaj tespit edilirse sizi saniyeler içerisinde uyarırız."
+   },
+   "dfd_landing_desc3": {
+      "message": "Bu durumda, sonuçların gerçek zamanlı analizini görüntüleyebileceksiniz."
+   },
+   "dfd_landing_home_btn": {
+      "message": "Ana sayfaya git"
+   },
+   "dfd_landing_title": {
+      "message": "Artık bu cihazda dolandırıcılıktan korunuyorsunuz"
+   },
+   "download_scan_popup_expanded_descriptions": {
+      "message": "İndirme işleminiz taranıyor. Sorun olursa size bildireceğiz."
+   },
+   "dws_do_not_ask_again_btn": {
+      "message": "Bir daha sorma"
+   },
+   "dws_do_not_ask_again_close_btn": {
+      "message": "Teşekkürler"
+   },
+   "dws_do_not_ask_again_title": {
+      "message": "Bu e-posta adresini kullandığınızda yeniden sormayız."
+   },
+   "dws_email_input_error": {
+      "message": "Bu e-posta adresi doğru görünmüyor."
+   },
+   "dws_email_input_label": {
+      "message": "E-posta adresi"
+   },
+   "dws_remind_later_btn": {
+      "message": "Bir dahaki sefere bana anımsat"
+   },
+   "dws_remind_later_title": {
+      "message": "Bu e-posta adresini bir daha kullandığınızda size yeniden sorarız."
+   },
+   "dws_scan_btn": {
+      "message": "E-posta adresimi kontrol edin"
+   },
+   "dws_scan_btn_first_time": {
+      "message": "E-posta adresimi kontrol edin"
+   },
+   "dws_scan_email_description": {
+      "message": "Hizmetimiz kapsamında kişisel bilgilerinizin çalınıp çalınmadığını görmek için karanlık ağ veritabanları kontrol edilir.  E-posta adresinizi kontrol ettirmek ister misiniz?"
+   },
+   "dws_scan_email_title": {
+      "message": "Kimliğinizi koruyun"
+   },
+   "dws_thanks_btn": {
+      "message": "Teşekkürler"
+   },
+   "efficacy_meter_excellent": {
+      "message": "Mükemmel"
+   },
+   "efficacy_meter_fair": {
+      "message": "Orta"
+   },
+   "efficacy_meter_good": {
+      "message": "İyi"
+   },
+   "efficacy_meter_poor": {
+      "message": "Düşük"
+   },
+   "efficacy_meter_title": {
+      "message": "Güvenlik Durumu Puanı"
+   },
+   "ffpolicy_accept_prompt": {
+      "message": "*Etkinleştirme İstemini Kabul Et"
+   },
+   "ffpolicy_activity_main_title": {
+      "message": "Sizi çevrimiçi korumaya yardımcı olmak için kullandığımız diğer yöntemler:"
+   },
+   "ffpolicy_activity_message": {
+      "message": "Bu bilgileri, WebAdvisor'ın hangi özelliklerinin en çok işinize yaradığını anlamak için kullanırız."
+   },
+   "ffpolicy_activity_title": {
+      "message": "Etkinlik verilerinin toplanması"
+   },
+   "ffpolicy_header_message": {
+      "message": "Kişisel veri toplamayı açarsanız web'de gezinirken tehditlerden uzak kalmanıza yardımcı olabiliriz.  Aksi takdirde McAfee® WebAdvisor'ı kaldırmanız gerekecek."
+   },
+   "ffpolicy_header_message_2": {
+      "message": "Eklenti izinlerini etkinleştirirseniz web'de gezinirken tehditlerden uzak kalmanıza yardımcı olabiliriz. "
+   },
+   "ffpolicy_header_message_uninstall": {
+      "message": "kaldırmanız"
+   },
+   "ffpolicy_header_title": {
+      "message": "Korunmuyorsunuz"
+   },
+   "ffpolicy_header_title_protected": {
+      "message": "McAfee® WebAdvisor şimdi sizi koruyor"
+   },
+   "ffpolicy_page_tab_title": {
+      "message": "McAfee - Bir adım kaldı"
+   },
+   "ffpolicy_permissions_accept_button": {
+      "message": "İzin ver"
+   },
+   "ffpolicy_permissions_message": {
+      "message": "Güvenlik risklerini belirleyip size haber verebilmemiz için ziyaret ettiğiniz sitelerdeki verileri okuyup değiştirmemiz gereklidir. Web'te gezinirken sizi koruyabilmemiz için bu ayar gereklidir."
+   },
+   "ffpolicy_permissions_message_line_2": {
+      "message": "Aşağıda 'İzin Ver'e tıklayarak ve açılır pencerede 'İzin ver'i seçerek izin isteğini başlatın."
+   },
+   "ffpolicy_permissions_on": {
+      "message": "AÇIK"
+   },
+   "ffpolicy_permissions_title": {
+      "message": "Eklenti izinleri (Gerekli)"
+   },
+   "ffpolicy_personal_data_accept_button": {
+      "message": "Evet, lütfen McAfee Gizlilik İlkesi ile uyumlu olarak kişisel verilerimi toplayın"
+   },
+   "ffpolicy_personal_data_decline_button": {
+      "message": "Hayır, kişisel verilerimi toplamayın"
+   },
+   "ffpolicy_personal_message_intro": {
+      "message": "Güvenlik durumlarının kontrolü için gezindiğiniz sitelerin web adreslerini uzmanlarımıza gönderiyoruz. İçiniz rahat olsun, bilgilerinizi hiçbir zaman satmayız. Sizi kişisel olarak tanımlayan aşağıdaki verileri toplayabilir miyiz:"
+   },
+   "ffpolicy_personal_message_outro": {
+      "message": "Kişisel verilerinizi toplamamıza izin vermemeyi seçerseniz, McAfee® WebAdvisor'ın güvenlik özelliklerinden yararlanamayacaksınız ve onu kaldırmanız gerekecek."
+   },
+   "ffpolicy_personal_message_outro_line_2": {
+      "message": "Topladığımız kişisel verilerle ilgili tüm detayları ve onlarla ne yaptığımızla ilgili bilgileri $link$",
+      "placeholders": {
+         "link": {
+            "content": "$1"
+         }
+      }
+   },
+   "ffpolicy_personal_message_point_1": {
+      "message": "Güvenlik durumlarını kontrol etmek ve size güncel güvenlik sağlamak için ziyaret ettiğiniz sitelerin  web adresleri (URL)."
+   },
+   "ffpolicy_personal_message_point_2": {
+      "message": "Güvenlik durumlarını kontrol etmek ve size güvenlik notları sağlamak için arama motoru sonuçlarınızda listelenen web sitelerinin web adresleri (URL)."
+   },
+   "ffpolicy_personal_message_point_3": {
+      "message": "McAfee® WebAdvisor'ın güvenlik hizmetiyle ilgili olası sorunları tespit etmek için topladığımız mevcut tarayıcı sürümünüz."
+   },
+   "ffpolicy_personal_message_point_4": {
+      "message": "McAfee® WebAdvisor'ın güvenlik hizmetiyle ilgili olası sorunları tespit etmek için topladığımız, kullanmakta olduğunuz McAfee® WebAdvisor sürümünüz."
+   },
+   "ffpolicy_personal_title": {
+      "message": "Kişisel verilerin toplanması"
+   },
+   "ffpolicy_personal_title_required": {
+      "message": "(Gerekli)"
+   },
+   "ffpolicy_privacy_policy_link": {
+      "message": "Gizlilik İlkesi içeriğimizde bulabilirsiniz"
+   },
+   "ffpolicy_privacy_text": {
+      "message": "Kişisel verilerinizi nasıl topladığımız, kullandığımız ve paylaştığımız ile ilgili daha fazla detay için"
+   },
+   "ffpolicy_privacy_text_link": {
+      "message": "McAfee® WebAdvisor Gizlilik Bildirimi içeriğimize göz atın"
+   },
+   "ffpolicy_required_suffix_1": {
+      "message": "1/2"
+   },
+   "ffpolicy_required_suffix_2": {
+      "message": "2/2"
+   },
+   "ffpolicy_see_settings": {
+      "message": "Ayarları görüntüle"
+   },
+   "ffpolicy_uninstall_popup_message": {
+      "message": "Kişisel veriler işaretlenmediği sürece malesef McAfee® WebAdvisor çalışmayacak çünkü güvenlik özelliklerini paylaşmak için güncel güvenlik bilgisine sahip olmayacak.  McAfee® WebAdvisor'ın toplayacağı verilere izin vermeyi yeniden gözden geçirmeyi istemediğiniz sürece McAfee® WebAdvisor'ı kaldırmanızı öneririz."
+   },
+   "howitworks_about": {
+      "message": "Hakkında"
+   },
+   "howitworks_about_careers": {
+      "message": "Kariyer Fırsatları"
+   },
+   "howitworks_about_contact": {
+      "message": "Bize Ulaşın"
+   },
+   "howitworks_about_legal": {
+      "message": "Gizlilik ve Yasal Hükümler"
+   },
+   "howitworks_about_map": {
+      "message": "Site Haritası"
+   },
+   "howitworks_about_mcafee": {
+      "message": "McAfee Hakkında"
+   },
+   "howitworks_about_req": {
+      "message": "Sistem Gereksinimleri"
+   },
+   "howitworks_address": {
+      "message": "Şirket Genel Merkezi 6220 America Center Drive San Jose, CA 95002 USA"
+   },
+   "howitworks_description": {
+      "message": "McAfee, siz internette gezinirken zararlı yazılım ve kimlik avı saldırılarını daha gerçekleşmeden önleyerek sizi koruyan ön cephe savunmanızdır."
+   },
+   "howitworks_download_description": {
+      "message": "Bilgisayarınızı virüslerden ve diğer tehditlerden koruyun. Şüpheli bir dosya indirirseniz sizi uyarır ve web sayfalarında gizlenmiş zararlı yazılımları engelleriz."
+   },
+   "howitworks_download_title": {
+      "message": "Daha Güvenli İndirme İşlemleri"
+   },
+   "howitworks_legal": {
+      "message": "Aboneliğiniz $howitworks_legal_license$ ve $howitworks_legal_notice$  öğelerine tabidir ayrıca aboneliğiniz kapsamında izin verilen sayıda desteklenen cihazda kişisel kullanımınız içindir. “Tüm” cihazları kapsayan abonelikler, sahip olduğunuz desteklenen cihazlarla sınırlıdır. Abonelik dönemi içinde ürün özellikleri eklenebilir, değiştirilebilir veya kaldırılabilir ve bütün özellikler her işletim sisteminde desteklenmez. Desteklenen cihazları görmek için $howitworks_legal_req$ bölümüne bakın. Yazılım, olası tüm tehditlere karşı koruma garantisi vermez.",
+      "placeholders": {
+         "howitworks_legal_license": {
+            "content": "$1"
+         },
+         "howitworks_legal_notice": {
+            "content": "$2"
+         },
+         "howitworks_legal_req": {
+            "content": "$3"
+         }
+      }
+   },
+   "howitworks_legal_license": {
+      "message": "Lisans Sözleşmesi"
+   },
+   "howitworks_legal_notice": {
+      "message": "Gizlilik Bildirimi"
+   },
+   "howitworks_legal_req": {
+      "message": "Sistem Gereksinimleri"
+   },
+   "howitworks_lets_connect": {
+      "message": "Bize bağlanın."
+   },
+   "howitworks_page_title": {
+      "message": "McAfee - Nasıl Çalışır"
+   },
+   "howitworks_phishing_description": {
+      "message": "Bilgisayar korsanları resmi gibi görünen e-postalar yoluyla veya arama sonuçlarını cazip hale getirerek kişisel bilgilerinizi çalmaya çalışır. Tuzağa düşmemenizi sağlayarak kişisel bilgilerinizin korunmasına yardımcı olacağız."
+   },
+   "howitworks_phishing_title": {
+      "message": "Kimlik Avı Koruması"
+   },
+   "howitworks_products": {
+      "message": "Ürünler"
+   },
+   "howitworks_products_identity": {
+      "message": "McAfee® Identity Theft Protection"
+   },
+   "howitworks_products_livesafe": {
+      "message": "McAfee® LiveSafe"
+   },
+   "howitworks_products_totalprotection": {
+      "message": "McAfee® Total Protection"
+   },
+   "howitworks_refund_trademark": {
+      "message": "McAfee ve McAfee logosu, McAfee LLC’nin veya bağlı kuruluşlarının ABD'de ve diğer ülkelerde ticari markaları veya tescilli ticari markalarıdır. Diğer adlar ve markalar ilgili sahiplerinin mülkiyetinde olabilir. Copyright © $year$ McAfee, LLC",
+      "placeholders": {
+         "year": {
+            "content": "$1"
+         }
+      }
+   },
+   "howitworks_share": {
+      "message": "Güvende ve tehditlerin farkında olmanız için sizinle haber ve ipuçları paylaşacağız."
+   },
+   "howitworks_social_description": {
+      "message": "Facebook, LinkedIn, Reddit ve benzeri gibi sitelerde haber akışınızda güvenle gezinin. Bağlantılara renkli kod uygulayacağız, böylece hangilerini güvenle tıklayabileceğinizi bileceksiniz.*"
+   },
+   "howitworks_social_title": {
+      "message": "Sosyal Medya Koruması"
+   },
+   "howitworks_star_message": {
+      "message": "*Yalnızca Windows'ta kullanılabilir"
+   },
+   "howitworks_support": {
+      "message": "Destek"
+   },
+   "howitworks_support_consumer": {
+      "message": "Tüketici Desteği"
+   },
+   "howitworks_tech_scam": {
+      "message": "Tech Scam Koruması"
+   },
+   "howitworks_tech_scam_description": {
+      "message": "Açık ve net güvenlik uyarılarıyla bilgisayarınıza ve kişisel bilgilerinize uzaktan erişmeye çalışan dolandırıcıları alt edin ve kontrolünüzü korumaya devam edin."
+   },
+   "howitworks_title": {
+      "message": "McAfee Arkanızı Kollar"
+   },
+   "howitworks_url_description": {
+      "message": "Bilgisayar korsanları, gerçeğiyle neredeyse aynı görünen adresleri kullanarak kötü amaçlı siteler oluşturur. URL'de kasıtlı yapılmış bir yazım hatası veya yanlış yönlendiren bir bağlantı yolunuzdan saptırırsa, sizi güvenliğe geri yönlendiririz.*"
+   },
+   "howitworks_url_title": {
+      "message": "URL Saldırısı Koruması"
+   },
+   "iframe_banner_message": {
+      "message": "Bu sayfayı test ettik ve olası tehlikeli veya şüpheli sitelerden gelen içeriği engelledik. Bu içeriğe sadece güvenli sitelerden geldiğinden eminseniz izin verin."
+   },
+   "iframe_banner_view_all_btn": {
+      "message": "Engellenen tüm içeriği göster"
+   },
+   "mb_back_btn_message": {
+      "message": "Geri"
+   },
+   "mb_banner_learn_more": {
+      "message": "Daha fazla bilgi edinin"
+   },
+   "mb_banner_manage_settings": {
+      "message": "Ayarları yönetin"
+   },
+   "mb_faq_back_btn_message": {
+      "message": "Geri"
+   },
+   "mb_faq_description": {
+      "message": "Ses yapay montajları, bunları nasıl tespit ettiğimiz ve oluşturdukları risk hakkında daha fazla bilgi edinin."
+   },
+   "mb_faq_title": {
+      "message": "Video dolandırıcılığı koruması SSS"
+   },
+   "mb_graph_error": {
+      "message": "Ses verilerini şu anda görüntüleyemiyoruz. Daha sonra tekrar deneyin."
+   },
+   "mb_graph_feature_off": {
+      "message": "Yapay Montaj Algılayıcı açık"
+   },
+   "mb_graph_label_detected": {
+      "message": "Yapay montaj algılandı"
+   },
+   "mb_graph_label_scanning": {
+      "message": "Yapay montajlar taranıyor..."
+   },
+   "mb_graph_no_audio": {
+      "message": "Şu anda ses çalınmıyor"
+   },
+   "mb_graph_no_video": {
+      "message": "Şu anda video oynatılmıyor"
+   },
+   "mb_info_link_need_help": {
+      "message": "Yardım mı gerekiyor?"
+   },
+   "mb_info_link_need_support": {
+      "message": "Destek Birimi ile İletişime Geçin"
+   },
+   "mb_main_audio_detection_off": {
+      "message": "Kapalı"
+   },
+   "mb_main_audio_detection_on": {
+      "message": "Açık"
+   },
+   "mb_main_audio_detection_title": {
+      "message": "Dolandırıcılık koruması"
+   },
+   "mb_main_cur_video": {
+      "message": "Mevcut video"
+   },
+   "mb_main_deepfake": {
+      "message": "yapay montaj"
+   },
+   "mb_main_deepfakes": {
+      "message": "yapay montaj"
+   },
+   "mb_main_faq_message": {
+      "message": "Video dolandırıcılığı korumasının nasıl çalıştığını ve sizi nasıl güvende tuttuğumuzu öğrenin."
+   },
+   "mb_main_faq_title": {
+      "message": "Video dolandırıcılığı koruması SSS"
+   },
+   "mb_main_feedback_btn": {
+      "message": "Gönder"
+   },
+   "mb_main_feedback_message": {
+      "message": "Geri bildiriminizi paylaşın."
+   },
+   "mb_main_feedback_text": {
+      "message": "Doğru başardık mı?"
+   },
+   "mb_main_feedback_thank_you": {
+      "message": "Teşekkürler!"
+   },
+   "mb_main_hr_flagged": {
+      "message": "sa. işaretlendi"
+   },
+   "mb_main_hr_scanned": {
+      "message": "sa. tarandı"
+   },
+   "mb_main_hrs_flagged": {
+      "message": "sa. işaretlendi"
+   },
+   "mb_main_hrs_scanned": {
+      "message": "sa. tarandı"
+   },
+   "mb_main_min_flagged": {
+      "message": "dk. işaretlendi"
+   },
+   "mb_main_min_scanned": {
+      "message": "dk. tarandı"
+   },
+   "mb_main_mins_flagged": {
+      "message": "dk. işaretlendi"
+   },
+   "mb_main_mins_scanned": {
+      "message": "dk. tarandı"
+   },
+   "mb_main_my_data": {
+      "message": "Algılama verilerim"
+   },
+   "mb_main_pause_day": {
+      "message": "$day$ gün",
+      "placeholders": {
+         "day": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_hour": {
+      "message": "$hour$ saat",
+      "placeholders": {
+         "hour": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_hours": {
+      "message": "$hours$ saat",
+      "placeholders": {
+         "hours": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_notification": {
+      "message": "Bildirimleri duraklat"
+   },
+   "mb_main_snooze": {
+      "message": "Ertele"
+   },
+   "mb_main_snooze_until": {
+      "message": "$time$ olana kadar ertelendi",
+      "placeholders": {
+         "time": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_subscription_banner_buy": {
+      "message": "Şimdi satın alın"
+   },
+   "mb_main_title": {
+      "message": "Video Dolandırıcılıkları"
+   },
+   "mb_main_trial_end_in_hours_text": {
+      "message": "Deneme 24 saat içinde sona erecek"
+   },
+   "mb_main_trial_end_in_plural_text": {
+      "message": "Deneme $days$ gün içinde sona erecek",
+      "placeholders": {
+         "days": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_trial_end_in_single_text": {
+      "message": "Deneme $day$ gün içinde sona erecek",
+      "placeholders": {
+         "day": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_trial_expired_text": {
+      "message": "Denemeniz sona erdi"
+   },
+   "mb_main_what_we_found": {
+      "message": "Şimdiye kadar bulduklarımız:"
+   },
+   "mb_prompt_banner_desc": {
+      "message": "McAfee'nin video dolandırıcılığı koruması şimdi açık. $mb_banner_learn_more$",
+      "placeholders": {
+         "mb_banner_learn_more": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_prompt_banner_desc_page": {
+      "message": "Video dolandırıcılığı koruması açık. $mb_banner_manage_settings$",
+      "placeholders": {
+         "mb_banner_manage_settings": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_sidebar_faq_a1": {
+      "message": "Video dolandırıcılığı koruması, tarayıcınızda çalan YZ ile oluşturulmuş sesi tarar. \u003Cbr>\u003Cbr> İzlediğiniz bir şeyde YZ ile oluşturulmuş ses tespit edersek size haber veririz. Bu durumda sesin hangi kısımlarının montaj olduğunu öğrenebilirsiniz. \u003Cbr>\u003Cbr> Video içeriğindeki sesi taramamıza rağmen, video dolandırıcılığı koruması yalnızca yapay zeka sesini tanımlar ve yapay zeka tarafından oluşturulan videoları veya görüntüleri kontrol etmez."
+   },
+   "mb_sidebar_faq_a2": {
+      "message": "Yapay montajları tanımlamak için tarayıcınızda çalan sesi taramamız gerekiyor. Ancak video dolandırıcılığı koruması doğrudan cihazınıza yüklü olduğu için tüm ses işleme ve tarama işlemleri yerel olarak gerçekleştirilir. \u003Cbr>\u003Cbr> Yani taranan bilgiler sunucularımızla veya bulutla etkileşime girmez. Sesinizi hiçbir şekilde toplamayız veya kaydetmeyiz ve daha fazla gizlilik istediğinizde ses algılamayı kapatabilirsiniz. \u003Cbr>\u003Cbr> Daha fazla bilgi edinmek için $mb_sidebar_faq_privacy_notice$ sayfasını inceleyin.",
+      "placeholders": {
+         "mb_sidebar_faq_privacy_notice": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_sidebar_faq_a3": {
+      "message": "Yapay montaj, bir kişinin sesini veya görünüşünü kopyalamak veya sıfırdan sahte bir kişi oluşturmak için yapay zekayı kullanan bir ses kaydı, video veya görüntüdür. \u003Cbr>\u003Cbr>  Örneğin ünlü birinin yapay montajı, hiç kullanmadığı bir ürünü tavsiye ettiği görüntü olabilir. Ya da bir politik liderin yapay montajında liderin yaptığı konuşmayı değiştirmek için sahte bir ses kullanılabilir. \u003Cbr>\u003Cbr>  Yapay montajlar oldukça inandırıcı oldukları için çevrim içi olarak izlediğiniz veya dinlediğiniz şeylerin gerçek olup olmadığına dair inanmakta zorlanırsınız. Bu sizi dolandırıcılığa veya yanlış bilgilendirmeye karşı daha savunmasız hale getirebilir."
+   },
+   "mb_sidebar_faq_a4": {
+      "message": "Tarayıcınızda oynatılan herhangi bir sesi analiz eden bir yapay zeka modelini çalıştırmak için cihazınızda zaten bulunan yapay zeka teknolojisini kullanırız. Bu model, sesin yapay zeka tarafından klonlanıp klonlanmadığını veya sahte olup olmadığını kontrol eder."
+   },
+   "mb_sidebar_faq_privacy_notice": {
+      "message": "Gizlilik Bildirimi"
+   },
+   "mb_sidebar_faq_q1": {
+      "message": "Video dolandırıcılığı koruması ne işe yarar?"
+   },
+   "mb_sidebar_faq_q2": {
+      "message": "Gizliliğim güvende mi?"
+   },
+   "mb_sidebar_faq_q3": {
+      "message": "Yapay montaj nedir ve beni nasıl etkiler?"
+   },
+   "mb_sidebar_faq_q4": {
+      "message": "Yapay montajlar nasıl tespit edilir?"
+   },
+   "mb_video_banner_AI_audio_title": {
+      "message": "Yapay montaj algılandı"
+   },
+   "mb_video_banner_no_AI_audio_title": {
+      "message": "Yapay montajlar taranıyor"
+   },
+   "overlay_accept_ss": {
+      "message": "Arama motorunuzu McAfee® Güvenli Arama olarak değiştirmeyi kabul ediyorsunuz"
+   },
+   "overlay_add_ss": {
+      "message": "McAfee® Güvenli Arama'yı tarayıcınıza ekleyin"
+   },
+   "overlay_form_button": {
+      "message": "Bitti"
+   },
+   "overlay_form_question": {
+      "message": "Bu bilgileri faydalı bulmadığınız için üzgünüz. Lütfen neyin yanlış olduğunu bize söyleyin, biz de doğru bir şekilde sorunu sınıflandıralım."
+   },
+   "overlay_form_text": {
+      "message": "Metin alanı buraya yaz"
+   },
+   "overlay_ss_description": {
+      "message": "Arama sonuçlarınızda riskli siteleri işaretlediğimiz için hangi sitelerin güvenli hangilerinin güvenli olmadığını bilebilirsiniz."
+   },
+   "overlay_step_1": {
+      "message": "1. ADIM"
+   },
+   "overlay_step_2": {
+      "message": "2. ADIM"
+   },
+   "overlay_thank_you_close_button": {
+      "message": "Kapat"
+   },
+   "overlay_thank_you_message": {
+      "message": "Değerli geri bildiriminiz için teşekkürler!"
+   },
+   "page_title": {
+      "message": "McAfee Koruma Merkezi"
+   },
+   "phishingdesc": {
+      "message": "Bilgisayar korsanları resmi görünen \"kimlik avı\" e-postaları ve web siteleriyle sizi tuzağa düşürerek bilgilerinizi almaya çalışır. Kandırılmamanız için bağlantıyı keseceğiz."
+   },
+   "phishingtitle": {
+      "message": "Kişisel bilgilerinizi güvende tutun"
+   },
+   "read_more_about_typosquatting": {
+      "message": "Yanlış siteye yönlendirme hakkında daha fazla bilgi edinin."
+   },
+   "res_PRODUCT_NAME": {
+      "message": "%PRODUCTNAME%"
+   },
+   "res_PRODUCT_NAME_NOT_TRADEMARKED": {
+      "message": "WebAdvisor"
+   },
+   "res_PRODUCT_NAME_TRADEMARKED": {
+      "message": "McAfee® WebAdvisor"
+   },
+   "search_engine_bing": {
+      "message": "Bing"
+   },
+   "search_engine_yahoo": {
+      "message": "Yahoo"
+   },
+   "search_suggest_input": {
+      "message": "Renk kodlu arama sonuçlarını bul"
+   },
+   "search_toast_body_text_compliant": {
+      "message": "Güvenli Arama'yı ekleyerek kötü niyetli kişilerden uzak durmak ister misiniz?"
+   },
+   "search_toast_body_text_test": {
+      "message": "Güvenli Aramayı ekleyerek hangi sitelerin güvenli olduğunu bilmek mi istiyorsunuz?"
+   },
+   "search_toast_done": {
+      "message": "Bitti"
+   },
+   "search_toast_heading_compliant": {
+      "message": "Güvenli Arama'ya sahip değilsiniz; dikkatli olun"
+   },
+   "search_toast_heading_test": {
+      "message": "Arama sonuçlarınızla ilgili güvenlik tavsiyesi alın"
+   },
+   "search_toast_no_thanks": {
+      "message": "Hayır, teşekkürler"
+   },
+   "search_toast_ok": {
+      "message": "Tamam"
+   },
+   "search_toast_option_compliant": {
+      "message": "Evet, Güvenli Arama'yı tarayıcıma ekle ve varsayılan aramamı $search_provider$ olarak değiştir.",
+      "placeholders": {
+         "search_provider": {
+            "content": "$1"
+         }
+      }
+   },
+   "search_toast_option_test": {
+      "message": "Evet, Güvenli Arama'yı ekle ve varsayılan aramamı $search_provider$ olarak değiştir.",
+      "placeholders": {
+         "search_provider": {
+            "content": "$1"
+         }
+      }
+   },
+   "search_toast_sub_heading_compliant": {
+      "message": "Güvenli Arama, sizi arama sonuçlarınızdaki riskli sitelerden uzak tutar."
+   },
+   "search_toast_sub_heading_test": {
+      "message": "Güvenli Arama, arama sonuçlarınız arasındaki riskli siteleri gösterir."
+   },
+   "search_toast_yes": {
+      "message": "Evet"
+   },
+   "securesearchdesc": {
+      "message": "Renkli kodları olan arama sonuçlarına endişelenmeden göz atın — Hangi sitelerin güvenli ve hangilerinin şüpheli olduğunu size söyleyeceğiz."
+   },
+   "securesearchtitle": {
+      "message": "Riskli arama sonuçlarından uzak durun"
+   },
+   "settings_about_block_download": {
+      "message": "Riskli yüklemeler engellenir"
+   },
+   "settings_about_firewall_antivirus": {
+      "message": "Güvenlik duvarınız ile virüsten koruma programınızın açık olduğundan emin olmanız sağlanır"
+   },
+   "settings_about_flag_website": {
+      "message": "Tehlikeli web siteleri işaretlenir"
+   },
+   "settings_about_help_link_message": {
+      "message": "Şimdi yardım alın"
+   },
+   "settings_about_help_message": {
+      "message": "Bazen hepimizin yardıma ihtiyacı olur."
+   },
+   "settings_about_help_title": {
+      "message": "Yardım ve teknik destek alın"
+   },
+   "settings_about_privacy_link_message": {
+      "message": "Gizlilik Bildirimi'ni okuyun"
+   },
+   "settings_about_privacy_message": {
+      "message": "McAfee gizliliğinizi ciddiye alır."
+   },
+   "settings_about_privacy_title": {
+      "message": "Gizlilik Bildirimi"
+   },
+   "settings_about_product_affid": {
+      "message": "Bağlı Kimlik: $affid$",
+      "placeholders": {
+         "affid": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_binary_version": {
+      "message": "İkili sürüm: $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_extension_version": {
+      "message": "Uzantı sürümü: $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_title": {
+      "message": "Ürün sürümü"
+   },
+   "settings_about_share_title": {
+      "message": "%PRODUCTNAME% ürününü arkadaşlarınızla paylaşın"
+   },
+   "settings_about_subtitle": {
+      "message": "%PRODUCTNAME% çevrimiçiyken yaptıklarınız konusunda daha iyi kararlar almanıza yardımcı olur."
+   },
+   "settings_about_title": {
+      "message": "HAKKINDA"
+   },
+   "settings_page_title": {
+      "message": "%PRODUCTNAME%"
+   },
+   "settings_preference_annotation_all": {
+      "message": "Herhangi bir arama motorunda bir arama sonucunun güvenli olup olmadığını benimle paylaş."
+   },
+   "settings_preference_annotation_none": {
+      "message": "Arama sonuçlarını benimle paylaşma."
+   },
+   "settings_preference_annotation_ss": {
+      "message": "Yalnızca Güvenli Arama'da bir arama sonucunun güvenli olup olmadığını benimle paylaş."
+   },
+   "settings_preference_annotation_ss_with_tip": {
+      "message": "Güvenli Arama ile arama sonucunun güvenli olup olmadığını benimle paylaş (İpucu: Adres çubuğunuzda arama yaparak Güvenli Arama'ya erişin)."
+   },
+   "settings_preference_annotation_subtitle": {
+      "message": "Hangi sitelerin güvenli olduğunu belirtrmek için arama sonuçlarınızı renk kodlayıcılarla göstereceğiz."
+   },
+   "settings_preference_annotation_title": {
+      "message": "Güvenli Arama"
+   },
+   "settings_preference_aps_toggle_label_message": {
+      "message": "Belirli mali sitelerle alışveriş sitelerinin ve diğer sitelerin meşru olduklarını ve tehlike arz etmediklerini belirten rahatlatıcı uyarılarla rahatça gezinin."
+   },
+   "settings_preference_aps_toggle_label_title": {
+      "message": "Erken koruma sinyalleri"
+   },
+   "settings_preference_aps_toggle_subtitle": {
+      "message": "Bu ayarın açık olması sizi daha güvende tutmamıza yardımcı olur."
+   },
+   "settings_preference_aps_toggle_title": {
+      "message": "Erken Koruma Sinyali"
+   },
+   "settings_preference_ffpolicy_activity_message": {
+      "message": "Bu bilgileri, WebAdvisor'ın hangi özelliklerinin en çok işinize yaradığını anlamak için kullanacağız. "
+   },
+   "settings_preference_ffpolicy_activity_title": {
+      "message": "Etkinlik verilerinin toplanması"
+   },
+   "settings_preference_ffpolicy_permissions__title": {
+      "message": "Eklenti İzinleri"
+   },
+   "settings_preference_ffpolicy_permissions_message": {
+      "message": "Güvenlik risklerini belirleyip size haber verebilmemiz için ziyaret ettiğiniz sitelerdeki verileri okuyup değiştirmemiz gereklidir. Web'te gezinirken sizi koruyabilmemiz için bu ayar gereklidir."
+   },
+   "settings_preference_ffpolicy_permissions_on": {
+      "message": "AÇIK"
+   },
+   "settings_preference_ffpolicy_permissions_toggle__title": {
+      "message": "Eklenti izinleri (Gerekli)"
+   },
+   "settings_preference_ffpolicy_personal_message_intro": {
+      "message": "Güvenlik durumlarının kontrolü için gezindiğiniz sitelerin web adreslerini uzmanlarımıza gönderiyoruz. İçiniz rahat olsun, bilgilerinizi hiçbir zaman satmayız. Sizi kişisel olarak tanımlayan aşağıdaki verileri toplayabilir miyiz:"
+   },
+   "settings_preference_ffpolicy_personal_message_outro": {
+      "message": "Kişisel verilerinizi toplamamıza izin vermemeyi seçerseniz, McAfee® WebAdvisor'ın güvenlik özelliklerinden yararlanamayacaksınız ve onu kaldırmanız gerekecek."
+   },
+   "settings_preference_ffpolicy_personal_message_outro_line_2": {
+      "message": "Topladığımız kişisel verilerle ilgili tüm detayları ve onlarla ne yaptığımızla ilgili bilgileri $link$",
+      "placeholders": {
+         "link": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_preference_ffpolicy_personal_message_point_1": {
+      "message": "Güvenlik durumlarını kontrol etmek ve güncel güvenliğinizi sağlamak için ziyaret ettiğiniz sitelerin  web adresleri (URL)."
+   },
+   "settings_preference_ffpolicy_personal_message_point_2": {
+      "message": "Güvenlik durumlarını kontrol etmek ve size güvenlik notları sağlamak için arama motoru sonuçlarınızda listelenen sitelerin web adresleri (URL)."
+   },
+   "settings_preference_ffpolicy_personal_message_point_3": {
+      "message": "McAfee® WebAdvisor'ın güvenlik hizmetiyle ilgili olası sorunları tespit etmek için topladığımız mevcut tarayıcı sürümünüz."
+   },
+   "settings_preference_ffpolicy_personal_message_point_4": {
+      "message": "McAfee® WebAdvisor'ın güvenlik hizmetiyle ilgili olası sorunları tespit etmek için topladığımız, kullanmakta olduğunuz McAfee® WebAdvisor sürümünüz."
+   },
+   "settings_preference_ffpolicy_personal_title": {
+      "message": "Kişisel verilerin toplanması"
+   },
+   "settings_preference_ffpolicy_personal_title_required": {
+      "message": "(Gerekli)"
+   },
+   "settings_preference_ffpolicy_privacy_policy_link": {
+      "message": "Gizlilik İlkesi içeriğimizde bulabilirsiniz"
+   },
+   "settings_preference_ffpolicy_subtitle": {
+      "message": "Bu ayarların ikisinin de açık olması sizi güvende tutmamıza ve yararlı bir deneyim sunmamıza yardımcı olacak."
+   },
+   "settings_preference_ffpolicy_title": {
+      "message": "Veri izinleri"
+   },
+   "settings_preference_reset_button": {
+      "message": "Sıfırla"
+   },
+   "settings_preference_reset_subtitle": {
+      "message": "%PRODUCTNAME% bildirimini göz ardı ettiniz ve buna pişman mısınız? Her türden %PRODUCTNAME% mesajını tekrar almaya başlamak için bildirimleri sıfırlayın."
+   },
+   "settings_preference_reset_title": {
+      "message": "Ayarları Sıfırla"
+   },
+   "settings_preference_sma_facebook": {
+      "message": "Facebook"
+   },
+   "settings_preference_sma_facebook_label": {
+      "message": "Facebook"
+   },
+   "settings_preference_sma_instagram": {
+      "message": "Instagram"
+   },
+   "settings_preference_sma_instagram_label": {
+      "message": "Instagram"
+   },
+   "settings_preference_sma_linkedin": {
+      "message": "Linkedin"
+   },
+   "settings_preference_sma_linkedin_label": {
+      "message": "Linkedin"
+   },
+   "settings_preference_sma_message": {
+      "message": "Bunlar bilgi vereceğimiz siteler."
+   },
+   "settings_preference_sma_reddit": {
+      "message": "Reddit"
+   },
+   "settings_preference_sma_reddit_label": {
+      "message": "Reddit"
+   },
+   "settings_preference_sma_subtitle": {
+      "message": "Hangilerinin güvenli olduğunu belirtmek için sosyal medya akışlarındaki bağlantıları renkli simgelerle göstereceğiz."
+   },
+   "settings_preference_sma_title": {
+      "message": "Sosyal Medya Koruması"
+   },
+   "settings_preference_sma_twitter": {
+      "message": "X"
+   },
+   "settings_preference_sma_twitter_label": {
+      "message": "X"
+   },
+   "settings_preference_sma_youtube": {
+      "message": "Youtube"
+   },
+   "settings_preference_sma_youtube_label": {
+      "message": "Youtube"
+   },
+   "settings_preference_title": {
+      "message": "EK HİZMETLER"
+   },
+   "settings_statistics_ads_blocked": {
+      "message": "izinsiz reklam engellendi"
+   },
+   "settings_statistics_downloads_blocked": {
+      "message": "güvenilir olmayan indirme engellendi"
+   },
+   "settings_statistics_downloads_scanned": {
+      "message": "indirme tarandı"
+   },
+   "settings_statistics_links_scanned": {
+      "message": "bağlantı tarandı"
+   },
+   "settings_statistics_message": {
+      "message": "Şimdiye kadar gerçekleştirdiklerimiz:"
+   },
+   "settings_statistics_pages_blocked": {
+      "message": "tehlikeli sayfa engellendi"
+   },
+   "settings_statistics_pages_scanned": {
+      "message": "sayfa tarandı"
+   },
+   "settings_statistics_subtitle": {
+      "message": "Çevrimiçi ortamda güvende olmanıza yardım etmek için buradayız."
+   },
+   "settings_statistics_title": {
+      "message": "İSTATİSTİKLER"
+   },
+   "settings_statistics_trackers_blocked": {
+      "message": "izleyiciler engellendi"
+   },
+   "settings_subtitle": {
+      "message": "Web korumanızı özelleştirin."
+   },
+   "settings_tab_about": {
+      "message": "Hakkında"
+   },
+   "settings_tab_preference": {
+      "message": "Tercihler"
+   },
+   "settings_tab_statistics": {
+      "message": "İstatistikler"
+   },
+   "settings_tab_whitelist": {
+      "message": "Güvenilir Siteler"
+   },
+   "settings_title": {
+      "message": "Web Koruması"
+   },
+   "settings_whitelist_input": {
+      "message": "Bir web adresi yazın..."
+   },
+   "settings_whitelist_title": {
+      "message": "GÜVENDİĞİNİZ SİTELER"
+   },
+   "sidebar_dangerous_blocked": {
+      "message": "tehlikeli sayfa engellendi"
+   },
+   "sidebar_deepfake_found": {
+      "message": "yapay montaj bulundu"
+   },
+   "sidebar_deepfakes_found": {
+      "message": "yapay montaj bulundu"
+   },
+   "sidebar_deepfakes_found_new": {
+      "message": "YENİ"
+   },
+   "sidebar_get_help": {
+      "message": "Yardım alın"
+   },
+   "sidebar_pages_scanned": {
+      "message": "sayfa tarandı"
+   },
+   "sidebar_privacy_terms": {
+      "message": "Gizlilik ve Yasal Koşullar"
+   },
+   "sidebar_rat_detection_got_it_btn_text": {
+      "message": "Anladım"
+   },
+   "sidebar_rat_detection_information_I": {
+      "message": "Bu sitedeki yazılım başkalarının cihazınıza erişmesine izin veriyor. Korsanlar veya dolandırıcılar kişisel bilgilerinize gizlice erişmek için bu sayfayı kullanabilir."
+   },
+   "sidebar_rat_detection_information_II": {
+      "message": "Yalnızca güvendiğiniz yazılımları indirin ve bilgilerinizi yalnızca güvendiğiniz kişilerle paylaşın."
+   },
+   "sidebar_rat_detection_title": {
+      "message": "Bu site başkalarının cihazınızı kontrol etmesine izin veriyor"
+   },
+   "sidebar_rat_detection_whitelist_btn": {
+      "message": "Beni bu sayfada tekrar uyarma"
+   },
+   "sidebar_subtitle": {
+      "message": "Şimdiye kadar gerçekleştirdiklerimiz:"
+   },
+   "sidebar_title": {
+      "message": "Çevrimiçi ortamda güvende olmanıza yardımcı oluyoruz"
+   },
+   "sidebar_unsafe_blocked": {
+      "message": "güvenilir olmayan öğe engellendi"
+   },
+   "sidebar_version": {
+      "message": "Sürüm"
+   },
+   "sidebar_view_site_report": {
+      "message": "Site raporunu görüntüle"
+   },
+   "site_status_block_page_accept_risk": {
+      "message": "Yine de ziyaret et"
+   },
+   "site_status_block_page_go_back": {
+      "message": "Geri dön"
+   },
+   "site_status_body_text_danger": {
+      "message": "Bu site bilgisayarınıza zarar verebilecek potansiyel tehlikeli içerik bulunduruyor. Bu siteyi engelledik bu yüzden endişe etmeden gezinebilirsiniz."
+   },
+   "site_status_body_text_site_report_danger": {
+      "message": "Zararlı etkinlikler için web sitelerini düzenli olarak tararız. Ancak bu site bilgisayarınıza zarar verebilecek tehlikeli içerik bulunduruyor olabilir."
+   },
+   "site_status_body_text_site_report_safe": {
+      "message": "Bu web sitesini inceledik ve her şey yolunda görünüyor. Güvendesiniz!"
+   },
+   "site_status_body_text_site_report_unknown": {
+      "message": "Bu siteyi henüz taramadık gibi görünüyor. Bir daha tarama yaptığımızda güvenlik derecesini güncelleyeceğiz."
+   },
+   "site_status_body_text_site_report_warning": {
+      "message": "Tehlikeli veya riskli etkinlikler için web sitelerini düzenli olarak tararız. Ancak bu site bize biraz riskli göründü."
+   },
+   "site_status_body_text_typosquatting": {
+      "message": "Bir web sitesi adresini yanlış yazdığınızda, kendinizi ziyaret etmeyi amaçlamadığınız sitelerde bulabilirsiniz. Bu siteler sizi zararlı yazılım bombardımanına uğratabilir, kişisel bilgilerinizi isteyebilir hatta daha fazlasını yapabilir. Bu sitelerden sakınmanızı sağlamak için buradayız."
+   },
+   "site_status_body_text_warning": {
+      "message": "Bu site biraz riskli göründüğünden tedbirli olmak için işaretledik. Devam etmeye karar vermeniz durumunda bu siteye güvendiğinizden emin olun. Pişman olmaktansa güvende olmak daha iyidir!"
+   },
+   "site_status_feedback_question": {
+      "message": "Bu bilgileri faydalı buldunuz mu?"
+   },
+   "site_status_footer_note": {
+      "message": "Yine de ziyaret etmeyi seçerseniz engellenmiş URL, güvenli siteler listenize eklenecektir."
+   },
+   "site_status_header_text": {
+      "message": "Web sitesi durumu:"
+   },
+   "site_status_search_input": {
+      "message": "Renk kodlu arama sonuçlarını bul"
+   },
+   "site_status_state_danger": {
+      "message": "Riskli"
+   },
+   "site_status_state_safe": {
+      "message": "Güvenli"
+   },
+   "site_status_state_typosquatting": {
+      "message": "Yanlış siteye yönlendirme"
+   },
+   "site_status_state_unknown": {
+      "message": "Bilinmiyor"
+   },
+   "site_status_state_warning": {
+      "message": "Şüpheli"
+   },
+   "site_status_submit_ticket_text": {
+      "message": "Bu siteyi güvenli buluyor musunuz? $submitTicketLink$.",
+      "placeholders": {
+         "submitTicketLink": {
+            "content": "$1"
+         }
+      }
+   },
+   "site_status_submit_ticket_text_link": {
+      "message": "Teknik destek isteyin"
+   },
+   "site_status_title": {
+      "message": "%PRODUCTNAME% - Web Sitesi Güvenlik Derecelendirmesi"
+   },
+   "site_status_typosquatting_go_back": {
+      "message": "Geri dön"
+   },
+   "site_status_typosquatting_suggest_url_text": {
+      "message": "$suggestUrl$ mi demek istediniz?",
+      "placeholders": {
+         "suggestUrl": {
+            "content": "$1"
+         }
+      }
+   },
+   "site_status_typosquatting_take_me_there": {
+      "message": "Siteye götür"
+   },
+   "site_status_typosquatting_visit_anyway": {
+      "message": "Yine de ziyaret et"
+   },
+   "smadesc": {
+      "message": "Size hangi bağlantıların güvenli olduğunu söyleyen renkli kodları olan bağlantılarla akışınıza güvenle göz atın."
+   },
+   "smatitle": {
+      "message": "Hangi sosyal medya bağlantılarının güvenli ve hangilerinin riskli olduğunu bilin"
+   },
+   "summarydesc": {
+      "message": "Çevrimiçi göz atma, arama ve alışverişiniz sırasında güvende kalmanız için aldığımız tüm önlemlerin en güncel özetini göstereceğiz."
+   },
+   "summarytitle": {
+      "message": "Güvenlikle ilgili gerçek zamanlı kontrol ve yönetim ekranınız"
+   },
+   "typodesc": {
+      "message": "Bilgisayar korsanları, gerçeğiyle neredeyse aynı görünen adresleri kullanarak siteler oluşturur. Buna \"benzer URL parselleme\" denir. URL'deki bir yazım hatası yolunuzdan saptırırsa sizi güvenliğe geri yönlendiririz. "
+   },
+   "typotitle": {
+      "message": "Gerçek gibi davranan tehlikeli sitelerden kaçının"
+   },
+   "wb_container__right__cancel": {
+      "message": "Hayır, teşekkürler"
+   },
+   "wb_container__right__content": {
+      "message": "$ph1$ ile daha hızlı göz atın. Otomatik olarak oynayan ve web'de gezinmenizi yavaşlatan videoları durdururuz.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   },
+   "wb_container__right__content_second": {
+      "message": "$ph1$ otomatik olarak oynayan ve web'de gezinmenizi yavaşlatan videoları durdurur. Web Boost'la ilgilenmiyorsanız tekrar sormayacağız.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   },
+   "wb_container__right__eula": {
+      "message": "$ph1$ düğmesine tıklayarak $ph2$ ve $ph3$ koşullarını kabul etmiş olursunuz.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         },
+         "ph2": {
+            "content": "$2"
+         },
+         "ph3": {
+            "content": "$3"
+         }
+      }
+   },
+   "wb_container__right__eula_licence_agreement": {
+      "message": "Lisans Sözleşmesi"
+   },
+   "wb_container__right__eula_privacy_notice": {
+      "message": "Gizlilik Bildirimi"
+   },
+   "wb_container__right__submit": {
+      "message": "Web Boost'u Edinin"
+   },
+   "wb_container__right__title": {
+      "message": "Otomatik olarak oynayan can sıkıcı videolar sizi yavaşlatıyor mu?"
+   },
+   "wb_container__right__title_second": {
+      "message": "Son kez soruyoruz, videoların otomatik olarak oynatılmasını önlemek ister misiniz?"
+   },
+   "wb_name_title": {
+      "message": "McAfee&reg; Web Boost"
+   },
+   "wb_top__body__action_message": {
+      "message": "Web'de gezinmeyi hızlandırın"
+   },
+   "wb_top_banner_left_text": {
+      "message": "$ph1$ Uygulamasını Edinin",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   }
+}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { X, Database, Table as TableIcon, Search, RefreshCw, Layers, Save, Trash2 } from 'lucide-react'
 import { cn } from '../lib/utils'
-import { useShowStore } from '../store/useShowStore'
+import { useSequencerStore } from '../store/useSequencerStore'
 
 interface DatabaseManagerProps {
     isOpen: boolean
@@ -9,7 +9,7 @@ interface DatabaseManagerProps {
 }
 
 export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClose }) => {
-    const { openModal, addToast } = useShowStore()
+    const { openModal, addToast } = useSequencerStore()
     const [tables, setTables] = useState<string[]>([])
     const [selectedTable, setSelectedTable] = useState<string | null>(null)
     const [tableData, setTableData] = useState<any[]>([])
@@ -27,13 +27,22 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
     const loadTables = async () => {
         if (!(window as any).require) return
         const { ipcRenderer } = (window as any).require('electron')
-        const result = await ipcRenderer.invoke('db:get-tables')
-        setTables(result)
+        try {
+            const result = await ipcRenderer.invoke('db:get-tables')
+            setTables(result)
+        } catch (err) {
+            console.error('Failed to load tables', err)
+        }
     }
 
-    const loadTableData = async (tableName: string) => {
+    const loadTableData = async (tableName: string, resetSearch: boolean = false) => {
         setIsLoading(true)
         setSelectedTable(tableName)
+        if (resetSearch) setSearchQuery('')
+
+        // Always refresh table list too to ensure we see the latest schema/tables
+        loadTables()
+
         if (!(window as any).require) return
         const { ipcRenderer } = (window as any).require('electron')
         try {
@@ -166,7 +175,7 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
                             {tables.map(table => (
                                 <button
                                     key={table}
-                                    onClick={() => loadTableData(table)}
+                                    onClick={() => loadTableData(table, true)}
                                     className={cn(
                                         "w-full px-3 py-2.5 rounded-lg text-left text-xs flex items-center gap-3 transition-all",
                                         selectedTable === table
@@ -282,7 +291,7 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
                         <div className="glass bg-card w-full max-w-2xl max-h-full flex flex-col rounded-xl shadow-2xl">
                             <div className="p-4 border-b border-white/10 flex items-center justify-between">
                                 <h3 className="font-bold text-white">Rij Bewerken</h3>
-                                <button onClick={() => setEditingRow(null)}><X className="w-5 h-5 text-muted-foreground hover:text-white" /></button>
+                                <button onClick={() => setEditingRow(null)} title="Sluiten"><X className="w-5 h-5 text-muted-foreground hover:text-white" /></button>
                             </div>
                             <div className="flex-1 overflow-y-auto p-6 space-y-4">
                                 {Object.keys(formData).map(key => (
@@ -292,6 +301,8 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
                                             type="text"
                                             disabled={key === 'id'}
                                             value={typeof formData[key] === 'object' ? JSON.stringify(formData[key]) : formData[key]}
+                                            title={key}
+                                            placeholder={`Voer ${key} in...`}
                                             onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
                                             className={cn(
                                                 "w-full bg-white/5 border border-white/10 rounded px-3 py-2 text-xs text-white focus:border-primary/50 outline-none font-mono",

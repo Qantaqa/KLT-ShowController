@@ -1,0 +1,89 @@
+import type { Device } from './devices';
+
+export interface ShowEvent {
+    act: string
+    sceneId: number
+    eventId: number
+    fixture: string
+    effect: string
+    palette: string
+    color1: string
+    color2: string
+    color3: string
+    brightness: number
+    speed: number
+    intensity: number
+    transition: number
+    sound: boolean
+    scriptPg?: number
+    cue?: string
+    type?: string
+    filename?: string
+    duration?: number
+    segmentId?: number
+    effectId?: number
+    paletteId?: number
+    stopAct?: string
+    stopSceneId?: number
+    stopEventId?: number
+    mediaTriggerId?: string
+}
+
+export interface ClipboardItem {
+    id: number
+    type: string
+    data: ShowEvent
+    timestamp: string
+}
+
+/**
+ * Metadata and persistent settings for a specific Show project.
+ */
+export interface ShowProfile {
+    id: string                  // Database UUID
+    name: string                // Display name of the show
+    pdfPath: string             // Path to the primary script PDF
+    totalPages?: number          // Total pages in the script (populated after parse)
+    sidebarWidth?: number       // UI preference for sidebar size
+    invertScriptColors?: boolean // UI preference for dark/light script display
+    schedule?: Record<number, { time1: string; time2: string }> // Automated show triggers per day
+    viewState?: {
+        collapsedGroups?: Record<string, boolean> // Saved collapse/expand states for Edit Mode
+        currentScriptPage?: number                // Last viewed page
+        sceneNames?: Record<string, string>       // Custom labels for scene groups
+    }
+    devices?: Device[]          // Show-specific device overrides
+}
+
+/**
+ * Application-wide configuration stored in the database.
+ */
+export interface AppSettingsProfile {
+    defaultLogo: string         // Base64 or path to the project logo
+    accessPin: string           // 4-digit PIN for remote client authorization
+    serverPort: number          // Port for the Socket.io hub
+    serverIp: string            // IP address of the host machine
+    controllerMonitorIndex?: number // Which monitor the main dashboard should open on
+    testVideoPath?: string      // Default video for testing projections
+    geminiApiKey?: string       // API key for AI-enhanced script parsing
+    devices: Device[]           // Global device list (available to all shows)
+    pincodes?: {
+        showDetails?: string
+    }
+    clientConfigs?: Record<string, { // Per-client UI preferences (webcams, previews)
+        isCameraActive?: boolean
+        isSelfPreviewVisible?: boolean
+        selectedCameraClients?: string[]
+        lastSeen?: number
+    }>
+}
+
+export interface KeyboardBinding {
+    id: string
+    key: string
+    ctrl: boolean
+    shift: boolean
+    alt: boolean
+    action: 'nextEvent' | 'nextScene' | 'nextAct' | 'nextSmart' | 'stopAll' | 'pageUp' | 'pageDown'
+    label?: string
+}

@@ -1,0 +1,118 @@
+﻿
+Imports System.Text.RegularExpressions
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel
+
+Module ScriptEditor
+    ' Parse hulpfunctie
+    Private Function TryParsePdfPageFromUrl(url As String, ByRef page As Integer) As Boolean
+        If String.IsNullOrEmpty(url) Then Return False
+        Dim m = System.Text.RegularExpressions.Regex.Match(url, "(?:[#&]|%23|%26)page=(\d+)", RegexOptions.IgnoreCase)
+        If m.Success AndAlso Integer.TryParse(m.Groups(1).Value, page) Then Return True
+        ' Fallback: plain #page=
+        m = System.Text.RegularExpressions.Regex.Match(url, "page=(\d+)", RegexOptions.IgnoreCase)
+        If m.Success AndAlso Integer.TryParse(m.Groups(1).Value, page) Then Return True
+        Return False
+    End Function
+
+    Private Async Function GetCurrentPdfPageAsync() As Task(Of Integer)
+        Try
+            If pdfView Is Nothing OrElse pdfView.CoreWebView2 Is Nothing Then Return currentPdfPage
+            ' Probeer URL (snel)
+            Dim src As String = pdfView.CoreWebView2.Source
+            Dim p As Integer
+            If TryParsePdfPageFromUrl(src, p) Then
+                Return p
+            End If
+            ' Fallback: vraag location.href via JS
+            Dim res = Await pdfView.CoreWebView2.ExecuteScriptAsync("location.href")
+            If Not String.IsNullOrEmpty(res) Then
+                Dim href As String = res.Trim(""""c)
+                If TryParsePdfPageFromUrl(href, p) Then
+                    Return p
+                End If
+            End If
+        Catch
+        End Try
+        Return currentPdfPage
+    End Function
+
+    Private Async Sub UpdateCurrentPdfPageFromWebView()
+        currentPdfPage = Await GetCurrentPdfPageAsync()
+    End Sub
+
+    ' SourceChanged handler om page-mutaties te detecteren (bij scrollen/bediening in PDF-viewer)
+    Private Sub OnPdfSourceChanged(sender As Object, e As Object)
+        UpdateCurrentPdfPageFromWebView()
+    End Sub
+
+    ' Link huidige PDF-pagina aan geselecteerde DG_Show-regel
+    Private Async Sub LinkSelectedRowToCurrentPage()
+        If DG_Show.CurrentRow Is Nothing Then
+            ToonFlashBericht("Geen regel geselecteerd.", 3, FlashSeverity.IsInfo)
+            Return
+        End If
+        Dim page = Await GetCurrentPdfPageAsync()
+        DG_Show.CurrentRow.Cells("colScriptPage").Value = page
+        ToonFlashBericht($"Script pagina {page} gelinkt aan deze regel.", 3)
+    End Sub
+
+    ' Ga naar gekoppelde pagina voor geselecteerde regel
+    Private Sub NavigateToSelectedRowPage()
+        If DG_Show.CurrentRow Is Nothing Then
+            ToonFlashBericht("Geen regel geselecteerd.", 3, FlashSeverity.IsInfo)
+            Return
+        End If
+        Dim cell = DG_Show.CurrentRow.Cells("colScriptPage").Value
+        Dim page As Integer
+        If cell IsNot Nothing AndAlso Integer.TryParse(cell.ToString(), page) AndAlso page > 0 Then
+            NavigatePdfToPage(page)
+            ToonFlashBericht($"Naar script pagina {page}.", 2)
+        Else
+            ToonFlashBericht("Geen script pagina aan deze regel gekoppeld.", 4, FlashSeverity.IsInfo)
+        End If
+    End Sub
+
+    ' Breid je KeyDown uit met sneltoetsen:
+    Private Sub FrmMain_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        If e.KeyCode = Keys.F5 Then
+            StartPdfAutoScroll()
+            e.Handled = True
+        ElseIf e.KeyCode = Keys.F6 Then
+            StopPdfAutoScroll()
+            e.Handled = True
+        ElseIf e.Control AndAlso (e.KeyCode = Keys.Oemplus OrElse e.KeyCode = Keys.Add) Then
+            pdfAutoScrollIntervalMs = Math.Max(250, pdfAutoScrollIntervalMs - 250)
+            pdfAutoScrollTimer.Interval = pdfAutoScrollIntervalMs
+            ToonFlashBericht($"PDF scroll sneller: {pdfAutoScrollIntervalMs} ms", 2)
+            e.Handled = True
+        ElseIf e.Control AndAlso (e.KeyCode = Keys.OemMinus OrElse e.KeyCode = Keys.Subtract) Then
+            pdfAutoScrollIntervalMs = Math.Min(20000, pdfAutoScrollIntervalMs + 250)
+            pdfAutoScrollTimer.Interval = pdfAutoScrollIntervalMs
+            ToonFlashBericht($"PDF scroll langzamer: {pdfAutoScrollIntervalMs} ms", 2)
+            e.Handled = True
+        ElseIf e.Control AndAlso e.KeyCode = Keys.L Then
+            LinkSelectedRowToCurrentPage()
+            e.Handled = True
+        ElseIf e.Control AndAlso e.KeyCode = Keys.G Then
+            NavigateToSelectedRowPage()
+            e.Handled = True
+        End If
+    End Sub
+
+    ' Koppel events bij initialisatie van WebView2 in ShowPdfInPanel2:
+    ' (binnen If pdfView Is Nothing Then ... na EnsureCoreWebView2Async)
+    AddHandler() pdfView.CoreWebView2.SourceChanged, AddressOf OnPdfSourceChanged
+
+' En roep UpdateCurrentPdfPageFromWebView aan wanneer je navigeert:
+UpdateCurrentPdfPageFromWebView()
+
+' Optioneel: bij elke auto-scroll tick ook de pagina bijwerken:
+Private Sub OnPdfAutoScrollTick(sender As Object, e As EventArgs)
+        If pdfView Is Nothing Then Return
+        pdfView.Focus()
+        SendKeys.SendWait("{PGDN}")
+        ' Na scroll kort pagina proberen te updaten
+        UpdateCurrentPdfPageFromWebView()
+    End Sub
+
+End Module

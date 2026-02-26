@@ -12,6 +12,7 @@ import {
     Zap,
     Check,
     Plus,
+    PlusSquare,
     Loader2,
     AlertCircle,
     ChevronDown,
@@ -32,8 +33,9 @@ import {
     MousePointer2,
     SkipForward
 } from 'lucide-react'
-import { useShowStore, type Device } from '../store/useShowStore'
-import type { ShowEvent, ClipboardItem } from '../services/xml-service'
+import { useSequencerStore } from '../store/useSequencerStore'
+import type { Device } from '../types/devices'
+import type { ShowEvent, ClipboardItem } from '../types/show'
 import { cn } from '../lib/utils'
 
 interface RenamableInputProps {
@@ -200,7 +202,7 @@ const LightConfigurator: React.FC<{
         }
     }
 
-    const appSettings = useShowStore(s => s.appSettings)
+    const appSettings = useSequencerStore(s => s.appSettings)
     const serverIp = appSettings.serverIp || window.location.hostname;
     const FILE_PORT = (appSettings.serverPort || 3001) + 1;
 
@@ -349,7 +351,7 @@ const LightConfigurator: React.FC<{
                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/prev-eff:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                                         <Info className="w-3 h-3 text-white" />
                                     </div>
-                                    <div className="fixed hidden group-hover/prev-eff:block z-[250] pointer-events-none p-1 bg-[#111] border border-white/20 rounded shadow-2xl animate-in fade-in zoom-in-95 duration-200" style={{ transform: 'translate(40px, -60px)' }}>
+                                    <div className="fixed hidden group-hover/prev-eff:block z-[250] pointer-events-none p-1 bg-[#111] border border-white/20 rounded shadow-2xl animate-in fade-in zoom-in-95 duration-200 effect-preview-box">
                                         <img
                                             src={getEffectPreviewUrl((event as any).effectId)!}
                                             alt="Preview"
@@ -388,7 +390,7 @@ const LightConfigurator: React.FC<{
                                         className="w-full h-full object-cover"
                                         onError={(e) => (e.target as HTMLImageElement).src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}
                                     />
-                                    <div className="fixed hidden group-hover/prev-pal:block z-[250] pointer-events-none p-1 bg-[#111] border border-white/20 rounded shadow-2xl animate-in fade-in zoom-in-95 duration-200" style={{ transform: 'translate(40px, -60px)' }}>
+                                    <div className="fixed hidden group-hover/prev-pal:block z-[250] pointer-events-none p-1 bg-[#111] border border-white/20 rounded shadow-2xl animate-in fade-in zoom-in-95 duration-200 palette-preview-box">
                                         <img
                                             src={getPalettePreviewUrl((event as any).paletteId)!}
                                             alt="Preview"
@@ -438,11 +440,16 @@ const VideoWallPreviewOverlay: React.FC<{ layout: string, bezelSize?: number }> 
     }, [layout]);
 
     return (
-        <div className="absolute inset-0 grid pointer-events-none p-0.5" style={{
-            gridTemplateColumns: `repeat(${cols}, 1fr)`,
-            gridTemplateRows: `repeat(${rows}, 1fr)`,
-            gap: `${bezelSize / 2}px` // Scale down slightly for the small preview box
-        }}>
+        <div
+            className="absolute inset-0 pointer-events-none p-0.5 videowall-preview-overlay"
+            ref={el => {
+                if (el) {
+                    el.style.setProperty('--cols', cols.toString());
+                    el.style.setProperty('--rows', rows.toString());
+                    el.style.setProperty('--gap', `${bezelSize / 2}px`);
+                }
+            }}
+        >
             {Array.from({ length: cols * rows }).map((_, i) => (
                 <div key={i} className="border border-white/40 ring-1 ring-black/50" />
             ))}
@@ -454,6 +461,8 @@ const VideoWallPreviewOverlay: React.FC<{ layout: string, bezelSize?: number }> 
 const RowItem: React.FC<{
     event: ShowEvent
     originalIndex: number
+    id: number | string
+    isShadow?: boolean
     isActiveGroup?: boolean
     isNextGroup?: boolean
     handleRowClick: (index: number) => void
@@ -470,47 +479,48 @@ const RowItem: React.FC<{
     selectedEvent: ShowEvent | null
     ongoingEffects?: { type: 'media' | 'light', id: string }[]
 }> = ({
-    event, originalIndex, isActiveGroup, isNextGroup, handleRowClick, handleRowDoubleClick,
+    event, originalIndex, id, isShadow, isActiveGroup, isNextGroup, handleRowClick, handleRowDoubleClick,
     editingIndex, setEditingIndex, menuOpenIndex, setMenuOpenIndex, isLocked,
     activeEventIndex, eventStatuses, selectedEventIndex, selectedEvent, ongoingEffects
 }) => {
         const [currentTime, setCurrentTime] = useState(new Date())
+        const menuButtonRef = useRef<HTMLButtonElement>(null)
 
         useEffect(() => {
             const t = setInterval(() => setCurrentTime(new Date()), 1000)
             return () => clearInterval(t)
         }, [])
 
-        const isTimeTracking = useShowStore(s => s.isTimeTracking)
-        const lastTransitionTime = useShowStore(s => s.lastTransitionTime)
-        const events = useShowStore(s => s.events)
+        const isTimeTracking = useSequencerStore(s => s.isTimeTracking)
+        const lastTransitionTime = useSequencerStore(s => s.lastTransitionTime)
+        const events = useSequencerStore(s => s.events)
 
         // Actions
-        const updateEvent = useShowStore(s => s.updateEvent)
-        const deleteGroup = useShowStore(s => s.deleteGroup)
-        const deleteEvent = useShowStore(s => s.deleteEvent)
-        const resendEvent = useShowStore(s => s.resendEvent)
-        const renameAct = useShowStore(s => s.renameAct)
-        const renameScene = useShowStore(s => s.renameScene)
-        const moveAct = useShowStore(s => s.moveAct)
-        const moveScene = useShowStore(s => s.moveScene)
-        const moveEvent = useShowStore(s => s.moveEvent)
-        const insertAct = useShowStore(s => s.insertAct)
-        const insertScene = useShowStore(s => s.insertScene)
-        const insertEvent = useShowStore(s => s.insertEvent)
-        const addEventAbove = useShowStore(s => s.addEventAbove)
-        const addEventBelow = useShowStore(s => s.addEventBelow)
-        const restartMedia = useShowStore(s => s.restartMedia)
-        const stopMedia = useShowStore(s => s.stopMedia)
-        const toggleAudio = useShowStore(s => s.toggleAudio)
-        const toggleRepeat = useShowStore(s => s.toggleRepeat)
-        const setMediaVolume = useShowStore(s => s.setMediaVolume)
-        const copyToClipboard = useShowStore(s => s.copyToClipboard)
-        const loadClipboard = useShowStore(s => s.loadClipboard)
-        const clipboard = useShowStore(s => s.clipboard)
-        const openModal = useShowStore(s => s.openModal)
-        const pasteEvent = useShowStore(s => s.pasteEvent)
-        const addCommentToEvent = useShowStore(s => s.addCommentToEvent)
+        const updateEvent = useSequencerStore(s => s.updateEvent)
+        const deleteEvent = useSequencerStore(s => s.deleteEvent)
+        const addToast = useSequencerStore(s => s.addToast)
+        const resendEvent = useSequencerStore(s => s.resendEvent)
+        const renameAct = useSequencerStore(s => s.renameAct)
+        const renameScene = useSequencerStore(s => s.renameScene)
+        const moveAct = useSequencerStore(s => s.moveAct)
+        const moveScene = useSequencerStore(s => s.moveScene)
+        const moveEvent = useSequencerStore(s => s.moveEvent)
+        const insertAct = useSequencerStore(s => s.insertAct)
+        const insertScene = useSequencerStore(s => s.insertScene)
+        const insertEvent = useSequencerStore(s => s.insertEvent)
+        const addEventAbove = useSequencerStore(s => s.addEventAbove)
+        const addEventBelow = useSequencerStore(s => s.addEventBelow)
+        const restartMedia = useSequencerStore(s => s.restartMedia)
+        const stopMedia = useSequencerStore(s => s.stopMedia)
+        const toggleAudio = useSequencerStore(s => s.toggleAudio)
+        const toggleRepeat = useSequencerStore(s => s.toggleRepeat)
+        const setMediaVolume = useSequencerStore(s => s.setMediaVolume)
+        const copyToClipboard = useSequencerStore(s => s.copyToClipboard)
+        const loadClipboard = useSequencerStore(s => s.loadClipboard)
+        const clipboard = useSequencerStore(s => s.clipboard)
+        const openModal = useSequencerStore(s => s.openModal)
+        const pasteEvent = useSequencerStore(s => s.pasteEvent)
+        const addCommentToEvent = useSequencerStore(s => s.addCommentToEvent)
 
         const pasteFromClipboard = (item: ClipboardItem, target: ShowEvent) => {
             if (isLocked) return
@@ -518,7 +528,7 @@ const RowItem: React.FC<{
             const copiedEvent = { ...item.data }
 
             // Find group events to check for fixture conflict
-            const events = useShowStore.getState().events
+            const events = useSequencerStore.getState().events
             const groupEvents = events.filter(e =>
                 e.act === target.act &&
                 e.sceneId === target.sceneId &&
@@ -556,15 +566,9 @@ const RowItem: React.FC<{
             const type = event.type?.toLowerCase()
 
             if (type === 'title') {
-                openModal({
-                    title: 'Groep Verwijderen',
-                    message: `Weet je zeker dat je de gehele groep (${event.act} - ${event.sceneId}.${event.eventId}) wilt verwijderen?`,
-                    type: 'confirm',
-                    onConfirm: () => {
-                        deleteGroup(event.act, event.sceneId, event.eventId);
-                        setMenuOpenIndex(null);
-                    }
-                });
+                addToast('De header (Title) van een event kan niet worden verwijderd.', 'warning');
+                setMenuOpenIndex(null);
+                return;
             } else if (type === 'comment') {
                 deleteEvent(originalIndex);
                 setMenuOpenIndex(null);
@@ -592,7 +596,7 @@ const RowItem: React.FC<{
         const status = eventStatuses[originalIndex]
         const videoRef = useRef<HTMLVideoElement>(null)
 
-        const appSettings = useShowStore(s => s.appSettings)
+        const appSettings = useSequencerStore(s => s.appSettings)
         const serverIp = appSettings.serverIp || window.location.hostname;
         const SOCKET_PORT = appSettings.serverPort || 3001;
         const FILE_PORT = SOCKET_PORT + 1;
@@ -605,7 +609,16 @@ const RowItem: React.FC<{
 
         const getDevices = useCallback(() => appSettings.devices || [], [appSettings.devices])
 
-        const playingMedia = useShowStore(s => s.playingMedia)
+        const siblingMedia = useMemo(() => {
+            return events.filter(e =>
+                e.act === event.act &&
+                e.sceneId === event.sceneId &&
+                e.eventId === event.eventId &&
+                e.type?.toLowerCase() === 'media'
+            );
+        }, [events, event.act, event.sceneId, event.eventId]);
+
+        const playingMedia = useSequencerStore(s => s.playingMedia)
         const isActuallyPlaying = useMemo(() => {
             if (type !== 'media' || !event.filename) return false;
             if (isRowActive) return true; // Sequence active is always "live"
@@ -649,11 +662,12 @@ const RowItem: React.FC<{
 
         return (
             <div
-                onClick={() => handleRowClick(originalIndex)}
-                onDoubleClick={() => handleRowDoubleClick(originalIndex)}
+                data-row-id={id}
+                onClick={() => !isShadow && handleRowClick(originalIndex)}
+                onDoubleClick={() => !isShadow && handleRowDoubleClick(originalIndex)}
                 className={cn(
-                    "group/row relative flex items-center px-4 py-2 transition-all cursor-pointer border-l-2",
-                    "border-l-2",
+                    "group/row relative flex items-center px-4 py-2 transition-all border-l-2",
+                    isShadow ? "cursor-default opacity-50 grayscale bg-white/5 border-l-dashed border-l-primary/30" : "cursor-pointer",
                     isRowActive ? "bg-green-500/20 border-green-500 shadow-[inset_0_0_10px_rgba(34,197,94,0.1)]" : "border-transparent hover:bg-white/5",
                     isRowSelected && !isRowActive && "bg-blue-500/10 border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.15)] z-10",
                     isExactSelection && !isRowActive && "bg-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.5)] border-white/60 ring-1 ring-blue-400/50 scale-[1.01] z-20",
@@ -666,7 +680,8 @@ const RowItem: React.FC<{
                     ),
                     type === 'comment' && "opacity-60 italic text-[11px]",
                     type === 'action' && "bg-yellow-500/10 border-l-yellow-500 text-yellow-200",
-                    type === 'trigger' && "bg-primary/10 border-l-primary text-primary-foreground font-bold"
+                    type === 'trigger' && "bg-primary/10 border-l-primary text-primary-foreground font-bold",
+                    isShadow && "shadow-none hover:bg-white/5" // Keep hover subtle for shadow
                 )}
             >
                 {/* Visual Indicators for Ongoing Effects (Persistence lines) */}
@@ -727,8 +742,30 @@ const RowItem: React.FC<{
                                             </div>
                                         )}
                                         {event.effect?.toLowerCase() === 'media' && (
-                                            <div className="flex-1 text-[10px] text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded px-2 py-1 flex items-center gap-2">
-                                                <SkipForward className="w-3 h-3" /> Wacht op media in dit event...
+                                            <div className="flex-1 flex gap-2">
+                                                {siblingMedia.length > 0 ? (
+                                                    <select
+                                                        title="Selecteer Media Trigger"
+                                                        className="flex-1 bg-zinc-900 border border-white/10 rounded px-2 py-1 text-[10px] text-blue-400 outline-none"
+                                                        value={event.mediaTriggerId || ''}
+                                                        onChange={(e) => updateEvent(originalIndex, { mediaTriggerId: e.target.value })}
+                                                    >
+                                                        <option value="">Wacht op een media in dit event...</option>
+                                                        {siblingMedia.map((m, idx) => {
+                                                            const mediaId = `${m.filename}|${m.fixture}`;
+                                                            const name = m.filename?.split(/[\\/]/).pop() || 'Onbekende media';
+                                                            return (
+                                                                <option key={idx} value={mediaId}>
+                                                                    {name} {m.fixture ? `(${m.fixture})` : ''}
+                                                                </option>
+                                                            );
+                                                        })}
+                                                    </select>
+                                                ) : (
+                                                    <div className="flex-1 text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-1 flex items-center gap-2">
+                                                        <AlertCircle className="w-3 h-3" /> Geen media gevonden in dit event
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -761,7 +798,7 @@ const RowItem: React.FC<{
                                             {(() => {
                                                 const usedFixtures = (event as any).usedFixtures || []
                                                 const filteredScreens = getDevices().filter((d: any) =>
-                                                    (d.type === 'local_monitor' || d.type === 'remote_ledwall' || d.type === 'videowall_agent') &&
+                                                    (d.type === 'local_monitor' || d.type === 'remote_VideoWall' || d.type === 'videowall_agent') &&
                                                     (!usedFixtures.includes(d.name) || d.name === event.fixture)
                                                 )
 
@@ -801,7 +838,7 @@ const RowItem: React.FC<{
                                                     <select
                                                         title="Selecteer Stop Event"
                                                         className="flex-1 bg-zinc-900 border border-white/10 rounded px-2 py-0.5 text-[10px] text-primary outline-none font-bold"
-                                                        value={event.stopAct ? `${event.stopAct}-${event.stopSceneId}-${event.stopEventId}` : ''}
+                                                        value={event.stopAct ? `${event.stopAct}|${event.stopSceneId}|${event.stopEventId}` : ''}
                                                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                             const val = e.target.value
                                                             if (!val) {
@@ -811,7 +848,7 @@ const RowItem: React.FC<{
                                                                     stopEventId: undefined
                                                                 } as any)
                                                             } else {
-                                                                const [act, sId, eId] = val.split('-')
+                                                                const [act, sId, eId] = val.split('|')
                                                                 updateEvent(originalIndex, {
                                                                     stopAct: act,
                                                                     stopSceneId: parseInt(sId),
@@ -823,7 +860,7 @@ const RowItem: React.FC<{
                                                         {events
                                                             .filter((e: ShowEvent, idx: number) => e.type?.toLowerCase() === 'title' && idx > originalIndex)
                                                             .map((titleEvt: ShowEvent, idx: number) => (
-                                                                <option key={idx} value={`${titleEvt.act}-${titleEvt.sceneId}-${titleEvt.eventId}`}>
+                                                                <option key={idx} value={`${titleEvt.act}|${titleEvt.sceneId}|${titleEvt.eventId}`}>
                                                                     {titleEvt.act}.{titleEvt.sceneId}.{titleEvt.eventId} {titleEvt.cue ? `(${titleEvt.cue})` : ''}
                                                                 </option>
                                                             ))
@@ -871,11 +908,17 @@ const RowItem: React.FC<{
                                             ) : event.effect?.toLowerCase() === 'media' ? (
                                                 <div className="flex items-center gap-1.5 text-blue-400">
                                                     <SkipForward className="w-3.5 h-3.5" />
-                                                    <span>Overgang als media is afgerond</span>
+                                                    {(() => {
+                                                        if (!event.mediaTriggerId) return <span>Overgang als een media is afgerond</span>;
+                                                        const [filename] = event.mediaTriggerId.split('|');
+                                                        const name = filename?.split(/[\\/]/).pop() || 'Onbekende media';
+                                                        return <span>Overgang als "{name}" is afgerond</span>;
+                                                    })()}
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-1.5 text-primary">
-                                                    <span>{event.cue || 'Handmatige overgang'}</span>
+                                                    <Zap className="w-3.5 h-3.5" />
+                                                    <span>Handmatige overgang ({event.cue || 'Geen cue'})</span>
                                                 </div>
                                             )}
                                         </div>
@@ -895,7 +938,7 @@ const RowItem: React.FC<{
                                             )}
                                             {event.fixture && getDevices().find(d => d.name === event.fixture)?.type === 'wiz' && (
                                                 <span className="text-[8px] bg-blue-500/20 text-blue-200 px-1 rounded flex gap-1 items-center">
-                                                    WIZ <span className="opacity-50">|</span> <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: event.color1 }}></span> <span className="opacity-50">|</span> Bri: {event.brightness}
+                                                    WIZ <span className="opacity-50">|</span> <span className="w-2 h-2 rounded-full inline-block color-indicator" ref={el => el?.style.setProperty('--bg-color', event.color1 || '#ffffff')}></span> <span className="opacity-50">|</span> Bri: {event.brightness}
                                                 </span>
                                             )}
                                         </div>
@@ -932,9 +975,28 @@ const RowItem: React.FC<{
                                 </div>
                                 <div className="w-px h-6 bg-white/10 mx-2" />
                                 <button onClick={(e) => { e.stopPropagation(); toggleRepeat(originalIndex) }} className={cn("p-1.5 rounded transition-colors", event.effect === 'repeat' ? "bg-green-500/20 text-green-500" : "bg-white/10 text-white/40")} title="Repeat"><Repeat className="w-3.5 h-3.5" /></button>
+                                {/* Transfer Progress (Sync) */}
+                                {(() => {
+                                    const activeTransfers = useSequencerStore.getState().activeTransfers;
+                                    const targetDev = event.fixture ? getDevices().find(d => d.name === event.fixture) : null;
+                                    if (!targetDev) return null;
+                                    const transfer = Object.values(activeTransfers).find(t => t.deviceId === targetDev.id);
+                                    if (!transfer) return null;
+                                    const statusLabel = transfer.status === 'checking' ? '⏳' : transfer.status === 'uploading' ? `⬆ ${transfer.percent}%` : transfer.status === 'complete' ? '✅' : transfer.status === 'skipped' ? '✓' : '❌';
+                                    return (
+                                        <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded text-[9px] font-bold text-amber-300">
+                                            {statusLabel}
+                                        </div>
+                                    );
+                                })()}
                             </div>
                             {event.filename && (
-                                <div className="w-32 aspect-video bg-black rounded border border-white/10 overflow-hidden relative group/preview">
+                                <div className={cn(
+                                    "w-32 bg-black rounded border border-white/10 overflow-hidden relative group/preview",
+                                    (event.fixture && getDevices().find(d => d.name === event.fixture)?.type === 'videowall_agent' && (getDevices().find(d => d.name === event.fixture) as any)?.orientation === 'portrait')
+                                        ? "aspect-[9/16]"
+                                        : "aspect-video"
+                                )}>
                                     <video
                                         ref={videoRef}
                                         src={getMediaUrlWithContext(event.filename)}
@@ -974,7 +1036,10 @@ const RowItem: React.FC<{
 
                                     {/* Progress Bar */}
                                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
-                                        <div className="video-progress-bar h-full bg-primary transition-[width] duration-300 ease-linear" style={{ width: '0%' }} />
+                                        <div
+                                            className="video-progress-bar h-full bg-primary transition-[width] duration-300 ease-linear progress-bar-fill"
+                                            ref={el => el?.style.setProperty('--percent', '0%')}
+                                        />
                                     </div>
                                 </div>
                             )}
@@ -991,10 +1056,17 @@ const RowItem: React.FC<{
                 )}
 
                 <div className="flex-shrink-0 flex items-center gap-2 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                    {editingIndex === originalIndex ? null : (
+                    {editingIndex === originalIndex || isShadow ? null : (
                         <div className="relative">
                             {!isLocked || (type === 'light' || type === 'media') ? (
-                                <button id={`row-menu-${originalIndex}`} onClick={(e) => { e.stopPropagation(); setMenuOpenIndex(menuOpenIndex === originalIndex ? null : originalIndex) }} title="Context Menu" className="p-1 hover:bg-white/10 rounded"><MoreVertical className="w-3.5 h-3.5" /></button>
+                                <button
+                                    ref={menuButtonRef}
+                                    onClick={(e) => { e.stopPropagation(); setMenuOpenIndex(menuOpenIndex === originalIndex ? null : originalIndex) }}
+                                    title="Context Menu"
+                                    className="p-1 hover:bg-white/10 rounded"
+                                >
+                                    <MoreVertical className="w-3.5 h-3.5" />
+                                </button>
                             ) : null}
                             {menuOpenIndex === originalIndex && (
                                 <ContextMenu
@@ -1003,7 +1075,7 @@ const RowItem: React.FC<{
                                     type={type}
                                     isLocked={isLocked}
                                     onClose={() => setMenuOpenIndex(null)}
-                                    anchorRect={document.getElementById(`row-menu-${originalIndex}`)?.getBoundingClientRect() || undefined}
+                                    anchorRect={menuButtonRef.current?.getBoundingClientRect() || undefined}
                                     handlers={{
                                         setEditingIndex, resendEvent, renameAct, renameScene, moveAct, moveScene, moveEvent,
                                         insertAct, insertScene, insertEvent, addEventAbove, addEventBelow, addCommentToEvent, handleDelete,
@@ -1035,18 +1107,20 @@ const HeaderContextMenu: React.FC<{
     sceneId?: number
 }> = ({ type, onClose, anchorRect, handlers, act, scene, actId, sceneId }) => {
     const menuRef = useRef<HTMLDivElement>(null)
-    const openModal = useShowStore(s => s.openModal)
+    const openModal = useSequencerStore(s => s.openModal)
 
     if (!anchorRect) return null
 
     const menuContent = (
         <div
-            ref={menuRef}
-            className="fixed w-52 glass border border-white/10 rounded-lg shadow-2xl py-1 z-[9999]"
-            style={{
-                top: `${anchorRect.bottom + 4}px`,
-                left: `${anchorRect.right - 208}px`
+            ref={el => {
+                if (el && anchorRect) {
+                    el.style.setProperty('--menu-top', `${anchorRect.bottom + 4}px`);
+                    el.style.setProperty('--menu-left', `${anchorRect.right - 208}px`);
+                }
+                if (menuRef) (menuRef as any).current = el;
             }}
+            className="fixed w-52 glass border border-white/10 rounded-lg shadow-2xl py-1 z-[9999] context-menu-container"
         >
             {type === 'act' && (
                 <>
@@ -1095,6 +1169,15 @@ const HeaderContextMenu: React.FC<{
                         onClose();
                     }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2">
                         <Plus className="w-3 h-3 text-green-400" /> Scene invoegen na
+                    </button>
+                    <div className="h-px bg-white/5 my-1" />
+                    <button onClick={() => {
+                        const lastEventNode = scene.events[scene.events.length - 1]
+                        const lastRow = lastEventNode?.rows[lastEventNode.rows.length - 1]
+                        if (lastRow) handlers.insertEvent(lastRow.originalIndex, 'after');
+                        onClose();
+                    }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2">
+                        <PlusSquare className="w-3 h-3 text-blue-400" /> Event toevoegen
                     </button>
                     <div className="h-px bg-white/5 my-1" />
                     <button onClick={() => {
@@ -1185,18 +1268,16 @@ const ContextMenu: React.FC<{
 
     const menuContent = (
         <div
-            ref={menuRef}
+            ref={el => {
+                if (el && anchorRect) {
+                    el.style.setProperty('--menu-top', `${isFlipped ? (anchorRect.top - Math.round(el.offsetHeight) - 4) : (anchorRect.bottom + 4)}px`);
+                    el.style.setProperty('--menu-left', `${anchorRect.right - 208}px`);
+                }
+                if (menuRef) (menuRef as any).current = el;
+            }}
             className={cn(
-                "fixed w-52 glass border border-white/10 rounded-lg shadow-2xl py-1 z-[9999] overflow-visible",
+                "fixed w-52 glass border border-white/10 rounded-lg shadow-2xl py-1 z-[9999] overflow-visible context-menu-container",
             )}
-            style={{
-                // eslint-disable-next-line react/no-unknown-property
-                '--menu-top': `${isFlipped ? (anchorRect.top - (menuRef.current?.offsetHeight || 0) - 4) : (anchorRect.bottom + 4)}px`,
-                // eslint-disable-next-line react/no-unknown-property
-                '--menu-left': `${anchorRect.right - 208}px`,
-                top: 'var(--menu-top)',
-                left: 'var(--menu-left)'
-            } as React.CSSProperties}
         >
             {!isLocked && (
                 <button onClick={() => { handlers.setEditingIndex(index); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2">
@@ -1269,12 +1350,6 @@ const ContextMenu: React.FC<{
                     {/* Event Level Actions */}
                     {type === 'title' && (
                         <>
-                            <button onClick={() => { handlers.insertEvent(index, 'before'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2">
-                                <Plus className="w-3 h-3 text-green-400" /> Event invoegen voor
-                            </button>
-                            <button onClick={() => { handlers.insertEvent(index, 'after'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2">
-                                <Plus className="w-3 h-3 text-green-400" /> Event invoegen na
-                            </button>
                             <button onClick={() => { handlers.addCommentToEvent(index); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2">
                                 <Info className="w-3 h-3 text-blue-400" /> Commentaarregel toevoegen
                             </button>
@@ -1300,7 +1375,9 @@ const ContextMenu: React.FC<{
                                 <button onClick={() => { handlers.addEventBelow(index, 'Action', 'Aktie'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><User className="w-3 h-3 text-blue-400" /> Aktie </button>
                                 <button onClick={() => { handlers.addEventBelow(index, 'Light', 'Licht'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><Lightbulb className="w-3 h-3 text-yellow-400" /> Licht </button>
                                 <button onClick={() => { handlers.addEventBelow(index, 'Media', 'Media'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><Layers className="w-3 h-3 text-purple-400" /> Media </button>
-                                <button onClick={() => { handlers.addEventBelow(index, 'Trigger', 'Handmatige overgang'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><MousePointer2 className="w-3 h-3 text-primary" /> Trigger </button>
+                                {!useSequencerStore.getState().events.some(e => e.act === event.act && e.sceneId === event.sceneId && e.eventId === event.eventId && e.type?.toLowerCase() === 'trigger') && (
+                                    <button onClick={() => { handlers.addEventBelow(index, 'Trigger', 'Handmatige overgang'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><MousePointer2 className="w-3 h-3 text-primary" /> Trigger </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -1337,29 +1414,30 @@ const SequenceGrid: React.FC = () => {
         toggleCollapse,
         runtimeCollapsedGroups,
         eventStatuses,
-    } = useShowStore() as any
+    } = useSequencerStore() as any
 
-    const selectedEventIndex = useShowStore(s => s.selectedEventIndex)
-    const setSelectedEvent = useShowStore(s => s.setSelectedEvent)
+    const selectedEventIndex = useSequencerStore(s => s.selectedEventIndex)
+    const setSelectedEvent = useSequencerStore(s => s.setSelectedEvent)
     const selectedEvent = events[selectedEventIndex] || null;
 
-    const lastTransitionTime = useShowStore(s => s.lastTransitionTime)
+    const lastTransitionTime = useSequencerStore(s => s.lastTransitionTime)
 
     // Actions
-    const deleteGroup = useShowStore(s => s.deleteGroup)
-    const renameAct = useShowStore(s => s.renameAct)
-    const renameScene = useShowStore(s => s.renameScene)
-    const moveAct = useShowStore(s => s.moveAct)
-    const moveScene = useShowStore(s => s.moveScene)
-    const moveEvent = useShowStore(s => s.moveEvent)
-    const insertAct = useShowStore(s => s.insertAct)
-    const insertScene = useShowStore(s => s.insertScene)
-    const insertEvent = useShowStore(s => s.insertEvent)
-    const addToast = useShowStore(s => s.addToast)
+    const deleteGroup = useSequencerStore(s => s.deleteGroup)
+    const renameAct = useSequencerStore(s => s.renameAct)
+    const renameScene = useSequencerStore(s => s.renameScene)
+    const moveAct = useSequencerStore(s => s.moveAct)
+    const moveScene = useSequencerStore(s => s.moveScene)
+    const moveEvent = useSequencerStore(s => s.moveEvent)
+    const insertAct = useSequencerStore(s => s.insertAct)
+    const insertScene = useSequencerStore(s => s.insertScene)
+    const insertEvent = useSequencerStore(s => s.insertEvent)
+    const addToast = useSequencerStore(s => s.addToast)
 
 
     const [editingIndex, setEditingIndex] = useState<number | null>(null)
     const [menuOpenIndex, setMenuOpenIndex] = useState<number | string | null>(null)
+    const [headerMenuAnchor, setHeaderMenuAnchor] = useState<DOMRect | undefined>(undefined)
 
     // Clear editing/menu when locked (Show Mode)
     useEffect(() => {
@@ -1375,10 +1453,10 @@ const SequenceGrid: React.FC = () => {
         : (activeShow?.viewState?.collapsedGroups || {})
 
     // Ensure currentTime is available or use new Date if store doesn't provide it live (it does usually if subbed)
-    // Actually useShowStore has `currentTime`? NO. App.tsx has `currentTime`.
+    // Actually useSequencerStore has `currentTime`? NO. App.tsx has `currentTime`.
     // SequenceGrid needs `currentTime`.
-    // I should add `currentTime` to `useShowStore` or pass it?
-    // `useShowStore` doesn't have `currentTime`.
+    // I should add `currentTime` to `useSequencerStore` or pass it?
+    // `useSequencerStore` doesn't have `currentTime`.
     // But `SequenceGrid` uses `currentTime`. Where did it come from? 
     // In previous view_file, line 100+...
     // Let's check where `currentTime` came from in `SequenceGrid`.
@@ -1423,7 +1501,8 @@ const SequenceGrid: React.FC = () => {
     interface EventRow {
         event: ShowEvent
         originalIndex: number
-        id: number
+        id: number | string
+        isShadow?: boolean
     }
 
     interface EventNode {
@@ -1564,10 +1643,21 @@ const SequenceGrid: React.FC = () => {
                         for (let i = nodeIdx; i < endNodeIdx; i++) {
                             const n = allEventNodes[i].eventNode
                             if (!n.ongoingEffects) n.ongoingEffects = []
+                            const effId = `${evt.act}-${evt.sceneId}-${evt.eventId}-${row.id}`
                             n.ongoingEffects.push({
                                 type: evt.type?.toLowerCase() as 'media' | 'light',
-                                id: `${evt.act}-${evt.sceneId}-${evt.eventId}-${row.id}`
+                                id: effId
                             })
+
+                            // Add shadow row if not the source node
+                            if (i > nodeIdx && !n.rows.some(r => r.originalIndex === row.originalIndex)) {
+                                n.rows.push({
+                                    event: evt,
+                                    originalIndex: row.originalIndex,
+                                    id: `shadow-${row.id}-${i}`,
+                                    isShadow: true
+                                })
+                            }
                         }
                     }
                 }
@@ -1583,16 +1673,14 @@ const SequenceGrid: React.FC = () => {
                             const t = (type || '').toLowerCase()
                             if (t === 'title') return 1
                             if (t === 'comment') return 2
-                            if (t === 'action') return 3
-                            if (t === 'media') return 4
-                            if (t === 'light') return 5
+                            if (t === 'action' || t === 'media' || t === 'light') return 3
                             if (t === 'trigger') return 6
                             return 99
                         }
                         const priorityA = getPriority(a.event.type)
                         const priorityB = getPriority(b.event.type)
                         if (priorityA !== priorityB) return priorityA - priorityB
-                        return (a.event.fixture || '').localeCompare(b.event.fixture || '')
+                        return a.originalIndex - b.originalIndex
                     })
                 })
             })
@@ -1678,8 +1766,11 @@ const SequenceGrid: React.FC = () => {
                                     </div>
                                     <div className="w-px h-6 bg-white/10" />
                                     <button
-                                        id={`act-menu-${act.id}`}
-                                        onClick={(e) => { e.stopPropagation(); setMenuOpenIndex(`act-${act.id}`) }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setHeaderMenuAnchor(e.currentTarget.getBoundingClientRect());
+                                            setMenuOpenIndex(`act-${act.id}`);
+                                        }}
                                         title="Act Menu"
                                         className="p-1 hover:bg-white/10 rounded"
                                     >
@@ -1691,7 +1782,7 @@ const SequenceGrid: React.FC = () => {
                                             type="act"
                                             id={act.id}
                                             onClose={() => setMenuOpenIndex(null)}
-                                            anchorRect={document.getElementById(`act-menu-${act.id}`)?.getBoundingClientRect() || undefined}
+                                            anchorRect={headerMenuAnchor}
                                             handlers={{ insertAct, deleteAct, moveAct, addToast }}
                                             act={act}
                                         />
@@ -1745,9 +1836,25 @@ const SequenceGrid: React.FC = () => {
                                                         </div>
                                                         <div className="w-px h-6 bg-white/10" />
 
+                                                        <div className="flex flex-col gap-px">
+                                                            <button onClick={() => {
+                                                                const firstEventIdx = scene.events[0]?.rows[0]?.originalIndex ?? 0
+                                                                insertScene(firstEventIdx, 'before')
+                                                            }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Voeg Scene In (Voor)"><Plus className="w-2.5 h-2.5" /></button>
+                                                            <button onClick={() => {
+                                                                const lastEventNode = scene.events[scene.events.length - 1]
+                                                                const lastRow = lastEventNode?.rows[lastEventNode.rows.length - 1]
+                                                                if (lastRow) insertScene(lastRow.originalIndex, 'after')
+                                                            }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Voeg Scene In (Na)"><Plus className="w-2.5 h-2.5" /></button>
+                                                        </div>
+                                                        <div className="w-px h-6 bg-white/10" />
+
                                                         <button
-                                                            id={`scene-menu-${act.id}-${scene.id}`}
-                                                            onClick={(e) => { e.stopPropagation(); setMenuOpenIndex(`scene-${act.id}-${scene.id}`) }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setHeaderMenuAnchor(e.currentTarget.getBoundingClientRect());
+                                                                setMenuOpenIndex(`scene-${act.id}-${scene.id}`);
+                                                            }}
                                                             title="Scene Menu"
                                                             className="p-1 hover:bg-white/10 rounded"
                                                         >
@@ -1759,8 +1866,8 @@ const SequenceGrid: React.FC = () => {
                                                                 type="scene"
                                                                 id={`${act.id}-${scene.id}`}
                                                                 onClose={() => setMenuOpenIndex(null)}
-                                                                anchorRect={document.getElementById(`scene-menu-${act.id}-${scene.id}`)?.getBoundingClientRect() || undefined}
-                                                                handlers={{ insertScene, deleteScene, moveScene, addToast }}
+                                                                anchorRect={headerMenuAnchor}
+                                                                handlers={{ insertScene, deleteScene, moveScene, insertEvent, addToast }}
                                                                 actId={act.id}
                                                                 sceneId={scene.id}
                                                                 scene={scene}
@@ -1778,7 +1885,10 @@ const SequenceGrid: React.FC = () => {
                                                         const eventCollapsed = collapsedGroups[eventNode.uniqueId] ?? (isLocked && eventNode.isMinimal)
 
                                                         const titleRow = eventNode.rows.find(r => r.event.type?.toLowerCase() === 'title')
-                                                        const otherRows = eventNode.rows.filter(r => r.event.type?.toLowerCase() !== 'title')
+                                                        const otherRows = eventNode.rows.filter(r => {
+                                                            const type = r.event.type?.toLowerCase()
+                                                            return type !== 'title' && type !== 'act' && type !== 'scene'
+                                                        })
 
                                                         // Calculate summary for header tags
                                                         const summaryCounts = otherRows.reduce((acc, r) => {
@@ -1937,6 +2047,8 @@ const SequenceGrid: React.FC = () => {
                                                                         key={`row-title-${titleRow.originalIndex}`}
                                                                         event={titleRow.event}
                                                                         originalIndex={titleRow.originalIndex}
+                                                                        id={titleRow.id}
+                                                                        isShadow={titleRow.isShadow}
                                                                         isNextGroup={eventNode.isNext}
                                                                         isActiveGroup={eventNode.isActive}
                                                                         handleRowClick={handleRowClick}
@@ -1973,9 +2085,11 @@ const SequenceGrid: React.FC = () => {
 
                                                                             return (
                                                                                 <RowItem
-                                                                                    key={`row-${item.originalIndex}`}
+                                                                                    key={`row-${item.id}`}
                                                                                     event={{ ...item.event, usedFixtures } as any}
                                                                                     originalIndex={item.originalIndex}
+                                                                                    id={item.id}
+                                                                                    isShadow={item.isShadow}
                                                                                     isNextGroup={eventNode.isNext}
                                                                                     isActiveGroup={eventNode.isActive}
                                                                                     handleRowClick={handleRowClick}

@@ -291,6 +291,15 @@ const ProjectionWindow: React.FC = () => {
                         ipcRenderer.send('projection-error', errMsg);
                     }
                 }}
+                onEnded={() => {
+                    if ((window as any).require) {
+                        const { ipcRenderer } = (window as any).require('electron');
+                        ipcRenderer.send('media-ended', {
+                            deviceId: (window as any).projectionDeviceId,
+                            src: state.src
+                        });
+                    }
+                }}
             />
         );
     }

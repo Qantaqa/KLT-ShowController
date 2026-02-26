@@ -1,21 +1,50 @@
-import type { Device, LocalMonitorDevice, VideoWallAgentDevice } from '../store/useShowStore';
+import type { Device, LocalMonitorDevice, VideoWallAgentDevice } from '../types/devices';
 import { networkService } from './network-service';
 import { videoWallAgentService } from './videowall-agent-service';
 
 // Helper to get IPC
+/**
+ * Retrieves the Electron IPC renderer instance if running in a window context.
+ * Useful for communicating with the main process from the frontend.
+ * @returns The ipcRenderer instance or null if not available.
+ */
 const getIpc = () => {
+    // Test if the window object has a 'require' method (Electron-specific environment)
     if ((window as any).require) {
         return (window as any).require('electron').ipcRenderer;
     }
     return null;
 }
 
+/**
+ * Normalizes a file path into a URL suitable for media players.
+ * Handles local paths, ledshow-file protocols, and already formatted URLs.
+ * @param path The raw file path or URL.
+ * @returns A formatted URL string.
+ */
 export const getMediaUrl = (path: string) => {
+    // Test if the path is empty; if true, return an empty string
     if (!path) return ''
+    // Test if the path already starts with a recognized protocol (http, file, ledshow-file)
     if (path.startsWith('http') || path.startsWith('file') || path.startsWith('ledshow-file')) return path
+    // Fallback: convert local Windows/Unix path to a file:// URL and encode characters
     return `file:///${encodeURI(path.replace(/\\/g, '/'))}`
 }
 
+/**
+ * Initiates media playback on a target device.
+ * Supports local monitors (via Electron IPC), remote VideoWalls (via Socket.io), 
+ * and hardware agents (via specialized protocol).
+ * 
+ * @param target The device object identifying where to play the media.
+ * @param sourcefile The path or URL of the media file.
+ * @param repeat Whether the media should loop.
+ * @param volume The playback volume (0-100 or 0-255 depending on target).
+ * @param fadeouttime Standard fade-out transition length (default 0).
+ * @param previewplayer Optional HTMLVideoElement for local UI preview.
+ * @param transitiontime Crossfade or fade-in transition length.
+ * @param mute Whether to start playback with sound disabled.
+ */
 export const StartMediaPlayer = async (
     target: Device,
     sourcefile: string,
@@ -30,16 +59,19 @@ export const StartMediaPlayer = async (
     const ipc = getIpc();
     const mediaUrl = getMediaUrl(sourcefile);
 
+    // Test if the target is a locally attached monitor
     if (target.type === 'local_monitor') {
+        // Test if IPC is unavailable (running outside Electron shell); if true, exit early
         if (!ipc) return;
         const d = target as LocalMonitorDevice;
-        // Ensure window exists
+
+        // Ensure the projection window exists for this specific device/monitor
         await ipc.invoke('start-projection', {
             deviceId: target.id,
             monitorIndex: d.monitorId !== undefined ? d.monitorId : 1
         });
 
-        // Send play command
+        // Send the play command to the projection window
         ipc.send('media-command', {
             deviceId: target.id,
             command: 'play',
@@ -51,7 +83,10 @@ export const StartMediaPlayer = async (
                 transitionTime: transitiontime
             }
         });
-    } else if (target.type === 'remote_ledwall') {
+    }
+    // Test if the target is a remote client (Web browser projection)
+    else if (target.type === 'remote_VideoWall') {
+        // Broadcast the media control command to the network service
         networkService.sendCommand({
             type: 'MEDIA_CONTROL',
             action: 'play',
@@ -63,26 +98,54 @@ export const StartMediaPlayer = async (
                 deviceId: target.id
             }
         });
-    } else if (target.type === 'videowall_agent') {
+    }
+    // Test if the target is a professional Videowall Agent hardware
+    else if (target.type === 'videowall_agent') {
         const d = target as VideoWallAgentDevice;
-        const filename = sourcefile.split(/[\\/]/).pop() || '';
-        videoWallAgentService.sendCommand(d, 'play', {
-            filename: filename,
-            loop: repeat || d.repeat || false,
-            volume: volume,
-            mute: mute,
-            fadeInTime: transitiontime || d.fadeInTime || 0.5,
-            crossoverTime: d.crossoverTime || 1.0
+        // Extract and decode filename (sourcefile may be a file:// URL with %20 encoding)
+        let rawFilename = sourcefile.split(/[\\/]/).pop() || '';
+        try { rawFilename = decodeURIComponent(rawFilename); } catch (_) { }
+        const filename = rawFilename;
+
+        // Sync file with checksum validation first, then play
+        videoWallAgentService.syncFileWithProgress(d, sourcefile, filename).then(() => {
+            videoWallAgentService.sendCommand(d, 'play', {
+                filename: filename,
+                loop: repeat || (d as any).repeat || false,
+                volume: volume,
+                mute: mute,
+                fadeInTime: transitiontime || d.fadeInTime || 0.5,
+                crossoverTime: d.crossoverTime || 1.0
+            });
+        }).catch(err => {
+            console.error('Sync failed, attempting play anyway:', err);
+            videoWallAgentService.sendCommand(d, 'play', {
+                filename: filename,
+                loop: repeat || (d as any).repeat || false,
+                volume: volume,
+                mute: mute,
+                fadeInTime: transitiontime || d.fadeInTime || 0.5,
+                crossoverTime: d.crossoverTime || 1.0
+            });
         });
     }
 
-    // Handle preview player if provided
+    // Handle local preview sync: Test if a preview video element was provided
     if (previewplayer instanceof HTMLVideoElement) {
         previewplayer.src = mediaUrl;
         previewplayer.play().catch(err => console.warn('MediaPlayer: Preview play failed', err));
     }
 };
 
+/**
+ * Switches the current media on a target device, typically used for seamless transitions.
+ * @param target The device to update.
+ * @param newSourcefile The new media file path.
+ * @param transitiontime Length of the crossfade transition.
+ * @param repeat Whether to loop the new media.
+ * @param volume Initial volume for the new media.
+ * @param mute Initial mute state.
+ */
 export const ChangeMediaPlayer = (
     target: Device,
     newSourcefile: string,
@@ -95,7 +158,9 @@ export const ChangeMediaPlayer = (
     const ipc = getIpc();
     const mediaUrl = getMediaUrl(newSourcefile);
 
+    // Test if target is a local monitor
     if (target.type === 'local_monitor') {
+        // Test for IPC presence
         if (!ipc) return;
         ipc.send('media-command', {
             deviceId: target.id,
@@ -108,7 +173,9 @@ export const ChangeMediaPlayer = (
                 transitionTime: transitiontime
             }
         });
-    } else if (target.type === 'remote_ledwall') {
+    }
+    // Test if target is a remote web client
+    else if (target.type === 'remote_VideoWall') {
         networkService.sendCommand({
             type: 'MEDIA_CONTROL',
             action: 'play',
@@ -120,20 +187,43 @@ export const ChangeMediaPlayer = (
                 deviceId: target.id
             }
         });
-    } else if (target.type === 'videowall_agent') {
+    }
+    // Test if target is a videowall agent node
+    else if (target.type === 'videowall_agent') {
         const d = target as VideoWallAgentDevice;
-        const filename = newSourcefile.split(/[\\/]/).pop() || '';
-        videoWallAgentService.sendCommand(d, 'play', {
-            filename: filename,
-            loop: repeat || d.repeat || false,
-            volume: volume,
-            mute: mute,
-            fadeInTime: transitiontime || d.fadeInTime || 0.5,
-            crossoverTime: d.crossoverTime || 1.0
+        let rawFilename = newSourcefile.split(/[\\/]/).pop() || '';
+        try { rawFilename = decodeURIComponent(rawFilename); } catch (_) { }
+        const filename = rawFilename;
+
+        // Sync file with checksum validation first, then play
+        videoWallAgentService.syncFileWithProgress(d, newSourcefile, filename).then(() => {
+            videoWallAgentService.sendCommand(d, 'play', {
+                filename: filename,
+                loop: repeat || (d as any).repeat || false,
+                volume: volume,
+                mute: mute,
+                fadeInTime: transitiontime || d.fadeInTime || 0.5,
+                crossoverTime: d.crossoverTime || 1.0
+            });
+        }).catch(err => {
+            console.error('Sync failed, attempting play anyway:', err);
+            videoWallAgentService.sendCommand(d, 'play', {
+                filename: filename,
+                loop: repeat || (d as any).repeat || false,
+                volume: volume,
+                mute: mute,
+                fadeInTime: transitiontime || d.fadeInTime || 0.5,
+                crossoverTime: d.crossoverTime || 1.0
+            });
         });
     }
 };
 
+/**
+ * Stops playback on a target device.
+ * @param target The device to stop.
+ * @param fadeouttime Duration of the fade-out effect.
+ */
 export const StopMediaPlayer = (
     target: Device,
     fadeouttime: number = 0
@@ -141,7 +231,9 @@ export const StopMediaPlayer = (
     console.log('StopMediaPlayer', { target, fadeouttime });
     const ipc = getIpc();
 
+    // Test if target is local monitor
     if (target.type === 'local_monitor') {
+        // Test for IPC presence
         if (!ipc) return;
         ipc.send('media-command', {
             deviceId: target.id,
@@ -150,13 +242,17 @@ export const StopMediaPlayer = (
                 fadeOutTime: fadeouttime
             }
         });
-    } else if (target.type === 'remote_ledwall') {
+    }
+    // Test if target is remote web client
+    else if (target.type === 'remote_VideoWall') {
         networkService.sendCommand({
             type: 'MEDIA_CONTROL',
             action: 'stop',
             payload: { deviceId: target.id, fadeOutTime: fadeouttime }
         });
-    } else if (target.type === 'videowall_agent') {
+    }
+    // Test if target is videowall agent node
+    else if (target.type === 'videowall_agent') {
         const d = target as VideoWallAgentDevice;
         videoWallAgentService.sendCommand(d, 'stop', {
             fadeOutTime: fadeouttime || d.fadeOutTime || 0.5
@@ -164,6 +260,12 @@ export const StopMediaPlayer = (
     }
 };
 
+/**
+ * Adjusts the volume or mute state of current playback on a target device.
+ * @param target The device to update.
+ * @param newVolume New volume level.
+ * @param mute Whether to immediately mute the sound.
+ */
 export const SetVolumeMediaPlayer = (
     target: Device,
     newVolume: number,
@@ -172,6 +274,7 @@ export const SetVolumeMediaPlayer = (
     console.log('SetVolumeMediaPlayer', { target, newVolume, mute });
     const ipc = getIpc();
 
+    // Test if target is local monitor
     if (target.type === 'local_monitor') {
         if (!ipc) return;
         ipc.send('media-command', {
@@ -182,7 +285,9 @@ export const SetVolumeMediaPlayer = (
                 mute: mute || newVolume === 0
             }
         });
-    } else if (target.type === 'remote_ledwall') {
+    }
+    // Test if target is remote web client
+    else if (target.type === 'remote_VideoWall') {
         networkService.sendCommand({
             type: 'MEDIA_CONTROL',
             action: 'volume',
@@ -192,7 +297,9 @@ export const SetVolumeMediaPlayer = (
                 mute: mute || newVolume === 0
             }
         });
-    } else if (target.type === 'videowall_agent') {
+    }
+    // Test if target is videowall agent node
+    else if (target.type === 'videowall_agent') {
         const d = target as VideoWallAgentDevice;
         videoWallAgentService.sendCommand(d, 'volume', {
             level: mute ? 0 : newVolume
@@ -200,6 +307,11 @@ export const SetVolumeMediaPlayer = (
     }
 };
 
+/**
+ * Toggles the looping/repeat behavior of current playback on a target device.
+ * @param target The device to update.
+ * @param repeat Whether to set playback to loop.
+ */
 export const SetRepeatMediaPlayer = (
     target: Device,
     repeat: boolean
@@ -207,6 +319,7 @@ export const SetRepeatMediaPlayer = (
     console.log('SetRepeatMediaPlayer', { target, repeat });
     const ipc = getIpc();
 
+    // Test if target is local monitor
     if (target.type === 'local_monitor') {
         if (!ipc) return;
         ipc.send('media-command', {
@@ -216,7 +329,9 @@ export const SetRepeatMediaPlayer = (
                 loop: repeat
             }
         });
-    } else if (target.type === 'remote_ledwall') {
+    }
+    // Test if target is remote web client
+    else if (target.type === 'remote_VideoWall') {
         networkService.sendCommand({
             type: 'MEDIA_CONTROL',
             action: 'toggle_repeat',
@@ -225,10 +340,31 @@ export const SetRepeatMediaPlayer = (
                 repeat: repeat
             }
         });
-    } else if (target.type === 'videowall_agent') {
+    }
+    // Test if target is videowall agent node
+    else if (target.type === 'videowall_agent') {
         const d = target as VideoWallAgentDevice;
         videoWallAgentService.sendCommand(d, 'repeat', {
             repeat: repeat
         });
     }
+};
+
+export const StartProjection = async (device: Device, monitorIndex: number) => {
+    const ipc = getIpc();
+    if (!ipc) return;
+    await ipc.invoke('start-projection', {
+        deviceId: device.id,
+        monitorIndex: monitorIndex
+    });
+};
+
+export const MediaAction = (device: Device, action: string, payload?: any) => {
+    const ipc = getIpc();
+    if (!ipc) return;
+    ipc.send('media-command', {
+        deviceId: device.id,
+        command: action,
+        payload: payload
+    });
 };

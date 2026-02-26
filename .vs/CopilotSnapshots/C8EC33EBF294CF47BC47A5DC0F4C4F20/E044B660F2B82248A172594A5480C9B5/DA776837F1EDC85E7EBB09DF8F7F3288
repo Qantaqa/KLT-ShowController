@@ -1,0 +1,345 @@
+﻿Imports System.Net
+Imports System.Text
+Imports System.Threading
+
+Module Mobile
+
+    Private listener As HttpListener
+    Private serverThread As Thread
+    Private serverRunning As Boolean = False
+    Private ReadOnly Prefix As String = "http://+:8090/"
+
+    Public Sub Start()
+        Try
+            If serverRunning Then Return
+            listener = New HttpListener()
+            listener.Prefixes.Add(Prefix)
+            listener.Start()
+            serverRunning = True
+
+            serverThread = New Thread(AddressOf ListenLoop)
+            serverThread.IsBackground = True
+            serverThread.Start()
+
+            ToonFlashBericht("Mobile webinterface gestart op poort 8090.", 5, FlashSeverity.IsInfo)
+        Catch ex As Exception
+            ToonFlashBericht("Kon mobile webinterface niet starten: " & ex.Message, 8, FlashSeverity.IsWarning)
+        End Try
+    End Sub
+
+    Public Sub [Stop]()
+        Try
+            serverRunning = False
+            If listener IsNot Nothing Then
+                listener.Stop()
+                listener.Close()
+                listener = Nothing
+            End If
+            If serverThread IsNot Nothing AndAlso serverThread.IsAlive Then
+                serverThread.Join(500)
+            End If
+        Catch
+        End Try
+    End Sub
+
+    Private Sub ListenLoop()
+        While serverRunning
+            Try
+                Dim ctx = listener.GetContext()
+                ThreadPool.QueueUserWorkItem(AddressOf HandleContext, ctx)
+            Catch ex As HttpListenerException
+                Exit While
+            Catch
+                ' ignore
+            End Try
+        End While
+    End Sub
+
+    Private Sub HandleContext(state As Object)
+        Dim ctx = CType(state, HttpListenerContext)
+        Dim req = ctx.Request
+        Dim resp = ctx.Response
+        Try
+            Dim path = req.Url.AbsolutePath.ToLowerInvariant()
+            If path = "/" Then
+                WriteHtml(resp, BuildHtml())
+            ElseIf path = "/status" Then
+                WriteJson(resp, GetStatusJson())
+            ElseIf path = "/action" Then
+                Dim action As String = GetActionFromRequest(req)
+                HandleAction(action)
+                WriteJson(resp, "{""ok"":true}")
+            Else
+                resp.StatusCode = 404
+                WriteText(resp, "Not Found", "text/plain")
+            End If
+        Catch ex As Exception
+            Try
+                resp.StatusCode = 500
+                WriteText(resp, "Server error: " & ex.Message, "text/plain")
+            Catch
+            End Try
+        Finally
+            Try
+                resp.OutputStream.Close()
+            Catch
+            End Try
+        End Try
+    End Sub
+
+    Private Function GetActionFromRequest(req As HttpListenerRequest) As String
+        Dim action As String = ""
+        If req.HttpMethod = "GET" Then
+            action = GetQueryParam(req.Url.Query, "action")
+        ElseIf req.HttpMethod = "POST" Then
+            Using sr As New IO.StreamReader(req.InputStream, req.ContentEncoding)
+                Dim body = sr.ReadToEnd()
+                action = GetQueryParam(body, "action")
+            End Using
+        End If
+        Return action
+    End Function
+
+    Private Function GetQueryParam(query As String, key As String) As String
+        If String.IsNullOrEmpty(query) Then Return ""
+        Dim q = query
+        If q.StartsWith("?") Then q = q.Substring(1)
+        For Each part In q.Split("&"c)
+            Dim kv = part.Split("="c)
+            If kv.Length >= 2 Then
+                If String.Equals(kv(0), key, StringComparison.OrdinalIgnoreCase) Then
+                    Return Uri.UnescapeDataString(kv(1))
+                End If
+            End If
+        Next
+        Return ""
+    End Function
+
+    Private Sub HandleAction(action As String)
+        If String.IsNullOrWhiteSpace(action) Then Return
+        Try
+            Select Case action.ToLowerInvariant()
+                Case "nextscene"
+                    RunOnUI(Sub() DG_Show.Next_EventOrScene(FrmMain.DG_Show, FrmMain.nextScene))
+                Case "nextevent"
+                    RunOnUI(Sub() DG_Show.Next_EventOrScene(FrmMain.DG_Show, FrmMain.nextEvent))
+                Case "nextact"
+                    RunOnUI(Sub() DG_Show.Next_Act(FrmMain.DG_Show, FrmMain.filterAct))
+                Case "prevscene"
+                    RunOnUI(Sub() PrevScene())
+                Case "prevact"
+                    RunOnUI(Sub() PrevAct())
+            End Select
+        Catch
+        End Try
+    End Sub
+
+    Private Sub RunOnUI(a As Action)
+        If FrmMain Is Nothing Then Return
+        If FrmMain.InvokeRequired Then
+            FrmMain.Invoke(a)
+        Else
+            a()
+        End If
+    End Sub
+
+    Private Function GetStatusJson() As String
+        Dim currentAct As String = ""
+        Dim currentScene As Integer = 0
+        Dim currentEvent As Integer = 0
+        Dim nextHint As String = ""
+        Dim page As Integer = 0
+        Dim autoGoto As Boolean = False
+
+        RunOnUI(Sub()
+                    ' Vind eerste actieve rij (btnApply = ">")
+                    Dim activeRow As DataGridViewRow = Nothing
+                    For Each r As DataGridViewRow In FrmMain.DG_Show.Rows
+                        If r.IsNewRow Then Continue For
+                        If Convert.ToString(r.Cells("btnApply").Value) = ">" Then
+                            activeRow = r
+                            Exit For
+                        End If
+                    Next
+                    If activeRow IsNot Nothing Then
+                        currentAct = Convert.ToString(activeRow.Cells("colAct").Value)
+                        Integer.TryParse(Convert.ToString(activeRow.Cells("colSceneId").Value), currentScene)
+                        Integer.TryParse(Convert.ToString(activeRow.Cells("colEventId").Value), currentEvent)
+                        ' Hint: neem volgende zichtbare rij als cue
+                        Dim idx = activeRow.Index
+                        For i = idx + 1 To FrmMain.DG_Show.Rows.Count - 1
+                            Dim rr = FrmMain.DG_Show.Rows(i)
+                            If rr.IsNewRow OrElse Not rr.Visible Then Continue For
+                            nextHint = Convert.ToString(rr.Cells("colAct").Value) & " / S" & rr.Cells("colSceneId").Value & " / E" & rr.Cells("colEventId").Value
+                            Exit For
+                        Next
+                    End If
+                    page = FrmMain.currentPage
+                    autoGoto = (FrmMain.btnAutoGotoPDFPage IsNot Nothing AndAlso FrmMain.btnAutoGotoPDFPage.Text = "on")
+                End Sub)
+
+        Dim json As String = "{""act"":""" & Escape(currentAct) & """,""scene"":" & currentScene & ",""event"":" & currentEvent & ",""next"":""" & Escape(nextHint) & """,""pdfPage"":" & page & ",""autoGoto"":" & LCase(autoGoto.ToString()) & "}"
+        Return json
+    End Function
+
+    Private Function Escape(s As String) As String
+        If s Is Nothing Then Return ""
+        Return s.Replace("\\", "\\\\").Replace("""", "\"")
+    End Function
+
+    Private Sub WriteHtml(resp As HttpListenerResponse, html As String)
+        WriteBytes(resp, Encoding.UTF8.GetBytes(html), "text/html; charset=utf-8")
+    End Sub
+
+    Private Sub WriteJson(resp As HttpListenerResponse, json As String)
+        WriteBytes(resp, Encoding.UTF8.GetBytes(json), "application/json; charset=utf-8")
+    End Sub
+
+    Private Sub WriteText(resp As HttpListenerResponse, text As String, mime As String)
+        WriteBytes(resp, Encoding.UTF8.GetBytes(text), mime)
+    End Sub
+
+    Private Sub WriteBytes(resp As HttpListenerResponse, data As Byte(), mime As String)
+        resp.ContentType = mime
+        resp.ContentLength64 = data.LongLength
+        Using os = resp.OutputStream
+            os.Write(data, 0, data.Length)
+        End Using
+    End Sub
+
+    Private Function BuildHtml() As String
+        Dim sb As New StringBuilder()
+        sb.AppendLine("<!doctype html>")
+        sb.AppendLine("<html><head><meta name='viewport' content='width=device-width, initial-scale=1'>")
+        sb.AppendLine("<title>KLT Mobile</title>")
+        sb.AppendLine("<style>body{font-family:sans-serif;padding:12px;} .row{margin:8px 0;} button{padding:12px 16px;font-size:16px;margin:4px;} .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}</style>")
+        sb.AppendLine("</head><body>")
+        sb.AppendLine("<h2>KLT LedShow - Mobile</h2>")
+        sb.AppendLine("<div class='row'>Actief: <span id='cur'>-</span></div>")
+        sb.AppendLine("<div class='row'>Volgende: <span id='next'>-</span></div>")
+        sb.AppendLine("<div class='row'>PDF pagina: <span id='pg'>-</span> <span id='auto' style='font-size:12px;color:#666'></span></div>")
+        sb.AppendLine("<div class='grid'>")
+        sb.AppendLine("<button onclick=doAction('prevact')>Prev Act</button>")
+        sb.AppendLine("<button onclick=doAction('nextact')>Next Act</button>")
+        sb.AppendLine("<button onclick=doAction('prevscene')>Prev Scene</button>")
+        sb.AppendLine("<button onclick=doAction('nextscene')>Next Scene</button>")
+        sb.AppendLine("<button onclick=doAction('nextevent') style='grid-column:span 2'>Next Event</button>")
+        sb.AppendLine("</div>")
+        sb.AppendLine("<script>async function refresh(){try{let r=await fetch('/status');let j=await r.json();document.getElementById('cur').innerText=`${j.act} / S${j.scene} / E${j.event}`;document.getElementById('next').innerText=j.next||'-';document.getElementById('pg').innerText=j.pdfPage;document.getElementById('auto').innerText=j.autoGoto?'(auto goto aan)':'(auto goto uit)';}catch(e){}};async function doAction(a){try{await fetch('/action?action='+a,{method:'POST'});setTimeout(refresh,200);}catch(e){}};refresh();setInterval(refresh,2000);</script>")
+        sb.AppendLine("</body></html>")
+        Return sb.ToString()
+    End Function
+
+    ' ======= PREV HELPERS =======
+    Private Sub PrevScene()
+        Dim dg = FrmMain.DG_Show
+        If dg Is Nothing OrElse dg.Rows.Count = 0 Then Return
+
+        ' vind actieve rij
+        Dim active As DataGridViewRow = Nothing
+        For Each r As DataGridViewRow In dg.Rows
+            If r.IsNewRow Then Continue For
+            If Convert.ToString(r.Cells("btnApply").Value) = ">" Then active = r : Exit For
+        Next
+        If active Is Nothing Then Return
+
+        Dim act = Convert.ToString(active.Cells("colAct").Value)
+        Dim scene = Convert.ToInt32(active.Cells("colSceneId").Value)
+
+        Dim targetScene As Integer = -1
+        Dim targetEvent As Integer = -1
+        ' search upwards for previous scene within same act
+        For i = active.Index - 1 To 0 Step -1
+            Dim r = dg.Rows(i)
+            If r.IsNewRow Then Continue For
+            If Convert.ToString(r.Cells("colAct").Value) = act Then
+                Dim s = Convert.ToInt32(r.Cells("colSceneId").Value)
+                Dim e = Convert.ToInt32(r.Cells("colEventId").Value)
+                If s < scene Then
+                    targetScene = s
+                    targetEvent = e
+                    Exit For
+                End If
+            End If
+        Next
+        If targetScene = -1 Then Return
+        ActivateTargetGroup(act, targetScene, targetEvent)
+    End Sub
+
+    Private Sub PrevAct()
+        Dim dg = FrmMain.DG_Show
+        If dg Is Nothing OrElse dg.Rows.Count = 0 Then Return
+        Dim active As DataGridViewRow = Nothing
+        For Each r As DataGridViewRow In dg.Rows
+            If r.IsNewRow Then Continue For
+            If Convert.ToString(r.Cells("btnApply").Value) = ">" Then active = r : Exit For
+        Next
+        If active Is Nothing Then Return
+        Dim curAct = Convert.ToString(active.Cells("colAct").Value)
+
+        Dim targetAct As String = Nothing
+        Dim targetScene As Integer = -1
+        Dim targetEvent As Integer = -1
+        For i = active.Index - 1 To 0 Step -1
+            Dim r = dg.Rows(i)
+            If r.IsNewRow Then Continue For
+            Dim a = Convert.ToString(r.Cells("colAct").Value)
+            If a <> curAct Then
+                targetAct = a
+                targetScene = Convert.ToInt32(r.Cells("colSceneId").Value)
+                targetEvent = Convert.ToInt32(r.Cells("colEventId").Value)
+                Exit For
+            End If
+        Next
+        If String.IsNullOrEmpty(targetAct) Then Return
+        ActivateTargetGroup(targetAct, targetScene, targetEvent)
+    End Sub
+
+    Private Sub ActivateTargetGroup(act As String, sceneId As Integer, eventId As Integer)
+        Dim dg = FrmMain.DG_Show
+        If dg Is Nothing Then Return
+
+        ' Clear and mark target rows
+        Dim active As Boolean = False
+        Dim firstTargetRow As DataGridViewRow = Nothing
+        For Each row As DataGridViewRow In dg.Rows
+            If row.IsNewRow Then Continue For
+            Dim a = Convert.ToString(row.Cells("colAct").Value)
+            Dim s = Convert.ToInt32(row.Cells("colSceneId").Value)
+            Dim ev = Convert.ToInt32(row.Cells("colEventId").Value)
+            If a = act AndAlso s = sceneId AndAlso ev = eventId Then
+                row.Cells("btnApply").Value = ">"
+                row.Cells("colSend").Value = "False"
+                If firstTargetRow Is Nothing Then firstTargetRow = row
+                active = True
+            Else
+                row.Cells("btnApply").Value = ""
+                row.Cells("colSend").Value = "False"
+            End If
+        Next
+
+        ' Auto goto PDF
+        If firstTargetRow IsNot Nothing Then
+            Dim val = firstTargetRow.Cells("ScriptPg").Value
+            Dim page As Integer
+            If val IsNot Nothing AndAlso Integer.TryParse(val.ToString(), page) Then
+                If FrmMain.btnAutoGotoPDFPage IsNot Nothing AndAlso FrmMain.btnAutoGotoPDFPage.Text = "on" Then
+                    FrmMain.NavigatePdfToPage(page)
+                End If
+            End If
+        End If
+
+        ' Send instructions to devices for marked rows
+        For Each row As DataGridViewRow In dg.Rows
+            If row.IsNewRow Then Continue For
+            If Convert.ToString(row.Cells("btnApply").Value) = ">" AndAlso Convert.ToString(row.Cells("colSend").Value) = "False" Then
+                SendInstructionSetForDevice(dg, row)
+                row.Cells("colSend").Value = "True"
+            End If
+        Next
+
+        ' Reselect
+        Reselect_Rows(dg)
+    End Sub
+
+End Module

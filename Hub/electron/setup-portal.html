@@ -181,16 +181,6 @@
             outline: 2px solid var(--primary);
             outline-offset: 2px;
         }
-
-        .warning {
-            background: rgba(251, 191, 36, 0.1);
-            border: 1px solid rgba(251, 191, 36, 0.2);
-            padding: 12px;
-            border-radius: 8px;
-            color: var(--primary);
-            font-size: 12px;
-            margin-bottom: 16px;
-        }
     </style>
 </head>
 
@@ -199,16 +189,11 @@
         <h1>VideoWall Agent Setup</h1>
         <p>Configureer en download de agent software voor je externe computer.</p>
 
-        <div class="warning">
-            <strong>Let op:</strong> Voor installatie zonder internet moet je Node.js en MPV installers reeds gedownload
-            hebben.
-        </div>
-
         <div class="section">
             <h2>1. Configuratie</h2>
             <div class="field">
                 <label>Agent Naam</label>
-                <input type="text" id="agentName" placeholder="Bijv. LedWall-Zaal-A" value="LedWall-Agent">
+                <input type="text" id="agentName" placeholder="Bijv. VideoWall-Zaal-A" value="VideoWall-Agent">
             </div>
             <div class="grid-2">
                 <div class="field">
@@ -225,12 +210,21 @@
                     </select>
                 </div>
             </div>
-            <div class="field">
-                <label>Oriëntatie</label>
-                <select id="agentOrientation" title="Selecteer Scherm Oriëntatie">
-                    <option value="landscape">Landscape</option>
-                    <option value="portrait">Portrait</option>
-                </select>
+            <div class="grid-2">
+                <div class="field">
+                    <label>Oriëntatie</label>
+                    <select id="agentOrientation" title="Selecteer Scherm Oriëntatie">
+                        <option value="landscape">Landscape</option>
+                        <option value="portrait">Portrait</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Platform</label>
+                    <select id="agentPlatform" title="Selecteer Besturingssysteem">
+                        <option value="windows">Windows</option>
+                        <option value="linux">Linux / Raspberry Pi</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -246,7 +240,7 @@
                     </svg>
                     Download Agent (.zip)
                 </a>
-                <button onclick="downloadScript()" class="btn">
+                <button onclick="downloadScript()" class="btn" id="btnGenerateScript">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="16 18 22 12 16 6" />
@@ -255,51 +249,16 @@
                     Genereer Start Script (.bat)
                 </button>
             </div>
-            <p class="config-note">
+            <p class="config-note" id="configNote">
                 De bovenstaande configuratie wordt direct in het <strong>start.bat</strong> bestand geplaatst als
                 omgevingsvariabelen.
             </p>
         </div>
 
         <div class="section">
-            <h2>3. Installatie Instructies (Foolproof)</h2>
-            <div class="steps">
-                <ol>
-                    <li>
-                        <strong>Stap 1: Node.js installeren</strong><br>
-                        Download en installeer <a href="https://nodejs.org/dist/v22.14.0/node-v22.14.0-x64.msi"
-                            target="_blank" rel="noopener">Node.js (LTS v22)</a>.
-                        Dit is nodig om de agent software te kunnen draaien.
-                    </li>
-                    <li>
-                        <strong>Stap 2: MPV Player installeren</strong><br>
-                        Download de <b>shinchiro</b> build van <a
-                            href="https://sourceforge.net/projects/mpv-player-windows/files/64bit/" target="_blank"
-                            rel="noopener">MPV Player (64-bit)</a>.<br>
-                        <i>Tip: Pak de zip uit en voeg de map toe aan je Windows 'Path' OF plaats <b>mpv.exe</b> direct
-                            in de agent map na het uitpakken.</i>
-                    </li>
-                    <li>
-                        <strong>Stap 3: Agent uitpakken</strong><br>
-                        Pak de <strong>ledshow-agent.zip</strong> uit naar een map op je computer (bijvoorbeeld
-                        <code>C:\LedShowAgent\</code>).
-                    </li>
-                    <li>
-                        <strong>Stap 4: Start script plaatsen</strong><br>
-                        Download het <strong>start.bat</strong> bestand hierboven en plaats deze <u>direct</u> in de map
-                        waar ook <code>package.json</code> en <code>dist/</code> staan.
-                    </li>
-                    <li>
-                        <strong>Stap 5: Starten!</strong><br>
-                        Dubbelklik op <strong>start.bat</strong>. Er opent een zwart venster. De eerste keer kan Windows
-                        vragen om netwerktoegang; sta dit toe.
-                    </li>
-                    <li>
-                        <strong>Stap 6: Controle</strong><br>
-                        Ga op de computer waar de agent draait naar <a href="http://localhost:3000" target="_blank"
-                            rel="noopener">http://localhost:3000</a> om de status te zien.
-                    </li>
-                </ol>
+            <h2>3. Installatie Instructies</h2>
+            <div class="steps" id="installSteps">
+                <!-- Filled by JS based on platform -->
             </div>
         </div>
     </div>
@@ -310,6 +269,10 @@
 
         const modelSelect = document.getElementById('agentModel');
         const layoutSelect = document.getElementById('agentLayout');
+        const platformSelect = document.getElementById('agentPlatform');
+        const btnGenerateScript = document.getElementById('btnGenerateScript');
+        const configNote = document.getElementById('configNote');
+        const installSteps = document.getElementById('installSteps');
 
         function updateLayouts() {
             const model = modelSelect.value;
@@ -317,87 +280,144 @@
             layoutSelect.innerHTML = layouts.map(l => `<option value="${l}">${l}</option>`).join('');
         }
 
+        function updatePlatformUI() {
+            const isWindows = platformSelect.value === 'windows';
+            const scriptName = isWindows ? 'start.bat' : 'start.sh';
+            const scriptExt = isWindows ? '.bat' : '.sh';
+
+            btnGenerateScript.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                </svg>
+                Genereer Start Script (${scriptExt})
+            `;
+
+            configNote.innerHTML = `De bovenstaande configuratie wordt direct in het <strong>${scriptName}</strong> bestand geplaatst als omgevingsvariabelen.`;
+
+            if (isWindows) {
+                installSteps.innerHTML = `
+                    <ol>
+                        <li>
+                            <strong>Stap 1: Node.js installeren</strong><br>
+                            Download en installeer <a href="https://nodejs.org/dist/v22.14.0/node-v22.14.0-x64.msi"
+                                target="_blank" rel="noopener">Node.js (LTS v22)</a>.
+                            Dit is nodig om de agent software te kunnen draaien.
+                        </li>
+                        <li>
+                            <strong>Stap 2: Google Chrome installeren</strong><br>
+                            Zorg dat <a href="https://www.google.com/intl/nl/chrome/" target="_blank" rel="noopener">Google Chrome</a>,
+                            Microsoft Edge, of Chromium geïnstalleerd is.
+                            De agent gebruikt de browser voor videoweergave.
+                        </li>
+                        <li>
+                            <strong>Stap 3: Agent uitpakken</strong><br>
+                            Pak de <strong>VideoWall-agent-v1.1.0.zip</strong> uit naar een map op je computer (bijvoorbeeld
+                            <code>C:\\LedShow-Agent\\</code>).
+                        </li>
+                        <li>
+                            <strong>Stap 4: Installeren</strong><br>
+                            Dubbelklik op <strong>install.bat</strong> in de uitgepakte map. Dit installeert de benodigde afhankelijkheden.
+                        </li>
+                        <li>
+                            <strong>Stap 5: Start script plaatsen</strong><br>
+                            Download het <strong>start.bat</strong> bestand hierboven en plaats deze <u>direct</u> in de map
+                            waar ook <code>package.json</code> en <code>dist/</code> staan.
+                        </li>
+                        <li>
+                            <strong>Stap 6: Starten!</strong><br>
+                            Dubbelklik op <strong>start.bat</strong>. Er opent een zwart venster. De eerste keer kan Windows
+                            vragen om netwerktoegang; sta dit toe.
+                        </li>
+                        <li>
+                            <strong>Stap 7: Controle</strong><br>
+                            Ga op de computer waar de agent draait naar <a href="http://localhost:3003" target="_blank"
+                                rel="noopener">http://localhost:3003</a> om de status te zien.
+                            Het output scherm is te vinden op <a href="http://localhost:3003/output" target="_blank"
+                                rel="noopener">http://localhost:3003/output</a>.
+                        </li>
+                    </ol>
+                `;
+            } else {
+                installSteps.innerHTML = `
+                    <ol>
+                        <li>
+                            <strong>Stap 1: Node.js installeren</strong><br>
+                            Installeer Node.js v18 of hoger via je pakketbeheerder of
+                            <a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a>.
+                        </li>
+                        <li>
+                            <strong>Stap 2: Chromium installeren</strong><br>
+                            Installeer Chromium of Google Chrome:<br>
+                            <code>sudo apt install chromium-browser</code>
+                        </li>
+                        <li>
+                            <strong>Stap 3: Agent uitpakken</strong><br>
+                            <code>unzip VideoWall-agent-v1.1.0.zip -d ~/VideoWall-agent</code><br>
+                            <code>cd ~/VideoWall-agent</code>
+                        </li>
+                        <li>
+                            <strong>Stap 4: Installeren</strong><br>
+                            <code>chmod +x install.sh start.sh</code><br>
+                            <code>./install.sh</code>
+                        </li>
+                        <li>
+                            <strong>Stap 5: Start script plaatsen</strong><br>
+                            Download het <strong>start.sh</strong> bestand hierboven en plaats deze in de agent map
+                            (naast <code>package.json</code>). Maak uitvoerbaar met <code>chmod +x start.sh</code>.
+                        </li>
+                        <li>
+                            <strong>Stap 6: Starten!</strong><br>
+                            <code>./start.sh</code>
+                        </li>
+                        <li>
+                            <strong>Stap 7: Controle</strong><br>
+                            Ga naar <a href="http://localhost:3003" target="_blank"
+                                rel="noopener">http://localhost:3003</a> om de status te zien.
+                            Het output scherm is te vinden op <a href="http://localhost:3003/output" target="_blank"
+                                rel="noopener">http://localhost:3003/output</a>.
+                        </li>
+                    </ol>
+                `;
+            }
+        }
+
         modelSelect.addEventListener('change', updateLayouts);
+        platformSelect.addEventListener('change', updatePlatformUI);
         updateLayouts();
+        updatePlatformUI();
+
+        function generateWindowsBat(name, model, layout, orientation) {
+            return `@echo off\r\ntitle LedShow VideoWall Agent - ${name}\r\nREM ============================================\r\nREM  LedShow VideoWall Agent - Start Script\r\nREM  Gegenereerd door de LedShow Hub\r\nREM ============================================\r\nREM\r\nREM  Configuratie (aangepast per installatie):\r\nset AGENT_NAME=${name}\r\nset AGENT_MODEL=${model}\r\nset AGENT_LAYOUT=${layout}\r\nset AGENT_ORIENTATION=${orientation}\r\nset AGENT_PORT=3003\r\n\r\necho --- LedShow VideoWall Agent ---\r\necho Naam:        %AGENT_NAME%\r\necho Model:       %AGENT_MODEL%\r\necho Layout:      %AGENT_LAYOUT%\r\necho Orientatie:  %AGENT_ORIENTATION%\r\necho Poort:       %AGENT_PORT%\r\necho ---\r\n\r\n:: Check Node.js\r\nnode -v >nul 2>&1\r\nif %ERRORLEVEL% NEQ 0 (\r\n    echo [FOUT] Node.js is niet gevonden. Installeer Node.js en probeer het opnieuw.\r\n    pause\r\n    exit /b\r\n)\r\n\r\n:: Check compiled files\r\nif not exist "dist\\index.js" (\r\n    echo [FOUT] De gecompileerde software ^(dist/index.js^) ontbreekt.\r\n    echo Zorg dat je de volledige zip hebt uitgepakt.\r\n    pause\r\n    exit /b\r\n)\r\n\r\n:: Check dependencies\r\nif not exist "node_modules" (\r\n    echo [INFO] Afhankelijkheden ontbreken. Voer eerst install.bat uit.\r\n    pause\r\n    exit /b\r\n)\r\n\r\necho Starting VideoWall Agent: %AGENT_NAME% (%AGENT_MODEL% %AGENT_LAYOUT%)\r\nnode dist/index.js\r\nif %ERRORLEVEL% NEQ 0 (\r\n    echo Agent is onverwacht gestopt ^(Error Code: %ERRORLEVEL%^).\r\n    pause\r\n)\r\n`;
+        }
+
+        function generateLinuxSh(name, model, layout, orientation) {
+            return `#!/bin/bash\n# ============================================\n#  LedShow VideoWall Agent - Start Script\n#  Gegenereerd door de LedShow Hub\n# ============================================\n\n# Configuratie (aangepast per installatie):\nexport AGENT_NAME="${name}"\nexport AGENT_MODEL="${model}"\nexport AGENT_LAYOUT="${layout}"\nexport AGENT_ORIENTATION="${orientation}"\nexport AGENT_PORT="3003"\n\necho "--- LedShow VideoWall Agent ---"\necho "Naam:        $AGENT_NAME"\necho "Model:       $AGENT_MODEL"\necho "Layout:      $AGENT_LAYOUT"\necho "Orientatie:  $AGENT_ORIENTATION"\necho "Poort:       $AGENT_PORT"\necho "---"\n\n# Check Node.js\nif ! command -v node &> /dev/null; then\n    echo "[FOUT] Node.js is niet gevonden."\n    exit 1\nfi\n\n# Check compiled files\nif [ ! -f "dist/index.js" ]; then\n    echo "[FOUT] dist/index.js ontbreekt. Pak de volledige zip uit."\n    exit 1\nfi\n\n# Check dependencies\nif [ ! -d "node_modules" ]; then\n    echo "[INFO] Afhankelijkheden ontbreken. Voer eerst ./install.sh uit."\n    exit 1\nfi\n\necho "Starting VideoWall Agent: $AGENT_NAME ($AGENT_MODEL $AGENT_LAYOUT)"\nnode dist/index.js\n`;
+        }
 
         function downloadScript() {
             const name = document.getElementById('agentName').value;
             const model = document.getElementById('agentModel').value;
             const layout = document.getElementById('agentLayout').value;
             const orientation = document.getElementById('agentOrientation').value;
+            const platform = document.getElementById('agentPlatform').value;
 
-            const content = `@echo off
-title LedShow VideoWall Agent - ${name}
-set AGENT_NAME=${name}
-set AGENT_MODEL=${model}
-set AGENT_LAYOUT=${layout}
-set AGENT_ORIENTATION=${orientation}
-set AGENT_PORT=3000
+            let content, filename;
 
-echo ==================================================
-echo   LedShow VideoWall Agent - ${name}
-echo ==================================================
-echo.
-
-:: Check Node.js
-node -v >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo [FOUT] Node.js is niet gevonden! 
-    echo Installeer Node.js (via https://nodejs.org) en probeer het opnieuw.
-    pause
-    exit /b
-)
-
-:: Check Files
-if not exist "package.json" (
-    echo [FOUT] Verkeerde map! 
-    echo Plaats dit start.bat bestand in de hoofdmap van de agent (naast package.json).
-    pause
-    exit /b
-)
-
-if not exist "dist\\index.js" (
-    echo [FOUT] Software is niet gecompileerd (dist/index.js ontbreekt). 
-    echo Zorg dat je de volledige zip hebt uitgepakt.
-    pause
-    exit /b
-)
-
-:: Check MPV
-set MPV_AUTO_PATH=""
-if exist "mpv.exe" set MPV_AUTO_PATH="mpv.exe"
-if exist "mpv\\mpv.exe" set MPV_AUTO_PATH="mpv\\mpv.exe"
-
-mpv --version >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    if %MPV_AUTO_PATH% == "" (
-        echo [WAARSCHUWING] MPV Player is niet gevonden in het systeem-pad of de lokale map.
-        echo Videoweergave zal niet werken zonder MPV.
-    ) else (
-        set MPV_PATH=%MPV_AUTO_PATH%
-        echo [INFO] MPV gevonden op: %MPV_AUTO_PATH%
-    )
-)
-
-echo.
-echo Agent wordt gestart op poort %AGENT_PORT%...
-echo Sluit dit venster niet zolang de VideoWall actief moet zijn.
-echo.
-
-node dist/index.js
-if %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo [FOUT] De agent is onverwacht gestopt (Error Code: %ERRORLEVEL%).
-    pause
-)
-`;
-
+            if (platform === 'windows') {
+                content = generateWindowsBat(name, model, layout, orientation);
+                filename = 'start.bat';
+            } else {
+                content = generateLinuxSh(name, model, layout, orientation);
+                filename = 'start.sh';
+            }
 
             const blob = new Blob([content], { type: 'text/plain' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'start.bat';
+            a.download = filename;
             a.click();
             window.URL.revokeObjectURL(url);
         }

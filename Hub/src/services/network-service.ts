@@ -1,33 +1,48 @@
 import { io, Socket } from 'socket.io-client'
-import { useShowStore } from '../store/useShowStore'
+import { useSequencerStore } from '../store/useSequencerStore'
 
+/**
+ * Handles real-time communication between the client and the Central Hub.
+ * Manages Socket.io connections, state synchronization, remote execution, and camera streaming.
+ */
 class NetworkService {
-    private socket: Socket | null = null
+    private socket: Socket | null = null // Current Socket.io connection instance
 
+    /**
+     * Establishes a connection to the Central Hub server.
+     * @param url The URL of the Hub server (default: http://localhost:3001).
+     */
     connect(url: string = 'http://localhost:3001') {
+        // Test if a socket connection already exists; if true, do not reconnect
         if (this.socket) return
 
         this.socket = io(url)
 
+        // Event: Successful initial connection or reconnection
         this.socket.on('connect', () => {
             console.log('--- NETWORK: Connected to Hub, socket ID:', this.socket?.id)
+            // Immediately identify this client type to the server
             this.registerClient()
         })
 
+        // Event: Generic execution message from server or other clients
         this.socket.on('execute', (data: any) => {
-            // Don't log camera frames (too noisy)
+            // Noise reduction: Test if the message is a high-frequency camera frame; if not, log it
             if (data.type !== 'CAMERA_FRAME') {
                 console.log('Remote execution command:', data.type, data)
             }
 
+            // --- Logic Branch: Show Event Triggering ---
+            // Test if an event was triggered remotely (e.g. by another client or host)
             if (data.type === 'EVENT_TRIGGER') {
                 const event = data.event
+                // Log specific media loading for video wall debugging
                 if (event.type === 'Media' || (event.fixture && event.fixture.includes('Video'))) {
                     console.log(`VIDEO WALL: Loading ${event.filename || event.effect}`)
                 }
 
-                // Sync the UI if it's not already on this event
-                const store = useShowStore.getState()
+                const store = useSequencerStore.getState()
+                // Test if our local state already matches the remote event index
                 const currentIndex = store.events.findIndex(e =>
                     e.act === event.act &&
                     e.sceneId === event.sceneId &&
@@ -36,70 +51,100 @@ class NetworkService {
                     e.cue === event.cue
                 )
 
+                // If found and different, update the local active event index
                 if (currentIndex !== -1 && currentIndex !== store.activeEventIndex) {
                     console.log('SYNC: Remote triggered event jump to index', currentIndex)
                     store.setActiveEvent(currentIndex)
                 }
-            } else if (data.type === 'SYNC_PAGE') {
-                console.log('SYNC: Updating script page to', data.page)
-                useShowStore.getState().setCurrentScriptPage(data.page)
-            } else if (data.type === 'SET_SCRIPT') {
+            }
+            // --- Logic Branch: Manual host page navigation sync (remote ignores this — free navigation) ---
+            else if (data.type === 'SYNC_PAGE') {
+                // Remote clients do NOT auto-follow manual host navigation
+                // They only follow EVENT_PAGE (event-triggered jumps)
+                console.log('SYNC: Host manual page update (remote ignoring):', data.page)
+            }
+            // --- Logic Branch: Event-triggered page jump (remote follows this) ---
+            else if (data.type === 'EVENT_PAGE') {
+                console.log('SYNC: Event-triggered page jump to', data.page)
+                useSequencerStore.getState().setCurrentScriptPage(data.page)
+            }
+            // --- Logic Branch: Script File Sync ---
+            else if (data.type === 'SET_SCRIPT') {
                 console.log('SYNC: Updating script URL to', data.url)
-                useShowStore.getState().updateActiveShowPdf(data.url)
-            } else if (data.type === 'STATE_SYNC') {
+                useSequencerStore.getState().updateActiveShowPdf(data.url)
+            }
+            // --- Logic Branch: Full State Sync ---
+            else if (data.type === 'STATE_SYNC') {
                 console.log('SYNC: Received full state sync from host')
-                useShowStore.getState().syncFromRemote(data.state)
+                useSequencerStore.getState().syncFromRemote(data.state)
+                // Test if the sync packet includes application-wide settings
                 if (data.state.appSettings) {
-                    useShowStore.getState().syncAppSettings(data.state.appSettings)
+                    useSequencerStore.getState().syncAppSettings(data.state.appSettings)
                 }
-            } else if (data.type === 'REQUEST_STATE') {
-                // If we are the host, broadcast our state
+            }
+            // --- Logic Branch: State Request ---
+            else if (data.type === 'REQUEST_STATE') {
+                // Test if this client is the HOST (has access to Node/Electron modules)
                 if (!!(window as any).require) {
                     console.log('SYNC: Remote requested state, broadcasting...')
-                    useShowStore.getState().broadcastState()
+                    // As the host, broadcast current state to all remote clients
+                    useSequencerStore.getState().broadcastState()
                 }
-            } else if (data.type === 'CLIENTS_UPDATE') {
-                const store = useShowStore.getState()
+            }
+            // --- Logic Branch: Connected Clients List Update ---
+            else if (data.type === 'CLIENTS_UPDATE') {
+                const store = useSequencerStore.getState()
                 store.setConnectedClients(data.clients)
-                // Sync local lock state if server says we are locked/unlocked
+
+                // Synchronize remote locking: Test if the current client is locked/unlocked by an admin
                 const me = data.clients.find((c: any) => c.uuid === store.clientUUID)
                 if (me && me.isLocked !== undefined && me.isLocked !== store.appLocked) {
                     console.log('SYNC: Remote lock status changed to', me.isLocked)
-                    useShowStore.setState({ appLocked: me.isLocked })
+                    useSequencerStore.setState({ appLocked: me.isLocked })
                 }
-            } else if (data.type === 'CAMERA_FRAME') {
-                const senderUUID = data.clientUUID || data.clientId // fallback to clientId if uuid missing
-                useShowStore.getState().updateCameraFrame(senderUUID, data.frame)
+            }
+            // --- Logic Branch: Incoming Webcam Stream Frame ---
+            else if (data.type === 'CAMERA_FRAME') {
+                const senderUUID = data.clientUUID || data.clientId // Test for legacy ID or modern UUID
+                useSequencerStore.getState().updateCameraFrame(senderUUID, data.frame)
 
-                // Auto-selection logic based on UUID
-                const store = useShowStore.getState()
+                const store = useSequencerStore.getState()
                 const { selectedCameraClients, dismissedWebcams } = store
                 const isHost = !!(window as any).require
 
-                // Check if this client was manually dismissed
+                // Auto-selection: Test if the stream is new and hasn't been manually dismissed
                 if (senderUUID && !selectedCameraClients.includes(senderUUID) && !dismissedWebcams.includes(senderUUID)) {
-                    // Host auto-selects remote streams (any client that isn't the host itself)
-                    // Remote auto-selects the host stream
                     const senderClient = store.connectedClients.find(c => c.uuid === senderUUID || c.id === senderUUID)
                     const isHostSender = senderClient?.type === 'HOST'
 
+                    /**
+                     * Automatic Stream Selection Logic:
+                     * 1. If we are the HOST: Auto-select non-host (remote) streams.
+                     * 2. If we are a REMOTE: Auto-select the HOST stream.
+                     */
                     if ((isHost && !isHostSender) || (!isHost && isHostSender)) {
-                        // Only auto-select if we have space (max 2)
+                        // Test if we have space in the current UI layout (max 2 streams)
                         if (selectedCameraClients.length < 2) {
                             console.log('CAMERA: Auto-selecting stream', senderUUID)
                             store.toggleCameraSelection(senderUUID)
                         }
                     }
                 }
-            } else if (data.type === 'CAMERA_STOPPED') {
+            }
+            // --- Logic Branch: Webcam Stream Stopped ---
+            else if (data.type === 'CAMERA_STOPPED') {
                 const stoppedUUID = data.clientUUID || data.clientId
                 console.log('CAMERA: Client stopped camera:', stoppedUUID)
-                useShowStore.getState().clearCameraStream(stoppedUUID)
-            } else if (data.type === 'REMOTE_CONTROL') {
+                useSequencerStore.getState().clearCameraStream(stoppedUUID)
+            }
+            // --- Logic Branch: Remote Control Commands (Next/Prev) ---
+            else if (data.type === 'REMOTE_CONTROL') {
                 const isHost = !!(window as any).require
+                // Only the HOST process should execute physical hardware changes
                 if (isHost) {
                     console.log('HOST: Executing remote control command:', data.action)
-                    const store = useShowStore.getState()
+                    const store = useSequencerStore.getState()
+                    // Test action type and execute corresponding store method
                     if (data.action === 'nextEvent') store.nextEvent(data.force)
                     else if (data.action === 'nextScene') store.nextScene(data.force)
                     else if (data.action === 'nextAct') store.nextAct(data.force)
@@ -107,30 +152,56 @@ class NetworkService {
                         store.setActiveEvent(data.index !== undefined ? data.index : -1)
                     }
                 }
-            } else if (data.type === 'DEVICE_STATUS_UPDATE') {
+            }
+            // --- Logic Branch: Media Finished ---
+            else if (data.type === 'MEDIA_FINISHED') {
+                const store = useSequencerStore.getState()
+                const currentEvent = store.events[store.activeEventIndex]
+
+                if (currentEvent && currentEvent.type?.toLowerCase() === 'trigger' && currentEvent.effect?.toLowerCase() === 'media') {
+                    // Check if a specific media was targeted, or fallback to any media finishing
+                    const targetId = currentEvent.mediaTriggerId;
+                    const finishedId = `${data.src}|${data.deviceId}`;
+
+                    if (!targetId || targetId === finishedId) {
+                        console.log('SYNC: Media finished, triggering next event');
+                        store.nextEvent(true);
+                    }
+                }
+            }
+            // --- Logic Branch: Device Availability Update ---
+            else if (data.type === 'DEVICE_STATUS_UPDATE') {
                 console.log('--- NETWORK: Received DEVICE_STATUS_UPDATE for IDs:', Object.keys(data.statuses).join(', '));
-                useShowStore.getState().setDeviceAvailability(data.statuses)
-            } else if (data.type === 'REGISTRATION_REQUIRED') {
-                useShowStore.setState({
+                useSequencerStore.getState().setDeviceAvailability(data.statuses)
+            }
+            // --- Logic Branch: Client Registration Feedback ---
+            else if (data.type === 'REGISTRATION_REQUIRED') {
+                useSequencerStore.setState({
                     registrationStatus: data.status,
                     registrationData: { existingClients: data.existingClients },
                     clientFriendlyName: data.friendlyName || ''
                 })
-            } else if (data.type === 'HOST_PIN_CORRECT') {
-                useShowStore.setState({ registrationStatus: 'WAITING_REGISTRATION' })
+            }
+            // --- Logic Branch: Security/Pin Feedback ---
+            else if (data.type === 'HOST_PIN_CORRECT') {
+                useSequencerStore.setState({ registrationStatus: 'WAITING_REGISTRATION' })
             } else if (data.type === 'HOST_PIN_INCORRECT') {
-                useShowStore.getState().addToast('Ongeldige Host Pin', 'error')
-            } else if (data.type === 'AUTHORIZED') {
-                useShowStore.setState({
+                useSequencerStore.getState().addToast('Ongeldige Host Pin', 'error')
+            }
+            // --- Logic Branch: Authorization Success ---
+            else if (data.type === 'AUTHORIZED') {
+                useSequencerStore.setState({
                     isAuthorized: true,
                     registrationStatus: 'AUTHORIZED',
                     clientFriendlyName: data.friendlyName,
                     appLocked: false
                 })
-                // Once authorized, request state
+                // Once authorized, fetch the latest state from the hub
                 this.sendCommand({ type: 'REQUEST_STATE' })
-            } else if (data.type === 'CLIENT_PIN_INCORRECT') {
-                useShowStore.getState().addToast('Ongeldige Client Pincode', 'error')
+            }
+            // --- Logic Branch: Authorization Failure ---
+            else if (data.type === 'CLIENT_PIN_INCORRECT') {
+                useSequencerStore.getState().addToast('Ongeldige Client Pincode', 'error')
             }
         })
 
@@ -139,7 +210,12 @@ class NetworkService {
         })
     }
 
+    /**
+     * Sends a command packet to the server via the established socket.
+     * @param data The payload containing command type and parameters.
+     */
     sendCommand(data: any) {
+        // Test if the socket is currently active; if so, emit the command
         if (this.socket?.connected) {
             this.socket.emit('command', data)
         } else {
@@ -147,19 +223,30 @@ class NetworkService {
         }
     }
 
+    /**
+     * @returns The unique socket identifier for this session.
+     */
     getSocketId() {
         return this.socket?.id
     }
 
+    /**
+     * Gracefully closes the connection to the hub.
+     */
     disconnect() {
         this.socket?.disconnect()
         this.socket = null
     }
 
+    /**
+     * Announces this client's unique UUID and role (Host/Remote) to the server.
+     */
     registerClient() {
-        const state = useShowStore.getState()
+        const state = useSequencerStore.getState()
         const uuid = state.clientUUID
         const isHost = !!(window as any).require
+
+        // Test if UUID is set and socket is ready; if so, register
         if (uuid && this.socket?.connected) {
             this.sendCommand({
                 type: 'REGISTER_CLIENT',

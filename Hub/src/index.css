@@ -48,6 +48,70 @@
   }
 }
 
+/* PDF Viewer canvas color inversion (dark mode for scripts) */
+.pdf-inverted {
+  filter: grayscale(100%) invert(100%) brightness(1.05) contrast(1.2);
+}
+
+/* PDF page scrubber (range input) */
+.pdf-scrubber {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pdf-scrubber:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.pdf-scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: hsl(263.4 70% 50.4%);
+  cursor: pointer;
+  box-shadow: 0 0 6px hsl(263.4 70% 50.4% / 0.6);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.pdf-scrubber::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 10px hsl(263.4 70% 50.4% / 0.8);
+}
+
+.pdf-scrubber::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: hsl(263.4 70% 50.4%);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 6px hsl(263.4 70% 50.4% / 0.6);
+}
+
+/* Scrubber tooltip — position driven by --offset CSS custom property set inline */
+.pdf-scrubber-tooltip {
+  position: absolute;
+  top: -1.75rem;
+  left: var(--offset, 0%);
+  transform: translateX(-50%);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: hsl(263.4 70% 50.4%);
+  color: white;
+  font-size: 9px;
+  font-weight: 900;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 /* Antigravity Glassmorphism */
 .glass {
   @apply bg-card/60 backdrop-blur-md border border-white/10;
@@ -59,6 +123,35 @@
 
 .sidebar-resizable {
   width: var(--sidebar-width, 600px);
+}
+
+.camera-preview-img {
+  aspect-ratio: 4/3;
+  width: 100%;
+  object-fit: cover;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  width: var(--percent, 0%);
+  transition: width 300ms ease-out;
+}
+
+.videowall-preview-overlay {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 1), 1fr);
+  grid-template-rows: repeat(var(--rows, 1), 1fr);
+  gap: var(--gap, 0px);
+}
+
+.color-indicator {
+  background-color: var(--bg-color, transparent);
+}
+
+.context-menu-container {
+  top: var(--menu-top, 0);
+  left: var(--menu-left, 0);
 }
 
 /* Animations */

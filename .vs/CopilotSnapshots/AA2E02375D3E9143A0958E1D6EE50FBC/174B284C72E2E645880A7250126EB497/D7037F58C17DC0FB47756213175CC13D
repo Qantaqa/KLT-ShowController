@@ -1,0 +1,518 @@
+﻿Imports UglyToad.PdfPig
+Imports UglyToad.PdfPig.Content
+Imports System.Text
+Imports System.IO
+Imports Newtonsoft.Json
+Imports System.Text.RegularExpressions
+Imports System.Drawing
+Imports System.Linq
+
+Module ScriptEditor
+
+    Private isInitialized As Boolean = False
+
+    Private Class IndexEntry
+        Public Property Display As String
+        Public Property Offset As Integer
+        Public Property Kind As String  ' H1 | H2 | H3 | SongTitle | Bookmark | Time | Actor | (legacy)
+    End Class
+
+    Private IndexEntries As New List(Of IndexEntry)
+
+    ' Persistable script line (now with optional BookmarkId)
+    Private Class ScriptLine
+        Public Property Text As String
+        Public Property Type As String  ' Normal | H1 | H2 | H3 | SongTitle | SongText | Comment | Acting | Actor | Bookmark | Time
+        Public Property BookmarkId As String ' Only set when Type = Bookmark
+    End Class
+
+    ' StageHand action model for JSON persistence
+    Private Class StageHandAction
+        Public Property BookmarkId As String
+        Public Property OrderId As Integer
+        Public Property StageHand As String
+        Public Property WhenText As String ' renamed to avoid VB keyword issues
+        Public Property What As String
+    End Class
+
+    Private Class ScriptDocument
+        Public Property Version As Integer = 2
+        Public Property Lines As List(Of ScriptLine)
+        Public Property StageHandActions As List(Of StageHandAction)
+    End Class
+
+    ' Line index -> Type
+    Private LineTypes As New Dictionary(Of Integer, String)
+    ' Line index -> BookmarkId
+    Private BookmarkIds As New Dictionary(Of Integer, String)
+    Private nextBookmarkCounter As Integer = 1
+
+    Public Sub InitializeScriptEditor()
+        If isInitialized Then Return
+        If FrmMain IsNot Nothing Then
+            For Each tsi In FrmMain.ToolStrip_ScriptEditor.Items
+                Dim dd = TryCast(tsi, ToolStripDropDownButton)
+                If dd IsNot Nothing Then
+                    For Each mi As ToolStripItem In dd.DropDownItems
+                        Select Case mi.Text.ToLowerInvariant()
+                            Case "import" : AddHandler mi.Click, AddressOf OnImportScriptClick
+                            Case "load" : AddHandler mi.Click, AddressOf OnLoadScriptClick
+                            Case "save" : AddHandler mi.Click, AddressOf OnSaveScriptClick
+                        End Select
+                    Next
+                End If
+                Dim btn = TryCast(tsi, ToolStripButton)
+                If btn IsNot Nothing Then
+                    Select Case btn.Name
+                        Case "TSB_Editor_H1" : AddHandler btn.Click, Sub() ApplyHeader(1)
+                        Case "TSB_Editor_H2" : AddHandler btn.Click, Sub() ApplyHeader(2)
+                        Case "TSB_Editor_H3" : AddHandler btn.Click, Sub() ApplyHeader(3)
+                        Case "TSB_Editor_Comment" : AddHandler btn.Click, AddressOf ApplyComment
+                        Case "TSB_Editor_SongText" : AddHandler btn.Click, AddressOf ApplySongText
+                        Case "TSB_Editor_SongTitle" : AddHandler btn.Click, AddressOf ApplySongTitle
+                        Case "TSB_Editor_Acting" : AddHandler btn.Click, AddressOf ApplyActing
+                        Case "TSB_Editor_Actor" : AddHandler btn.Click, AddressOf ApplyActor
+                        Case "TSB_Editor_RebuildIndex" : AddHandler btn.Click, Sub() BuildScriptIndex(FrmMain.RichTextBox_ScriptEditor.Text)
+                        Case "TSB_Editor_Bookmark" : AddHandler btn.Click, AddressOf ApplyBookmark
+                    End Select
+                End If
+            Next
+            AddHandler FrmMain.ListBox_ScriptIndex.SelectedIndexChanged, AddressOf OnIndexSelected
+        End If
+        isInitialized = True
+    End Sub
+
+    ' ---------------- PDF IMPORT ----------------
+    Private Sub OnImportScriptClick(sender As Object, e As EventArgs)
+        Dim ofd As New OpenFileDialog() With {
+            .Title = "Importeer Script (PDF/PDF-A)",
+            .Filter = "PDF bestanden (*.pdf)|*.pdf",
+            .Multiselect = False
+        }
+        If ofd.ShowDialog() <> DialogResult.OK Then Return
+        Try
+            Dim sb As New StringBuilder()
+            Using pdf = PdfDocument.Open(ofd.FileName)
+                Dim pageIndex As Integer = 1
+                For Each page In pdf.GetPages()
+                    Dim words = page.GetWords()
+                    If words IsNot Nothing AndAlso words.Count > 0 Then
+                        Dim lineBuilder As New StringBuilder()
+                        Dim lastBottom As Double = -1
+                        For Each w In words
+                            Dim bottom = Math.Round(w.BoundingBox.Bottom, 1)
+                            If lastBottom <> -1 AndAlso Math.Abs(bottom - lastBottom) > 1.5 Then
+                                sb.AppendLine(lineBuilder.ToString().Trim())
+                                lineBuilder.Clear()
+                            End If
+                            lineBuilder.Append(w.Text & " ")
+                            lastBottom = bottom
+                        Next
+                        If lineBuilder.Length > 0 Then sb.AppendLine(lineBuilder.ToString().Trim())
+                    Else
+                        sb.AppendLine(page.Text)
+                    End If
+                    sb.AppendLine("--- Pagina " & pageIndex & " ---")
+                    pageIndex += 1
+                Next
+            End Using
+            Dim cleaned = PostProcessImportedText(sb.ToString())
+            FrmMain.RichTextBox_ScriptEditor.Clear()
+            FrmMain.RichTextBox_ScriptEditor.Text = cleaned
+            LineTypes.Clear()
+            BookmarkIds.Clear()
+            BuildScriptIndex(cleaned)
+            ToonFlashBericht("Script geïmporteerd.", 2)
+        Catch ex As Exception
+            MessageBox.Show("Fout bij importeren PDF: " & ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Function PostProcessImportedText(raw As String) As String
+        Return raw
+    End Function
+
+    ' --------------- INDEX BUILD ----------------
+    Private Sub BuildScriptIndex(allText As String)
+        FrmMain.ListBox_ScriptIndex.Items.Clear()
+        IndexEntries.Clear()
+
+        Dim lines = allText.Split({Environment.NewLine}, StringSplitOptions.None)
+        Dim offset As Integer = 0
+        For i = 0 To lines.Length - 1
+            Dim line = lines(i)
+            Dim trimmed = line.Trim()
+            Dim kind As String = Nothing
+            Dim display As String = Nothing
+            Dim storedType As String = Nothing
+            If LineTypes.ContainsKey(i) Then storedType = LineTypes(i)
+
+            If storedType IsNot Nothing Then
+                Select Case storedType
+                    Case "H1", "H2", "H3"
+                        kind = storedType : display = trimmed
+                    Case "SongTitle"
+                        kind = "SongTitle" : display = "♫ " & trimmed
+                    Case "Bookmark"
+                        kind = "Bookmark" : display = "⚑ " & trimmed
+                    Case "Actor"
+                        kind = "Actor" : display = "👤 " & trimmed
+                End Select
+            End If
+
+            If kind IsNot Nothing Then
+                Dim entry As New IndexEntry With {.Display = display, .Offset = offset, .Kind = kind}
+                IndexEntries.Add(entry)
+                FrmMain.ListBox_ScriptIndex.Items.Add(display)
+            End If
+            offset += line.Length + Environment.NewLine.Length
+        Next
+    End Sub
+
+    Private Sub OnIndexSelected(sender As Object, e As EventArgs)
+        Dim lb = DirectCast(sender, ListBox)
+        Dim idx = lb.SelectedIndex
+        If idx < 0 OrElse idx >= IndexEntries.Count Then Return
+        Dim entry = IndexEntries(idx)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        If entry.Offset < 0 OrElse entry.Offset > rtb.TextLength Then Return
+        rtb.SelectionStart = entry.Offset
+        rtb.SelectionLength = 0
+        rtb.ScrollToCaret()
+        rtb.Focus()
+    End Sub
+
+    ' --------------- SAVE / LOAD ----------------
+    Private Sub OnSaveScriptClick(sender As Object, e As EventArgs)
+        Dim sfd As New SaveFileDialog() With {
+            .Title = "Bewaar script",
+            .Filter = "KLT Script (*.kls)|*.kls|Alle bestanden (*.*)|*.*",
+            .DefaultExt = "kls"
+        }
+        If sfd.ShowDialog() <> DialogResult.OK Then Return
+        Try
+            Dim lines = FrmMain.RichTextBox_ScriptEditor.Text.Split({Environment.NewLine}, StringSplitOptions.None)
+            Dim doc As New ScriptDocument With {.Lines = New List(Of ScriptLine)(), .StageHandActions = New List(Of StageHandAction)()}
+            For i = 0 To lines.Length - 1
+                Dim t As String = "Normal"
+                If LineTypes.ContainsKey(i) Then t = LineTypes(i)
+                Dim bId As String = Nothing
+                If t = "Bookmark" AndAlso BookmarkIds.ContainsKey(i) Then bId = BookmarkIds(i)
+                doc.Lines.Add(New ScriptLine With {.Text = lines(i), .Type = t, .BookmarkId = bId})
+            Next
+            ' Use DataGridView1 (stage hand actions grid)
+            If FrmMain.DG_StageHandActions IsNot Nothing Then
+                For Each row As DataGridViewRow In FrmMain.DG_StageHandActions.Rows
+                    If row.IsNewRow Then Continue For
+                    Dim bid = SafeCellString(row, "col_SH_BookMarkID")
+                    Dim ord = SafeCellInt(row, "col_SH_OrderId")
+                    Dim sh = SafeCellString(row, "col_SH_StageHand")
+                    Dim whn = SafeCellString(row, "col_SH_When")
+                    Dim wht = SafeCellString(row, "col_SH_What")
+                    If bid <> "" OrElse sh <> "" OrElse wht <> "" Then
+                        doc.StageHandActions.Add(New StageHandAction With {.BookmarkId = bid, .OrderId = ord, .StageHand = sh, .WhenText = whn, .What = wht})
+                    End If
+                Next
+            End If
+            Dim json = JsonConvert.SerializeObject(doc, Formatting.Indented)
+            File.WriteAllText(sfd.FileName, json, Encoding.UTF8)
+            ToonFlashBericht("Script opgeslagen (KLS).", 2)
+        Catch ex As Exception
+            MessageBox.Show("Fout bij opslaan: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Function SafeCellString(row As DataGridViewRow, name As String) As String
+        If Not row.DataGridView.Columns.Contains(name) Then Return ""
+        Dim v = row.Cells(name).Value
+        If v Is Nothing Then Return ""
+        Return v.ToString()
+    End Function
+    Private Function SafeCellInt(row As DataGridViewRow, name As String) As Integer
+        Dim s = SafeCellString(row, name)
+        Dim val As Integer = 0
+        Integer.TryParse(s, val)
+        Return val
+    End Function
+
+    Private Sub OnLoadScriptClick(sender As Object, e As EventArgs)
+        Dim ofd As New OpenFileDialog() With {
+            .Title = "Laad script",
+            .Filter = "KLT Script (*.kls)|*.kls|Alle bestanden (*.*)|*.*",
+            .Multiselect = False
+        }
+        If ofd.ShowDialog() <> DialogResult.OK Then Return
+        Try
+            Dim json = File.ReadAllText(ofd.FileName, Encoding.UTF8)
+            Dim doc = JsonConvert.DeserializeObject(Of ScriptDocument)(json)
+            If doc Is Nothing OrElse doc.Lines Is Nothing Then Throw New Exception("Ongeldig scriptbestand.")
+            LineTypes.Clear()
+            BookmarkIds.Clear()
+            Dim sb As New StringBuilder()
+            For i = 0 To doc.Lines.Count - 1
+                Dim ln = doc.Lines(i)
+                sb.AppendLine(ln.Text)
+                If Not String.IsNullOrEmpty(ln.Type) AndAlso ln.Type <> "Normal" Then
+                    LineTypes(i) = ln.Type
+                End If
+                If ln.Type = "Bookmark" AndAlso Not String.IsNullOrEmpty(ln.BookmarkId) Then
+                    BookmarkIds(i) = ln.BookmarkId
+                End If
+            Next
+            FrmMain.RichTextBox_ScriptEditor.Text = sb.ToString().TrimEnd()
+            ReapplyFormatting()
+            BuildScriptIndex(FrmMain.RichTextBox_ScriptEditor.Text)
+            If FrmMain.DG_StageHandActions IsNot Nothing Then
+                FrmMain.DG_StageHandActions.Rows.Clear()
+                If doc.StageHandActions IsNot Nothing Then
+                    For Each act In doc.StageHandActions.OrderBy(Function(a) a.BookmarkId).ThenBy(Function(a) a.OrderId)
+                        FrmMain.DG_StageHandActions.Rows.Add(act.BookmarkId, act.OrderId, act.StageHand, act.WhenText, act.What)
+                    Next
+                End If
+            End If
+            ToonFlashBericht("Script geladen.", 2)
+        Catch ex As Exception
+            MessageBox.Show("Fout bij laden: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub ReapplyFormatting()
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        rtb.SuspendLayout()
+        Try
+            For Each kv In LineTypes
+                Dim idx = kv.Key
+                If idx < 0 OrElse idx >= rtb.Lines.Length Then Continue For
+                Dim lineStart = rtb.GetFirstCharIndexFromLine(idx)
+                Dim lineText = rtb.Lines(idx)
+                If lineStart < 0 Then Continue For
+                rtb.Select(lineStart, lineText.Length)
+                ApplyFormattingForType(kv.Value, False)
+            Next
+            rtb.Select(rtb.TextLength, 0)
+        Finally
+            rtb.ResumeLayout()
+        End Try
+    End Sub
+
+    Private Sub ApplyFormattingForType(t As String, rebuild As Boolean)
+        Select Case t
+            Case "H1" : FormatHeader(1, False)
+            Case "H2" : FormatHeader(2, False)
+            Case "H3" : FormatHeader(3, False)
+            Case "SongTitle" : FormatSongTitle(False)
+            Case "SongText" : FormatSongText(False)
+            Case "Comment" : FormatComment(False)
+            Case "Acting" : FormatActing(False)
+            Case "Actor" : FormatActor(False)
+            Case "Bookmark" : FormatBookmark(False)
+        End Select
+        If rebuild Then BuildScriptIndex(FrmMain.RichTextBox_ScriptEditor.Text)
+    End Sub
+
+    ' ---------------- STYLE APPLICATION HELPERS ----------------
+    Private Sub UpdateLinesTypeForSelection(typeValue As String)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        Dim selStart = rtb.SelectionStart
+        Dim selEnd = selStart + rtb.SelectionLength
+        Dim firstLine = rtb.GetLineFromCharIndex(selStart)
+        Dim lastLine = rtb.GetLineFromCharIndex(Math.Max(selEnd - 1, selStart))
+        For ln = firstLine To lastLine
+            LineTypes(ln) = typeValue
+        Next
+    End Sub
+
+    Private Sub ApplyHeader(level As Integer)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        If rtb Is Nothing Then Return
+        rtb.SuspendLayout()
+        Try
+            EnsureSelectionCoversLineIfEmpty(rtb)
+            FormatHeader(level, True)
+            UpdateLinesTypeForSelection("H" & level)
+        Catch ex As Exception
+            ToonFlashBericht("Header formattering fout: " & ex.Message, 5, FlashSeverity.IsError)
+        Finally
+            rtb.ResumeLayout()
+            BuildScriptIndex(rtb.Text)
+        End Try
+    End Sub
+
+    Private Sub ApplyComment(sender As Object, e As EventArgs)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor : If rtb Is Nothing Then Return
+        rtb.SuspendLayout()
+        Try
+            EnsureSelectionCoversLineIfEmpty(rtb)
+            FormatComment(True)
+            UpdateLinesTypeForSelection("Comment")
+        Catch ex As Exception
+            ToonFlashBericht("Comment formattering fout: " & ex.Message, 5, FlashSeverity.IsError)
+        Finally
+            rtb.ResumeLayout()
+        End Try
+    End Sub
+
+    Private Sub ApplySongText(sender As Object, e As EventArgs)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor : If rtb Is Nothing Then Return
+        rtb.SuspendLayout()
+        Try
+            EnsureSelectionCoversLineIfEmpty(rtb)
+            FormatSongText(True)
+            UpdateLinesTypeForSelection("SongText")
+        Catch ex As Exception
+            ToonFlashBericht("Songtekst formattering fout: " & ex.Message, 5, FlashSeverity.IsError)
+        Finally
+            rtb.ResumeLayout()
+            BuildScriptIndex(rtb.Text)
+        End Try
+    End Sub
+
+    Private Sub ApplySongTitle(sender As Object, e As EventArgs)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor : If rtb Is Nothing Then Return
+        rtb.SuspendLayout()
+        Try
+            EnsureSelectionCoversLineIfEmpty(rtb)
+            FormatSongTitle(True)
+            UpdateLinesTypeForSelection("SongTitle")
+        Catch ex As Exception
+            ToonFlashBericht("Songtitel formattering fout: " & ex.Message, 5, FlashSeverity.IsError)
+        Finally
+            rtb.ResumeLayout()
+            BuildScriptIndex(rtb.Text)
+        End Try
+    End Sub
+
+    Private Sub ApplyActing(sender As Object, e As EventArgs)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor : If rtb Is Nothing Then Return
+        rtb.SuspendLayout()
+        Try
+            EnsureSelectionCoversLineIfEmpty(rtb)
+            FormatActing(True)
+            UpdateLinesTypeForSelection("Acting")
+        Catch ex As Exception
+            ToonFlashBericht("Acting formattering fout: " & ex.Message, 5, FlashSeverity.IsError)
+        Finally
+            rtb.ResumeLayout()
+        End Try
+    End Sub
+
+    Private Sub ApplyActor(sender As Object, e As EventArgs)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor : If rtb Is Nothing Then Return
+        rtb.SuspendLayout()
+        Try
+            EnsureSelectionCoversLineIfEmpty(rtb)
+            FormatActor(True)
+            UpdateLinesTypeForSelection("Actor")
+        Catch ex As Exception
+            ToonFlashBericht("Actor formattering fout: " & ex.Message, 5, FlashSeverity.IsError)
+        Finally
+            rtb.ResumeLayout()
+            BuildScriptIndex(rtb.Text)
+        End Try
+    End Sub
+
+    Private Sub ApplyBookmark(sender As Object, e As EventArgs)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor : If rtb Is Nothing Then Return
+        rtb.SuspendLayout()
+        Try
+            EnsureSelectionCoversLineIfEmpty(rtb)
+            FormatBookmark(True)
+            UpdateLinesTypeForSelection("Bookmark")
+            ' Assign bookmark id for each affected line
+            Dim firstLine = rtb.GetLineFromCharIndex(rtb.SelectionStart)
+            Dim lastLine = rtb.GetLineFromCharIndex(rtb.SelectionStart + rtb.SelectionLength - 1)
+            For ln = firstLine To lastLine
+                If Not BookmarkIds.ContainsKey(ln) Then
+                    Dim bid = $"BM{nextBookmarkCounter:0000}"
+                    nextBookmarkCounter += 1
+                    BookmarkIds(ln) = bid
+                    ' Add empty StageHand action row for user to fill
+                    If FrmMain.DG_StageHandActions IsNot Nothing Then
+                        FrmMain.DG_StageHandActions.Rows.Add(BookmarkIds(ln), 1, "", "", "")
+                    End If
+                End If
+            Next
+        Catch ex As Exception
+            ToonFlashBericht("Bookmark fout: " & ex.Message, 5, FlashSeverity.IsError)
+        Finally
+            rtb.ResumeLayout()
+            BuildScriptIndex(rtb.Text)
+        End Try
+    End Sub
+
+    ' ---------------- LOW LEVEL FORMATTERS ----------------
+    Private Sub FormatHeader(level As Integer, modifyText As Boolean)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        Dim baseSize = rtb.Font.Size
+        Dim newSize As Single = baseSize
+        Dim color As Color = Color.Black
+        Select Case level
+            Case 1 : newSize = baseSize + 6 : color = Color.DarkBlue
+            Case 2 : newSize = baseSize + 4 : color = Color.SteelBlue
+            Case 3 : newSize = baseSize + 2 : color = Color.SaddleBrown
+        End Select
+        rtb.SelectionColor = color
+        rtb.SelectionFont = New Font(rtb.Font.FontFamily, newSize, FontStyle.Bold)
+        If modifyText Then
+            Dim selectedText = rtb.SelectedText
+            Dim parts = selectedText.Split({Environment.NewLine}, StringSplitOptions.None)
+            For i = 0 To parts.Length - 1
+                parts(i) = parts(i).Trim()
+            Next
+            rtb.SelectedText = String.Join(Environment.NewLine, parts)
+        End If
+    End Sub
+
+    Private Sub FormatComment(modifyText As Boolean)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        rtb.SelectionColor = Color.Gray
+        rtb.SelectionFont = New Font(rtb.Font, FontStyle.Italic)
+    End Sub
+
+    Private Sub FormatSongText(modifyText As Boolean)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        rtb.SelectionColor = Color.Orange
+        rtb.SelectionFont = New Font(rtb.Font, FontStyle.Bold)
+        rtb.SelectionIndent = 40 ' ensure indent (requirement #4)
+        If modifyText Then rtb.SelectedText = rtb.SelectedText.ToUpperInvariant()
+    End Sub
+
+    Private Sub FormatSongTitle(modifyText As Boolean)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        rtb.SelectionColor = Color.Red
+        rtb.SelectionFont = New Font(rtb.Font.FontFamily, rtb.Font.Size + 1, FontStyle.Bold)
+        If modifyText Then rtb.SelectedText = rtb.SelectedText.ToUpperInvariant()
+    End Sub
+
+    Private Sub FormatActing(modifyText As Boolean)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        rtb.SelectionColor = Color.White
+        rtb.SelectionFont = New Font(rtb.Font, FontStyle.Regular)
+        rtb.SelectionIndent = 40
+    End Sub
+
+    Private Sub FormatActor(modifyText As Boolean)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        rtb.SelectionColor = Color.LightBlue
+        rtb.SelectionFont = New Font(rtb.Font, FontStyle.Bold)
+        If modifyText Then rtb.SelectedText = rtb.SelectedText.ToUpperInvariant()
+    End Sub
+
+    Private Sub FormatBookmark(modifyText As Boolean)
+        Dim rtb = FrmMain.RichTextBox_ScriptEditor
+        rtb.SelectionColor = Color.DarkViolet
+        rtb.SelectionFont = New Font(rtb.Font, FontStyle.Bold)
+    End Sub
+
+    Private Sub EnsureSelectionCoversLineIfEmpty(rtb As RichTextBox)
+        If rtb.SelectionLength > 0 Then Return
+        Dim selStart = rtb.SelectionStart
+        Dim lineIndex = rtb.GetLineFromCharIndex(selStart)
+        If lineIndex < 0 OrElse lineIndex >= rtb.Lines.Length Then Return
+        Dim lineStart = rtb.GetFirstCharIndexFromLine(lineIndex)
+        Dim lineText = rtb.Lines(lineIndex)
+        rtb.SelectionStart = lineStart
+        rtb.SelectionLength = lineText.Length
+    End Sub
+
+End Module

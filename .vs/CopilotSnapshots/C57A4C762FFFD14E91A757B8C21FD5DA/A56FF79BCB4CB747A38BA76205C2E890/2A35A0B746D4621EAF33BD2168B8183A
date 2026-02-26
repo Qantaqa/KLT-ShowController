@@ -1,0 +1,291 @@
+﻿Imports System.ComponentModel
+Imports System.Drawing.Design
+Imports System.Net
+Imports System.Net.Http
+Imports System.Text
+Imports System.Text.RegularExpressions
+Imports System.Threading.Tasks.Dataflow
+Imports System.Windows.Forms.AxHost
+Imports Newtonsoft.Json.Linq
+
+Module WLEDControl
+
+    ' ================== OFFLINE DETECTIE & MARKERING ==================
+    Private Function IsDeviceOffline(wledName As String) As Boolean
+        If String.IsNullOrWhiteSpace(wledName) Then Return True
+        For Each devRow As DataGridViewRow In FrmMain.DG_Devices.Rows
+            If devRow.IsNewRow Then Continue For
+            If String.Equals(Convert.ToString(devRow.Cells("colInstance").Value), wledName, StringComparison.OrdinalIgnoreCase) Then
+                ' Enabled kolom (optioneel) en online icoon controleren
+                Dim enabledOk As Boolean = True
+                If devRow.Cells("colEnabled").Value IsNot Nothing Then
+                    Boolean.TryParse(devRow.Cells("colEnabled").Value.ToString(), enabledOk)
+                End If
+                Dim img = TryCast(devRow.Cells("colOnline").Value, Image)
+                Dim green As Boolean = (img Is My.Resources.iconGreenBullet1)
+                Return (Not enabledOk) OrElse (Not green)
+            End If
+        Next
+        Return True ' Niet gevonden => behandel als offline
+    End Function
+
+    Private Sub MarkShowRowsForDevice(DG_Show As DataGridView, wledName As String, act As String, scene As String, evt As String, offline As Boolean)
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+            Dim fixture = TryCast(row.Cells("colFixture").Value, String)
+            If String.IsNullOrEmpty(fixture) OrElse fixture.StartsWith("**") Then Continue For
+            Dim parts = fixture.Split("/"c)
+            If parts.Length <> 2 Then Continue For
+            If String.Equals(parts(0), wledName, StringComparison.OrdinalIgnoreCase) AndAlso
+               Convert.ToString(row.Cells("colAct").Value) = act AndAlso
+               Convert.ToString(row.Cells("colSceneId").Value) = scene AndAlso
+               Convert.ToString(row.Cells("colEventId").Value) = evt Then
+                If offline Then
+                    row.DefaultCellStyle.BackColor = Color.DarkRed
+                    row.DefaultCellStyle.ForeColor = Color.White
+                Else
+                    row.DefaultCellStyle.BackColor = SystemColors.Window
+                    row.DefaultCellStyle.ForeColor = SystemColors.ControlText
+                End If
+            End If
+        Next
+    End Sub
+
+    ' ****************************************************************************************
+    '  Stuur een effect naar de WLED-instantie.
+    ' ****************************************************************************************
+    Public Async Function SendEffectToWLed(IPAddress As String, Segment As String, effectId As Integer) As Task
+        Using client As New HttpClient()
+            Try
+                Dim payload As String = "{\"seg\":[{\"fx\":" & effectId & ",\"id\":\"" & Segment & "\"}]}"
+
+                Dim content As New StringContent(payload, Encoding.UTF8, "application/json")
+                Dim postResponse As HttpResponseMessage = Await client.PostAsync("http://" + IPAddress + "/json/state", content)
+                Dim responseContent As String = Await postResponse.Content.ReadAsStringAsync()
+                FrmMain.txt_APIResult.Text = responseContent
+                If postResponse.IsSuccessStatusCode Then
+                    FrmMain.txt_APIResult.Text = $"Effect met ID '{effectId}' toegepast op '{IPAddress }'."
+                Else
+                    MessageBox.Show($"Fout bij het toepassen van effect (HTTP {postResponse.StatusCode}): {responseContent}", "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End If
+            Catch ex As HttpRequestException
+                FrmMain.txt_APIResult.Text = $"Fout bij het toepassen van effect: {ex.Message}"
+                ToonFlashBericht($"Fout bij het toepassen van effect: {ex.Message}", 2)
+            Catch ex As TaskCanceledException
+                FrmMain.txt_APIResult.Text = "Timeout bij het toepassen van effect."
+                ToonFlashBericht("Timeout bij het toepassen van effect.", 2)
+            Catch ex As Exception
+                FrmMain.txt_APIResult.Text = $"Onverwachte fout: {ex.Message}"
+                ToonFlashBericht($"Onverwachte fout: {ex.Message}", 2)
+            End Try
+        End Using
+    End Function
+
+    ' *********************************************************
+    ' Deze functie stuurt een POST-verzoek naar de WLED API om het effect toe te passen
+    ' *********************************************************
+    Public Async Function SendPaletteToWLed(ipAddress As String, paletteId As Integer) As Task
+        Dim payload As String = "{\"seg\":[{\"pal\":" & paletteId & "}]}"
+
+        Dim content As New StringContent(payload, Encoding.UTF8, "application/json")
+        Using client As New HttpClient()
+            Try
+                ' Stuur het POST-verzoek naar de WLED API
+                Dim postResponse As HttpResponseMessage = Await client.PostAsync("http://" + ipAddress + "/json/state", content)
+                Dim responseContent As String = Await postResponse.Content.ReadAsStringAsync()
+                FrmMain.txt_APIResult.Text = responseContent
+                ' Controleer de statuscode van het antwoord
+                If postResponse.IsSuccessStatusCode Then
+                    FrmMain.txt_APIResult.Text = $"Palette met ID '{paletteId}' toegepast op '{ipAddress}'."
+                Else
+                    MessageBox.Show($"Fout bij het toepassen van effect (HTTP {postResponse.StatusCode}): {responseContent}", "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End If
+            Catch ex As HttpRequestException
+                FrmMain.txt_APIResult.Text = $"Fout bij het toepassen van palette: {ex.Message}"
+                MessageBox.Show($"Fout bij het toepassen van palette: {ex.Message}", "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Catch ex As TaskCanceledException
+                FrmMain.txt_APIResult.Text = "Timeout bij het toepassen van palette."
+                MessageBox.Show("Timeout bij het toepassen van palette.", "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Catch ex As Exception
+                FrmMain.txt_APIResult.Text = $"Onverwachte fout: {ex.Message}"
+                MessageBox.Show($"Onverwachte fout: {ex.Message}", "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End Try
+        End Using
+    End Function
+
+    ' **********************************************************
+    Private Async Function SendJsonToWLED2(ipAddress As String, content As StringContent) As Task
+        Using client As New HttpClient()
+            Try
+                Dim postResponse As HttpResponseMessage = Await client.PostAsync("http://" + ipAddress + "/json/state", content)
+                postResponse.EnsureSuccessStatusCode()
+                Dim responseContent As String = Await postResponse.Content.ReadAsStringAsync()
+                FrmMain.txt_APIResult.Text = responseContent
+                If postResponse.IsSuccessStatusCode Then
+                    FrmMain.txt_APIResult.Text = "Succes"
+                Else
+                    MessageBox.Show($"Fout bij het verzenden van commando naar WLED {ipAddress}", "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End If
+            Catch ex As HttpRequestException
+                MessageBox.Show($"Fout bij het verzenden van commando naar WLED {ipAddress}: {ex.Message}", "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                FrmMain.txt_APIResult.Text = $"Fout: {ex.Message}"
+            Catch ex As TaskCanceledException
+                MessageBox.Show($"Timeout bij het verzenden van commando naar WLED {ipAddress}.", "Timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                FrmMain.txt_APIResult.Text = "Timeout bij verzenden van commando."
+            Catch ex As Exception
+                MessageBox.Show($"Onverwachte fout: {ex.Message}", "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                FrmMain.txt_APIResult.Text = $"Fout: {ex.Message}"
+            End Try
+        End Using
+    End Function
+
+    ' ================== APPLY EN INSTRUCTIE SET ==================
+    Public Async Sub Apply_DGShowRow_ToWLED(ByVal DG_Show As DataGridView, ByVal DG_Devices As DataGridView, ByVal DG_Effecten As DataGridView, ByVal DG_Paletten As DataGridView, notify As Boolean)
+        If DG_Show.RowCount = 0 Then Exit Sub
+        If DG_Show.CurrentCell Is Nothing OrElse DG_Show.CurrentRow Is Nothing OrElse DG_Show.CurrentRow.IsNewRow Then Exit Sub
+
+        Dim currentRow = DG_Show.CurrentRow
+        Dim selectedFixture = TryCast(currentRow.Cells("colFixture").Value, String)
+        If String.IsNullOrEmpty(selectedFixture) OrElse selectedFixture.StartsWith("**") Then Exit Sub
+        Dim parts = selectedFixture.Split("/"c)
+        If parts.Length <> 2 Then Exit Sub
+        Dim wledName = parts(0)
+        Dim segmentId = parts(1)
+
+        Dim act = Convert.ToString(currentRow.Cells("colAct").Value)
+        Dim scene = Convert.ToString(currentRow.Cells("colSceneId").Value)
+        Dim evt = Convert.ToString(currentRow.Cells("colEventId").Value)
+
+        If IsDeviceOffline(wledName) Then
+            MarkShowRowsForDevice(DG_Show, wledName, act, scene, evt, True)
+            If notify Then ToonFlashBericht($"Device {wledName} offline - overslaan.", 2, FlashSeverity.IsWarning)
+            Exit Sub
+        Else
+            MarkShowRowsForDevice(DG_Show, wledName, act, scene, evt, False)
+        End If
+
+        ' Zoek IP
+        Dim wledIp As String = ""
+        For Each devRow As DataGridViewRow In DG_Devices.Rows
+            If devRow.IsNewRow Then Continue For
+            If Convert.ToString(devRow.Cells("colInstance").Value) = wledName Then
+                wledIp = Convert.ToString(devRow.Cells("colIPAddress").Value)
+                Exit For
+            End If
+        Next
+        If String.IsNullOrEmpty(wledIp) Then Exit Sub
+
+        Dim stateOnOff = Convert.ToString(currentRow.Cells("colStateOnOff").Value)
+        Dim effectName = Convert.ToString(currentRow.Cells("colEffect").Value)
+        Dim paletteName = Convert.ToString(currentRow.Cells("colPalette").Value)
+        Dim brightness = Convert.ToString(currentRow.Cells("colBrightness").Value)
+        Dim speed = Convert.ToString(currentRow.Cells("colSpeed").Value)
+        Dim intensity = Convert.ToString(currentRow.Cells("colIntensity").Value)
+
+        Dim effectId = GetEffectIdFromName(effectName, DG_Effecten)
+        Dim paletteId = GetPaletteIdFromName(paletteName, DG_Paletten)
+        Dim onFlag = If(stateOnOff = "Uit", "false", "true")
+
+        Dim payload As String = "{""seg"": [{" &
+                          """id"": " & segmentId & "," &
+                          """on"": " & onFlag & "," &
+                          """fx"": " & effectId & "," &
+                          """pal"": " & paletteId & "," &
+                          """sel"": true," &
+                          """bri"": " & brightness & "," &
+                          """sx"": " & speed & "," &
+                          """ix"": " & intensity & "}]}"
+        Dim content As New StringContent(payload, Encoding.UTF8, "application/json")
+        Await SendJsonToWLED2(wledIp, content)
+        If notify Then
+            ToonFlashBericht($"Segment {segmentId} van {wledName} ingesteld (effect {effectName}, palette {paletteName}).", 2)
+        End If
+    End Sub
+
+    Public Async Sub SendInstructionSetForDevice(DG_Show As DataGridView, primaryRow As DataGridViewRow)
+        Dim act = Convert.ToString(primaryRow.Cells("colAct").Value)
+        Dim scene = Convert.ToString(primaryRow.Cells("colSceneId").Value)
+        Dim evt = Convert.ToString(primaryRow.Cells("colEventId").Value)
+        Dim fixture = Convert.ToString(primaryRow.Cells("colFixture").Value)
+        If String.IsNullOrEmpty(fixture) OrElse fixture.StartsWith("**") Then Exit Sub
+        Dim wledName = fixture.Split("/"c)(0)
+
+        If IsDeviceOffline(wledName) Then
+            MarkShowRowsForDevice(DG_Show, wledName, act, scene, evt, True)
+            ToonFlashBericht($"{wledName} offline - overslaan.", 2, FlashSeverity.IsWarning)
+            Exit Sub
+        Else
+            MarkShowRowsForDevice(DG_Show, wledName, act, scene, evt, False)
+        End If
+
+        ' IP bepalen
+        Dim wledIp As String = ""
+        For Each devRow As DataGridViewRow In FrmMain.DG_Devices.Rows
+            If devRow.IsNewRow Then Continue For
+            If Convert.ToString(devRow.Cells("colInstance").Value) = wledName Then
+                wledIp = Convert.ToString(devRow.Cells("colIPAddress").Value)
+                Exit For
+            End If
+        Next
+        If String.IsNullOrEmpty(wledIp) Then Exit Sub
+
+        ' Verzamel alle segmenten voor hetzelfde act/scene/event & device
+        Dim segmentArray As New List(Of JObject)
+        For Each row As DataGridViewRow In DG_Show.Rows
+            If row.IsNewRow Then Continue For
+            If Convert.ToString(row.Cells("colAct").Value) <> act OrElse
+               Convert.ToString(row.Cells("colSceneId").Value) <> scene OrElse
+               Convert.ToString(row.Cells("colEventId").Value) <> evt Then Continue For
+
+            Dim rowFixture = Convert.ToString(row.Cells("colFixture").Value)
+            If String.IsNullOrEmpty(rowFixture) OrElse rowFixture.StartsWith("**") Then Continue For
+            Dim parts = rowFixture.Split("/"c)
+            If parts.Length <> 2 OrElse parts(0) <> wledName Then Continue For
+
+            Dim segId As Integer
+            If Not Integer.TryParse(parts(1), segId) Then Continue For
+
+            Dim stateOnOff = Convert.ToString(row.Cells("colStateOnOff").Value)
+            Dim effectName = Convert.ToString(row.Cells("colEffect").Value)
+            Dim paletteName = Convert.ToString(row.Cells("colPalette").Value)
+            Dim brightness = Convert.ToString(row.Cells("colBrightness").Value)
+            Dim speed = Convert.ToString(row.Cells("colSpeed").Value)
+            Dim intensity = Convert.ToString(row.Cells("colIntensity").Value)
+            Dim effectId = GetEffectIdFromName(effectName, FrmMain.DG_Effecten)
+            Dim paletteId = GetPaletteIdFromName(paletteName, FrmMain.DG_Paletten)
+            Dim onFlag = (stateOnOff <> "Uit")
+
+            Dim segObj As New JObject From {
+                {"id", segId},
+                {"on", onFlag},
+                {"fx", effectId},
+                {"pal", paletteId},
+                {"sel", True},
+                {"bri", If(String.IsNullOrEmpty(brightness), 255, CInt(brightness))},
+                {"sx", If(String.IsNullOrEmpty(speed), 127, CInt(speed))},
+                {"ix", If(String.IsNullOrEmpty(intensity), 127, CInt(intensity))}
+            }
+            segmentArray.Add(segObj)
+            If DG_Show.Columns.Contains("colSend") Then row.Cells("colSend").Value = True
+        Next
+        If segmentArray.Count = 0 Then Exit Sub
+
+        Dim payloadObj As New JObject From {{"seg", JArray.FromObject(segmentArray)}}
+        Try
+            Using client As New HttpClient()
+                client.Timeout = TimeSpan.FromSeconds(3)
+                Dim content As New StringContent(payloadObj.ToString(), Encoding.UTF8, "application/json")
+                Dim response = Await client.PostAsync($"http://{wledIp}/json/state", content)
+                If Not response.IsSuccessStatusCode Then
+                    ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {response.StatusCode}", 5, FlashSeverity.IsError)
+                End If
+            End Using
+        Catch ex As Exception
+            ToonFlashBericht($"[WLED] Fout bij verzenden instructieset naar {wledName}: {ex.Message}", 5, FlashSeverity.IsError)
+        End Try
+    End Sub
+
+    ' ================== OVERIGE BESTAANDE FUNCTIES (ongewijzigd) ==================
+    ' (Laat overige helper functies uit originele bestand staan; hier weggelaten voor beknoptheid.)
+
+End Module

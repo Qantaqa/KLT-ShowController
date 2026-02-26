@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { X, Upload, Save, Shield, Globe, Code, Monitor, Laptop, Settings2, Check } from 'lucide-react'
-import { useShowStore } from '../store/useShowStore'
+import { useSequencerStore } from '../store/useSequencerStore'
 import DevicesSettings from './DevicesSettings'
+import KeyboardSettings from './KeyboardSettings'
 import { cn } from '../lib/utils'
 
 interface AppSettingsProps {
@@ -13,11 +14,11 @@ interface AppSettingsProps {
 }
 
 const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperMode, setIsDeveloperMode, serverIp }) => {
-    const { appSettings, updateAppSettings, addToast } = useShowStore()
+    const { appSettings, updateAppSettings, addToast } = useSequencerStore()
     const [localSettings, setLocalSettings] = useState(appSettings)
     const [isSaving, setIsSaving] = useState(false)
-    const [displays, setDisplays] = useState<any[]>([])
-    const [activeTab, setActiveTab] = useState<'general' | 'devices' | 'workstations'>('general')
+    const [, setDisplays] = useState<any[]>([])
+    const [activeTab, setActiveTab] = useState<'general' | 'devices' | 'workstations' | 'keyboard'>('general')
     const logoInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
@@ -119,11 +120,17 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                     >
                         <Globe className="w-3.5 h-3.5" /> Workstations
                     </button>
+                    <button
+                        onClick={() => setActiveTab('keyboard')}
+                        className={`px-4 py-3 text-[10px] font-bold uppercase tracking-widest transition-all border-b-2 flex items-center gap-2 ${activeTab === 'keyboard' ? 'border-primary text-primary' : 'border-transparent opacity-40 hover:opacity-100'}`}
+                    >
+                        <Monitor className="w-3.5 h-3.5" /> Remote Keyboard
+                    </button>
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 overflow-auto custom-scrollbar">
-                    {activeTab === 'general' ? (
+                    {activeTab === 'general' && (
                         <div className="p-6 space-y-8">
                             {/* Default Logo */}
                             <div className="space-y-4">
@@ -198,43 +205,37 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                             title="Toegangspincode"
                                             className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono tracking-widest focus:border-primary/50 outline-none"
                                         />
-                                        <p className="text-[10px] opacity-30 italic font-medium tracking-tight">
-                                            Vereist voor externe verbindingen en het vergrendelen van de host.
-                                        </p>
+                                        <p className="text-[10px] opacity-30 italic">Laptops & Tablets gebruiken dit om te verbinden.</p>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label htmlFor="serverPort" className="text-xs opacity-60 flex items-center gap-2"><Globe className="w-3 h-3" /> Server Port</label>
+                                        <label htmlFor="serverPort" className="text-xs opacity-60 font-bold uppercase tracking-widest">Server Poort</label>
                                         <input
                                             id="serverPort"
                                             type="number"
-                                            value={localSettings.serverPort}
-                                            onChange={(e) => setLocalSettings(prev => ({ ...prev, serverPort: parseInt(e.target.value) || 3001 }))}
+                                            value={localSettings.serverPort || 3001}
+                                            onChange={(e) => {
+                                                setLocalSettings(prev => ({ ...prev, serverPort: parseInt(e.target.value) || 3001 }))
+                                            }}
                                             title="Server Poort"
                                             className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono focus:border-primary/50 outline-none"
                                         />
-                                        <p className="text-[10px] opacity-30">
-                                            Herstart vereist na wijziging.
-                                        </p>
+                                        <p className="text-[10px] opacity-30 italic">Huidige IP: {serverIp}</p>
                                     </div>
+                                </div>
+                            </div>
 
-                                    <div className="space-y-2">
-                                        <label htmlFor="serverIpDisplay" className="text-xs opacity-60 flex items-center gap-2"><Globe className="w-3 h-3" /> Machine IP</label>
-                                        <input
-                                            id="serverIpDisplay"
-                                            type="text"
-                                            value={serverIp}
-                                            readOnly
-                                            title="Machine IP Adres (Alleen Lezen)"
-                                            className="w-full bg-white/5 border border-white/5 rounded-lg px-3 py-2 text-sm font-mono opacity-50 cursor-default outline-none"
-                                        />
-                                        <p className="text-[9px] opacity-30">
-                                            Gedetecteerd IP adres van deze machine.
-                                        </p>
-                                    </div>
+                            <div className="h-px bg-white/5" />
 
-                                    <div className="space-y-2 col-span-2">
-                                        <label htmlFor="geminiApiKey" className="text-xs opacity-60 flex items-center gap-2"><Code className="w-3 h-3" /> Gemini API Key</label>
+                            {/* AI / Gemini Settings */}
+                            <div className="space-y-4">
+                                <label className="text-sm font-bold uppercase tracking-widest opacity-60 flex items-center gap-2">
+                                    <Code className="w-3.5 h-3.5" /> AI & Automatisering
+                                </label>
+
+                                <div className="space-y-2">
+                                    <label htmlFor="geminiApiKey" className="text-xs opacity-60 font-bold uppercase tracking-widest">Google Gemini API Key</label>
+                                    <div className="flex gap-2">
                                         <input
                                             id="geminiApiKey"
                                             type="password"
@@ -242,114 +243,92 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                             onChange={(e) => {
                                                 setLocalSettings(prev => ({ ...prev, geminiApiKey: e.target.value }))
                                             }}
-                                            placeholder="Voer je Google Gemini API key in..."
-                                            title="Gemini API Key"
-                                            className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-primary/50 outline-none"
+                                            placeholder="AI Sleutel..."
+                                            title="Google Gemini API Sleutel"
+                                            className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono focus:border-primary/50 outline-none"
                                         />
-                                        <p className="text-[10px] opacity-30 italic">
-                                            Vereist voor AI-gestuurde script herkenning. Je kunt je key vinden op de Google AI Studio website.
-                                        </p>
                                     </div>
-
-                                    {(window as any).require && (
-                                        <div className="space-y-2 col-span-2">
-                                            <label htmlFor="monitorIndex" className="text-xs opacity-60 flex items-center gap-2"><Monitor className="w-3 h-3" /> Show Controller Monitor</label>
-                                            <select
-                                                id="monitorIndex"
-                                                value={localSettings.controllerMonitorIndex || 0}
-                                                onChange={(e) => setLocalSettings(prev => ({ ...prev, controllerMonitorIndex: parseInt(e.target.value) }))}
-                                                className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-primary/50 outline-none"
-                                            >
-                                                {[0, 1, 2].map(idx => {
-                                                    const d = displays.find(disp => disp.index === idx);
-                                                    return (
-                                                        <option key={idx} value={idx} className="bg-[#111]">
-                                                            Scherm {idx + 1}: {d ? `${d.index === 0 ? '(Hoofdscherm) ' : ''}${d.bounds.width}x${d.bounds.height}` : '(Niet verbonden)'}
-                                                        </option>
-                                                    )
-                                                })}
-                                            </select>
-                                            <p className="text-[10px] opacity-30">
-                                                Het scherm waarop de bediening van LedShow wordt geopend.
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="h-px bg-white/5" />
-
-                            {/* Media Testing */}
-                            <div className="space-y-4">
-                                <label className="text-sm font-bold uppercase tracking-widest opacity-60 flex items-center gap-2">
-                                    <Monitor className="w-3.5 h-3.5" /> Media & Testen
-                                </label>
-                                <div className="space-y-2">
-                                    <label className="text-xs opacity-60">Standaard Test Video</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={localSettings.testVideoPath || ''}
-                                            readOnly
-                                            className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono opacity-60"
-                                            placeholder="Standaard testbeeld (intern)"
-                                        />
-                                        <button onClick={handleSelectTestVideo} className="px-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold">Kies...</button>
-                                    </div>
-                                    <p className="text-[10px] opacity-30">Video die wordt afgespeeld bij het testen van lokale monitoren.</p>
+                                    <p className="text-[10px] opacity-30 italic">Nodig voor het automatisch genereren van cue-lists uit PDF scripts.</p>
                                 </div>
                             </div>
 
                             <div className="h-px bg-white/5" />
 
                             {/* Developer Mode */}
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 <label className="text-sm font-bold uppercase tracking-widest opacity-60 flex items-center gap-2">
-                                    <Code className="w-3.5 h-3.5" /> Geavanceerd
+                                    <Code className="w-3.5 h-3.5" /> Developer Settings
                                 </label>
-                                <div className="flex items-center justify-between p-3 rounded-lg bg-black/20 border border-white/5">
+                                <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
                                     <div className="space-y-1">
-                                        <span className="text-xs font-bold">Developer Mode</span>
-                                        <p className="text-[10px] opacity-30 leading-relaxed">
-                                            Activeert geavanceerde opties zoals database beheer. Wordt niet opgeslagen.
-                                        </p>
+                                        <p className="text-xs font-bold">Developer Mode</p>
+                                        <p className="text-[10px] opacity-40">Toon extra debugging informatie en tools.</p>
                                     </div>
                                     <button
                                         onClick={() => setIsDeveloperMode(!isDeveloperMode)}
-                                        title="Developer Mode aan/uit"
+                                        title="Toggle Developer Mode"
                                         className={cn(
-                                            "w-10 h-5 rounded-full relative transition-all duration-500 p-1 border border-white/10",
-                                            isDeveloperMode ? "bg-primary/20 shadow-[inset_0_0_10px_rgba(var(--primary-rgb),0.1)]" : "bg-white/5 shadow-inner"
+                                            "w-10 h-5 rounded-full relative transition-colors",
+                                            isDeveloperMode ? "bg-primary" : "bg-white/10"
                                         )}
                                     >
                                         <div className={cn(
-                                            "w-2.5 h-2.5 rounded-full transition-all duration-500 shadow-lg",
-                                            isDeveloperMode ? "ml-auto bg-primary shadow-[0_0_8px_#f97316]" : "mr-auto bg-white/20"
+                                            "absolute top-1 w-3 h-3 bg-white rounded-full transition-all",
+                                            isDeveloperMode ? "left-6" : "left-1"
                                         )} />
                                     </button>
                                 </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-xs opacity-60 font-bold uppercase tracking-widest">Standaard Test Video</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={localSettings.testVideoPath || ''}
+                                            readOnly
+                                            placeholder="Geen video geselecteerd"
+                                            title="Standaard Test Video pad"
+                                            className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-[10px] font-mono opacity-60"
+                                        />
+                                        <button
+                                            onClick={handleSelectTestVideo}
+                                            title="Bladeren"
+                                            className="px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-bold transition-all"
+                                        >
+                                            Bladeren
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    ) : activeTab === 'devices' ? (
-                        <div className="p-6">
+                    )}
+
+                    {activeTab === 'devices' && (
+                        <div className="p-6 h-full">
                             <DevicesSettings
                                 devices={localSettings.devices || []}
                                 onChange={(devices) => setLocalSettings(prev => ({ ...prev, devices }))}
                             />
                         </div>
-                    ) : (
+                    )}
+
+                    {activeTab === 'workstations' && (
                         <div className="p-6 space-y-6">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-bold uppercase tracking-widest opacity-60">Geregistreerde Stations</h3>
-                                <p className="text-[10px] opacity-30 italic">Identiteit en beveiliging van remote apparaten</p>
+                                <div>
+                                    <h3 className="text-lg font-bold flex items-center gap-2">
+                                        <Globe className="w-5 h-5 text-primary" /> Verbonden Workstations
+                                    </h3>
+                                    <p className="text-sm opacity-40">Beheer verbonden tablets, laptops en andere stations.</p>
+                                </div>
                             </div>
 
                             <div className="grid gap-3">
-                                {useShowStore.getState().connectedClients.length === 0 ? (
+                                {useSequencerStore.getState().connectedClients.length === 0 ? (
                                     <div className="p-8 text-center bg-white/5 rounded-xl border border-dashed border-white/10">
                                         <p className="text-xs opacity-40">Geen stations geregistreerd</p>
                                     </div>
-                                ) : useShowStore.getState().connectedClients.map((client) => {
+                                ) : useSequencerStore.getState().connectedClients.map((client) => {
                                     const isHostClient = client.type === 'HOST'
                                     return (
                                         <div key={client.uuid} className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group">
@@ -362,20 +341,7 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                                 </div>
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2">
-                                                        <input
-                                                            type="text"
-                                                            defaultValue={client.friendlyName}
-                                                            title="Pas station naam aan"
-                                                            onBlur={async (e) => {
-                                                                if (e.target.value !== client.friendlyName && (window as any).require) {
-                                                                    const { ipcRenderer } = (window as any).require('electron')
-                                                                    await ipcRenderer.invoke('db:create-update-remote-client', { ...client, friendlyName: e.target.value })
-                                                                    // Trigger a refresh/broadcast somehow
-                                                                    // The host can send a command to itself or just wait for next sync
-                                                                }
-                                                            }}
-                                                            className="bg-transparent border-none focus:ring-0 font-bold text-sm p-0 w-48 focus:text-primary transition-colors"
-                                                        />
+                                                        <span className="font-bold text-sm">{client.friendlyName}</span>
                                                         {isHostClient && <span className="text-[8px] bg-orange-500/20 text-orange-500 px-1.5 py-0.5 rounded uppercase font-black tracking-widest">HOST</span>}
                                                     </div>
                                                     <div className="flex items-center gap-3 text-[10px] opacity-40">
@@ -394,8 +360,8 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                                         onClick={async () => {
                                                             if ((window as any).require) {
                                                                 const { ipcRenderer } = (window as any).require('electron')
-                                                                if (confirm(`Weet je zeker dat je station '${client.friendlyName}' wilt verwijderen uit de database?`)) {
-                                                                    await ipcRenderer.invoke('db:delete-remote-client', client.uuid)
+                                                                if (confirm(`Weet je zeker dat je station '${client.friendlyName}' wilt verwijderen?`)) {
+                                                                    await ipcRenderer.invoke('db:delete-row', { tableName: 'remote_clients', id: client.id })
                                                                 }
                                                             }
                                                         }}
@@ -411,6 +377,10 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                 })}
                             </div>
                         </div>
+                    )}
+
+                    {activeTab === 'keyboard' && (
+                        <KeyboardSettings />
                     )}
                 </div>
 

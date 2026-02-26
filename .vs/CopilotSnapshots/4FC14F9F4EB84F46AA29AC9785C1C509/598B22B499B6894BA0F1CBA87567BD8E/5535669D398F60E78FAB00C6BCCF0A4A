@@ -1,0 +1,372 @@
+﻿Public Class ColorPickerExtented
+    Private currentColor As Color = Color.FromArgb(255, 0, 0, 0)
+    Private savedSlots As PictureBox()
+    Private isMouseDownOnArea As Boolean = False
+
+    Private Sub ColorPickerExtented_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        ' initialize slots array in same order as designer
+        savedSlots = New PictureBox() {slot_01, slot_02, slot_03, slot_04, slot_05, slot_06, slot_07, slot_08, slot_09, slot_10,
+                                      slot_11, slot_12, slot_13, slot_14, slot_15, slot_16, slot_17, slot_18, slot_19, slot_20,
+                                      slot_21, slot_22, slot_23, slot_24}
+
+        ' initialize controls with currentColor
+        UpdateAllControlsFromColor(currentColor)
+
+        ' set sensible trackbar ranges if designer values differ
+        trkRed.Minimum = 0 : trkRed.Maximum = 255
+        trkGreen.Minimum = 0 : trkGreen.Maximum = 255
+        trkBlue.Minimum = 0 : trkBlue.Maximum = 255
+        trkAlpha.Minimum = 0 : trkAlpha.Maximum = 255
+        trkHue.Minimum = 0 : trkHue.Maximum = 255
+
+        ' ensure numeric controls match ranges
+        valueRed.Minimum = 0 : valueRed.Maximum = 255
+        valueGreen.Minimum = 0 : valueGreen.Maximum = 255
+        ValueBlue.Minimum = 0 : ValueBlue.Maximum = 255
+        valueAlpha.Minimum = 0 : valueAlpha.Maximum = 255
+        ValueHue.Minimum = 0 : ValueHue.Maximum = 255
+
+        ' numeric slot bounds
+        valueSlot.Minimum = 1
+        valueSlot.Maximum = savedSlots.Length
+    End Sub
+
+    Private Sub UpdateAllControlsFromColor(c As Color)
+        currentColor = c
+        ' prevent recursive updates by checking equality before assignment
+        If trkRed.Value <> c.R Then trkRed.Value = c.R
+        If trkGreen.Value <> c.G Then trkGreen.Value = c.G
+        If trkBlue.Value <> c.B Then trkBlue.Value = c.B
+        If trkAlpha.Value <> c.A Then trkAlpha.Value = c.A
+
+        If valueRed.Value <> c.R Then valueRed.Value = c.R
+        If valueGreen.Value <> c.G Then valueGreen.Value = c.G
+        If ValueBlue.Value <> c.B Then ValueBlue.Value = c.B
+        If valueAlpha.Value <> c.A Then valueAlpha.Value = c.A
+
+        ' Hue mapping: convert RGB -> HSV and map H(0-360) to trackbar 0-255
+        Dim h As Double, s As Double, v As Double
+        ColorToHSV(c, h, s, v)
+        Dim hueValue As Integer = CInt(Math.Round(h / 360.0 * trkHue.Maximum))
+        If ValueHue.Value <> hueValue Then ValueHue.Value = hueValue
+        If trkHue.Value <> hueValue Then trkHue.Value = hueValue
+
+        valueHTML.Text = ColorToHex(c)
+        lblHTMLValue.Text = valueHTML.Text
+        lbRGBValues.Text = String.Format("R: {0:D3}  G: {1:D3}  B: {2:D3}", c.R, c.G, c.B)
+
+        pbColorArea.Invalidate()
+    End Sub
+
+    Private Sub SetColorFromRGB(r As Integer, g As Integer, b As Integer, Optional a As Integer = 255)
+        Dim c As Color = Color.FromArgb(a, r, g, b)
+        UpdateAllControlsFromColor(c)
+    End Sub
+
+    Private Sub SetColorFromHSV(hueTrackValue As Integer, saturation As Double, value As Double, Optional alpha As Integer = 255)
+        Dim h As Double = hueTrackValue / trkHue.Maximum * 360.0
+        Dim c = ColorFromHSV(h, saturation, value)
+        c = Color.FromArgb(alpha, c.R, c.G, c.B)
+        UpdateAllControlsFromColor(c)
+    End Sub
+
+    Private Sub pbColorArea_MouseDown(sender As Object, e As MouseEventArgs) Handles pbColorArea.MouseDown
+        isMouseDownOnArea = True
+        HandleColorAreaMouse(e)
+    End Sub
+
+    Private Sub pbColorArea_MouseMove(sender As Object, e As MouseEventArgs) Handles pbColorArea.MouseMove
+        If isMouseDownOnArea Then
+            HandleColorAreaMouse(e)
+        End If
+    End Sub
+
+    Private Sub pbColorArea_MouseUp(sender As Object, e As MouseEventArgs) Handles pbColorArea.MouseUp
+        isMouseDownOnArea = False
+    End Sub
+
+    Private Sub HandleColorAreaMouse(e As MouseEventArgs)
+        ' For this implementation, pbColorArea controls alpha when clicked horizontally
+        If pbColorArea.Width <= 0 Then Return
+        Dim ratio As Double = e.X / pbColorArea.Width
+        If ratio < 0 Then ratio = 0 ElseIf ratio > 1 Then ratio = 1
+        Dim newA As Integer = CInt(Math.Round(ratio * 255))
+        currentColor = Color.FromArgb(newA, currentColor.R, currentColor.G, currentColor.B)
+        UpdateAllControlsFromColor(currentColor)
+    End Sub
+
+    Private Sub pbColorArea_Paint(sender As Object, e As PaintEventArgs) Handles pbColorArea.Paint
+        Dim g = e.Graphics
+        Dim w = pbColorArea.Width
+        Dim h = pbColorArea.Height
+
+        ' draw checkerboard
+        Dim checkerSize = 8
+        Using b1 As New SolidBrush(Color.FromArgb(220, 220, 220))
+            Using b2 As New SolidBrush(Color.FromArgb(180, 180, 180))
+                For y As Integer = 0 To h - 1 Step checkerSize
+                    For x As Integer = 0 To w - 1 Step checkerSize
+                        Dim use = ((x / checkerSize) + (y / checkerSize)) Mod 2
+                        g.FillRectangle(If(use = 0, b1, b2), x, y, checkerSize, checkerSize)
+                    Next
+                Next
+            End Using
+        End Using
+
+        ' overlay current color with alpha
+        Using brush As New SolidBrush(Color.FromArgb(currentColor.A, currentColor.R, currentColor.G, currentColor.B))
+            g.FillRectangle(brush, 0, 0, w, h)
+        End Using
+
+        ' draw border and text info
+        Using pen As New Pen(Color.Black)
+            g.DrawRectangle(pen, 0, 0, w - 1, h - 1)
+        End Using
+
+        Dim info = String.Format("A: {0} ({1:P0})", currentColor.A, currentColor.A / 255.0)
+        Using sf As New StringFormat()
+            sf.Alignment = StringAlignment.Near
+            sf.LineAlignment = StringAlignment.Near
+            g.DrawString(info, Me.Font, Brushes.Black, New PointF(4, 4), sf)
+        End Using
+    End Sub
+
+    Private Sub valueRed_Scroll(sender As Object, e As ScrollEventArgs) Handles valueRed.Scroll
+        ' Not used - NumericUpDown does not raise Scroll, included for designer compatibility
+    End Sub
+
+    Private Sub valueRed_ValueChanged(sender As Object, e As EventArgs) Handles valueRed.ValueChanged
+        Dim r = CInt(valueRed.Value)
+        If trkRed.Value <> r Then trkRed.Value = r
+        SetColorFromRGB(r, currentColor.G, currentColor.B, currentColor.A)
+    End Sub
+
+    Private Sub valueGreen_Scroll(sender As Object, e As ScrollEventArgs) Handles valueGreen.Scroll
+    End Sub
+
+    Private Sub valueGreen_ValueChanged(sender As Object, e As EventArgs) Handles valueGreen.ValueChanged
+        Dim g = CInt(valueGreen.Value)
+        If trkGreen.Value <> g Then trkGreen.Value = g
+        SetColorFromRGB(currentColor.R, g, currentColor.B, currentColor.A)
+    End Sub
+
+    Private Sub ValueBlue_Scroll(sender As Object, e As ScrollEventArgs) Handles ValueBlue.Scroll
+    End Sub
+
+    Private Sub ValueBlue_ValueChanged(sender As Object, e As EventArgs) Handles ValueBlue.ValueChanged
+        Dim b = CInt(ValueBlue.Value)
+        If trkBlue.Value <> b Then trkBlue.Value = b
+        SetColorFromRGB(currentColor.R, currentColor.G, b, currentColor.A)
+    End Sub
+
+    Private Sub ValueHue_Scroll(sender As Object, e As ScrollEventArgs) Handles ValueHue.Scroll
+    End Sub
+
+    Private Sub ValueHue_ValueChanged(sender As Object, e As EventArgs) Handles ValueHue.ValueChanged
+        Dim hv = CInt(ValueHue.Value)
+        If trkHue.Value <> hv Then trkHue.Value = hv
+        ' keep saturation/value from current color
+        Dim h As Double, s As Double, v As Double
+        ColorToHSV(currentColor, h, s, v)
+        Dim newHue = hv / trkHue.Maximum * 360.0
+        Dim col = ColorFromHSV(newHue, s, v)
+        currentColor = Color.FromArgb(currentColor.A, col.R, col.G, col.B)
+        UpdateAllControlsFromColor(currentColor)
+    End Sub
+
+    Private Sub valueAlpha_Scroll(sender As Object, e As ScrollEventArgs) Handles valueAlpha.Scroll
+    End Sub
+
+    Private Sub valueAlpha_ValueChanged(sender As Object, e As EventArgs) Handles valueAlpha.ValueChanged
+        Dim a = CInt(valueAlpha.Value)
+        If trkAlpha.Value <> a Then trkAlpha.Value = a
+        currentColor = Color.FromArgb(a, currentColor.R, currentColor.G, currentColor.B)
+        UpdateAllControlsFromColor(currentColor)
+    End Sub
+
+    Private Sub trkRed_ValueChanged(sender As Object, e As EventArgs) Handles trkRed.ValueChanged
+        Dim r = trkRed.Value
+        If valueRed.Value <> r Then valueRed.Value = r
+        SetColorFromRGB(r, currentColor.G, currentColor.B, currentColor.A)
+    End Sub
+
+    Private Sub trkGreen_ValueChanged(sender As Object, e As EventArgs) Handles trkGreen.ValueChanged
+        Dim g = trkGreen.Value
+        If valueGreen.Value <> g Then valueGreen.Value = g
+        SetColorFromRGB(currentColor.R, g, currentColor.B, currentColor.A)
+    End Sub
+
+    Private Sub trkBlue_ValueChanged(sender As Object, e As EventArgs) Handles trkBlue.ValueChanged
+        Dim b = trkBlue.Value
+        If ValueBlue.Value <> b Then ValueBlue.Value = b
+        SetColorFromRGB(currentColor.R, currentColor.G, b, currentColor.A)
+    End Sub
+
+    Private Sub trkHue_ValueChanged(sender As Object, e As EventArgs) Handles trkHue.ValueChanged
+        Dim hv = trkHue.Value
+        If ValueHue.Value <> hv Then ValueHue.Value = hv
+        ' change hue but preserve s/v
+        Dim h As Double, s As Double, v As Double
+        ColorToHSV(currentColor, h, s, v)
+        Dim newHue = hv / trkHue.Maximum * 360.0
+        Dim col = ColorFromHSV(newHue, s, v)
+        currentColor = Color.FromArgb(currentColor.A, col.R, col.G, col.B)
+        UpdateAllControlsFromColor(currentColor)
+    End Sub
+
+    Private Sub trkAlpha_ValueChanged(sender As Object, e As EventArgs) Handles trkAlpha.ValueChanged
+        Dim a = trkAlpha.Value
+        If valueAlpha.Value <> a Then valueAlpha.Value = a
+        currentColor = Color.FromArgb(a, currentColor.R, currentColor.G, currentColor.B)
+        UpdateAllControlsFromColor(currentColor)
+    End Sub
+
+    Private Sub valueHTML_TextChanged(sender As Object, e As EventArgs) Handles valueHTML.TextChanged
+        Dim t = valueHTML.Text.Trim()
+        If String.IsNullOrEmpty(t) Then Return
+        Try
+            Dim c = ParseHexColor(t)
+            UpdateAllControlsFromColor(c)
+        Catch
+            ' ignore parse errors silently for now
+        End Try
+    End Sub
+
+    Private Sub btnOK_Click(sender As Object, e As EventArgs) Handles btnOK.Click
+        Me.DialogResult = DialogResult.OK
+        Me.Close()
+    End Sub
+
+    Private Sub btnDefaultWindowColorSelector_Click(sender As Object, e As EventArgs) Handles btnDefaultWindowColorSelector.Click
+        ' populate saved slots with system colors as a quick palette
+        Dim sys = New Color() {SystemColors.Control, SystemColors.Window, SystemColors.Highlight, Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Magenta, Color.Cyan, Color.Black, Color.White}
+        For i As Integer = 0 To savedSlots.Length - 1
+            savedSlots(i).BackColor = sys(i Mod sys.Length)
+        Next
+    End Sub
+
+    Private Sub pbColorWheel_MouseClick(sender As Object, e As MouseEventArgs) Handles pbColorWheel.MouseClick
+        If pbColorWheel.Image Is Nothing Then Return
+        Dim img = pbColorWheel.Image
+        ' map click to image coordinates (SizeMode.StretchImage)
+        Dim ix = CInt(e.X * img.Width / pbColorWheel.Width)
+        Dim iy = CInt(e.Y * img.Height / pbColorWheel.Height)
+        If ix < 0 Then ix = 0 ElseIf ix >= img.Width Then ix = img.Width - 1
+        If iy < 0 Then iy = 0 ElseIf iy >= img.Height Then iy = img.Height - 1
+        Try
+            Dim bmp As Bitmap = CType(img, Bitmap)
+            Dim picked As Color = bmp.GetPixel(ix, iy)
+            ' use picked color RGB; maintain current alpha
+            currentColor = Color.FromArgb(currentColor.A, picked.R, picked.G, picked.B)
+            UpdateAllControlsFromColor(currentColor)
+        Catch
+            ' ignore if image is not a bitmap
+        End Try
+    End Sub
+
+    Private Sub btnRestoreFromSlot_Click(sender As Object, e As EventArgs) Handles btnRestoreFromSlot.Click
+        Dim index = CInt(valueSlot.Value) - 1
+        If index >= 0 AndAlso index < savedSlots.Length Then
+            Dim c = savedSlots(index).BackColor
+            If Not c.IsEmpty Then
+                UpdateAllControlsFromColor(c)
+            End If
+        End If
+    End Sub
+
+    Private Sub btnSaveToSlot_Click(sender As Object, e As EventArgs) Handles btnSaveToSlot.Click
+        Dim index = CInt(valueSlot.Value) - 1
+        If index >= 0 AndAlso index < savedSlots.Length Then
+            savedSlots(index).BackColor = currentColor
+        End If
+    End Sub
+
+    ' Utility functions
+    Private Function ColorToHex(c As Color) As String
+        If c.A < 255 Then
+            Return String.Format("#{0:X2}{1:X2}{2:X2}{3:X2}", c.A, c.R, c.G, c.B)
+        Else
+            Return String.Format("#{0:X2}{1:X2}{2:X2}", c.R, c.G, c.B)
+        End If
+    End Function
+
+    Private Function ParseHexColor(text As String) As Color
+        Dim t = text.Trim()
+        If t.StartsWith("#") Then t = t.Substring(1)
+        If t.Length = 6 Then
+            Dim r = Convert.ToInt32(t.Substring(0, 2), 16)
+            Dim g = Convert.ToInt32(t.Substring(2, 2), 16)
+            Dim b = Convert.ToInt32(t.Substring(4, 2), 16)
+            Return Color.FromArgb(255, r, g, b)
+        ElseIf t.Length = 8 Then
+            Dim a = Convert.ToInt32(t.Substring(0, 2), 16)
+            Dim r = Convert.ToInt32(t.Substring(2, 2), 16)
+            Dim g = Convert.ToInt32(t.Substring(4, 2), 16)
+            Dim b = Convert.ToInt32(t.Substring(6, 2), 16)
+            Return Color.FromArgb(a, r, g, b)
+        Else
+            Throw New FormatException("Invalid hex length")
+        End If
+    End Function
+
+    ' HSV helpers (h in degrees 0-360, s & v in 0-1)
+    Private Function ColorFromHSV(h As Double, s As Double, v As Double) As Color
+        If s = 0 Then
+            Dim val = CInt(Math.Round(v * 255))
+            Return Color.FromArgb(val, val, val)
+        End If
+        Dim hh = h
+        If hh >= 360 Then hh = 0
+        hh = hh / 60.0
+        Dim i = Math.Floor(hh)
+        Dim ff = hh - i
+        Dim p = v * (1 - s)
+        Dim q = v * (1 - (s * ff))
+        Dim t = v * (1 - (s * (1 - ff)))
+        Dim r As Double, g As Double, b As Double
+        Select Case CInt(i)
+            Case 0
+                r = v : g = t : b = p
+            Case 1
+                r = q : g = v : b = p
+            Case 2
+                r = p : g = v : b = t
+            Case 3
+                r = p : g = q : b = v
+            Case 4
+                r = t : g = p : b = v
+            Case Else
+                r = v : g = p : b = q
+        End Select
+        Return Color.FromArgb(CInt(Math.Round(r * 255)), CInt(Math.Round(g * 255)), CInt(Math.Round(b * 255)))
+    End Function
+
+    Private Sub ColorToHSV(c As Color, ByRef h As Double, ByRef s As Double, ByRef v As Double)
+        Dim r = c.R / 255.0
+        Dim g = c.G / 255.0
+        Dim b = c.B / 255.0
+        Dim max = Math.Max(r, Math.Max(g, b))
+        Dim min = Math.Min(r, Math.Min(g, b))
+        v = max
+        Dim delta = max - min
+        If max = 0 Then
+            s = 0
+            h = 0
+            Return
+        End If
+        s = If(max = 0, 0, delta / max)
+        If delta = 0 Then
+            h = 0
+            Return
+        End If
+        If r = max Then
+            h = (g - b) / delta
+        ElseIf g = max Then
+            h = 2 + (b - r) / delta
+        Else
+            h = 4 + (r - g) / delta
+        End If
+        h = h * 60
+        If h < 0 Then h += 360
+    End Sub
+End Class

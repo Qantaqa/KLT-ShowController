@@ -1,39 +1,5 @@
 import { XMLParser } from 'fast-xml-parser'
-
-export interface ShowEvent {
-    act: string
-    sceneId: number
-    eventId: number
-    fixture: string
-    effect: string
-    palette: string
-    color1: string
-    color2: string
-    color3: string
-    brightness: number
-    speed: number
-    intensity: number
-    transition: number
-    sound: boolean
-    scriptPg?: number
-    cue?: string
-    type?: string
-    filename?: string
-    duration?: number
-    segmentId?: number
-    effectId?: number
-    paletteId?: number
-    stopAct?: string
-    stopSceneId?: number
-    stopEventId?: number
-}
-
-export interface ClipboardItem {
-    id: number
-    type: string
-    data: ShowEvent
-    timestamp: string
-}
+import type { ShowEvent } from '../types/show'
 
 export class XmlService {
     private parser: XMLParser

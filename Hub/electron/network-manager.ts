@@ -15,13 +15,15 @@ export interface WledCommand {
  * Centrale module voor alle communicatie met externe hardware (WLED, WiZ).
  * Beheert zowel HTTP (JSON API) als UDP (WiZ Protocol) verbindingen.
  */
+/**
+ * Manager Agent for Network Interaction.
+ * Central module for all communication with external hardware (WLED, WiZ).
+ * Handles both HTTP (JSON API) and UDP (WiZ Protocol) connections.
+ */
 class NetworkManager {
     /**
-     * Doel: Verstuurt een JSON commando naar een WLED apparaat.
-     * Input: command (WledCommand object met IP en parameters).
-     * Output: Void.
-     * Condities: Gebruikt HTTP POST naar de /json/state endpoint. Timeout van 1s.
-     * Integriteit: Foutafhandeling vangt netwerkproblemen op zonder het hoofdproces te blokkeren.
+     * Sends a JSON configuration command to a WLED device.
+     * @param command WledCommand object containing the device IP and state parameters.
      */
     async sendWledCommand(command: WledCommand) {
         const { ip, ...params } = command
@@ -29,49 +31,57 @@ class NetworkManager {
 
         try {
             console.log(`Sending WLED command to ${ip}:`, JSON.stringify(params))
+            // Perform HTTP POST to the WLED JSON state endpoint with a 1s timeout
             await axios.post(url, params, { timeout: 1000 })
         } catch (error: any) {
+            // Log network errors without throwing, allowing the show to continue
             console.error(`WLED command failed for ${ip}:`, error.message)
         }
     }
 
     /**
-     * Doel: Verstuurt een commando naar een WiZ lamp via het UDP protocol.
-     * Input: ip (target), method (setPilot/getPilot), params (parameters voor de lamp).
-     * Output: Promise met het resultaat van de lamp.
-     * Condities: Gebruikt UDP poort 38899. Wacht op antwoord bij 'getPilot'.
-     * Integriteit: Sluit de socket altijd af na verzending of timeout om resources vrij te maken.
-     * Protocol-Strict: Volgt het WiZ JSON-over-UDP protocol.
+     * Sends a command to a WiZ light using the WiZ UDP protocol.
+     * @param ip The IP address of the WiZ device.
+     * @param method The WiZ method to call (e.g., 'setPilot', 'getPilot').
+     * @param params The parameters associated with the method.
+     * @returns A promise resolving to the device response or a success indicator.
      */
     async sendWizCommand(ip: string, method: string, params: any) {
         return new Promise((resolve, reject) => {
             const socket = dgram.createSocket('udp4')
             const msg = JSON.stringify({ method, params })
 
+            // Send the JSON message over UDP to the standard WiZ port (38899)
             socket.send(msg, 38899, ip, (err) => {
+                // Test if the packet sending failed; if true, cleanup and reject
                 if (err) {
                     socket.close()
                     reject(err)
                     return
                 }
 
+                // Test if we are requesting status ('getPilot'); if true, wait for a response
                 if (method === 'getPilot') {
+                    // Listen for the device return message
                     socket.on('message', (msg) => {
                         try {
                             const result = JSON.parse(msg.toString())
                             socket.close()
                             resolve(result)
                         } catch (e) {
+                            // If response is not valid JSON, cleanup and reject
                             socket.close()
                             reject(e)
                         }
                     })
-                    // Timeout voor status: Voorkom dat de promise oneindig blijft hangen als apparaat offline is.
+
+                    // Set a timeout to prevent the promise from hanging if the device is offline
                     setTimeout(() => {
                         try { socket.close() } catch (e) { }
                         resolve({ error: 'timeout' })
                     }, 2000)
                 } else {
+                    // For 'set' commands, we typically don't wait for a response on this socket
                     socket.close()
                     resolve({ success: true })
                 }
@@ -80,43 +90,43 @@ class NetworkManager {
     }
 
     /**
-     * Doel: Haalt de huidige status en informatie op van een WLED apparaat.
-     * Input: ip van het apparaat.
-     * Output: Object met info en state, of null bij falen.
-     * Condities: Twee HTTP GET requests (info en state).
-     * Integriteit: Gebruikt timeouts om vertraging bij offline apparaten te beperken.
+     * Retrieves the current state and device information from a WLED instance.
+     * @param ip The IP address of the WLED device.
+     * @returns An object containing 'info' and 'state' data, or null if unreachable.
      */
     async getWledInfo(ip: string) {
         try {
+            // Fetch hardware info and current operational state in parallel
             const response = await axios.get(`http://${ip}/json/info`, { timeout: 2000 })
             const stateResponse = await axios.get(`http://${ip}/json/state`, { timeout: 2000 })
             return { info: response.data, state: stateResponse.data }
         } catch (error: any) {
+            // Catch timeouts or connection errors
             console.error(`Failed to get WLED info from ${ip}:`, error.message)
             return null
         }
     }
 
     /**
-     * Doel: Haalt de lijst met beschikbare effecten op van een WLED apparaat.
-     * Input: ip.
-     * Output: Array van effectnamen.
-     * Integriteit: Retourneert lege array bij fout.
+     * Fetches the list of available lighting effects from a WLED device.
+     * @param ip The IP address of the WLED device.
+     * @returns An array of strings representing effect names.
      */
     async getWledEffects(ip: string) {
         try {
             const response = await axios.get(`http://${ip}/json/eff`, { timeout: 2000 })
             return response.data
         } catch (error: any) {
+            // Fallback to empty list on failure
             console.error(`Failed to get WLED effects from ${ip}:`, error.message)
             return []
         }
     }
 
     /**
-     * Doel: Haalt de lijst met beschikbare kleurenpaletten op van een WLED apparaat.
-     * Input: ip.
-     * Output: Array van paletnamen.
+     * Fetches the list of available color palettes from a WLED device.
+     * @param ip The IP address of the WLED device.
+     * @returns An array of strings representing palette names.
      */
     async getWledPalettes(ip: string) {
         try {
@@ -129,32 +139,32 @@ class NetworkManager {
     }
 
     /**
-     * Doel: Verwerkt een ShowEvent en vertaalt deze naar specifieke hardware commando's.
-     * Input: event (ShowEvent object uit de show runner).
-     * Output: Void.
-     * Condities: Alleen voor 'light' events. Zoekt bijbehorende IP in de database.
-     * Logica: 
-     *  - Als type 'wiz' is: Gebruik sendWizCommand met RGB conversie.
-     *  - Als type 'wled' is: Gebruik sendWledCommand met segment-ondersteuning.
-     * Integriteit: Valt terug op statische IP mapping als database device niet gevonden wordt.
+     * Processes a show event and translates it into physical hardware commands.
+     * Handles color conversion, device lookup, and protocol selection.
+     * @param event The ShowEvent to execute.
      */
     processEvent(event: ShowEvent) {
+        // Test if the event is a light command and specifies a fixture; if true, process it
         if (event.type?.toLowerCase() === 'light' && event.fixture) {
-            // Statische fallback map voor bekende apparaten
+            // Static mapping for legacy support or hardcoded setups
             const ipMap: Record<string, string> = {
                 'Beuk Cour': '192.168.0.10',
                 'Beuk Jardin': '192.168.0.11',
                 'WIZ Lamp': '192.168.0.119'
             }
 
-            // Dynamische lookup in DB
+            // Perform dynamic lookup in the GLOBAL devices table
             const devices = dbManager.getDevices('GLOBAL') || [];
             const device = devices.find((d: any) => d.name === event.fixture);
+
+            // Resolve the target IP (DB entry takes precedence over the static map)
             const ip = device?.ip || ipMap[event.fixture];
 
+            // Test if an IP was successfully resolved for the fixture; if true, send commands
             if (ip) {
+                // Test if the device type is WiZ; if true, use the UDP protocol
                 if (device?.type === 'wiz') {
-                    // WiZ Protocol integratie: RGB naar 0-255, Dimming naar 0-100
+                    // Send RGB values (0-255) and map brightness (0-255) to WiZ dimming (0-100)
                     this.sendWizCommand(ip, 'setPilot', {
                         r: this.hexToRgb(event.color1)[0],
                         g: this.hexToRgb(event.color1)[1],
@@ -162,13 +172,14 @@ class NetworkManager {
                         dimming: (event.brightness !== undefined ? Math.round(event.brightness / 2.55) : 100)
                     });
                 } else {
-                    // WLED JSON API integratie
+                    // Otherwise, assume WLED (JSON API) protocol
                     const payload: any = {
                         on: true,
                         bri: event.brightness,
                         seg: []
                     };
 
+                    // Define the segment configuration based on the event details
                     const segUpdate = {
                         fx: event.effectId !== undefined ? event.effectId : 0,
                         pal: event.paletteId !== undefined ? event.paletteId : 0,
@@ -181,64 +192,95 @@ class NetworkManager {
                         ix: event.intensity
                     };
 
-                    if (event.segmentId !== undefined && event.segmentId >= 0) {
-                        // Specifiek segment targeten
-                        payload.seg.push({ id: event.segmentId, ...segUpdate });
-                    } else {
-                        // Alle segmenten targeten: We halen eerst de state op om te weten welke segmenten bestaan.
+                    // NEW: Check and restore segments if needed
+                    const handleSegments = async () => {
                         try {
-                            this.getWledInfo(ip).then(data => {
-                                if (data && data.state && data.state.seg) {
-                                    payload.seg = data.state.seg.map((s: any) => ({ id: s.id, ...segUpdate }));
+                            const storedSegments = device?.id ? dbManager.getWledSegments(device.id) : null;
+                            const currentData = await this.getWledInfo(ip);
+
+                            if (storedSegments && currentData && currentData.state) {
+                                const currentSegments = currentData.state.seg || [];
+
+                                // Simplified check: compare number of segments and their boundaries (start/stop)
+                                // More complex attributes could be checked but boundaries are critical for "configuration presence"
+                                const needsRestore = currentSegments.length !== storedSegments.length ||
+                                    storedSegments.some((ss: any, i: number) => {
+                                        const cs = currentSegments[i];
+                                        return !cs || cs.start !== ss.start || cs.stop !== ss.stop;
+                                    });
+
+                                if (needsRestore) {
+                                    console.log(`[NetworkManager] Restoring segments for WLED ${ip}...`);
+                                    await this.sendWledCommand({ ip, seg: storedSegments });
+                                }
+                            }
+
+                            // Proceed with the actual command
+                            if (event.segmentId !== undefined && event.segmentId >= 0) {
+                                payload.seg.push({ id: event.segmentId, ...segUpdate });
+                                this.sendWledCommand({ ip, ...payload });
+                            } else {
+                                // If no specific segment, update all current segments
+                                const finalData = await this.getWledInfo(ip);
+                                if (finalData && finalData.state && finalData.state.seg) {
+                                    payload.seg = finalData.state.seg.map((s: any) => ({ id: s.id, ...segUpdate }));
                                     this.sendWledCommand({ ip, ...payload });
                                 } else {
-                                    // Fallback: alleen segment 0 als lookup faalt
                                     payload.seg.push({ id: 0, ...segUpdate });
                                     this.sendWledCommand({ ip, ...payload });
                                 }
-                            });
-                            return;
-                        } catch (e) {
+                            }
+                        } catch (e: any) {
+                            console.error(`[NetworkManager] WLED segment handling failed for ${ip}:`, e.message);
+                            // Fallback to basic segment 0 update
                             payload.seg.push({ id: 0, ...segUpdate });
+                            this.sendWledCommand({ ip, ...payload });
                         }
-                    }
+                    };
 
-                    this.sendWledCommand({ ip, ...payload });
+                    handleSegments();
                 }
             }
         }
     }
 
     /**
-     * Doel: Test de verbinding met een apparaat door een visuele feedback (kleurwissel) te geven.
-     * Input: device object.
-     * Condities: Voor WLED: Flash R-G-B. Voor WiZ: Directe RGB wissel via UDP.
-     * Integriteit: Wordt gebruikt in de configuratie-portal om hardware te identificeren.
+     * Executes a visual test sequence on a device (Red -> Green -> Blue).
+     * Used for identifying physical fixtures during setup.
+     * @param device The device object to test.
      */
     async testDevice(device: any) {
         console.log('Testing device:', device.name, device.ip, device.type)
 
+        // Test if the device utilizes the WLED protocol
         if (device.type === 'wled') {
             const url = `http://${device.ip}/json/state`
             try {
-                // Test Loop: R -> G -> B met timeouts
+                // Execute a timed sequence of color changes to segment 0
                 await axios.post(url, { on: true, bri: 255, seg: [{ id: 0, col: [[255, 0, 0]] }] }, { timeout: 1000 })
                 setTimeout(() => axios.post(url, { seg: [{ id: 0, col: [[0, 255, 0]] }] }).catch(() => { }), 500)
                 setTimeout(() => axios.post(url, { seg: [{ id: 0, col: [[0, 0, 255]] }] }).catch(() => { }), 1000)
             } catch (e: any) {
                 console.error(`Test WLED failed: ${e.message}`)
             }
-        } else if (device.type === 'wiz') {
+        }
+        // Test if the device utilizes the WiZ protocol
+        else if (device.type === 'wiz') {
             const socket = dgram.createSocket('udp4')
             const msg = JSON.stringify({ method: "setPilot", params: { r: 255, g: 0, b: 0, dimming: 100 } })
 
-            // WiZ Test Loop: R -> G -> B via UDP stream
+            // Rapidly send UDP packets to cycle through RGB colors
             socket.send(msg, 38899, device.ip, (err) => {
+                // Log transmission errors
                 if (err) console.error('WiZ test failed:', err)
+
+                // Switch to Green after 500ms
                 setTimeout(() => {
                     const msgG = JSON.stringify({ method: "setPilot", params: { r: 0, g: 255, b: 0, dimming: 100 } })
                     socket.send(msgG, 38899, device.ip)
                 }, 500)
+
+                // Switch to Blue after 1000ms, then close the socket
                 setTimeout(() => {
                     const msgB = JSON.stringify({ method: "setPilot", params: { r: 0, g: 0, b: 255, dimming: 100 } })
                     socket.send(msgB, 38899, device.ip, () => socket.close())
@@ -248,14 +290,15 @@ class NetworkManager {
     }
 
     /**
-     * Doel: Converteert HEX kleur naar RGB array voor hardware protocols.
-     * Input: hex string (bijv. "#FF0000").
-     * Output: [r, g, b] array.
-     * Condities: Handelt 'Black' en ontbrekende '#' af.
-     * Integriteit: Voorkomt NaN errors door fallback naar 0.
+     * Helper to convert a CSS-style HEX string to an RGB array.
+     * @param hex The hex string (e.g. "#FF8800").
+     * @returns An array [red, green, blue].
      */
     private hexToRgb(hex: string): [number, number, number] {
+        // Test if the hex string is invalid, black, or improperly formatted; if true, return black (0,0,0)
         if (!hex || hex === 'Black' || !hex.startsWith('#')) return [0, 0, 0]
+
+        // Parse hex chunks into integers
         const r = parseInt(hex.slice(1, 3), 16) || 0
         const g = parseInt(hex.slice(3, 5), 16) || 0
         const b = parseInt(hex.slice(5, 7), 16) || 0

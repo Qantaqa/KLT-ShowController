@@ -1,0 +1,1808 @@
+{
+   "annotation_balloon_color_green": {
+      "message": "안전한 링크입니다"
+   },
+   "annotation_balloon_color_grey": {
+      "message": "알 수 없는 링크입니다"
+   },
+   "annotation_balloon_color_red": {
+      "message": "위험한 링크입니다"
+   },
+   "annotation_balloon_color_yellow": {
+      "message": "의심스러운 링크입니다"
+   },
+   "annotation_balloon_view_site_report": {
+      "message": "사이트 보고서 보기"
+   },
+   "aps_expanded_shield_site_ecommerce": {
+      "message": "이 사이트를 확인했으며 안전합니다. 이제 안심하고 쇼핑하세요."
+   },
+   "aps_expanded_shield_site_email": {
+      "message": "피싱 사이트인지 검사한 결과 안전해 보입니다."
+   },
+   "aps_expanded_shield_site_financial": {
+      "message": "안전한 사이트입니다. 실제 금융 사이트임을 확인했습니다."
+   },
+   "aps_expanded_shield_site_signup": {
+      "message": "여기에 정보를 입력해도 안전합니다. 피싱과 다른 위험이 있는지 확인했습니다."
+   },
+   "aps_expanded_shield_site_unknown": {
+      "message": "아직 이 사이트의 안전성을 평가하지 않았습니다. 사이트를 신뢰하는 경우에만 개인 정보를 입력하세요."
+   },
+   "aps_toast_button": {
+      "message": "알겠습니다"
+   },
+   "aps_toast_list_bullet_four": {
+      "message": "방문하는 모든 사이트"
+   },
+   "aps_toast_list_bullet_one": {
+      "message": "뱅킹 및 금융 사이트"
+   },
+   "aps_toast_list_bullet_three": {
+      "message": "온라인 등록 양식"
+   },
+   "aps_toast_list_bullet_two": {
+      "message": "체크아웃 및 결제 페이지"
+   },
+   "aps_toast_paragraph": {
+      "message": "'안전함'을 나타내는 녹색 아이콘이 표시되면 보고 있는 모든 사이트에 위험한 링크가 없는 것입니다."
+   },
+   "aps_toast_title": {
+      "message": "모든 사이트를 검사합니다"
+   },
+   "category_id_103_name": {
+      "message": "성인물"
+   },
+   "category_id_ac_description": {
+      "message": "가상 미술관, 예술가 사이트(조각 및 사진 작품 포함), 박물관, 민족 풍습 및 국가 풍습 등을 다루는 웹 페이지입니다."
+   },
+   "category_id_ac_name": {
+      "message": "예술/문화/전통"
+   },
+   "category_id_al_description": {
+      "message": "주로 맥주, 와인, 양주 등을 비롯한 주류를 판매, 홍보하거나 취급하는 웹 페이지입니다. 칵테일 제조법 및 자가 양조법 등이 담긴 페이지도 이러한 범주에 포함됩니다."
+   },
+   "category_id_al_name": {
+      "message": "주류"
+   },
+   "category_id_an_description": {
+      "message": "사용자가 로컬 필터링 정책을 바이패스하여 어떤 웹 페이지에도 액세스할 수 있도록 자신의 IP 주소 또는 다른 신원 정보를 숨기고 웹 검색을 수행하는 것을 의도적으로 허용하는 웹 페이지입니다. 익명 서비스 웹 페이지는 쿠키 또는 브라우저 기록과 같은 추적 기술도 차단합니다. OS 버전 및 웹 페이지 기록이 웹 페이지로 전송되지 않도록 하는 방법이 사용되기도 합니다. 무료 프록시 IP 주소를 제공하거나 필터링 바이패스 방법을 설명하는 페이지도 이러한 범주에 포함됩니다."
+   },
+   "category_id_an_name": {
+      "message": "익명 서비스"
+   },
+   "category_id_au_description": {
+      "message": "서비스 제공 의도를 명시하지 않고 익명 웹 탐색을 유도하는 웹 페이지입니다. 필터링 소프트웨어를 바이패스하는 목적을 명시하지 않는 URL 번역기, 웹 페이지 캐싱 및 기타 익명 서비스 기능을 제공하는 유틸리티 등이 이 범주에 포함됩니다."
+   },
+   "category_id_au_name": {
+      "message": "익명 유틸리티"
+   },
+   "category_id_be_description": {
+      "message": "브라우저 익스플로잇이란 웹 브라우저 소프트웨어 버그의 취약성을 공격함으로써 브라우저로 하여금 실행 중단, 로컬 파일 읽기/쓰기, 바이러스 전파 또는 스파이웨어 설치 등을 포함한 예기치 않은 동작을 유발하도록 하는 작은 코드를 말합니다. 악성 코드는 HTML, JavaScript, 이미지, ActiveX, Java 및 기타 웹 기술에 대해 취약성 공격을 감행합니다. 드라이브바이 다운로드라고도 하는 취약성 공격은 보호받지 못하는 컴퓨터에 주로 사용자 모르게 자신을 설치하고 해당 컴퓨터에 암호 도용을 위한 키 입력 기록기 및 컴퓨터를 '봇'으로 만드는 트로이 목마 프로그램을 설치할 수 있습니다. 브라우저 익스플로잇을 배포하거나 실행하는 각종 URL이 이 범주에 포함됩니다."
+   },
+   "category_id_be_name": {
+      "message": "브라우저 익스플로잇"
+   },
+   "category_id_bl_description": {
+      "message": "사용자들이 언제든지 콘텐츠를 게시하거나 편집할 수 있으므로 잦은 변경이 이루어지는 동적 콘텐츠를 포함하는 웹 페이지입니다. 이러한 범주의 경우 사용자가 무해한 항목에서 불쾌한 항목까지 다양한 범위의 동적 콘텐츠에 노출될 수 있는 위험이 있습니다. 많은 블로그 및 위키 사이트들은 특정 테마나 주제를 가집니다. 이러한 범주의 사이트는 사이트의 주요 방향 또는 주제에 따라 논쟁적인 의견, 교육/참조, 스포츠, 정치/사설 또는 노출 등을 다루게 되는 경우가 많습니다. 불쾌한 콘텐츠가 포함될 수도 있습니다."
+   },
+   "category_id_bl_name": {
+      "message": "블로그/위키"
+   },
+   "category_id_bu_description": {
+      "message": "업체 개요 또는 비즈니스 기획 및 전략과 같은 비즈니스 관련 정보를 제공하는 웹 페이지입니다. 다른 이의 비즈니스 기획, 관리 및 기업 마케팅을 지원하는 정보, 서비스 또는 제품 역시 이러한 범주에 포함됩니다. 비즈니스 운영에 중점을 두면 다단계 마케팅 벤처 기업도 이러한 범주에 포함됩니다. 개인 페이지 및 웹 호스팅 웹 페이지는 이러한 범주에 포함되지 않습니다."
+   },
+   "category_id_bu_name": {
+      "message": "비즈니스"
+   },
+   "category_id_ch_description": {
+      "message": "공개 및 비공개 채팅방의 웹 기반, 실시간 소셜 메시징을 제공하는 웹 페이지입니다. IRC가 이러한 범주에 포함됩니다. 인스턴트 메시징은 이 범주에 포함되지 않습니다. 불쾌한 콘텐츠, 생산성에 대한 부정적 영향 및 비밀 정보의 유출과 같은 위험이 있습니다."
+   },
+   "category_id_ch_name": {
+      "message": "채팅"
+   },
+   "category_id_cm_description": {
+      "message": "공공 서비스 공급자, 지역 정보, 교통 시간표, 지도 또는 일기 예보와 같은 일반적인 참조 정보를 제공하는 웹 페이지입니다."
+   },
+   "category_id_cm_name": {
+      "message": "공개 정보"
+   },
+   "category_id_co_description": {
+      "message": "정치 또는 사회적 감수성에 반할 수 있으며 논란을 유발할 수 있는 의견을 포함하는 웹 페이지입니다. 이러한 콘텐츠는 대체로 잔혹한 여론을 다루는 경우가 많습니다. 예를 들어 동반 자살 합의, 거식증 지지, 외국인 혐오, 국수주의, 근본주의 관점, 특정 그룹에 대한 허위 정보 또는 비판적 견해 등이 포함됩니다."
+   },
+   "category_id_co_name": {
+      "message": "논쟁적인 의견"
+   },
+   "category_id_cp_description": {
+      "message": "소비자에게 사기 또는 속임수를 시도하는 웹 사이트입니다. 그러한 활동의 예로는 위조 제품 판매, 무료 제품의 유상 판매 또는 부적절한 다른 업체 브랜드 도용 등이 있습니다. 거짓 자선 모금 또는 투자 사기 등, 사람들의 인정이나 무지를 악용하려는 웹 사이트가 이러한 범주에 포함됩니다. 사기 또는 거짓 거래 등으로 많은 소비자들에 의해 신고된 사이트 또한 이 범주에 포함됩니다."
+   },
+   "category_id_cp_name": {
+      "message": "소비자 보호"
+   },
+   "category_id_cs_description": {
+      "message": "McAfee의 판단에 따르면 불법 또는 범죄 행위에 대한 지침을 제공하는 웹 페이지입니다. 살인이나 자살, 파괴, 폭탄 제조, 자물쇠 해제, 서비스 절도, 경찰 회피 또는 약물 검사 도용 등에 대한 지침 등이 포함됩니다. 불법 콘텐츠 배포, 사기 행위 또는 소비자 사기 등의 방법 또한 이러한 범주에 포함됩니다."
+   },
+   "category_id_cs_name": {
+      "message": "잠재적인 범죄 행위"
+   },
+   "category_id_cv_description": {
+      "message": "공상 또는 가상의 폭력적인 표현이 포함된 게임, 만화 또는 만화 소설을 제공하는 웹 페이지입니다. 신체적 폭력 또는 맨손 격투 및 무기 또는 폭발물에 의한 심각한 부상과 피해를 묘사하는 이미지와 글이 이러한 범주에 포함됩니다."
+   },
+   "category_id_cv_name": {
+      "message": "게임/만화 폭력성"
+   },
+   "category_id_dc_description": {
+      "message": "사용자들이 인터넷을 통해 서로 온라인 카드 및 안부 카드를 주고받을 수 있도록 하는 웹 페이지입니다. 온라인 카드는 일반적으로 생일이나 명절과 같은 특별한 날을 기념하여 안부 메시지 등을 전달합니다. 어떤 디지털 엽서 사이트에는 성인용 유머를 다루는 부분이 별도로 마련되기도 합니다. 이러한 사이트에서는 사적이거나 소유권을 가진 정보, 불쾌한 콘텐츠, 맬웨어 또는 해로운 첨부 파일 등이 유출될 위험도 있습니다."
+   },
+   "category_id_dc_name": {
+      "message": "온라인 카드"
+   },
+   "category_id_dl_description": {
+      "message": "사용자가 의도치 않게 해롭거나 성가신 코드를 다운로드하도록 하는 웹 페이지입니다. 애드웨어, 스파이웨어, 바이러스를 비롯한 기타 악성 컴퓨터 코드가 담긴 화면 보호기, 도구 모음 및 파일 공유 프로그램과 같은 다운로드 가능한 파일이 이러한 범주에 포함됩니다. 때때로 전체 사용 약관을 읽지 않고 '예' 또는 '동의'를 클릭함으로써 사용자가 인식하지 못하는 사이에 맬웨어가 추가되기도 합니다. 이는 컴퓨터 속도 저하, 암호 도용 및 중요 개인 파일의 손실 또는 손상으로 이어지기도 합니다."
+   },
+   "category_id_dl_name": {
+      "message": "악성 다운로드"
+   },
+   "category_id_dp_description": {
+      "message": "온라인 데이트, 중매, 접대 또는 기타 잠재적인 배우자 소개에 대한 네트워크를 제공하는 웹 페이지입니다. 개인 또는 그룹 프로파일을 제공하고 회원들이 실시간 연락, 메시지 게시, 공공 게시판 및 미디어 공유 등을 통해 서로 소통할 수 있게 하는 사이트가 이러한 범주에 포함됩니다. 이러한 범주의 사이트를 통해 원하지 않는 모임 및 불쾌한 정보가 담긴 회원 프로파일을 접하게 될 수 있습니다."
+   },
+   "category_id_dp_name": {
+      "message": "데이트/개인"
+   },
+   "category_id_dr_description": {
+      "message": "불법 또는 기분 전환용 약물의 구매, 제조 및 사용에 관한 정보를 제공하는 웹 사이트입니다. 약물 복용 기구의 전시, 판매, 사용법 제공 및 환각제 복용, 처방약의 남용을 비롯한 기타 합법적인 약품의 불건전한 복용에 관한 정보의 제공 등이 이러한 범주에 포함됩니다."
+   },
+   "category_id_dr_name": {
+      "message": "마약"
+   },
+   "category_id_eb_description": {
+      "message": "온라인 경매 및 아이템 또는 서비스 판매를 제공하는 웹 페이지입니다. 경매와 판매를 주로 다루는 웹 페이지가 이 범주에 포함됩니다. 온라인 경매에 대해서는 거의 감시가 이루어지지 않습니다. 이러한 사이트에서는 사용자가 음란물, 무기, 노출 또는 폭력물 등의 범주에 해당되는 자료에 노출될 수 있습니다."
+   },
+   "category_id_eb_name": {
+      "message": "경매/생활광고"
+   },
+   "category_id_ed_description": {
+      "message": "학과(수학, 역사), 학교 또는 대학 웹 페이지 및 학사 관리 페이지(학교 게시판, 교사 수업 일정)와 같은 학업 관련 콘텐츠를 주로 다루는 웹 페이지입니다."
+   },
+   "category_id_ed_name": {
+      "message": "교육/참조"
+   },
+   "category_id_et_description": {
+      "message": "영화, 영화관, 음악, TV, 인포테인먼트, 엔터테인먼트 업계 소식 및 영화 배우와 뮤지션 등의 연예인 관련 사이트에 대한 정보를 제공하는 웹 페이지입니다. 점성술이나 팬클럽처럼 웹에 엔터테인먼트 요소를 제공하기 위한 콘텐츠로 구성된 사이트 역시 이러한 범주에 포함됩니다."
+   },
+   "category_id_et_name": {
+      "message": "엔터테인먼트"
+   },
+   "category_id_ex_description": {
+      "message": "이러한 범주는 혐오물, 차별 관련 콘텐츠, 음란물, 폭력물 또는 게임/만화 폭력성 범주 등을 통해 해당 범주에서 잔혹한 내용을 취급하는 URL을 식별하기 위해 사용됩니다. 불법 음란물이 한 예로서, 이는 음란물, 잠재적인 범죄 행위 및 잔혹 범주에 포함됩니다."
+   },
+   "category_id_ex_name": {
+      "message": "잔혹"
+   },
+   "category_id_fb_description": {
+      "message": "의류, 화장품, 보석 및 기타 패션에 관련된 상품, 액세서리 또는 서비스를 취급하는 웹 페이지입니다. 상품 후기, 비교, 일반 소비자 정보 및 미용실, 태닝 업소, 문신 및 피어싱 업소 등의 서비스업 등이 이러한 범주에 포함됩니다."
+   },
+   "category_id_fb_name": {
+      "message": "패션/미용"
+   },
+   "category_id_fi_description": {
+      "message": "금융 정보 또는 온라인 금융 계좌 액세스를 제공하는 웹 페이지입니다. 재정 관리에 대한 뉴스나 서비스를 포함한 금융 정보를 제공하지만, 재무제표 또는 세금, 모기지, 보험, 인가 또는 투자 관련 상담과 같은 사적인 금융 계좌 정보에 대한 액세스는 제공하지 않는 웹 페이지가 이러한 범주에 포함됩니다. 온라인 금융 계좌에 대한 액세스에는 개인 또는 기업 관련 뱅킹, 재정 관리, 세무 상담, 뮤추얼 펀드, 신용 카드, 신용 조합, 보험을 비롯한 기타 금융 공개 게시물 및 서비스 등이 포함됩니다. 주식 정보(주식 거래 미포함), 가계 및 정부 관련 금융 정보 등이 이러한 범주에 포함됩니다."
+   },
+   "category_id_fi_name": {
+      "message": "금융/은행"
+   },
+   "category_id_fk_description": {
+      "message": "특히 약 10세 이하의 자녀가 있는 가정의 안전에 대한 웹 페이지입니다."
+   },
+   "category_id_fk_name": {
+      "message": "자녀용"
+   },
+   "category_id_gb_description": {
+      "message": "온라인 도박 서비스를 제공하거나 카지노 게임, 베팅 풀, 스포츠 도박 및 복권 등의 온라인 도박 소프트웨어를 제공하는 웹 페이지입니다. 복권 티켓을 구입하거나 온라인에서 사용 가능한 복권도 이러한 범주에 포함됩니다."
+   },
+   "category_id_gb_name": {
+      "message": "도박"
+   },
+   "category_id_gm_description": {
+      "message": "치트, 코드, 데모, 에뮬레이터, 온라인 컨테스트 또는 롤플레잉 게임, 게임 클랜, 게임 제작사 사이트, 판타지 또는 가상 스포츠 리그를 비롯한 기타 게임 사이트 등의 온라인 게임 및 관련 정보를 무상으로 제공하는 웹 페이지입니다. Microsoft Xbox® 및 Sony PlayStation®과 같은 게임 콘솔이 이러한 범주에 포함됩니다."
+   },
+   "category_id_gm_name": {
+      "message": "게임"
+   },
+   "category_id_gr_description": {
+      "message": "관련 수단은 제공하지 않지만 도박에 대한 정보를 제공하는 웹 페이지입니다. 온라인 도박, 도박 링크, 팁, 스포츠 픽, 복권 결과 및 경마, 경주 또는 경정 등에 대한 정보는 제공하지 않는 카지노 관련 웹 페이지가 이러한 범주에 포함됩니다."
+   },
+   "category_id_gr_name": {
+      "message": "도박 관련"
+   },
+   "category_id_gv_description": {
+      "message": "정부 산하 조직 또는 기관, 경찰국, 소방국, 민방위, 대테러 조직이나, UN 또는 EU와 같은 초국가 조직 등 정부 또는 군 조직이 관리하는 콘텐츠가 포함된 웹 페이지입니다. 군사 및 재향 군인 의료 시설도 이 범주에 포함됩니다."
+   },
+   "category_id_gv_name": {
+      "message": "정부/군대"
+   },
+   "category_id_hi_description": {
+      "message": "역사적 사실에 대한 콘텐츠를 제공하는 웹 페이지입니다. 이러한 범주에는 고등 교육에 적합한 콘텐츠가 포함되는 반면, 교육 범주에는 초등 교육용 콘텐츠를 포함됩니다. 예를 들어 홀로코스트에 대한 사진이 담긴 사이트는 불쾌하게 여겨질 수 있더라도 학술적인 가치를 지닙니다."
+   },
+   "category_id_hi_name": {
+      "message": "역사"
+   },
+   "category_id_hk_description": {
+      "message": "McAfee의 판단에 따르면 사기, 범죄 또는 컴퓨터를 목적으로 하는 각종 악성 활동에 대한 지침을 제공하거나 또는 그러한 악성 활동이 가능하도록 하는 웹 페이지입니다. 악성 해킹 정보 또는 개인의 무단 컴퓨터 및 네트워크 액세스를 지원하는 도구(루트킷, 키디 스크립트) 등을 포함하는 컴퓨터 범죄 관련 웹 페이지가 이러한 범주에 포함됩니다. 다이얼러 스캠 및 디지털 기기의 불법 조작과 같은 기타 디지털 사기 영역 또한 이러한 범주에 포함됩니다."
+   },
+   "category_id_hk_name": {
+      "message": "잠재적인 해킹/컴퓨터 범죄"
+   },
+   "category_id_hl_description": {
+      "message": "모든 건강 관련 및 의료 서비스 정보를 제공하는 웹 페이지입니다. 건강 정보에는 신체, 정신적인 개인 웰빙 추구를 위한 주제도 포함됩니다(다이어트, 영양, 피트니스 또는 육아). 의료 서비스에는 건강 보험, 병원, 클리닉 및 독립 치과 의료진 제공자 등이 포함됩니다."
+   },
+   "category_id_hl_name": {
+      "message": "건강"
+   },
+   "category_id_hm_description": {
+      "message": "웃기거나 재미있는 콘텐츠를 제공하는 웹 페이지입니다. 농담, 스케치, 만화 및 풍자에 대한 페이지를 다루는 사이트가 이러한 범주에 포함됩니다. 주로 만화와 관련 있는 만화 소설 콘텐츠 역시 이러한 범주에 포함됩니다."
+   },
+   "category_id_hm_name": {
+      "message": "유머/만화"
+   },
+   "category_id_hr_description": {
+      "message": "중대한 역사적 사실을 비난하거나 다르게 해석하는(예: 홀로코스트 부인 행위)하는 웹 페이지입니다. 이러한 범주에 포함되는 사이트의 경우 학술적 가치는 적법하더라도, 정치적인 목적으로 역사를 불법 조작하는 사이트들이 많습니다. 이러한 범주에 속하는 일부 URL의 경우 어떤 국가에서는 불법이거나 모욕적인 콘텐츠로 간주될 수 있습니다."
+   },
+   "category_id_hr_name": {
+      "message": "역사적 수정주의"
+   },
+   "category_id_hs_description": {
+      "message": "McAfee의 판단에 따르면 특정 그룹 또는 개인에 대한 억압이나 차별을 공개적으로 조장하는 정보를 제공하는 웹 페이지입니다. 인종, 종교, 국적, 성별, 연령, 장애 또는 성 정체성 등을 기준으로 특정 그룹에 대한 안건을 홍보하는 콘텐츠 또한 이러한 범주에 포함됩니다. 특정 혐오를 기반으로 하는 안건 및 잔혹한 온라인 폭력을 지향하는 정당 및 조직도 이러한 범주에 포함될 수 있습니다."
+   },
+   "category_id_hs_name": {
+      "message": "차별"
+   },
+   "category_id_hw_description": {
+      "message": "공급업체, 제품 마케팅 및 후기, 소프트웨어/하드웨어 배포 및 유지 관리, 스크립트, 플러그인 또는 드라이버와 같은 소프트웨어 업데이트와 애드온 등을 포함한 컴퓨팅 소프트웨어 및 하드웨어에 관련된 웹 페이지입니다. 하드웨어에는 컴퓨터 부품, 액세서리 및 컴퓨터와 네트워크에 사용되는 전자 장비 등이 포함됩니다. 소프트웨어/하드웨어 마케팅 및 소프트웨어 또는 하드웨어 제품 후기 또는 업체 동향 등을 집중적으로 다루는 잡지 역시 이러한 범주에 포함됩니다."
+   },
+   "category_id_hw_name": {
+      "message": "소프트웨어/하드웨어"
+   },
+   "category_id_ia_description": {
+      "message": "브라우저 기반 오피스 제품군 및 그룹웨어와 같은 실시간 또는 대화형 웹 애플리케이션에 대한 액세스를 제공하는 웹 페이지입니다. 비즈니스, 학업 또는 개인에 집중하는 사이트가 이러한 범주에 포함됩니다."
+   },
+   "category_id_ia_name": {
+      "message": "대화형 웹 애플리케이션"
+   },
+   "category_id_il_description": {
+      "message": "McAfee의 판단에 따르면 저작권을 가진 음악이나 영화, 불법 라이선스 키 생성기 배포, 소프트웨어 크랙 및 일련 번호 등 불법 복제 가능성이 있거나 불법적인 소프트웨어 또는 디지털 미디어의 배포 정보를 제공하는 웹 사이트입니다."
+   },
+   "category_id_il_name": {
+      "message": "잠재적인 불법 소프트웨어"
+   },
+   "category_id_im_description": {
+      "message": "회원 연락처 목록 또는 메신저 세션에 참여한 회원에 대해 제한적으로 네트워크를 통한 실시간 통신을 제공하는 웹 페이지입니다. 대부분의 메신저 소프트웨어는 파일 전송, PC 간 전화 통화 등의 기능을 제공하며 다른 사람의 로그온 여부를 추적할 수 있습니다. 이러한 사이트의 경우 사적인 정보의 유출, 불쾌한 콘텐츠 또는 파일 공유와 관련된 문제가 발생할 수도 있습니다."
+   },
+   "category_id_im_name": {
+      "message": "인스턴트 메시징"
+   },
+   "category_id_in_description": {
+      "message": "온라인 주식 구매, 판매 또는 거래 서비스를 제공하는 웹 페이지입니다. 실시간 주가를 볼 수 있는 티커 테이프 정보 및 주식 시장의 스프레드 베팅 역시 이러한 범주에 포함됩니다. 그 외의 도박은 도박 범주에 포함됩니다. 주식 관련 정보를 제공하는 사이트라도 주식 구매, 판매 또는 거래 서비스를 제공하지 않으면 이 범주에 포함되지 않습니다."
+   },
+   "category_id_in_name": {
+      "message": "주식 거래"
+   },
+   "category_id_io_description": {
+      "message": "데이터 보호에 대한 정보를 합법적으로 제공하는 웹 페이지입니다. 비즈니스 보호 또는 개인 데이터, 지적 재산권, 개인 정보 및 인터넷상의 인프라, 사설 네트워크 또는 전자 통신 등의 기타 대역폭 서비스에 대한 자세한 정보가 이러한 범주에 포함됩니다. 가능한 위험에는 잠재적인 해킹/컴퓨터 범죄가 포함됩니다. 높은 위험성을 가진 콘텐츠를 다루며 '블랙 햇' 및 '화이트 햇' 간의 명확한 구별이 없는 사이트 또한 이러한 범주와 잠재적인 해킹/컴퓨터 범죄 범주에 포함될 수 있습니다. 일부 콘텐츠는 보안 유출 또는 불법 행위 시행에 악용될 수 있습니다."
+   },
+   "category_id_io_name": {
+      "message": "정보 보안"
+   },
+   "category_id_ir_description": {
+      "message": "인터넷 라디오, TV 프로그램 또는 팟캐스팅과 같은 오디오 또는 비디오 스트리밍 방송에 대한 소프트웨어 또는 액세스를 제공하는 웹 페이지입니다."
+   },
+   "category_id_ir_name": {
+      "message": "인터넷 라디오/TV"
+   },
+   "category_id_is_description": {
+      "message": "하나 이상의 사이트에 이미지, 미디어 파일 또는 JavaScript 등을 호스팅하고 Apache와 같은 기존 웹 서버에서의 콘텐츠 검색 속도를 높이려는 용도를 가진 서버의 URL입니다. 일반적으로 콘텐츠 서버에서는 웹 사용자가 게시된 콘텐츠를 보거나 사이트를 탐색할 수 없습니다. 이미지를 호스팅하는 콘텐츠 서버는 사용자의 사진 탐색을 허용하지 않습니다."
+   },
+   "category_id_is_name": {
+      "message": "콘텐츠 서버"
+   },
+   "category_id_it_description": {
+      "message": "웹 디자인, 도메인 등록, 인터넷 서비스 공급자 및 웹 서비스를 제공하는 광대역 및 전기 통신 업체 등과 같은 인터넷 사이트의 게시 및 유지 관리를 위한 서비스를 제공하는 웹 사이트입니다."
+   },
+   "category_id_it_name": {
+      "message": "인터넷 서비스"
+   },
+   "category_id_js_description": {
+      "message": "이력서 작성, 인터뷰 준비, 이직, 항목별 구직 광고 및 대규모 직종 데이터베이스 등을 다루는 구직과 관련된 웹 페이지입니다. 구인 목록을 제공하는 기업 웹 페이지, 급여 비교 사이트, 임시직 및 업체 구인 광고 역시 이러한 범주에 포함됩니다."
+   },
+   "category_id_js_name": {
+      "message": "구직"
+   },
+   "category_id_mb_description": {
+      "message": "Usenet 뉴스 그룹에 대한 액세스(http://)를 제공하거나 토론을 열고 관심 그룹에 대한 실시간 메시지 게시와 같은 사용자 생성 콘텐츠를 게시하는 웹 페이지입니다. 뉴스그룹에 업로드된 파일의 아카이브 역시 이러한 범주에 포함됩니다."
+   },
+   "category_id_mb_name": {
+      "message": "포럼/게시판"
+   },
+   "category_id_md_description": {
+      "message": "온라인 사진 앨범처럼 사용자가 미디어 파일 및 사진을 업로드, 검색, 공유할 수 있는 웹 페이지입니다. 이러한 범주는 미디어 공유로 인한 일반적인 위험을 포함할 수 있으나 특정 콘텐츠를 대상으로 하지는 않습니다. 일부 URL은 또한 불쾌한 콘텐츠를 포함할 수도 있습니다."
+   },
+   "category_id_md_name": {
+      "message": "미디어 공유"
+   },
+   "category_id_mg_description": {
+      "message": "텍스트 메시지 기능을 제공하는 웹 페이지입니다. 스마트폰, PDA, 팩스를 대상으로 하는 텍스트 메시지 발송과 내부 웹 사이트의 사용자간 메시징 또는 사이트간 메시징 등이 그러한 예입니다."
+   },
+   "category_id_mg_name": {
+      "message": "메시징"
+   },
+   "category_id_mk_description": {
+      "message": "개인 또는 기업의 제품이나 서비스를 홍보하지만 해당 제품이나 서비스의 온라인 판매는 제공하지 않는 웹 페이지입니다. 일반적으로 업체 개요, 서비스 또는 제품 설명을 제공하면서, 직접 판매하지는 않는 웹 사이트가 이러한 범주에 포함됩니다. 자동차 제조업체 사이트, 결혼 사진 서비스 또는 그래픽 디자인 서비스 등이 그러한 예입니다."
+   },
+   "category_id_mk_name": {
+      "message": "마케팅/판촉"
+   },
+   "category_id_mm_description": {
+      "message": "온라인 데이트, 친목, 동창회, 펜팔, 접대 또는 기타 잠재적인 배우자 소개 등의 사회적 교류를 주로 다루는 웹 페이지입니다. 회원들로 하여금 실시간 메시지 기능을 통해 교류하도록 하는 많은 사이트가 이러한 범주에 포함됩니다. 이러한 범주의 사이트를 통해 원하지 않는 모임 및 불쾌한 정보가 담긴 회원 프로파일을 접하게 될 수 있습니다."
+   },
+   "category_id_mm_name": {
+      "message": "데이팅/소셜 네트워킹"
+   },
+   "category_id_mn_description": {
+      "message": "고전적인 조각 및 그림이나 의료 이미지와 같이, 인간의 나체에 대한 비 음란물 이미지를 포함하는 웹 페이지입니다."
+   },
+   "category_id_mn_name": {
+      "message": "우발적인 노출"
+   },
+   "category_id_mo_description": {
+      "message": "스마트폰을 통해 다운로드 및 전송이 가능한 스마트폰용 미디어, 소프트웨어 또는 유틸리티를 판매하는 웹 페이지입니다. 벨소리, 로고/스킨, 게임, 화면 보호기, 텍스트 기반 곡조 및 SMS, MMS, WAP용 소프트웨어를 비롯한 기타 스마트폰 프로토콜 등이 그러한 예입니다."
+   },
+   "category_id_mo_name": {
+      "message": "휴대폰"
+   },
+   "category_id_mp_description": {
+      "message": "MP3, WAV, AVI, MPEG 형식의 오디오 또는 비디오 파일 다운로드 서비스를 제공하는 웹 페이지입니다. 해당 파일은 사용자의 컴퓨터로 저장되어 재생됩니다."
+   },
+   "category_id_mp_name": {
+      "message": "미디어 다운로드"
+   },
+   "category_id_mr_description": {
+      "message": "부적절해 보이는 메시지나 콘텐츠에 대한 차단 권한을 가진 개인 또는 그룹이 모니터링하는 게시판, 채팅방, 검색 엔진 또는 웹 메일 사이트입니다."
+   },
+   "category_id_mr_name": {
+      "message": "건전 사이트"
+   },
+   "category_id_ms_description": {
+      "message": "사용자 컴퓨터의 설정 또는 활동을 하이재킹하기 위한 코드를 배포하는 웹 페이지입니다. 자체 설치 응용프로그램('드라이브바이' 실행 파일 다운로드라고 함), 트로이 목마를 비롯하여 브라우저 또는 기타 응용프로그램의 보안 취약성을 공격하는 바이러스 등이 이러한 범주에 포함됩니다. 나중에 악성 상태가 소멸되어 다른 범주로 전환될 수 있는 웹 페이지입니다. 악성 사이트는 다른 컴퓨터에 피해를 주는 활동을 목적으로 합니다."
+   },
+   "category_id_ms_name": {
+      "message": "악성 사이트"
+   },
+   "category_id_mv_description": {
+      "message": "자동차, 밴, 트럭, SUV, 오토바이 및 스쿠터와 같은 소비자용 운송 차량의 제조사 및 대리점 웹 사이트입니다. 제품 마케팅, 후기, 비교, 가격 정보, 자동차 박람회, 자동차 전시회를 비롯하여 차량에 대한 일반 소비자 정보를 제공하는 사이트 역시 이러한 범주에 포함됩니다."
+   },
+   "category_id_mv_name": {
+      "message": "자동차, 오토바이"
+   },
+   "category_id_na_description": {
+      "message": "Usenet 뉴스 그룹 및 뉴스 그룹에 업로드된 파일의 아카이브에 대한 액세스(http://)를 제공하는 웹 페이지입니다. 유사한 커뮤니티 지향 콘텐츠를 게시하는 온라인 그룹 역시 이러한 범주에 포함됩니다. 이러한 범주의 URL에는 불쾌한 콘텐츠가 포함될 수 있습니다."
+   },
+   "category_id_na_name": {
+      "message": "유즈넷 뉴스"
+   },
+   "category_id_nd_description": {
+      "message": "인간의 나체에 대한 비 음란물 이미지를 포함하는 웹 페이지입니다. 고전적인 조각이나 그림, 예술 누드 사진, 일부 자연주의 그림 및 상세한 의료 관련 일러스트 등이 이러한 범주에 포함됩니다."
+   },
+   "category_id_nd_name": {
+      "message": "노출"
+   },
+   "category_id_np_description": {
+      "message": "클럽, 로비, 커뮤니티, 비영리 조직, 노동 조합 및 시민 단체와 같은 보다 대규모의 커뮤니티를 지원하면서 정해진 임무를 수행하는 자선 또는 교육 단체의 웹 사이트입니다. 프리메이슨, 엘크, 보이/걸 스카우트 또는 빅 브라더 등이 그러한 예입니다."
+   },
+   "category_id_np_name": {
+      "message": "비영리 단체/지지 단체/NGO"
+   },
+   "category_id_ns_description": {
+      "message": "사용자가 백업, 공유, 편집의 목적으로 폴더 및 파일을 온라인 네트워크 서버에 업로드할 수 있거나 웹 브라우저에서 파일 또는 폴더를 검색할 수 있는 웹 페이지입니다."
+   },
+   "category_id_ns_name": {
+      "message": "개인 네트워크 저장소"
+   },
+   "category_id_nt_description": {
+      "message": "전적으로 전문적이거나 비즈니스 목적의 소셜 네트워킹을 제공하는 웹 페이지입니다. 개인 또는 그룹 프로파일을 제공하고 회원들이 실시간 연락, 메시지 게시, 공공 게시판 및 미디어 공유 등을 통해 서로 소통할 수 있게 하는 사이트가 이 범주에 포함됩니다. 네트워킹 기능을 갖춘 동창회 사이트 역시 이러한 범주에 포함됩니다."
+   },
+   "category_id_nt_name": {
+      "message": "전문 네트워킹"
+   },
+   "category_id_nw_description": {
+      "message": "국제 또는 지역 뉴스 방송 및 출판과 같은 온라인 뉴스 매체를 제공하는 웹 페이지입니다. 뉴스 콘텐츠를 제공하는 포털 사이트가 이러한 범주에 포함됩니다."
+   },
+   "category_id_nw_name": {
+      "message": "일반 뉴스"
+   },
+   "category_id_os_description": {
+      "message": "제품이나 서비스를 온라인으로 판매하는 웹 페이지입니다. 다양한 종류의 제품을 파는 웹 페이지는 사용자에게 음란물, 무기, 노출 또는 폭력물 등 일반적으로 다른 범주에 속하는 항목에 대한 액세스도 제공하므로 위험을 야기할 가능성이 있습니다. 일부 사이트의 경우 음란물 및 무기와 같은 다른 범주의 항목에 대한 액세스를 허용할 수 있습니다."
+   },
+   "category_id_os_name": {
+      "message": "온라인 쇼핑"
+   },
+   "category_id_pa_description": {
+      "message": "나체 사진은 없지만 자극적이거나 노출이 심한 의상, 란제리 및 수영복 사진 또는 수퍼모델이나 연예인 사진이 포함된 웹 페이지입니다."
+   },
+   "category_id_pa_name": {
+      "message": "노출 의상"
+   },
+   "category_id_pc_description": {
+      "message": "DSL 모뎀 또는 케이블 모뎀을 통해 인터넷에 액세스하는 IP 주소(및 해당 주소에 연결된 도메인)입니다. 이러한 콘텐츠는 일반적으로 HTTP를 통해 인터넷에 액세스하도록 만들어지지 않았기 때문에, 해당 IP 주소를 통해 인터넷에 액세스하면 의심스러운 활동을 명시할 수 있습니다. 이러한 활동은 가정용 컴퓨터 또는 집에서 만들어진 익명 인터넷 액세스를 허용하는 게이트웨이 설정에 위치한 맬웨어와 관련되어 있을 수 있습니다."
+   },
+   "category_id_pc_name": {
+      "message": "거주지 IP 주소"
+   },
+   "category_id_pd_description": {
+      "message": "원래 콘텐츠를 갖고 있었으나 도메인이 판매되거나 철회되어 등록이 취소된 웹 페이지입니다. 파킹된 도메인은 자체 콘텐츠를 가지지는 않지만, 보통 해당 도메인 이름이 판매 대상임을 알리는 일반 페이지로 리디렉션되거나 일반 검색 엔진 및 포털 페이지로 리디렉션되며, 그러한 도메인 중 일부는 유효한 검색 엔진 결과를 제공합니다."
+   },
+   "category_id_pd_name": {
+      "message": "파킹된 도메인"
+   },
+   "category_id_ph_description": {
+      "message": "일반적으로 위조 이메일을 통해 전송되며, 사용자 계정 정보를 도용하기 위해 구축된 웹 페이지 링크입니다. 이러한 사이트는 사기 또는 도용의 목적으로 사용자 계정 정보를 편취하기 위해 자신을 거짓 정보로 소개하며 합법적인 업체의 웹 페이지인 것처럼 사용자를 속입니다."
+   },
+   "category_id_ph_name": {
+      "message": "피싱"
+   },
+   "category_id_pm_description": {
+      "message": "처방이 필요한 의약품, 일반 의약품, 피임약 또는 다이어트 보조제에 대한 후기, 설명 및 홍보 또는 판매를 제공하는 웹 페이지입니다."
+   },
+   "category_id_pm_name": {
+      "message": "의약품"
+   },
+   "category_id_pn_description": {
+      "message": "음악 파일 다운로드와 같이, 업무 또는 사적인 용도로 컴퓨터와 사용자 간의 파일 교환을 허용하는 웹 페이지입니다. P2P 클라이언트를 통해 사용자는 피어 사용자 네트워크에서 파일을 검색하고 교환할 수 있습니다. 그러한 클라이언트에는 스파이웨어나 실시간 채팅 기능이 포함되어 있는 경우가 많습니다. BitTorrent 웹 페이지가 이러한 범주에 포함됩니다."
+   },
+   "category_id_pn_name": {
+      "message": "P2P/파일 공유"
+   },
+   "category_id_po_description": {
+      "message": "정당, 정치인 및 다양한 주제에 대한 의견을 다루는 웹 페이지입니다. 약물에 관한 법률 및 정치적 의견 또한 이러한 범주에 포함될 수 있습니다. 정당 URL, 정치 캠페인 및 정치적 논란을 포함한 다양한 주제에 대한 의견 등이 이러한 범주에 포함됩니다."
+   },
+   "category_id_po_name": {
+      "message": "정치/사설"
+   },
+   "category_id_pp_description": {
+      "message": "ISP, 대학/교육 기관 서버 또는 무료 웹 페이지 호스트 등에 의해 호스팅되어 공통 도메인을 공유하는 개인 홈 페이지입니다. 개인 홈 페이지처럼 개인 정보가 포함된 고유 도메인도 이러한 범주에 포함됩니다. 개인 홈페이지에는 불쾌한 콘텐츠가 포함될 수 있습니다."
+   },
+   "category_id_pp_name": {
+      "message": "개인 페이지"
+   },
+   "category_id_pr_description": {
+      "message": "상스럽고 저속하거나 음란한 언어 또는 표현이 포함된 웹 페이지입니다."
+   },
+   "category_id_pr_name": {
+      "message": "비속어"
+   },
+   "category_id_ps_description": {
+      "message": "웹상의 콘텐츠에 대해 게이트웨이 또는 디렉터리 역할을 하는 웹 페이지입니다. 많은 포털은 또한 검색 엔진, 이메일, 뉴스 및 엔터테인먼트 소식 등을 다루거나 서비스하는 다양한 내부 사이트를 제공합니다. 다양한 콘텐츠를 다루는 메일링 리스트 사이트는 이러한 범주에 포함됩니다."
+   },
+   "category_id_ps_name": {
+      "message": "포털 사이트"
+   },
+   "category_id_pu_description": {
+      "message": "PUP(잠재적으로 원하지 않는 프로그램)를 포함하는 웹 페이지입니다. 잠재적으로 원하지 않는 프로그램은 대체로 유익한 목적으로 제작되지만 컴퓨터의 보안 또는 컴퓨터 사용자의 개인 정보를 변경합니다. 보안이나 개인 정보에 민감한 컴퓨터 사용자는 이러한 소프트웨어에 대해 알림을 제공받고 싶어할 수 있으며, 컴퓨터에서 해당 소프트웨어를 제거하고 싶어할 수도 있습니다."
+   },
+   "category_id_pu_name": {
+      "message": "잠재적으로 원하지 않는 프로그램"
+   },
+   "category_id_ra_description": {
+      "message": "프로그램, 온라인 서비스 또는 전체 컴퓨터 시스템에 대한 원격 액세스 기능을 제공하는 웹 페이지입니다. 원격 액세스는 원거리에서 합법적인 수단으로 컴퓨터를 실행할 목적으로 주로 사용되긴 하지만, 백도어 액세스와 같은 보안 위험을 야기할 수 있습니다. 프로그래머가 원래 작성한 백도어 액세스는 사용자 모르게 타자가 시스템을 제어할 수 있도록 허용합니다."
+   },
+   "category_id_ra_name": {
+      "message": "원격 액세스"
+   },
+   "category_id_rb_description": {
+      "message": "온라인 주문을 포함하여 레스토랑, 술집, 출장 요리 서비스, 테이크아웃 및 배달 등에 대한 정보를 제공하는 웹 페이지입니다. 매장 위치, 영업 시간, 가격, 메뉴 및 관련 음식 정보 등을 제공하는 사이트는 이러한 범주에 포함됩니다. 음식점 안내 및 후기, 카페와 커피숍 또한 이러한 범주에 포함됩니다."
+   },
+   "category_id_rb_name": {
+      "message": "레스토랑"
+   },
+   "category_id_re_description": {
+      "message": "상업용 또는 주거용 부동산에 대한 서비스 및 정보를 제공하는 웹 페이지입니다. 이러한 서비스와 정보에는 거주 공간 또는 소매 공간의 판매와 임대, 아파트와 주택 및 건물에 대한 안내, 그리고 감정 평가 및 중개 수수료 관련 정보 등이 포함됩니다. 모델 하우스를 둘러볼 수 있는 사이트도 이러한 범주에 포함됩니다."
+   },
+   "category_id_re_name": {
+      "message": "부동산"
+   },
+   "category_id_rh_description": {
+      "message": "여가 활동 및 취미를 주로 다루는 콘텐츠가 포함된 레저 조직 및 시설을 위한 웹 페이지입니다. 공공 수영장, 동물원, 박람회, 축제, 놀이 공원, 레크리에이션 지도, 하이킹, 낚시, 새 관찰하기 또는 우표 수집 등에 관한 정보가 이러한 범주에 포함됩니다."
+   },
+   "category_id_rh_name": {
+      "message": "레크리에이션/취미"
+   },
+   "category_id_rl_description": {
+      "message": "주요 종교에서 다루지 않는 종교적인 주제 및 인간의 신성에 대한 믿음에 관련된 콘텐츠를 제공하는 웹 페이지입니다. 주요 세계 종교 범주에 이미 포함되지 않은 사이트 중에서, 종교적인 토론, 신앙, 기사 및 교회 홈페이지와 같은 지역 신자 및 그룹을 위한 정보를 제공하는 사이트는 이러한 범주에 포함됩니다. 비교 종교학 또는 종교와 이데올로기에 대한 사이트 또한 이 범주에 포함됩니다."
+   },
+   "category_id_rl_name": {
+      "message": "종교/이데올로기"
+   },
+   "category_id_rm_description": {
+      "message": "종교적인 주제 및 주요 종교 관련 정보에 대한 콘텐츠를 다루는 웹 페이지입니다. 토론, 신앙, 논란의 여지가 없는 논의, 기사에 대한 콘텐츠 및 교회나 회당 홈페이지와 같은 지역 신자들을 위한 정보와 같은 종교적인 콘텐츠를 다루는 사이트가 이러한 범주에 포함됩니다. 바하이교, 불교, 유교, 기독교, 힌두교, 이슬람교, 자이나교, 유대교, 신도, 시크교, 텐리교, 배화교 등이 이러한 종교의 범주에 해당됩니다."
+   },
+   "category_id_rm_name": {
+      "message": "주요 세계 종교"
+   },
+   "category_id_rs_description": {
+      "message": "사용되지 않는 컴퓨터 자원을 일반 작업에 활용하기 위한 정보를 제공하는 웹 페이지입니다. 이러한 작업은 회사 또는 국제적인 차원에서 이루어집니다. 잘 알려진 예시인 SETI 프로그램과 인간 게놈 프로젝트 등은 수천 대의 자원 컴퓨터를 활용하여 데이터를 분석합니다."
+   },
+   "category_id_rs_name": {
+      "message": "리소스 공유"
+   },
+   "category_id_sc_description": {
+      "message": "무료 또는 수수료 기반으로 과제 보고서, 미리 작성된 에세이 또는 시험 답안을 제공함으로써 표절 또는 속임수를 홍보하는 웹 페이지입니다."
+   },
+   "category_id_sc_name": {
+      "message": "학교 부정 행위 정보"
+   },
+   "category_id_se_description": {
+      "message": "사용자가 검색어 기반으로 인터넷에서 정보를 찾을 수 있는 검색 결과를 제공하는 웹 페이지입니다."
+   },
+   "category_id_se_name": {
+      "message": "검색 엔진"
+   },
+   "category_id_sm_description": {
+      "message": "성적인 흥분을 자극하려는 목적은 없지만 성행위에 대해 설명하거나 묘사하는 웹 페이지입니다. 성적인 자료의 예로 성교육, 성적인 풍자, 유머 또는 성인용품 등을 들 수 있습니다."
+   },
+   "category_id_sm_name": {
+      "message": "성인물"
+   },
+   "category_id_sn_description": {
+      "message": "친목, 데이트, 전문 분야 또는 관심 주제 등 다양한 목적의 소셜 네트워킹 서비스를 제공하는 웹 페이지입니다. 이러한 사이트는 개인 또는 그룹 프로파일을 제공하고 회원들이 실시간 연락, 메시지 게시, 공공 게시판 및 미디어 공유 등을 통해 서로 소통할 수 있는 기능을 제공합니다. 이러한 범주의 사이트를 통해 원하지 않는 모임 및 불쾌한 정보가 담긴 회원 프로파일을 접하게 될 수 있습니다."
+   },
+   "category_id_sn_name": {
+      "message": "소셜 네트워킹"
+   },
+   "category_id_sp_description": {
+      "message": "전문적 또는 체계적인 레저 스포츠와 관계된 웹 페이지입니다. 스포츠 뉴스 및 플레이 관련 조언, 전략, 시합 점수 또는 선수 트레이드 등의 정보가 이러한 범주에 포함됩니다."
+   },
+   "category_id_sp_name": {
+      "message": "스포츠"
+   },
+   "category_id_st_description": {
+      "message": "스트리밍 미디어를 제공하거나, 전체 파일이 전송되기 전에 오디오 및 시각 데이터를 표시하도록 지원하는 소프트웨어 플러그인이 포함된 웹 페이지입니다."
+   },
+   "category_id_st_name": {
+      "message": "스트리밍 미디어"
+   },
+   "category_id_su_description": {
+      "message": "원하지 않은 스팸 이메일을 통해 전달된 웹 페이지 링크입니다. 스팸 URL 콘텐츠의 범위는 제품 마케팅에서 잠재적으로 불쾌하거나 사기의 가능성이 있는 사이트까지 다양합니다. 스팸 블로그 또는 댓글 스팸처럼 오로지 스팸을 위해 제작된 사이트는 이러한 범주에 포함됩니다."
+   },
+   "category_id_su_name": {
+      "message": "스팸 URL"
+   },
+   "category_id_sw_description": {
+      "message": "다운로드 가능한 쉐어웨어 및 프리웨어의 사본을 보관하는 웹 페이지입니다. 무료로 배포되는 쉐어웨어는 사용자가 자신의 책임 하에 사용할 수 있지만, 사용자가 해당 프로그램을 적절하게 자주 사용한다면 제작자는 소액의 사용자에게 수수료를 요청합니다. 프리웨어는 아무런 비용 없이 사용 가능한 소프트웨어입니다."
+   },
+   "category_id_sw_name": {
+      "message": "쉐어웨어/프리웨어"
+   },
+   "category_id_sx_description": {
+      "message": "McAfee의 판단에 따르면 성적인 흥분을 자극하거나 에로틱한 콘텐츠가 포함된 웹 페이지입니다. 페티시즘을 다루는 페이지, 애니메이션, 만화, 이야기 및 불법 음란물 등이 이러한 범주에 포함됩니다."
+   },
+   "category_id_sx_name": {
+      "message": "음란물"
+   },
+   "category_id_sy_description": {
+      "message": "개인 정보 또는 기업 보안을 침해하는 웹 페이지입니다. 이러한 범주는 다음을 포함합니다.\u003Cbr/>\u003Cbr/>\u003Cul>\u003Cli>사용자 정보를 수집한 후 사용자의 명시적인 인지 또는 동의 없이 이를 제3자에게 전송하는 소프트웨어를 다운로드하거나 프로그램을 실행하는 URL.\u003C/li>\u003Cli>키 입력을 기록하여(키 로거) 다른 컴퓨터상의 활동을 모니터링하거나 추적하는 소프트웨어.\u003C/li>\u003Cli>스파이웨어 또는 애드웨어를 포함한 것으로 알려진 소프트웨어를 배포하는 사이트.\u003C/li>\u003C/ul>이 범주는 사이트의 의도에 있어 악성 사이트 범주와 구별됩니다. 스파이웨어 및 키 로거는 정보를 몰래 수집하여 타자에게 전송합니다. 악성 사이트는 소프트웨어를 설치하거나 사용자의 동의 또는 인지 없이 작업을 실행할 의도로 제작됩니다."
+   },
+   "category_id_sy_name": {
+      "message": "스파이웨어/애드웨어/키 로거"
+   },
+   "category_id_tb_description": {
+      "message": "궐련, 시가, 파이프, 코 담배 및 씹는 담배를 포함하여 담배와 관련된 상품 및 용품을 판매, 홍보 또는 추천하는 웹 페이지입니다."
+   },
+   "category_id_tb_name": {
+      "message": "담배"
+   },
+   "category_id_tf_description": {
+      "message": "기술 또는 비즈니스에 특화되어, 기술 지원 또는 대화형 비즈니스 통신과 같은 온라인 메시지 게시나 실시간 채팅 서비스를 제공하는 웹 페이지입니다. 사용자가 게시할 수 있는 콘텐츠 유형에는 제한이 없지만 이러한 포럼에서는 불쾌한 콘텐츠가 제시될 위험이 비교적 적습니다. 기술 및 비즈니스 콘텐츠 외에도 여러 다양한 주제의 포럼을 제공하는 사이트는 오직 포럼/게시판 또는 채팅 범주에만 포함됩니다. 기본 기술 또는 비즈니스를 주로 다루는 포럼은 기술/비즈니스 포럼 범주에 포함됩니다."
+   },
+   "category_id_tf_name": {
+      "message": "기술/비즈니스 포럼"
+   },
+   "category_id_tg_description": {
+      "message": "천박, 불쾌, 충격적이거나 섬뜩할 것으로 간주되는 콘텐츠를 다루는 웹 페이지입니다. 저속한 유머, 신체 배설 기능, 의료 또는 사고 현장 사진(유혈 및 상처나 부상의 표현), 잔혹한 신체 개조(절단, 낙인 또는 음부 피어싱 등) 또는 지나치게 비인간적인 동물 학대 표현 등이 이러한 범주에 포함됩니다."
+   },
+   "category_id_tg_name": {
+      "message": "혐오물"
+   },
+   "category_id_ti_description": {
+      "message": "정보 기술, 컴퓨터 프로그램 및 인증 등 교육 분야에 집중된 컴퓨터 사용 정보를 제공하는 웹 페이지입니다. Linux 사용자 그룹, UNIX 명령, 소프트웨어 자습서 또는 기술 용어 사전 등이 그러한 예입니다. 이 범주에 포함된 대부분의 사이트는 보다 큰 도메인의 하위 디렉터리인 경우가 많습니다."
+   },
+   "category_id_ti_name": {
+      "message": "기술 정보"
+   },
+   "category_id_to_description": {
+      "message": "텍스트나 오디오로만 구성되며 이미지를 포함하지 않는 콘텐츠입니다. 이러한 범주는 음란물, 폭력물 또는 성인물 범주를 통해 차단되는 사진을 사용자가 원하는 경우, 예외적으로 노골적인 글과 녹음 자료에 대해서만 액세스를 허용하기 위해 사용됩니다. 도서관이나 대학은 이러한 범주를 이용하여 공공 시설에서 불쾌한 이미지가 표시되지 않도록 방지합니다."
+   },
+   "category_id_to_name": {
+      "message": "텍스트/음성 전용"
+   },
+   "category_id_tr_description": {
+      "message": "호텔, 리조트, 항공 노선, 육상 교통편, 자동차 대여, 여행사 및 일반 여행자 및 여행 정보 등 개인 여행 또는 비즈니스 출장 관련 정보를 제공하는 웹 페이지입니다. 티켓이나 숙소 예약을 위한 사이트 역시 이러한 범주에 포함됩니다."
+   },
+   "category_id_tr_name": {
+      "message": "여행"
+   },
+   "category_id_tt_description": {
+      "message": "사용자가 입력한 문장이나 구의 번역 결과를 제공하는 웹 페이지입니다. 언어 식별 웹 페이지 역시 이 범주에 포함됩니다."
+   },
+   "category_id_tt_name": {
+      "message": "텍스트 번역기"
+   },
+   "category_id_uk_description": {
+      "message": "전 세계에서 호스팅되는 아동 성적 학대 콘텐츠 및 영국에서 호스팅되는 형법상 음란물 및 인종 혐오 조장 콘텐츠 등을 포함하는 웹 페이지입니다."
+   },
+   "category_id_uk_name": {
+      "message": "불법 영국 사이트"
+   },
+   "category_id_vi_description": {
+      "message": "전쟁, 자살, 신체 절단 또는 훼손의 묘사 등 사람이나 동물 또는 단체에 대한 물리적 공격을 묘사, 서술 또는 추천하는 실제 또는 실제와 유사한 이미지나 텍스트가 포함된 웹 페이지입니다."
+   },
+   "category_id_vi_name": {
+      "message": "폭력"
+   },
+   "category_id_vs_description": {
+      "message": "축소판 이미지 등의 이미지 전용 검색 결과를 제공하는 웹 페이지입니다."
+   },
+   "category_id_vs_name": {
+      "message": "시각적 검색 엔진"
+   },
+   "category_id_wa_description": {
+      "message": "광고를 제작하는 광고 호스팅 또는 프로그램 서비스를 제공하는 웹 페이지입니다. 웹 페이지에 표시되는 배너, 팝업 및 기타 정적 또는 동적으로 생성된 다양한 종류의 광고를 위한 링크, 소스 코드 또는 애플릿 등이 그러한 예입니다. 이 범주는 웹 페이지에서 광고를 차단하기 위한 것이며, 광고나 광고 서비스를 제공하는 업체를 차단할 목적으로 만들어진 것은 아닙니다."
+   },
+   "category_id_wa_name": {
+      "message": "웹 광고"
+   },
+   "category_id_we_description": {
+      "message": "각종 총기, 단검, 칼, 페인트볼 건 및 탄약, 폭발물과 무기 액세서리 등 무기의 구매, 제조, 개조 또는 사용에 관한 정보를 제공하는 웹 페이지입니다."
+   },
+   "category_id_we_name": {
+      "message": "무기"
+   },
+   "category_id_wm_description": {
+      "message": "사용자가 인터넷 이메일을 송수신할 수 있는 웹 페이지입니다. 이러한 사이트는 사용자를 이메일 첨부 파일을 통해 전달된 해로운 콘텐츠에 노출시킬 수 있으며, 개인 데이터의 유출 또는 손실과 같은 보안 위험을 야기할 수 있습니다."
+   },
+   "category_id_wm_name": {
+      "message": "웹메일"
+   },
+   "category_id_wp_description": {
+      "message": "사용자가 인터넷으로 전화 통화를 하거나 그러한 목적으로 관련 정보나 소프트웨어를 확보할 수 있는 웹 페이지입니다. 인터넷전화 서비스는 인터넷 전화 또는 VoIP라고도 합니다. 인터넷전화 서비스에는 TCP/IP 네트워크로 연결되는 PC 대 PC, PC 대 전화기 및 전화기 대 전화기 서비스 등이 포함됩니다."
+   },
+   "category_id_wp_name": {
+      "message": "인터넷전화"
+   },
+   "category_id_wx_description": {
+      "message": "주로 비즈니스 목적의 실시간 회의, 화상 회의 및 대화형 프레젠테이션 호스팅 서비스를 제공하는 웹 페이지입니다. 웹 미팅에서는 일반적으로 스트리밍 오디오 및 비디오가 수반되며, 데이터 전송이나 온라인 프레젠테이션 같은 업무 지향 애플리케이션 공유가 허용됩니다. 이러한 범주의 URL에서는 대역폭 위험 및 민감한 데이터의 유출 또는 손실과 같은 보안 위험이 발생할 수 있습니다."
+   },
+   "category_id_wx_name": {
+      "message": "웹 미팅"
+   },
+   "dfd_landing_desc1": {
+      "message": "Youtube, Facebook과 같은 웹 사이트에서 동영상을 살펴보고 시청하세요"
+   },
+   "dfd_landing_desc2": {
+      "message": "딥페이크가 탐지될 경우 몇 초 내에 알림을 제공합니다."
+   },
+   "dfd_landing_desc3": {
+      "message": "그러면 사용자가 실시간 결과 분석을 확인할 수 있습니다."
+   },
+   "dfd_landing_home_btn": {
+      "message": "홈으로 이동"
+   },
+   "dfd_landing_title": {
+      "message": "현재 이 디바이스는 피싱으로부터 보호받고 있습니다"
+   },
+   "download_scan_popup_expanded_descriptions": {
+      "message": "다운로드 항목을 검사 중입니다. 문제가 있는 경우 알려드리겠습니다."
+   },
+   "dws_do_not_ask_again_btn": {
+      "message": "다시 묻지 않음"
+   },
+   "dws_do_not_ask_again_close_btn": {
+      "message": "감사합니다"
+   },
+   "dws_do_not_ask_again_title": {
+      "message": "이 이메일 주소를 사용할 때 다시 묻지 않습니다."
+   },
+   "dws_email_input_error": {
+      "message": "이메일이 올바르지 않은 것 같습니다."
+   },
+   "dws_email_input_label": {
+      "message": "이메일 주소"
+   },
+   "dws_remind_later_btn": {
+      "message": "나중에 알림"
+   },
+   "dws_remind_later_title": {
+      "message": "다음에 이 이메일 주소를 사용할 때 다시 묻습니다."
+   },
+   "dws_scan_btn": {
+      "message": "내 이메일 주소 확인"
+   },
+   "dws_scan_btn_first_time": {
+      "message": "내 이메일 주소 확인"
+   },
+   "dws_scan_email_description": {
+      "message": "다크웹 데이터베이스를 통해 개인 정보가 도난되었는지 확인합니다. 이메일 주소를 확인하고 싶으신가요?"
+   },
+   "dws_scan_email_title": {
+      "message": "신원 보호"
+   },
+   "dws_thanks_btn": {
+      "message": "감사합니다"
+   },
+   "efficacy_meter_excellent": {
+      "message": "우수"
+   },
+   "efficacy_meter_fair": {
+      "message": "보통"
+   },
+   "efficacy_meter_good": {
+      "message": "양호"
+   },
+   "efficacy_meter_poor": {
+      "message": "나쁨"
+   },
+   "efficacy_meter_title": {
+      "message": "보안 점수"
+   },
+   "ffpolicy_accept_prompt": {
+      "message": "*활성화 요청 메시지 표시 수락"
+   },
+   "ffpolicy_activity_main_title": {
+      "message": "귀하의 데이터를 사용하여 온라인 보호를 지원하는 다른 방법은 다음과 같습니다."
+   },
+   "ffpolicy_activity_message": {
+      "message": "이 정보를 사용하여 사용자에게 가장 유용한 웹어드바이저 기능을 파악할 수 있습니다."
+   },
+   "ffpolicy_activity_title": {
+      "message": "활동 데이터 수집"
+   },
+   "ffpolicy_header_message": {
+      "message": "웹을 검색하는 동안 위협으로부터 안전하게 보호할 수 있도록 개인 데이터 수집을 활성화하세요. 그렇지 않으면 McAfee® 웹어드바이저를 제거해야 합니다."
+   },
+   "ffpolicy_header_message_2": {
+      "message": "웹을 검색하는 동안 위협으로부터 안전하게 보호할 수 있도록 확장 권한을 활성화하세요."
+   },
+   "ffpolicy_header_message_uninstall": {
+      "message": "제거"
+   },
+   "ffpolicy_header_title": {
+      "message": "보호되고 있지 않습니다"
+   },
+   "ffpolicy_header_title_protected": {
+      "message": "McAfee® 웹어드바이저가 귀하를 보호하고 있습니다"
+   },
+   "ffpolicy_page_tab_title": {
+      "message": "McAfee - 한 단계 더 남았습니다"
+   },
+   "ffpolicy_permissions_accept_button": {
+      "message": "권한 부여"
+   },
+   "ffpolicy_permissions_message": {
+      "message": "당사가 보안 위험을 식별하고 귀하에게 알리려면 귀하가 방문하는 사이트의 데이터를 읽고 변경해야 합니다. 이 설정은 웹을 검색하는 동안 귀하를 보호하기 위해 필요합니다."
+   },
+   "ffpolicy_permissions_message_line_2": {
+      "message": "아래의 '권한 부여'를 클릭하고 팝업에서 '허용'을 선택하면 권한 요청이 시작됩니다."
+   },
+   "ffpolicy_permissions_on": {
+      "message": "활성화"
+   },
+   "ffpolicy_permissions_title": {
+      "message": "확장 권한(필수)"
+   },
+   "ffpolicy_personal_data_accept_button": {
+      "message": "예, McAfee의 개인 정보 보호 정책에 따라 개인 데이터 수집을 허용합니다"
+   },
+   "ffpolicy_personal_data_decline_button": {
+      "message": "아니오, 개인 데이터 수집을 허용하지 않습니다"
+   },
+   "ffpolicy_personal_message_intro": {
+      "message": "전문가에게 귀하가 검색하는 사이트의 웹 주소를 보내 보안 상태를 확인합니다 귀하의 정보는 절대 판매하지 않으므로 안심하셔도 좋습니다. 당사는 귀하를 개인적으로 식별할 수 있는 다음과 같은 데이터를 수집할 수 있습니다."
+   },
+   "ffpolicy_personal_message_outro": {
+      "message": "개인 데이터 수집을 허용하지 않기로 선택한 경우 McAfee® 웹어드바이저가 보안 기능을 제공할 수 없으므로 이 프로그램을 제거해야 합니다."
+   },
+   "ffpolicy_personal_message_outro_line_2": {
+      "message": "당사가 수집하는 개인 데이터와 이러한 데이터로 수행하는 작업에 대한 자세한 내용은 다음에서 확인할 수 있습니다. $link$",
+      "placeholders": {
+         "link": {
+            "content": "$1"
+         }
+      }
+   },
+   "ffpolicy_personal_message_point_1": {
+      "message": "귀하가 방문하는 사이트의 웹 주소(URL): 해당 사이트의 보안 상태를 확인하고 최신 보안 정보를 제공하기 위해 수집합니다."
+   },
+   "ffpolicy_personal_message_point_2": {
+      "message": "검색 엔진 결과에 기재된 사이트의 웹 주소(URL): 보안 상태를 확인하고 보안 주석을 제공하기 위해 수집합니다."
+   },
+   "ffpolicy_personal_message_point_3": {
+      "message": "현재 브라우저 버전: McAfee® 웹어드바이저의 보안 서비스에서 발생할 수 있는 문제 진단을 위해 수집합니다."
+   },
+   "ffpolicy_personal_message_point_4": {
+      "message": "사용 중인 McAfee® 웹어드바이저 버전: 보안 서비스에서 발생할 수 있는 문제를 진단하기 위해 수집합니다."
+   },
+   "ffpolicy_personal_title": {
+      "message": "개인 데이터 수집"
+   },
+   "ffpolicy_personal_title_required": {
+      "message": "(필수)"
+   },
+   "ffpolicy_privacy_policy_link": {
+      "message": "McAfee 개인 정보 보호 정책"
+   },
+   "ffpolicy_privacy_text": {
+      "message": "개인 데이터를 수집, 사용 및 공유하는 방법에 대한 자세한 내용은"
+   },
+   "ffpolicy_privacy_text_link": {
+      "message": "McAfee® 웹어드바이저 개인 정보 취급방침을 참조하세요."
+   },
+   "ffpolicy_required_suffix_1": {
+      "message": "1/2"
+   },
+   "ffpolicy_required_suffix_2": {
+      "message": "2/2"
+   },
+   "ffpolicy_see_settings": {
+      "message": "설정 보기"
+   },
+   "ffpolicy_uninstall_popup_message": {
+      "message": "죄송합니다. 표시된 개인 데이터가 없으면 보안 기능을 제공할 수 있는 최신 보안 정보가 없으므로 McAfee® 웹어드바이저가 작동하지 않습니다.  McAfee® 웹어드바이저가 데이터를 수집하도록 다시 허용하고 싶지 않다면 McAfee® 웹어드바이저를 제거하는 것이 좋습니다."
+   },
+   "howitworks_about": {
+      "message": "정보"
+   },
+   "howitworks_about_careers": {
+      "message": "채용 정보"
+   },
+   "howitworks_about_contact": {
+      "message": "연락처"
+   },
+   "howitworks_about_legal": {
+      "message": "개인 정보 및 약관"
+   },
+   "howitworks_about_map": {
+      "message": "사이트 맵"
+   },
+   "howitworks_about_mcafee": {
+      "message": "McAfee 소개"
+   },
+   "howitworks_about_req": {
+      "message": "시스템 요구 사항"
+   },
+   "howitworks_address": {
+      "message": "Corporate Headquarters 6220 America Center Drive San Jose, CA 95002 USA"
+   },
+   "howitworks_description": {
+      "message": "McAfee는 웹 서핑을 하는 동안 최우선 보호를 제공하여 맬웨어 및 피싱 공격이 발생하기 전에 방지할 수 있도록 지원합니다."
+   },
+   "howitworks_download_description": {
+      "message": "바이러스를 비롯한 기타 위협으로부터 PC를 보호하세요. 의심스러운 파일을 다운로드한 경우 경고를 제공하고 웹 페이지에 숨어있는 맬웨어를 차단합니다.*"
+   },
+   "howitworks_download_title": {
+      "message": "더욱 안전한 다운로드"
+   },
+   "howitworks_legal": {
+      "message": "귀하의 구독은 $howitworks_legal_license$ 및 $howitworks_legal_notice$에 의해 변경될 수 있으며 귀하의 구독이 지원하는 기기의 수만큼 개인적인 용도로 사용할 수 있습니다. 구독은 '모든' 기기에 적용되며 귀하가 소유하고 있으며 지원되는 기기로 제한됩니다. 제품 기능은 구독 기간 동안 추가, 변경 또는 제거될 수 있으며 일부 기능은 특정 운영 체제에서 지원되지 않습니다. 지원되는 기기는 $howitworks_legal_req$에서 확인하세요. 소프트웨어가 가능한 모든 위협에 대한 보호를 보장하는 것은 아닙니다.",
+      "placeholders": {
+         "howitworks_legal_license": {
+            "content": "$1"
+         },
+         "howitworks_legal_notice": {
+            "content": "$2"
+         },
+         "howitworks_legal_req": {
+            "content": "$3"
+         }
+      }
+   },
+   "howitworks_legal_license": {
+      "message": "라이선스 계약"
+   },
+   "howitworks_legal_notice": {
+      "message": "개인 정보 취급방침"
+   },
+   "howitworks_legal_req": {
+      "message": "시스템 요구 사항"
+   },
+   "howitworks_lets_connect": {
+      "message": "McAfee 소식을 알아보세요."
+   },
+   "howitworks_page_title": {
+      "message": "McAfee - 작동 방식"
+   },
+   "howitworks_phishing_description": {
+      "message": "해커는 공식적인 것처럼 보이는 이메일 또는 흥미를 끄는 검색 결과를 통해 사용자의 정보를 훔치려고 시도합니다. McAfee는 이러한 행위를 피할 수 있도록 조치하여 개인 정보를 보호합니다."
+   },
+   "howitworks_phishing_title": {
+      "message": "피싱 방지"
+   },
+   "howitworks_products": {
+      "message": "제품"
+   },
+   "howitworks_products_identity": {
+      "message": "McAfee® 신원 도용 보호"
+   },
+   "howitworks_products_livesafe": {
+      "message": "McAfee® 라이브세이프"
+   },
+   "howitworks_products_totalprotection": {
+      "message": "McAfee® 토탈 프로텍션"
+   },
+   "howitworks_refund_trademark": {
+      "message": "McAfee 및 McAfee 로고는 미국 및 기타 국가에서 McAfee LLC 또는 그 자회사의 상표 또는 등록 상표입니다. 기타 이름 및 브랜드는 각 소유자의 재산으로 주장될 수 있습니다. Copyright © $year$ McAfee, LLC",
+      "placeholders": {
+         "year": {
+            "content": "$1"
+         }
+      }
+   },
+   "howitworks_share": {
+      "message": "귀하가 주의하고 안전할 수 있도록 뉴스와 팁을 공유해 드립니다."
+   },
+   "howitworks_social_description": {
+      "message": "Facebook, LinkedIn, Reddit 등과 같은 사이트에서 안심하고 소셜 피드를 스크롤하세요. 클릭해도 안전한지 알 수 있도록 링크를 색으로 구분하여 표시합니다.*"
+   },
+   "howitworks_social_title": {
+      "message": "소셜 미디어 보호"
+   },
+   "howitworks_star_message": {
+      "message": "*Windows에서만 사용 가능"
+   },
+   "howitworks_support": {
+      "message": "지원"
+   },
+   "howitworks_support_consumer": {
+      "message": "고객 지원"
+   },
+   "howitworks_tech_scam": {
+      "message": "기술 사기 보호"
+   },
+   "howitworks_tech_scam_description": {
+      "message": "명확한 보안 경고를 통해 컴퓨터 및 개인 정보에 원격으로 액세스하려는 사기꾼을 제어하고 앞서 나갑니다."
+   },
+   "howitworks_title": {
+      "message": "McAfee는 사용자를 보호합니다"
+   },
+   "howitworks_url_description": {
+      "message": "해커는 실제와 거의 동일하게 보이는 주소를 사용하는 악성 사이트를 만듭니다. URL 오타 또는 허위 링크로 인해 사이트를 잘못 방문하는 경우 안전하게 돌아올 수 있도록 안내합니다.*"
+   },
+   "howitworks_url_title": {
+      "message": "URL 하이재킹 보호"
+   },
+   "iframe_banner_message": {
+      "message": "이 페이지를 테스트했으며 잠재적으로 위험하거나 의심스러운 사이트의 콘텐츠를 차단했습니다. 이 콘텐츠는 출처 사이트가 안전하다고 확신하는 경우에만 허용하십시오."
+   },
+   "iframe_banner_view_all_btn": {
+      "message": "모든 차단된 콘텐츠 보기"
+   },
+   "mb_back_btn_message": {
+      "message": "뒤로"
+   },
+   "mb_banner_learn_more": {
+      "message": "자세히 알아보기"
+   },
+   "mb_banner_manage_settings": {
+      "message": "설정 관리"
+   },
+   "mb_faq_back_btn_message": {
+      "message": "뒤로"
+   },
+   "mb_faq_description": {
+      "message": "오디오 딥페이크, 오디오 딥페이크를 탐지하는 방법, 오디오 딥페이크로 인한 위험에 대해 자세히 알아보세요."
+   },
+   "mb_faq_title": {
+      "message": "피싱 동영상 차단 FAQ"
+   },
+   "mb_graph_error": {
+      "message": "현재 오디오 데이터를 표시할 수 없습니다. 나중에 다시 시도하세요."
+   },
+   "mb_graph_feature_off": {
+      "message": "Deepfake Detector가 비활성화되어 있습니다"
+   },
+   "mb_graph_label_detected": {
+      "message": "딥페이크 탐지됨"
+   },
+   "mb_graph_label_scanning": {
+      "message": "딥페이크 검사 중..."
+   },
+   "mb_graph_no_audio": {
+      "message": "현재 재생 중인 오디오가 없습니다"
+   },
+   "mb_graph_no_video": {
+      "message": "현재 재생 중인 동영상이 없습니다"
+   },
+   "mb_info_link_need_help": {
+      "message": "도움이 필요하신가요?"
+   },
+   "mb_info_link_need_support": {
+      "message": "지원 문의"
+   },
+   "mb_main_audio_detection_off": {
+      "message": "비활성화"
+   },
+   "mb_main_audio_detection_on": {
+      "message": "활성화"
+   },
+   "mb_main_audio_detection_title": {
+      "message": "피싱 차단"
+   },
+   "mb_main_cur_video": {
+      "message": "현재 동영상"
+   },
+   "mb_main_deepfake": {
+      "message": "딥페이크 수"
+   },
+   "mb_main_deepfakes": {
+      "message": "딥페이크 수"
+   },
+   "mb_main_faq_message": {
+      "message": "피싱 동영상 차단 기능이 작동하는 방법과 McAfee가 사용자를 안전하게 보호하는 방법을 알아보세요."
+   },
+   "mb_main_faq_title": {
+      "message": "피싱 동영상 차단 FAQ"
+   },
+   "mb_main_feedback_btn": {
+      "message": "제출"
+   },
+   "mb_main_feedback_message": {
+      "message": "피드백을 공유해 주세요."
+   },
+   "mb_main_feedback_text": {
+      "message": "만족하셨나요?"
+   },
+   "mb_main_feedback_thank_you": {
+      "message": "감사합니다!"
+   },
+   "mb_main_hr_flagged": {
+      "message": "플래그 지정된 시간(시간)"
+   },
+   "mb_main_hr_scanned": {
+      "message": "검사 시간(시간)"
+   },
+   "mb_main_hrs_flagged": {
+      "message": "플래그 지정된 시간(시간)"
+   },
+   "mb_main_hrs_scanned": {
+      "message": "검사 시간(시간)"
+   },
+   "mb_main_min_flagged": {
+      "message": "플래그 지정된 시간(분)"
+   },
+   "mb_main_min_scanned": {
+      "message": "검사 시간(분)"
+   },
+   "mb_main_mins_flagged": {
+      "message": "플래그 지정된 시간(분)"
+   },
+   "mb_main_mins_scanned": {
+      "message": "검사 시간(분)"
+   },
+   "mb_main_my_data": {
+      "message": "내 탐지 데이터"
+   },
+   "mb_main_pause_day": {
+      "message": "$day$일",
+      "placeholders": {
+         "day": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_hour": {
+      "message": "$hour$시간",
+      "placeholders": {
+         "hour": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_hours": {
+      "message": "$hours$시간",
+      "placeholders": {
+         "hours": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_notification": {
+      "message": "알림 일시 중지"
+   },
+   "mb_main_snooze": {
+      "message": "다시 알림"
+   },
+   "mb_main_snooze_until": {
+      "message": "$time$까지 일시 중지",
+      "placeholders": {
+         "time": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_subscription_banner_buy": {
+      "message": "지금 구매"
+   },
+   "mb_main_title": {
+      "message": "피싱 동영상"
+   },
+   "mb_main_trial_end_in_hours_text": {
+      "message": "평가판이 24시간 후 종료됩니다"
+   },
+   "mb_main_trial_end_in_plural_text": {
+      "message": "평가판이 $days$일 후 종료됩니다",
+      "placeholders": {
+         "days": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_trial_end_in_single_text": {
+      "message": "평가판이 $day$일 후 종료됩니다",
+      "placeholders": {
+         "day": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_trial_expired_text": {
+      "message": "귀하의 평가판이 만료되었습니다"
+   },
+   "mb_main_what_we_found": {
+      "message": "다음은 지금까지 발견된 결과입니다"
+   },
+   "mb_prompt_banner_desc": {
+      "message": "McAfee의 피싱 동영상 차단 기능이 활성화되어 있습니다. $mb_banner_learn_more$",
+      "placeholders": {
+         "mb_banner_learn_more": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_prompt_banner_desc_page": {
+      "message": "피싱 동영상 차단 기능이 활성화되어 있습니다. $mb_banner_manage_settings$",
+      "placeholders": {
+         "mb_banner_manage_settings": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_sidebar_faq_a1": {
+      "message": "피싱 동영상 차단은 브라우저에서 재생 중인 AI 생성 오디오를 검사합니다. \u003Cbr>\u003Cbr> 시청 중인 동영상에서 AI 오디오를 감지하면 알려드립니다. 그러면 오디오의 어떤 부분이 가짜인지 알아볼 수 있습니다. \u003Cbr>\u003Cbr> 동영상 콘텐츠의 오디오를 검사하지만, 피싱 동영상 차단 기능은 AI 오디오만 식별하고 AI가 생성한 동영상이나 이미지는 확인하지 않습니다."
+   },
+   "mb_sidebar_faq_a2": {
+      "message": "딥페이크를 식별하려면 브라우저에서 재생 중인 오디오를 검사해야 합니다. 하지만 피싱 동영상 차단이 디바이스에 직접 로드되므로 모든 오디오 처리 및 검사가 로컬에서 이루어집니다. \u003Cbr>\u003Cbr> 즉, 검사한 정보는 당사 서버 또는 클라우드와 상호 작용하지 않습니다. McAfee는 어떤 방식으로도 사용자의 오디오를 수집하거나 기록하지 않으며, 개인 정보 보호를 강화하고 싶은 경우 언제든지 오디오 탐지 기능을 비활성화할 수 있습니다. \u003Cbr>\u003Cbr> 자세한 정보는 $mb_sidebar_faq_privacy_notice$을 확인하세요.",
+      "placeholders": {
+         "mb_sidebar_faq_privacy_notice": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_sidebar_faq_a3": {
+      "message": "딥페이크는 AI를 사용하여 사람의 목소리나 외모를 복제하거나 처음부터 가짜 사람을 생성하는 오디오 클립, 동영상 또는 이미지입니다. \u003Cbr>\u003Cbr> 예를 들어 유명 인사의 딥페이크는 그들이 들어본 적도 없는 제품을 홍보하는 모습을 보여줄 수 있습니다. 또는 정치 지도자의 딥페이크는 가짜 오디오를 사용하여 그들이 제공한 연설을 변경할 수 있습니다. \u003Cbr>\u003Cbr> 딥페이크는 매우 그럴듯하기 때문에 온라인에서 보거나 듣는 내용이 진짜인지 믿기 어렵게 만듭니다. 이로 인해 피싱 또는 잘못된 정보에 더 취약해질 수 있습니다."
+   },
+   "mb_sidebar_faq_a4": {
+      "message": "McAfee는 이미 디바이스에 내장된 AI 기술을 사용하여 브라우저에서 재생되는 모든 오디오를 분석하는 AI 모델을 실행합니다. 이 모델은 오디오가 AI에 의해 복제되거나 위조되었는지 확인합니다."
+   },
+   "mb_sidebar_faq_privacy_notice": {
+      "message": "개인 정보 취급방침"
+   },
+   "mb_sidebar_faq_q1": {
+      "message": "피싱 동영상 차단 기능이란 무엇인가요?"
+   },
+   "mb_sidebar_faq_q2": {
+      "message": "내 개인 정보는 안전한가요?"
+   },
+   "mb_sidebar_faq_q3": {
+      "message": "딥페이크란 무엇이며 나에게 어떤 영향을 미치나요?"
+   },
+   "mb_sidebar_faq_q4": {
+      "message": "딥페이크를 탐지하는 방법은 무엇인가요?"
+   },
+   "mb_video_banner_AI_audio_title": {
+      "message": "딥페이크 탐지됨"
+   },
+   "mb_video_banner_no_AI_audio_title": {
+      "message": "딥페이크 검사 중"
+   },
+   "overlay_accept_ss": {
+      "message": "검색 엔진을 McAfee® 보안 검색으로 변경하는 것에 동의합니다."
+   },
+   "overlay_add_ss": {
+      "message": "브라우저에 McAfee® 보안 검색 추가"
+   },
+   "overlay_form_button": {
+      "message": "완료"
+   },
+   "overlay_form_question": {
+      "message": "이 정보가 도움이 되지 않으셨다니 죄송합니다. 이를 올바르게 분류할 수 있도록 잘못된 부분을 알려주세요."
+   },
+   "overlay_form_text": {
+      "message": "여기에 텍스트 필드 입력"
+   },
+   "overlay_ss_description": {
+      "message": "검색 결과에 위험한 사이트가 있으면 플래그를 지정하므로 방문해도 안전한 사이트와 그렇지 않은 사이트를 확인할 수 있습니다."
+   },
+   "overlay_step_1": {
+      "message": "1단계"
+   },
+   "overlay_step_2": {
+      "message": "2단계"
+   },
+   "overlay_thank_you_close_button": {
+      "message": "닫기"
+   },
+   "overlay_thank_you_message": {
+      "message": "소중한 피드백을 제공해 주셔서 감사합니다."
+   },
+   "page_title": {
+      "message": "McAfee 프로텍션 센터"
+   },
+   "phishingdesc": {
+      "message": "해커는 공식적인 것처럼 보이는 '피싱' 이메일과 웹 사이트로 사용자를 속여 개인 정보를 손에 넣으려고 합니다. 이를 차단하여 피해를 방지합니다."
+   },
+   "phishingtitle": {
+      "message": "개인 정보를 안전하게 보호"
+   },
+   "read_more_about_typosquatting": {
+      "message": "타이포스쿼팅에 대해 자세히 알아보세요."
+   },
+   "res_PRODUCT_NAME": {
+      "message": "%PRODUCTNAME%"
+   },
+   "res_PRODUCT_NAME_NOT_TRADEMARKED": {
+      "message": "WebAdvisor"
+   },
+   "res_PRODUCT_NAME_TRADEMARKED": {
+      "message": "McAfee® 웹어드바이저"
+   },
+   "search_engine_bing": {
+      "message": "Bing"
+   },
+   "search_engine_yahoo": {
+      "message": "Yahoo"
+   },
+   "search_suggest_input": {
+      "message": "색 구분 검색 결과 받기"
+   },
+   "search_toast_body_text_compliant": {
+      "message": "보안 검색을 추가하여 위협에 앞서 대처하시겠습니까?"
+   },
+   "search_toast_body_text_test": {
+      "message": "보안 검색을 추가하여 방문해도 안전한 사이트를 확인하시겠습니까?"
+   },
+   "search_toast_done": {
+      "message": "완료"
+   },
+   "search_toast_heading_compliant": {
+      "message": "보안 검색 기능이 없음 - 주의하십시오"
+   },
+   "search_toast_heading_test": {
+      "message": "검색 결과를 안전하게 보호합니다."
+   },
+   "search_toast_no_thanks": {
+      "message": "아니요"
+   },
+   "search_toast_ok": {
+      "message": "확인"
+   },
+   "search_toast_option_compliant": {
+      "message": "예, 보안 검색을 내 브라우저에 추가하고 기본 검색을 $search_provider$(으)로 변경합니다.",
+      "placeholders": {
+         "search_provider": {
+            "content": "$1"
+         }
+      }
+   },
+   "search_toast_option_test": {
+      "message": "예, 보안 검색을 추가하고 기본 검색을 $search_provider$(으)로 변경합니다.",
+      "placeholders": {
+         "search_provider": {
+            "content": "$1"
+         }
+      }
+   },
+   "search_toast_sub_heading_compliant": {
+      "message": "보안 검색은 검색 결과 중 위험한 사이트를 차단합니다."
+   },
+   "search_toast_sub_heading_test": {
+      "message": "보안 검색은 검색 결과의 위험한 사이트를 플래그 지정합니다."
+   },
+   "search_toast_yes": {
+      "message": "예"
+   },
+   "securesearchdesc": {
+      "message": "색으로 구분된 검색 결과를 통해 안심하고 검색하세요. 안전한 사이트와 의심스러운 사이트를 알려드립니다."
+   },
+   "securesearchtitle": {
+      "message": "위험한 검색 결과 차단"
+   },
+   "settings_about_block_download": {
+      "message": "위험한 다운로드 차단"
+   },
+   "settings_about_firewall_antivirus": {
+      "message": "방화벽 및 안티바이러스 작동 확인"
+   },
+   "settings_about_flag_website": {
+      "message": "위험한 웹 사이트 플래그 지정"
+   },
+   "settings_about_help_link_message": {
+      "message": "지금 도움을 받으세요."
+   },
+   "settings_about_help_message": {
+      "message": "누구나 도움이 필요할 때가 있습니다."
+   },
+   "settings_about_help_title": {
+      "message": "도움 및 기술 지원을 받으세요."
+   },
+   "settings_about_privacy_link_message": {
+      "message": "개인 정보 취급방침을 읽으세요."
+   },
+   "settings_about_privacy_message": {
+      "message": "McAfee는 귀하의 개인 정보를 소중하게 다룹니다."
+   },
+   "settings_about_privacy_title": {
+      "message": "개인 정보 취급방침"
+   },
+   "settings_about_product_affid": {
+      "message": "제휴사 ID: $affid$",
+      "placeholders": {
+         "affid": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_binary_version": {
+      "message": "이진 버전: $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_extension_version": {
+      "message": "확장 버전: $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_title": {
+      "message": "제품 버전"
+   },
+   "settings_about_share_title": {
+      "message": "친구에게 %PRODUCTNAME% 공유"
+   },
+   "settings_about_subtitle": {
+      "message": "%PRODUCTNAME%은(는) 사용자가 올바른 상황 판단을 할 수 있도록 지원합니다."
+   },
+   "settings_about_title": {
+      "message": "정보"
+   },
+   "settings_page_title": {
+      "message": "%PRODUCTNAME%"
+   },
+   "settings_preference_annotation_all": {
+      "message": "모든 검색 엔진에서 검색 결과가 안전한지 알립니다."
+   },
+   "settings_preference_annotation_none": {
+      "message": "검색 결과에 대해 알리지 않습니다."
+   },
+   "settings_preference_annotation_ss": {
+      "message": "보안 검색에서만 검색 결과가 안전한지 알립니다."
+   },
+   "settings_preference_annotation_ss_with_tip": {
+      "message": "보안 검색을 통해 검색 결과가 안전한지 알립니다(팁: 주소 표시줄에서 검색하여 보안 검색에 액세스)."
+   },
+   "settings_preference_annotation_subtitle": {
+      "message": "검색 결과를 색으로 구분하여 어떤 사이트가 안전한지 표시합니다."
+   },
+   "settings_preference_annotation_title": {
+      "message": "보안 검색"
+   },
+   "settings_preference_aps_toggle_label_message": {
+      "message": "특정 금융, 쇼핑 및 기타 사이트가 합법적이고 위험하지 않다는 확인 알림을 통해 안심하고 검색하세요."
+   },
+   "settings_preference_aps_toggle_label_title": {
+      "message": "고급 보호 신호"
+   },
+   "settings_preference_aps_toggle_subtitle": {
+      "message": "이 설정을 사용하면 더 안전하게 보호할 수 있습니다."
+   },
+   "settings_preference_aps_toggle_title": {
+      "message": "고급 보호 신호"
+   },
+   "settings_preference_ffpolicy_activity_message": {
+      "message": "이 정보를 사용하여 사용자에게 가장 유용한 웹어드바이저 기능을 파악할 수 있습니다. "
+   },
+   "settings_preference_ffpolicy_activity_title": {
+      "message": "활동 데이터 수집"
+   },
+   "settings_preference_ffpolicy_permissions__title": {
+      "message": "확장 권한"
+   },
+   "settings_preference_ffpolicy_permissions_message": {
+      "message": "당사가 보안 위험을 식별하고 귀하에게 알리려면 귀하가 방문하는 사이트의 데이터를 읽고 변경해야 합니다. 이 설정은 웹을 검색하는 동안 귀하를 보호하기 위해 필요합니다."
+   },
+   "settings_preference_ffpolicy_permissions_on": {
+      "message": "활성화"
+   },
+   "settings_preference_ffpolicy_permissions_toggle__title": {
+      "message": "확장 권한(필수)"
+   },
+   "settings_preference_ffpolicy_personal_message_intro": {
+      "message": "전문가에게 귀하가 검색하는 사이트의 웹 주소를 보내 보안 상태를 확인합니다 귀하의 정보는 절대 판매하지 않으므로 안심하셔도 좋습니다. 당사는 귀하를 개인적으로 식별할 수 있는 다음과 같은 데이터를 수집할 수 있습니다."
+   },
+   "settings_preference_ffpolicy_personal_message_outro": {
+      "message": "개인 데이터 수집을 허용하지 않기로 선택한 경우 McAfee® 웹어드바이저가 보안 기능을 제공할 수 없으므로 이 프로그램을 제거해야 합니다."
+   },
+   "settings_preference_ffpolicy_personal_message_outro_line_2": {
+      "message": "당사가 수집하는 개인 데이터와 이러한 데이터로 수행하는 작업에 대한 자세한 내용은 다음에서 확인할 수 있습니다. $link$",
+      "placeholders": {
+         "link": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_preference_ffpolicy_personal_message_point_1": {
+      "message": "귀하가 방문하는 사이트의 웹 주소(URL): 보안 상태를 확인하고 최신 보안 정보를 제공하기 위해 수집합니다."
+   },
+   "settings_preference_ffpolicy_personal_message_point_2": {
+      "message": "검색 엔진 결과에 기재된 사이트의 웹 주소(URL): 보안 상태를 확인하고 보안 주석을 제공하기 위해 수집합니다."
+   },
+   "settings_preference_ffpolicy_personal_message_point_3": {
+      "message": "현재 브라우저 버전: McAfee® 웹어드바이저의 보안 서비스에서 발생할 수 있는 문제 진단을 위해 수집합니다."
+   },
+   "settings_preference_ffpolicy_personal_message_point_4": {
+      "message": "사용 중인 McAfee® 웹어드바이저 버전: 보안 서비스에서 발생할 수 있는 문제를 진단하기 위해 수집합니다."
+   },
+   "settings_preference_ffpolicy_personal_title": {
+      "message": "개인 데이터 수집"
+   },
+   "settings_preference_ffpolicy_personal_title_required": {
+      "message": "(필수)"
+   },
+   "settings_preference_ffpolicy_privacy_policy_link": {
+      "message": "McAfee 개인 정보 보호 정책"
+   },
+   "settings_preference_ffpolicy_subtitle": {
+      "message": "이 두 설정을 모두 켜면 사용자를 안전하게 보호하고 유용한 서비스를 이용할 수 있습니다."
+   },
+   "settings_preference_ffpolicy_title": {
+      "message": "데이터 권한"
+   },
+   "settings_preference_reset_button": {
+      "message": "재설정"
+   },
+   "settings_preference_reset_subtitle": {
+      "message": "%PRODUCTNAME% 알림을 무시하고 후회한 적이 있으십니까? 모든 종류의 %PRODUCTNAME% 메시지를 받을 수 있도록 알림을 재설정하세요."
+   },
+   "settings_preference_reset_title": {
+      "message": "재설정"
+   },
+   "settings_preference_sma_facebook": {
+      "message": "Facebook"
+   },
+   "settings_preference_sma_facebook_label": {
+      "message": "Facebook"
+   },
+   "settings_preference_sma_instagram": {
+      "message": "Instagram"
+   },
+   "settings_preference_sma_instagram_label": {
+      "message": "Instagram"
+   },
+   "settings_preference_sma_linkedin": {
+      "message": "Linkedin"
+   },
+   "settings_preference_sma_linkedin_label": {
+      "message": "Linkedin"
+   },
+   "settings_preference_sma_message": {
+      "message": "다음 사이트에는 주석이 표시됩니다."
+   },
+   "settings_preference_sma_reddit": {
+      "message": "Reddit"
+   },
+   "settings_preference_sma_reddit_label": {
+      "message": "Reddit"
+   },
+   "settings_preference_sma_subtitle": {
+      "message": "소셜 미디어 피드를 색으로 구분하여 어떤 링크가 안전한지 표시합니다."
+   },
+   "settings_preference_sma_title": {
+      "message": "소셜 미디어 보호"
+   },
+   "settings_preference_sma_twitter": {
+      "message": "X"
+   },
+   "settings_preference_sma_twitter_label": {
+      "message": "X"
+   },
+   "settings_preference_sma_youtube": {
+      "message": "Youtube"
+   },
+   "settings_preference_sma_youtube_label": {
+      "message": "Youtube"
+   },
+   "settings_preference_title": {
+      "message": "추가 서비스"
+   },
+   "settings_statistics_ads_blocked": {
+      "message": "건의 방해 광고 차단"
+   },
+   "settings_statistics_downloads_blocked": {
+      "message": "건의 안전하지 않은 다운로드 차단"
+   },
+   "settings_statistics_downloads_scanned": {
+      "message": "건의 다운로드 검사"
+   },
+   "settings_statistics_links_scanned": {
+      "message": "건의 링크 검사"
+   },
+   "settings_statistics_message": {
+      "message": "지금까지 수행한 작업입니다."
+   },
+   "settings_statistics_pages_blocked": {
+      "message": "건의 위험한 페이지 차단"
+   },
+   "settings_statistics_pages_scanned": {
+      "message": "건의 페이지 검사"
+   },
+   "settings_statistics_subtitle": {
+      "message": "귀하의 온라인 보안을 책임집니다."
+   },
+   "settings_statistics_title": {
+      "message": "통계"
+   },
+   "settings_statistics_trackers_blocked": {
+      "message": "건의 추적 차단됨"
+   },
+   "settings_subtitle": {
+      "message": "웹 보호를 사용자 지정하세요."
+   },
+   "settings_tab_about": {
+      "message": "정보"
+   },
+   "settings_tab_preference": {
+      "message": "기본 설정"
+   },
+   "settings_tab_statistics": {
+      "message": "통계"
+   },
+   "settings_tab_whitelist": {
+      "message": "신뢰할 수 있는 사이트"
+   },
+   "settings_title": {
+      "message": "웹 보호"
+   },
+   "settings_whitelist_input": {
+      "message": "웹 주소를 입력하세요."
+   },
+   "settings_whitelist_title": {
+      "message": "신뢰하는 사이트"
+   },
+   "sidebar_dangerous_blocked": {
+      "message": "차단된 위험한 페이지 수"
+   },
+   "sidebar_deepfake_found": {
+      "message": "발견된 딥페이크 수"
+   },
+   "sidebar_deepfakes_found": {
+      "message": "발견된 딥페이크 수"
+   },
+   "sidebar_deepfakes_found_new": {
+      "message": "신규"
+   },
+   "sidebar_get_help": {
+      "message": "도움말 보기"
+   },
+   "sidebar_pages_scanned": {
+      "message": "검사한 페이지 수"
+   },
+   "sidebar_privacy_terms": {
+      "message": "개인 정보 보호 및 약관"
+   },
+   "sidebar_rat_detection_got_it_btn_text": {
+      "message": "알겠습니다"
+   },
+   "sidebar_rat_detection_information_I": {
+      "message": "이 사이트의 소프트웨어는 다른 사람에게 귀하의 기기에 대한 액세스 권한을 부여합니다. 해커나 사기꾼이 이를 이용하여 귀하의 개인 데이터에 비밀리에 액세스할 수 있습니다."
+   },
+   "sidebar_rat_detection_information_II": {
+      "message": "신뢰할 수 있는 사람인 경우에만 소프트웨어를 다운로드하거나 정보를 제공하십시오."
+   },
+   "sidebar_rat_detection_title": {
+      "message": "이 사이트는 다른 사람이 귀하의 기기를 제어하도록 허용합니다"
+   },
+   "sidebar_rat_detection_whitelist_btn": {
+      "message": "이 사이트에 대한 경고를 다시 표시하지 않음"
+   },
+   "sidebar_subtitle": {
+      "message": "지금까지 수행한 작업입니다."
+   },
+   "sidebar_title": {
+      "message": "귀하의 온라인 보안을 책임집니다"
+   },
+   "sidebar_unsafe_blocked": {
+      "message": "차단된 안전하지 않은 항목 수"
+   },
+   "sidebar_version": {
+      "message": "버전"
+   },
+   "sidebar_view_site_report": {
+      "message": "사이트 보고서 보기"
+   },
+   "site_status_block_page_accept_risk": {
+      "message": "방문하기"
+   },
+   "site_status_block_page_go_back": {
+      "message": "뒤로 이동"
+   },
+   "site_status_body_text_danger": {
+      "message": "이 사이트에는 컴퓨터를 손상시킬 수 있는 잠재적으로 위험한 콘텐츠가 포함되어 있습니다. 안심하고 계속 탐색할 수 있도록 사이트를 차단했습니다."
+   },
+   "site_status_body_text_site_report_danger": {
+      "message": "McAfee는 정기적으로 웹 사이트에서 위험한 활동을 검사하며, 이 사이트에는 컴퓨터를 손상시킬 수 있는 위험한 콘텐츠가 포함되어 있을 수 있습니다."
+   },
+   "site_status_body_text_site_report_safe": {
+      "message": "이 웹 사이트를 철저히 검사했으며 안전해 보입니다. 안심하셔도 됩니다."
+   },
+   "site_status_body_text_site_report_unknown": {
+      "message": "이 사이트는 아직 검사되지 않은 것 같습니다. 다음에 검사할 때 안전 등급을 업데이트할 것입니다."
+   },
+   "site_status_body_text_site_report_warning": {
+      "message": "McAfee는 정기적으로 웹 사이트에서 위험한 활동을 검사하며, 이 사이트는 약간 의심스러워 보입니다."
+   },
+   "site_status_body_text_typosquatting": {
+      "message": "웹 사이트 주소를 잘못 입력하면 의도치 않은 사이트로 연결될 수 있습니다. 이러한 사이트에 접속하면 맬웨어, 개인 정보 요청 등의 공격을 받을 수 있습니다. 이러한 사이트에 연결되지 않도록 보호합니다."
+   },
+   "site_status_body_text_warning": {
+      "message": "이 사이트는 약간 위험해 보이므로 만약을 위해 플래그를 지정했습니다. 계속 진행하려는 경우 신뢰할 수 있는 사이트인지 확인하세요. 안전이 제일입니다."
+   },
+   "site_status_feedback_question": {
+      "message": "이 정보가 도움이 되셨습니까?"
+   },
+   "site_status_footer_note": {
+      "message": "'방문하기'를 선택하면 차단된 URL이 신뢰할 수 있는 사이트 목록에 추가됩니다."
+   },
+   "site_status_header_text": {
+      "message": "웹 사이트 상태:"
+   },
+   "site_status_search_input": {
+      "message": "색 구분 검색 결과 받기"
+   },
+   "site_status_state_danger": {
+      "message": "위험"
+   },
+   "site_status_state_safe": {
+      "message": "안전"
+   },
+   "site_status_state_typosquatting": {
+      "message": "타이포스쿼팅"
+   },
+   "site_status_state_unknown": {
+      "message": "알 수 없음"
+   },
+   "site_status_state_warning": {
+      "message": "의심스러움"
+   },
+   "site_status_submit_ticket_text": {
+      "message": "이 사이트가 실제로는 안전하다고 생각하십니까? $submitTicketLink$.",
+      "placeholders": {
+         "submitTicketLink": {
+            "content": "$1"
+         }
+      }
+   },
+   "site_status_submit_ticket_text_link": {
+      "message": "티켓을 제출하세요"
+   },
+   "site_status_title": {
+      "message": "%PRODUCTNAME% - 웹 사이트 안전 등급"
+   },
+   "site_status_typosquatting_go_back": {
+      "message": "뒤로 이동"
+   },
+   "site_status_typosquatting_suggest_url_text": {
+      "message": "$suggestUrl$이(가) 맞습니까?",
+      "placeholders": {
+         "suggestUrl": {
+            "content": "$1"
+         }
+      }
+   },
+   "site_status_typosquatting_take_me_there": {
+      "message": "해당 위치로 이동"
+   },
+   "site_status_typosquatting_visit_anyway": {
+      "message": "방문하기"
+   },
+   "smadesc": {
+      "message": "클릭해도 안전한지 여부를 표시하는 색으로 구분된 링크를 통해 피드를 안심하고 검색할 수 있습니다."
+   },
+   "smatitle": {
+      "message": "안전한 소셜 미디어 링크와 안전하지 않은 링크 식별"
+   },
+   "summarydesc": {
+      "message": "찾아보기, 검색, 온라인 쇼핑 시 안전을 유지하는 데 도움이 되는 모든 단계에 대한 최신 요약 정보를 보여 드립니다."
+   },
+   "summarytitle": {
+      "message": "실시간 보안 대시보드"
+   },
+   "typodesc": {
+      "message": "해커는 실제와 거의 동일하게 보이는 주소를 사용하는 사이트를 만들며, 이러한 행위를 '타이포스쿼팅'이라고 합니다. URL 입력 오류로 인해 잘못 연결되는 경우 안전하게 다시 안내해 드립니다. "
+   },
+   "typotitle": {
+      "message": "정상적인 것처럼 가장한 위험한 사이트로부터 보호"
+   },
+   "wb_container__right__cancel": {
+      "message": "아니요"
+   },
+   "wb_container__right__content": {
+      "message": "$ph1$을(를) 사용해 검색 속도를 향상시켜보세요. 동영상이 자동 재생되지 않고 검색 속도가 저하되지 않습니다.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   },
+   "wb_container__right__content_second": {
+      "message": "$ph1$을(를) 사용하면 동영상이 자동 재생되지 않고 검색 속도가 저하되지 않습니다. 웹 성능 개선에 관심이 없으시다면 다시 묻지 않겠습니다.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   },
+   "wb_container__right__eula": {
+      "message": "$ph1$을(를) 클릭하면 $ph2$ 및 $ph3$에 동의하는 것으로 간주됩니다.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         },
+         "ph2": {
+            "content": "$2"
+         },
+         "ph3": {
+            "content": "$3"
+         }
+      }
+   },
+   "wb_container__right__eula_licence_agreement": {
+      "message": "라이선스 계약"
+   },
+   "wb_container__right__eula_privacy_notice": {
+      "message": "개인 정보 취급방침"
+   },
+   "wb_container__right__submit": {
+      "message": "웹 성능 개선 받기"
+   },
+   "wb_container__right__title": {
+      "message": "성가신 동영상 자동 재생으로 인해 검색 속도가 느려지나요?"
+   },
+   "wb_container__right__title_second": {
+      "message": "마지막으로 확인하겠습니다. 동영상 자동 재생을 중지하시겠어요?"
+   },
+   "wb_name_title": {
+      "message": "McAfee&reg; 웹 성능 개선"
+   },
+   "wb_top__body__action_message": {
+      "message": "검색 속도 향상"
+   },
+   "wb_top_banner_left_text": {
+      "message": "$ph1$ 받기",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   }
+}

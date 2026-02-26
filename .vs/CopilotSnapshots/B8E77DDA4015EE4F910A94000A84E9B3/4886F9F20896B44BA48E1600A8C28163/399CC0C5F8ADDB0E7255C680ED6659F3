@@ -1,0 +1,476 @@
+﻿Imports System.IO
+Imports System.Text.RegularExpressions
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel
+Imports Microsoft.Web.WebView2.WinForms
+Imports Microsoft.Web.WebView2.Core
+Imports System.Windows.Forms
+Imports System.Drawing
+
+Module ScriptEditor
+
+    Private wired As Boolean = False
+    Private hoveredId As Integer = -1
+    Private ReadOnly hintTT As New ToolTip() With {.ShowAlways = True, .InitialDelay = 200, .AutoPopDelay = 4000, .ReshowDelay = 200}
+
+    ' Call this once (e.g., after pbPDFViewer is created) to enable PDF annotations
+    Public Sub Initialize()
+        Try
+            If wired Then Return
+            If My.Forms.FrmMain Is Nothing OrElse My.Forms.FrmMain.pbPDFViewer Is Nothing Then Return
+
+            AddHandler My.Forms.FrmMain.pbPDFViewer.MouseClick, AddressOf PdfViewer_MouseClick
+            AddHandler My.Forms.FrmMain.pbPDFViewer.Paint, AddressOf PdfViewer_Paint
+            AddHandler My.Forms.FrmMain.pbPDFViewer.MouseMove, AddressOf PdfViewer_MouseMove
+
+            If My.Forms.FrmMain.DG_Actions IsNot Nothing Then
+                AddHandler My.Forms.FrmMain.DG_Actions.RowsAdded, Sub() SafeInvalidatePdf()
+                AddHandler My.Forms.FrmMain.DG_Actions.RowsRemoved, Sub() SafeInvalidatePdf()
+                AddHandler My.Forms.FrmMain.DG_Actions.CellValueChanged, Sub() SafeInvalidatePdf()
+            End If
+
+            wired = True
+        Catch
+        End Try
+    End Sub
+
+    Private Sub SafeInvalidatePdf()
+        Try
+            If My.Forms.FrmMain IsNot Nothing AndAlso My.Forms.FrmMain.pbPDFViewer IsNot Nothing Then
+                My.Forms.FrmMain.pbPDFViewer.Invalidate()
+            End If
+        Catch
+        End Try
+    End Sub
+
+    Private Function IsLocked() As Boolean
+        Try
+            If My.Forms.FrmMain Is Nothing OrElse My.Forms.FrmMain.btnLockUnlocked Is Nothing Then Return False
+            Return String.Equals(My.Forms.FrmMain.btnLockUnlocked.Text, "Locked", StringComparison.OrdinalIgnoreCase)
+        Catch
+            Return False
+        End Try
+    End Function
+
+    Private Sub PdfViewer_MouseClick(sender As Object, e As MouseEventArgs)
+        Try
+            If My.Forms.FrmMain Is Nothing OrElse My.Forms.FrmMain.DG_Actions Is Nothing Then Return
+            If My.Forms.FrmMain.currentPage <= 0 Then Return
+
+            ' If locked: clicking on a marker shows read-only details; clicking elsewhere does nothing
+            If IsLocked() Then
+                Dim id = HitTestActionId(e.X, e.Y)
+                If id > 0 Then
+                    ShowActionDetailReadOnly(id)
+                End If
+                Return
+            End If
+
+            ' Unlocked: add new annotation at click
+            Dim page As Integer = My.Forms.FrmMain.currentPage
+            Dim x As Integer = e.X
+            Dim y As Integer = e.Y
+
+            ' Resolve required columns in DG_Actions
+            Dim idCol = GetColumnIndex(My.Forms.FrmMain.DG_Actions, New String() {"colActionId", "ID", "colID", "colActionID"})
+            Dim pageCol = GetColumnIndex(My.Forms.FrmMain.DG_Actions, New String() {"colActionPage", "Pagenr", "colPagenr", "Page", "colPage"})
+            Dim xCol = GetColumnIndex(My.Forms.FrmMain.DG_Actions, New String() {"colActionPosX", "x", "colX"})
+            Dim yCol = GetColumnIndex(My.Forms.FrmMain.DG_Actions, New String() {"colActionPosY", "y", "colY"})
+            If idCol = -1 OrElse pageCol = -1 OrElse xCol = -1 OrElse yCol = -1 Then
+                ToonFlashBericht("DG_Actions mist kolommen: ID, Pagenr, x, y.", 6, FlashSeverity.IsError)
+                Return
+            End If
+
+            ' Next ID = max(ID)+1
+            Dim nextId As Integer = 1
+            For Each r As DataGridViewRow In My.Forms.FrmMain.DG_Actions.Rows
+                If r.IsNewRow Then Continue For
+                Dim v = r.Cells(idCol).Value
+                Dim n As Integer
+                If v IsNot Nothing AndAlso Integer.TryParse(v.ToString(), n) Then
+                    If n >= nextId Then nextId = n + 1
+                End If
+            Next
+
+            ' Add new action row
+            Dim newIdx = My.Forms.FrmMain.DG_Actions.Rows.Add()
+            Dim row = My.Forms.FrmMain.DG_Actions.Rows(newIdx)
+            row.Cells(idCol).Value = nextId
+            row.Cells(pageCol).Value = page
+            row.Cells(xCol).Value = x
+            row.Cells(yCol).Value = y
+
+            ' Select the new row
+            My.Forms.FrmMain.DG_Actions.ClearSelection()
+            row.Selected = True
+            My.Forms.FrmMain.DG_Actions.CurrentCell = row.Cells(idCol)
+
+            ' Redraw overlays
+            SafeInvalidatePdf()
+
+            ' Ask for action details
+            ShowActionDetailPopup(nextId)
+        Catch ex As Exception
+            Try
+                ToonFlashBericht("Kon actie niet toevoegen: " & ex.Message, 6, FlashSeverity.IsError)
+            Catch
+            End Try
+        End Try
+    End Sub
+
+    Private Sub PdfViewer_MouseMove(sender As Object, e As MouseEventArgs)
+        Try
+            If Not IsLocked() Then
+                ' Clear hover state when unlocked
+                If hoveredId <> -1 Then
+                    hoveredId = -1
+                    hintTT.Hide(My.Forms.FrmMain.pbPDFViewer)
+                    My.Forms.FrmMain.pbPDFViewer.Cursor = Cursors.Default
+                End If
+                Return
+            End If
+
+            Dim id = HitTestActionId(e.X, e.Y)
+            If id <> hoveredId Then
+                hoveredId = id
+                hintTT.Hide(My.Forms.FrmMain.pbPDFViewer)
+                If id > 0 Then
+                    My.Forms.FrmMain.pbPDFViewer.Cursor = Cursors.Hand
+                    Dim text = BuildActionsSummary(id)
+                    If Not String.IsNullOrWhiteSpace(text) Then
+                        hintTT.Show(text, My.Forms.FrmMain.pbPDFViewer, e.X + 16, e.Y + 16, 3000)
+                    End If
+                Else
+                    My.Forms.FrmMain.pbPDFViewer.Cursor = Cursors.Default
+                End If
+            End If
+        Catch
+        End Try
+    End Sub
+
+    Private Function HitTestActionId(mx As Integer, my As Integer) As Integer
+        Try
+            If my.Forms.FrmMain Is Nothing OrElse my.Forms.FrmMain.DG_Actions Is Nothing Then Return -1
+            If mForms.FrmMain.currentPage <= 0 Then Return -1
+
+            Dim idCol = GetColumnIndex(my.Forms.FrmMain.DG_Actions, New String() {"colActionId", "ID", "colID", "colActionID"})
+            Dim pageCol = GetColumnIndex(my.Forms.FrmMain.DG_Actions, New String() {"colActionPage", "Pagenr", "colPagenr", "Page", "colPage"})
+            Dim xCol = GetColumnIndex(my.Forms.FrmMain.DG_Actions, New String() {"colActionPosX", "x", "colX"})
+            Dim yCol = GetColumnIndex(my.Forms.FrmMain.DG_Actions, New String() {"colActionPosY", "y", "colY"})
+            If idCol = -1 OrElse pageCol = -1 OrElse xCol = -1 OrElse yCol = -1 Then Return -1
+
+            For Each r As DataGridViewRow In my.Forms.FrmMain.DG_Actions.Rows
+                If r.IsNewRow Then Continue For
+
+                Dim pObj = r.Cells(pageCol).Value
+                Dim p As Integer
+                If pObj Is Nothing OrElse Not Integer.TryParse(pObj.ToString(), p) Then Continue For
+                If p <> my.Forms.FrmMain.currentPage Then Continue For
+
+                Dim xv = r.Cells(xCol).Value
+                Dim yv = r.Cells(yCol).Value
+                If xv Is Nothing OrElse yv Is Nothing Then Continue For
+
+                Dim px As Integer
+                Dim py As Integer
+                Integer.TryParse(xv.ToString(), px)
+                Integer.TryParse(yv.ToString(), py)
+
+                Dim size As Integer = Math.Max(12, CInt(Math.Min(my.Forms.FrmMain.pbPDFViewer.Width, my.Forms.FrmMain.pbPDFViewer.Height) * 0.03))
+                Dim half As Integer = size \ 2
+                Dim rect As New Rectangle(px - size, py - half, size, size)
+                If rect.Contains(mx, my) Then
+                    Dim idObj = r.Cells(idCol).Value
+                    Dim id As Integer
+                    If idObj IsNot Nothing AndAlso Integer.TryParse(idObj.ToString(), id) Then
+                        Return id
+                    End If
+                End If
+            Next
+        Catch
+        End Try
+        Return -1
+    End Function
+
+    Private Function BuildActionsSummary(actionId As Integer) As String
+        Try
+            If My.Forms.FrmMain Is Nothing OrElse My.Forms.FrmMain.DG_ActionsDetail Is Nothing Then Return String.Empty
+            Dim linkCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowID", "ActionRowID", "ActionId", "colActionId"})
+            Dim orderCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowOrder", "Order", "colOrder"})
+            Dim descrCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowDescr", "Descr", "Description", "colDescr"})
+            Dim actorCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowActor", "Actor", "colActor"})
+            If linkCol = -1 Then Return String.Empty
+
+            ' Gather rows
+            Dim items As New List(Of Tuple(Of Integer, String, String))()
+            For Each r As DataGridViewRow In My.Forms.FrmMain.DG_ActionsDetail.Rows
+                If r.IsNewRow Then Continue For
+                Dim linkObj = r.Cells(linkCol).Value
+                Dim id As Integer
+                If linkObj Is Nothing OrElse Not Integer.TryParse(linkObj.ToString(), id) Then Continue For
+                If id <> actionId Then Continue For
+                Dim orderVal As Integer = 0
+                If orderCol <> -1 Then
+                    Dim ov = r.Cells(orderCol).Value
+                    If ov IsNot Nothing Then Integer.TryParse(ov.ToString(), orderVal)
+                End If
+                Dim descrVal As String = If(If(descrCol <> -1, r.Cells(descrCol).Value, Nothing), String.Empty).ToString()
+                Dim actorVal As String = If(If(actorCol <> -1, r.Cells(actorCol).Value, Nothing), String.Empty).ToString()
+                items.Add(Tuple.Create(orderVal, descrVal, actorVal))
+            Next
+
+            ' Sort by order ascending
+            items.Sort(Function(a, b) a.Item1.CompareTo(b.Item1))
+
+            Dim sb As New System.Text.StringBuilder()
+            For Each it In items
+                Dim line As String = If(it.Item1 > 0, it.Item1 & ". ", "") & it.Item2
+                If Not String.IsNullOrWhiteSpace(it.Item3) Then line &= " (" & it.Item3 & ")"
+                If sb.Length > 0 Then sb.AppendLine()
+                sb.Append(line)
+            Next
+            Return sb.ToString()
+        Catch
+            Return String.Empty
+        End Try
+    End Function
+
+    Private Sub PdfViewer_Paint(sender As Object, e As PaintEventArgs)
+        Try
+            If My.Forms.FrmMain Is Nothing OrElse My.Forms.FrmMain.DG_Actions Is Nothing Then Return
+            If My.Forms.FrmMain.currentPage <= 0 Then Return
+
+            Dim g = e.Graphics
+            Dim idCol = GetColumnIndex(My.Forms.FrmMain.DG_Actions, New String() {"colActionId", "ID", "colID", "colActionID"})
+            Dim pageCol = GetColumnIndex(My.Forms.FrmMain.DG_Actions, New String() {"colActionPage", "Pagenr", "colPagenr", "Page", "colPage"})
+            Dim xCol = GetColumnIndex(My.Forms.FrmMain.DG_Actions, New String() {"colActionPosX", "x", "colX"})
+            Dim yCol = GetColumnIndex(My.Forms.FrmMain.DG_Actions, New String() {"colActionPosY", "y", "colY"})
+            If idCol = -1 OrElse pageCol = -1 OrElse xCol = -1 OrElse yCol = -1 Then Return
+
+            For Each r As DataGridViewRow In My.Forms.FrmMain.DG_Actions.Rows
+                If r.IsNewRow Then Continue For
+
+                Dim pObj = r.Cells(pageCol).Value
+                Dim p As Integer
+                If pObj Is Nothing OrElse Not Integer.TryParse(pObj.ToString(), p) Then Continue For
+                If p <> My.Forms.FrmMain.currentPage Then Continue For
+
+                Dim xv = r.Cells(xCol).Value
+                Dim yv = r.Cells(yCol).Value
+                If xv Is Nothing OrElse yv Is Nothing Then Continue For
+
+                Dim px As Integer
+                Dim py As Integer
+                Integer.TryParse(xv.ToString(), px)
+                Integer.TryParse(yv.ToString(), py)
+
+                ' Clamp to control bounds
+                px = Math.Max(0, Math.Min(My.Forms.FrmMain.pbPDFViewer.Width - 1, px))
+                py = Math.Max(0, Math.Min(My.Forms.FrmMain.pbPDFViewer.Height - 1, py))
+
+                Dim size As Integer = Math.Max(12, CInt(Math.Min(My.Forms.FrmMain.pbPDFViewer.Width, My.Forms.FrmMain.pbPDFViewer.Height) * 0.03))
+                Dim labelText As String = If(r.Cells(idCol).Value Is Nothing, "", r.Cells(idCol).Value.ToString())
+                DrawLeftTriangleMarker(g, px, py, size, labelText)
+            Next
+        Catch
+        End Try
+    End Sub
+
+    Private Sub DrawLeftTriangleMarker(g As Graphics, px As Integer, py As Integer, size As Integer, labelText As String)
+        Try
+            Dim half As Integer = size \ 2
+            Dim pts As Point() = {
+                New Point(px, py),
+                New Point(px - size, py - half),
+                New Point(px - size, py + half)
+            }
+            Using br As New SolidBrush(Color.FromArgb(220, Color.Red)), pen As New Pen(Color.DarkRed, 2)
+                g.FillPolygon(br, pts)
+                g.DrawPolygon(pen, pts)
+            End Using
+
+            If Not String.IsNullOrEmpty(labelText) Then
+                Using f As New Font("Segoe UI", Math.Max(8, size \ 2), FontStyle.Bold, GraphicsUnit.Pixel)
+                    Dim txtSize = g.MeasureString(labelText, f)
+                    Dim tx = px - size - CInt(txtSize.Width) - 6
+                    Dim ty = py - CInt(txtSize.Height \ 2)
+                    Using brTxt As New SolidBrush(Color.White), brBg As New SolidBrush(Color.FromArgb(200, Color.Black))
+                        g.FillRectangle(brBg, New Rectangle(tx - 2, ty - 1, CInt(txtSize.Width + 4), CInt(txtSize.Height + 2)))
+                        g.DrawString(labelText, f, brTxt, tx, ty)
+                    End Using
+                End Using
+            End If
+        Catch
+        End Try
+    End Sub
+
+    Private Sub ShowActionDetailPopup(actionId As Integer)
+        Try
+            If My.Forms.FrmMain Is Nothing OrElse My.Forms.FrmMain.DG_ActionsDetail Is Nothing Then Return
+
+            ' Build a small form with a DataGridView to enter multiple actions with order, description, actor
+            Dim form As New Form()
+            form.Text = "Acties voor ID " & actionId
+            form.StartPosition = FormStartPosition.CenterParent
+            form.FormBorderStyle = FormBorderStyle.FixedDialog
+            form.MinimizeBox = False
+            form.MaximizeBox = False
+            form.Width = 640
+            form.Height = 360
+
+            Dim lbl As New Label() With {.Text = "Voeg acties toe (volgorde, omschrijving, actor)", .AutoSize = True, .Left = 10, .Top = 10}
+            Dim grid As New DataGridView() With {
+                .Left = 10,
+                .Top = 30,
+                .Width = form.ClientSize.Width - 20,
+                .Height = form.ClientSize.Height - 80,
+                .Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right Or AnchorStyles.Bottom,
+                .AllowUserToAddRows = True,
+                .AllowUserToDeleteRows = True,
+                .AutoGenerateColumns = False
+            }
+
+            Dim colOrder As New DataGridViewTextBoxColumn() With {.Name = "colOrder", .HeaderText = "Volgorde", .Width = 80}
+            Dim colDescr As New DataGridViewTextBoxColumn() With {.Name = "colDescr", .HeaderText = "Omschrijving", .Width = 320}
+            Dim colActor As New DataGridViewTextBoxColumn() With {.Name = "colActor", .HeaderText = "Actor", .Width = 160}
+            grid.Columns.AddRange(New DataGridViewColumn() {colOrder, colDescr, colActor})
+
+            ' Start met 1 lege rij
+            grid.Rows.Add()
+
+            Dim btnOk As New Button() With {.Text = "OK", .DialogResult = DialogResult.OK, .Left = form.ClientSize.Width - 180, .Top = form.ClientSize.Height - 40, .Width = 80, .Anchor = AnchorStyles.Bottom Or AnchorStyles.Right}
+            Dim btnCancel As New Button() With {.Text = "Annuleren", .DialogResult = DialogResult.Cancel, .Left = form.ClientSize.Width - 90, .Top = form.ClientSize.Height - 40, .Width = 80, .Anchor = AnchorStyles.Bottom Or AnchorStyles.Right}
+
+            form.Controls.Add(lbl)
+            form.Controls.Add(grid)
+            form.Controls.Add(btnOk)
+            form.Controls.Add(btnCancel)
+            form.AcceptButton = btnOk
+            form.CancelButton = btnCancel
+
+            If form.ShowDialog(My.Forms.FrmMain) = DialogResult.OK Then
+                ' Resolve DG_ActionsDetail columns
+                Dim linkCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowID", "ActionRowID", "ActionId", "colActionId"})
+                Dim orderCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowOrder", "Order", "colOrder"})
+                Dim descrCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowDescr", "Descr", "Description", "colDescr"})
+                Dim actorCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowActor", "Actor", "colActor"})
+                If linkCol = -1 Then
+                    ToonFlashBericht("DG_ActionsDetail mist kolom colActionRowID.", 6, FlashSeverity.IsError)
+                    Return
+                End If
+
+                Dim seq As Integer = 1
+                For Each r As DataGridViewRow In grid.Rows
+                    If r.IsNewRow Then Continue For
+                    Dim vOrder = r.Cells("colOrder").Value
+                    Dim vDescr = r.Cells("colDescr").Value
+                    Dim vActor = r.Cells("colActor").Value
+
+                    Dim orderVal As Integer
+                    If vOrder IsNot Nothing AndAlso Integer.TryParse(vOrder.ToString(), orderVal) Then
+                        ' use provided
+                    Else
+                        orderVal = seq
+                    End If
+                    Dim descrVal As String = If(vDescr, String.Empty).ToString().Trim()
+                    Dim actorVal As String = If(vActor, String.Empty).ToString().Trim()
+
+                    If descrVal.Length = 0 AndAlso actorVal.Length = 0 Then
+                        Continue For ' skip empty lines
+                    End If
+
+                    Dim idx = My.Forms.FrmMain.DG_ActionsDetail.Rows.Add()
+                    Dim dr = My.Forms.FrmMain.DG_ActionsDetail.Rows(idx)
+                    dr.Cells(linkCol).Value = actionId
+                    If orderCol <> -1 Then dr.Cells(orderCol).Value = orderVal
+                    If descrCol <> -1 Then dr.Cells(descrCol).Value = descrVal
+                    If actorCol <> -1 Then dr.Cells(actorCol).Value = actorVal
+
+                    seq += 1
+                Next
+            End If
+        Catch
+        End Try
+    End Sub
+
+    Private Sub ShowActionDetailReadOnly(actionId As Integer)
+        Try
+            If My.Forms.FrmMain Is Nothing OrElse My.Forms.FrmMain.DG_ActionsDetail Is Nothing Then Return
+            Dim linkCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowID", "ActionRowID", "ActionId", "colActionId"})
+            Dim orderCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowOrder", "Order", "colOrder"})
+            Dim descrCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowDescr", "Descr", "Description", "colDescr"})
+            Dim actorCol = GetColumnIndex(My.Forms.FrmMain.DG_ActionsDetail, New String() {"colActionRowActor", "Actor", "colActor"})
+            If linkCol = -1 Then Return
+
+            ' Create form
+            Dim form As New Form()
+            form.Text = "Acties (alleen-lezen) voor ID " & actionId
+            form.StartPosition = FormStartPosition.CenterParent
+            form.FormBorderStyle = FormBorderStyle.FixedDialog
+            form.MinimizeBox = False
+            form.MaximizeBox = False
+            form.Width = 640
+            form.Height = 360
+
+            Dim grid As New DataGridView() With {
+                .Dock = DockStyle.Fill,
+                .AllowUserToAddRows = False,
+                .AllowUserToDeleteRows = False,
+                .ReadOnly = True,
+                .AutoGenerateColumns = False
+            }
+            Dim cOrder As New DataGridViewTextBoxColumn() With {.Name = "cOrder", .HeaderText = "Volgorde", .Width = 80}
+            Dim cDescr As New DataGridViewTextBoxColumn() With {.Name = "cDescr", .HeaderText = "Omschrijving", .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill}
+            Dim cActor As New DataGridViewTextBoxColumn() With {.Name = "cActor", .HeaderText = "Actor", .Width = 160}
+            grid.Columns.AddRange(New DataGridViewColumn() {cOrder, cDescr, cActor})
+
+            ' Collect data
+            Dim items As New List(Of Tuple(Of Integer, String, String))()
+            For Each r As DataGridViewRow In My.Forms.FrmMain.DG_ActionsDetail.Rows
+                If r.IsNewRow Then Continue For
+                Dim linkObj = r.Cells(linkCol).Value
+                Dim id As Integer
+                If linkObj Is Nothing OrElse Not Integer.TryParse(linkObj.ToString(), id) Then Continue For
+                If id <> actionId Then Continue For
+                Dim orderVal As Integer = 0
+                If orderCol <> -1 Then
+                    Dim ov = r.Cells(orderCol).Value
+                    If ov IsNot Nothing Then Integer.TryParse(ov.ToString(), orderVal)
+                End If
+                Dim descrVal As String = If(If(descrCol <> -1, r.Cells(descrCol).Value, Nothing), String.Empty).ToString()
+                Dim actorVal As String = If(If(actorCol <> -1, r.Cells(actorCol).Value, Nothing), String.Empty).ToString()
+                items.Add(Tuple.Create(orderVal, descrVal, actorVal))
+            Next
+            items.Sort(Function(a, b) a.Item1.CompareTo(b.Item1))
+
+            For Each it In items
+                grid.Rows.Add(it.Item1, it.Item2, it.Item3)
+            Next
+
+            form.Controls.Add(grid)
+            form.ShowDialog(My.Forms.FrmMain)
+        Catch
+        End Try
+    End Sub
+
+    Private Function GetFirstTextColumnIndex(dgv As DataGridView, excludeIndex As Integer) As Integer
+        If dgv Is Nothing Then Return -1
+        For Each c As DataGridViewColumn In dgv.Columns
+            If c.Index = excludeIndex Then Continue For
+            If TypeOf c Is DataGridViewTextBoxColumn Then Return c.Index
+        Next
+        Return -1
+    End Function
+
+    Private Function GetColumnIndex(dgv As DataGridView, candidates As IEnumerable(Of String)) As Integer
+        If dgv Is Nothing Then Return -1
+        For Each name In candidates
+            For Each col As DataGridViewColumn In dgv.Columns
+                If String.Equals(col.Name, name, StringComparison.OrdinalIgnoreCase) Then
+                    Return col.Index
+                End If
+            Next
+        Next
+        Return -1
+    End Function
+
+End Module

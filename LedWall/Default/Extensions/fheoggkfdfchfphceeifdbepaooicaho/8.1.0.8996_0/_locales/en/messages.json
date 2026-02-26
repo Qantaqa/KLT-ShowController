@@ -1,0 +1,1927 @@
+{
+   "annotation_balloon_color_green": {
+      "message": "This link is safe"
+   },
+   "annotation_balloon_color_grey": {
+      "message": "This link is unknown"
+   },
+   "annotation_balloon_color_red": {
+      "message": "This link is dangerous"
+   },
+   "annotation_balloon_color_yellow": {
+      "message": "This link is suspicious"
+   },
+   "annotation_balloon_view_site_report": {
+      "message": "View Site Report"
+   },
+   "aps_expanded_shield_site_ecommerce": {
+      "message": "We checked this site and it's safe. Go ahead and shop with confidence."
+   },
+   "aps_expanded_shield_site_email": {
+      "message": "We scanned this site for phishing — it looks safe to use."
+   },
+   "aps_expanded_shield_site_financial": {
+      "message": "This site is safe to use. We checked — it's a genuine financial site."
+   },
+   "aps_expanded_shield_site_signup": {
+      "message": "It's safe to enter your info here. We checked for phishing and other risks."
+   },
+   "aps_expanded_shield_site_unknown": {
+      "message": "We haven't assessed this site's safety yet. Enter personal info only if you trust it."
+   },
+   "aps_toast_button": {
+      "message": "Got it"
+   },
+   "aps_toast_list_bullet_four": {
+      "message": "Everywhere else you visit"
+   },
+   "aps_toast_list_bullet_one": {
+      "message": "Banking and financial sites"
+   },
+   "aps_toast_list_bullet_three": {
+      "message": "Online registration forms"
+   },
+   "aps_toast_list_bullet_two": {
+      "message": "Checkout and payment pages"
+   },
+   "aps_toast_paragraph": {
+      "message": "Feel confident any site you view is free from dangerous and risky links when you see our green “it's safe” icon."
+   },
+   "aps_toast_title": {
+      "message": "We scan every site for you"
+   },
+   "category_id_103_name": {
+      "message": "Adult Topics"
+   },
+   "category_id_ac_description": {
+      "message": "Web pages that contain virtual art galleries, artist sites (including sculpture and photography), museums, ethnic customs, and country customs."
+   },
+   "category_id_ac_name": {
+      "message": "Art/Culture/Heritage"
+   },
+   "category_id_al_description": {
+      "message": "Web pages that mainly sell, promote, or advocate the use of alcohol, such as beer, wine, and liquor. This category also includes cocktail recipes and home-brewing instructions."
+   },
+   "category_id_al_name": {
+      "message": "Alcohol"
+   },
+   "category_id_an_description": {
+      "message": "Web pages that purposefully allow users to browse the web by hiding their IP address, or other personal identification information, in order to bypass local filtering policies and access any web page. Anonymizer web pages also block any tracking technologies, such as cookies or browser history. Some methods also prevent OS version and web page history from being forwarded to the web page. This category includes pages that provide free proxy IP addresses or describe how to bypass filtering."
+   },
+   "category_id_an_name": {
+      "message": "Anonymizers"
+   },
+   "category_id_au_description": {
+      "message": "Web pages that result in anonymous web browsing without the explicit intent to provide such a service. This category includes URL translators, web-page caching, and other utilities that might function as anonymizers, but without the express purpose of bypassing filtering software."
+   },
+   "category_id_au_name": {
+      "message": "Anonymizing Utilities"
+   },
+   "category_id_be_description": {
+      "message": "A browser exploit is a piece of code that exploits a software bug in a web browser so that the code makes the browser do something unexpected, including stop running, read or write local files, propagate a virus or install spyware. Malicious code may exploit HTML, JavaScript, Images, ActiveX, Java and other web technologies. Exploits, sometimes called drive-by-downloads, can install themselves on unprotected computers often without a consumer's knowledge, where the code can install keystroke loggers (to steal passwords) and Trojan programs (to turn a computer into a 'bot’). This category includes URLs that distribute or execute any browser exploit."
+   },
+   "category_id_be_name": {
+      "message": "Browser Exploits"
+   },
+   "category_id_bl_description": {
+      "message": "Web pages containing dynamic content, which often changes because users can post or edit content at any time. This category covers the risks with dynamic content that might range from harmless to offensive. Many blogs and wikis focus on a theme or subject. This category is often used with others, such as Controversial Opinions, Education/Reference, Sports, Politics/Opinion, or Nudity, depending on the focus or subject of the site. Some content might be offensive."
+   },
+   "category_id_bl_name": {
+      "message": "Blogs/Wiki"
+   },
+   "category_id_bu_description": {
+      "message": "Web pages that provide business-related information, such as corporate overviews or business planning and strategies. This category also includes information, services, or products that help other businesses plan, manage, and market their enterprises. This category includes multi-level marketing ventures when the focus is on running the business. This category does not include personal pages and web-hosting web pages."
+   },
+   "category_id_bu_name": {
+      "message": "Business"
+   },
+   "category_id_ch_description": {
+      "message": "Web pages that provide web-based, real-time social messaging in public and private chat rooms. This category includes IRC. This category does not include instant messaging. Risks include Offensive content, detrimental effects on productivity, and the leaking of sensitive information."
+   },
+   "category_id_ch_name": {
+      "message": "Chat"
+   },
+   "category_id_cm_description": {
+      "message": "Web pages that provide general reference information such as public service providers, regional information, transportation schedules, maps, or weather reports."
+   },
+   "category_id_cm_name": {
+      "message": "Public Information"
+   },
+   "category_id_co_description": {
+      "message": "Web pages that contain opinions that are likely to offend political or social sensibilities and incite controversy. Much of this content is at the extremes of public opinion. Examples include suicide pacts, pro-anorexia, xenophobic, ethnocentric, fundamentalist viewpoints, disinformation, or critical examination of one group of people."
+   },
+   "category_id_co_name": {
+      "message": "Controversial Opinions"
+   },
+   "category_id_cp_description": {
+      "message": "Websites that try to rob or cheat consumers. Some examples of their activities include selling counterfeit products, selling products that were originally provided for free, or improperly using the brand of another company. This category includes websites that exploit kindness or ignorance such as fraudulently collecting money for a charity, or running fraudulent investment schemes. This category also includes sites where many consumers reported being cheated or not receiving services."
+   },
+   "category_id_cp_name": {
+      "message": "Consumer Protection"
+   },
+   "category_id_cs_description": {
+      "message": "Web pages, which McAfee believes provide instructions to commit illegal or criminal activities. Instructions include committing murder or suicide, sabotage, bomb-making, lock-picking, service theft, evading law enforcement, or spoofing drug tests. This category might also include information on how to distribute illegal content, perpetrate fraud, or consumer scams."
+   },
+   "category_id_cs_name": {
+      "message": "Potential Criminal Activities"
+   },
+   "category_id_cv_description": {
+      "message": "Web pages that provide fantasy or fictitious representations of violence within the context of games, comics, cartoons, or graphic novels. This category includes images and textual descriptions of physical assaults or hand-to-hand combat, and grave injury and destruction caused by weapons or explosives."
+   },
+   "category_id_cv_name": {
+      "message": "Game/Cartoon Violence"
+   },
+   "category_id_dc_description": {
+      "message": "Web pages that allow people to send and receive digital postcards and greeting cards via the Internet. Digital postcards give messages of greeting or sentiment, usually for special occasions such as birthdays and holidays. Some digital postcard sites have a specific adult humor directory. These sites might also raise concerns about leaking sensitive or proprietary information, objectionable content, malware, or harmful file attachments."
+   },
+   "category_id_dc_name": {
+      "message": "Digital Postcards"
+   },
+   "category_id_dl_description": {
+      "message": "Web pages that allow a user to inadvertently download code that is harmful or annoying. This category includes downloadable files like screensavers, toolbars and file-sharing programs that contain adware, spyware, viruses and other malicious computer code. Sometimes, the malware is added without the user’s knowledge, as when they click “Yes” or “I agree” without reading the full terms and conditions. The effects can include slower computer speeds, theft of passwords, and the loss or damage of valuable personal files."
+   },
+   "category_id_dl_name": {
+      "message": "Malicious Downloads"
+   },
+   "category_id_dp_description": {
+      "message": "Web pages that provide networking for online dating, matchmaking, escort services, or introductions to potential spouses. This category includes sites that provide personal or group profiles, and allow their members to interact through real-time communication, message posting, public bulletins, and media sharing. Sites in this category might also enable contact with undesirable parties and member profiles that contain objectionable information."
+   },
+   "category_id_dp_name": {
+      "message": "Dating/Personals"
+   },
+   "category_id_dr_description": {
+      "message": "Websites that provide information on the purchase, manufacture, and use of illegal or recreational drugs. This category includes displaying, selling, or describing the use of drug paraphernalia, and tips on legal highs, such as glue sniffing, the misuse of prescription drugs, or the abuse of other legal substances."
+   },
+   "category_id_dr_name": {
+      "message": "Drugs"
+   },
+   "category_id_eb_description": {
+      "message": "Web pages that provide online bidding and selling of items or services. This category includes web pages that focus on bidding and sales. Online auctions are rarely monitored. These sites might expose users to material that are also in categories such as Pornography, Weapons, Nudity, or Violence."
+   },
+   "category_id_eb_name": {
+      "message": "Auctions/Classifieds"
+   },
+   "category_id_ed_description": {
+      "message": "Web pages devoted to academic-related content such as academic subjects (mathematics, history), school or university web pages, and education administration pages (school boards, teacher curriculum)."
+   },
+   "category_id_ed_name": {
+      "message": "Education/Reference"
+   },
+   "category_id_et_description": {
+      "message": "Web pages that provide information about cinema, theater, music, television, infotainment, entertainment industry gossip-news, and sites about celebrities such as actors and musicians. This category also includes sites where the content is devoted to providing entertainment on the web, such as horoscopes or fan clubs."
+   },
+   "category_id_et_name": {
+      "message": "Entertainment"
+   },
+   "category_id_ex_description": {
+      "message": "This category is used with the categories of Gruesome Content, Discrimination, Pornography, Violence, or Game/Cartoon Violence to identify URLs that are at the extremes of these categories. An example is illegal pornography, which is in the categories of Pornography, Potential Criminal Activities, and Extreme."
+   },
+   "category_id_ex_name": {
+      "message": "Extreme"
+   },
+   "category_id_fb_description": {
+      "message": "Web pages that market clothing, cosmetics, jewelry, and other fashion-oriented products, accessories, or services. This category also includes product reviews, comparisons, and general consumer information, and services such as hair salons, tanning salons, tattoo studios, and body-piercing studios."
+   },
+   "category_id_fb_name": {
+      "message": "Fashion/Beauty"
+   },
+   "category_id_fi_description": {
+      "message": "Web pages that provide financial information or access to online financial accounts. This category includes web pages that provide financial information include news or services that deal with the management of money, but do not provide access to sensitive financial account information, such as financial statistics, or consultation in areas such as taxes, mortgage, insurance, accreditation, or investment. Access to online financial accounts includes personal or business related banking, money management, tax consulting, mutual funds, credit cards, credit unions, insurance, other financial publications and services. This category includes stock information (but not stock trading), home finance, and government-related financial information."
+   },
+   "category_id_fi_name": {
+      "message": "Finance/Banking"
+   },
+   "category_id_fk_description": {
+      "message": "Web pages that are family-safe, specifically for children of approximate ages ten and under."
+   },
+   "category_id_fk_name": {
+      "message": "For Kids"
+   },
+   "category_id_gb_description": {
+      "message": "Web pages that allow users to wager or place bets online, or provide gambling software that allows online betting, such as casino games, betting pools, sports betting, and lotteries. This category includes lotteries if you can buy the tickets or play online."
+   },
+   "category_id_gb_name": {
+      "message": "Gambling"
+   },
+   "category_id_gm_description": {
+      "message": "Web pages that offer online games and related information such as cheats, codes, demos, emulators, online contests or role-playing games, gaming clans, game manufacturer sites, fantasy or virtual sports leagues, and other gaming sites without chances of profit. This category includes gaming consoles, such as Microsoft Xbox® and Sony PlayStation®."
+   },
+   "category_id_gm_name": {
+      "message": "Games"
+   },
+   "category_id_gr_description": {
+      "message": "Web pages that offer information about gambling, without providing the means to gamble. This category includes casino-related web pages that do not offer online gambling, gambling links, tips, sports picks, lottery results, and horse, car, or boat racing."
+   },
+   "category_id_gr_name": {
+      "message": "Gambling Related"
+   },
+   "category_id_gv_description": {
+      "message": "Web pages that contain content maintained by governmental or military organizations, such as government branches or agencies, police departments, fire departments, civil defense, counterterrorism organizations, or supranational organizations, such as the United Nations or the European Union. This category includes military and veterans’ medical facilities."
+   },
+   "category_id_gv_name": {
+      "message": "Government/Military"
+   },
+   "category_id_hi_description": {
+      "message": "Web pages that provide content about historical facts. This category includes content suitable for higher education, but the Education category includes content for primary education. For example, a site with Holocaust photographs might be offensive, but have academic value."
+   },
+   "category_id_hi_name": {
+      "message": "History"
+   },
+   "category_id_hk_description": {
+      "message": "Web pages, which McAfee believes provide instructions, or otherwise enable, fraud, crime, or malicious activity that is computer-oriented. This category includes web pages related to computer crime include malicious hacking information or tools that help individuals gain unauthorized access to computers and networks (root kits, kiddy scripts). This category also includes other areas of electronic fraud such as dialer scams and illegal manipulation of electronic devices."
+   },
+   "category_id_hk_name": {
+      "message": "Potential Hacking/Computer Crime"
+   },
+   "category_id_hl_description": {
+      "message": "Web pages that cover all health-related information and health care services. Health information includes topics to improve an individual's well-being, whether for physical or mental health (diet, nutrition, fitness, or parenting). Health care services include providers such as health insurance, hospitals, clinics, and independent physicians."
+   },
+   "category_id_hl_name": {
+      "message": "Health"
+   },
+   "category_id_hm_description": {
+      "message": "Web pages that provide comical or funny content. This category includes sites with jokes, sketches, comics, and satire pages. This category might also include graphic novel content, which is often associated with comics."
+   },
+   "category_id_hm_name": {
+      "message": "Humor/Comics"
+   },
+   "category_id_hr_description": {
+      "message": "Web pages that denounce, or offer different interpretations of, significant historical facts, such as holocaust denial. This category includes sites that might have a legitimate academic value, however many of these sites include illegitimate manipulation of history for political purposes. Some URLs in this category might have content considered illegal or offensive in some countries."
+   },
+   "category_id_hr_name": {
+      "message": "Historical Revisionism"
+   },
+   "category_id_hs_description": {
+      "message": "Web pages, which McAfee believes provide information that explicitly encourages the oppression or discrimination of a specific group of individuals. This category includes promoting an agenda against groups based on race, religion, nationality, gender, age, disability, or sexual orientation. This category might include political parties and organizations with a specific hate-based agenda, and cyber-bullying where it is extreme."
+   },
+   "category_id_hs_name": {
+      "message": "Discrimination"
+   },
+   "category_id_hw_description": {
+      "message": "Web pages related to computing software and hardware, including vendors, product marketing and reviews, deployment and maintenance of software and hardware, and software updates and add-ons such as scripts, plug-ins, or drivers. Hardware includes computer parts, accessories, and electronic equipment used with computers and networks. This category includes the marketing of software and hardware, and magazines focused on software or hardware product reviews or industry trends."
+   },
+   "category_id_hw_name": {
+      "message": "Software/Hardware"
+   },
+   "category_id_ia_description": {
+      "message": "Web pages that provide access to live or interactive web applications, such as browser-based office suites and groupware. This category includes sites with business, academic, or individual focus."
+   },
+   "category_id_ia_name": {
+      "message": "Interactive Web Applications"
+   },
+   "category_id_il_description": {
+      "message": "Web pages, which McAfee believes offer information to potentially ‘pirated’ or illegally distribute software or electronic media, such as copyrighted music or film, distribution of illegal license key generators, software cracks, and serial numbers."
+   },
+   "category_id_il_name": {
+      "message": "Potential Illegal Software"
+   },
+   "category_id_im_description": {
+      "message": "Web pages that provide software for real-time communication over a network exclusively for users who joined a member’s contact list or an instant-messaging session. Most instant-messaging software includes features such as file transfer, PC-to-PC phone calls, and can track when other people log on and off. These sites might also raise concerns about the leaking of sensitive information, objectionable content, or file sharing."
+   },
+   "category_id_im_name": {
+      "message": "Instant Messaging"
+   },
+   "category_id_in_description": {
+      "message": "Web pages that offer purchasing, selling, or trading of shares online. This category also includes ticker-tape information that enables viewing of real-time stock prices and financial spread betting in the stock market. Other betting is in the Gambling category. This category does not include sites that offer information about stocks, but do not offer purchasing, selling, or trading of shares."
+   },
+   "category_id_in_name": {
+      "message": "Stock Trading"
+   },
+   "category_id_io_description": {
+      "message": "Web pages that legitimately provide information about data protection. This category includes detailed information for safeguarding business or personal data, intellectual property, privacy, and infrastructure on the Internet, private networks, or in other bandwidth services such as telecommunications. Possible risks include Potential Hacking/Computer Crime. Sites with high-risk content and no clear distinction between “black hat” and “white hat” might also be in this category, and the Potential Hacking/Computer Crime category. Some content might be exploited to breach security or commit unlawful acts."
+   },
+   "category_id_io_name": {
+      "message": "Information Security"
+   },
+   "category_id_ir_description": {
+      "message": "Web pages that provide software or access to continuous audio or video broadcasting, such as Internet radio, TV programming, or podcasting."
+   },
+   "category_id_ir_name": {
+      "message": "Internet Radio/TV"
+   },
+   "category_id_is_description": {
+      "message": "URLs for servers that host images, media files, or JavaScript for one or more sites and are intended to speed up content retrieval for existing web servers, such as Apache. Content servers generally do not have content posted or through-site navigation for web surfers. Content servers hosting images do not allow users to browse the photographs."
+   },
+   "category_id_is_name": {
+      "message": "Content Server"
+   },
+   "category_id_it_description": {
+      "message": "Web pages that provide services for publication and maintenance of Internet sites such as web design, domain registration, Internet Service Providers, and broadband and telecommunications companies that provide web services."
+   },
+   "category_id_it_name": {
+      "message": "Internet Services"
+   },
+   "category_id_js_description": {
+      "message": "Web pages related to a job search including sites concerned with resume writing, interviewing, changing careers, classified advertising, and large job databases. This category also includes corporate web pages that list job openings, salary comparison sites, temporary employment, and company job-posting sites."
+   },
+   "category_id_js_name": {
+      "message": "Job Search"
+   },
+   "category_id_mb_description": {
+      "message": "Web pages that provide access (http://) to Usenet newsgroups or hold discussions and post user-generated content, such as real-time message posting for an interest group. This category also includes archives of files uploaded to newsgroups."
+   },
+   "category_id_mb_name": {
+      "message": "Forum/Bulletin Boards"
+   },
+   "category_id_md_description": {
+      "message": "Web pages that allow users to upload, search for, and share media files and photographs, such as online photograph albums. This category covers the general risks of media sharing, but does not target specific content. Some URLs might also contain offensive content."
+   },
+   "category_id_md_name": {
+      "message": "Media Sharing"
+   },
+   "category_id_mg_description": {
+      "message": "Web pages that provide text messaging. Examples include text messaging to mobile phones, PDAs, fax machines, and internal website user-to-user messaging or site-to-site messaging."
+   },
+   "category_id_mg_name": {
+      "message": "Messaging"
+   },
+   "category_id_mk_description": {
+      "message": "Web pages that promote individual or business products or services on the web, but do not sell their products or services online. This category includes websites that are generally a company overview, describing services or products that cannot be purchased directly from these sites. Examples include automobile manufacturer sites, wedding photography services, or graphic design services."
+   },
+   "category_id_mk_name": {
+      "message": "Marketing/Merchandising"
+   },
+   "category_id_mm_description": {
+      "message": "Web pages that focus on social interaction such as online dating, friendship, school reunions, pen-pals, escort services, or introductions to potential spouses. This category includes many sites that allow their members to socially interact through real-time message posting. Sites in this category might also enable contact with undesirable parties and member profiles that contain objectionable information."
+   },
+   "category_id_mm_name": {
+      "message": "Dating/Social Networking"
+   },
+   "category_id_mn_description": {
+      "message": "Web pages that contain non-pornographic images of the bare human body like those in classic sculpture and paintings, or medical images."
+   },
+   "category_id_mn_name": {
+      "message": "Incidental Nudity"
+   },
+   "category_id_mo_description": {
+      "message": "Web pages that sell media, software, or utilities for mobile phones that can be downloaded and delivered to mobile phones. Examples include ringtones, logos/skins, games, screen-savers, text-based tunes, and software for SMS, MMS, WAP, and other mobile phone protocols."
+   },
+   "category_id_mo_name": {
+      "message": "Mobile Phone"
+   },
+   "category_id_mp_description": {
+      "message": "Web pages that provide audio or video files for download such as MP3, WAV, AVI, and MPEG formats. The files are saved to, and played from, the user’s computer."
+   },
+   "category_id_mp_name": {
+      "message": "Media Downloads"
+   },
+   "category_id_mr_description": {
+      "message": "Bulletin boards, chat rooms, search engines, or web mail sites that are monitored by an individual or group who has the authority to block messages or content considered inappropriate."
+   },
+   "category_id_mr_name": {
+      "message": "Moderated"
+   },
+   "category_id_ms_description": {
+      "message": "Web pages that deploy code designed specifically to hijack your computer’s settings or activity. This category includes self-installing applications (called “drive-by” executable file downloads), Trojan horses, and viruses that exploit security vulnerabilities in browsers or other applications. A web page can later lose its malicious status and be moved to another category. Malicious sites intend to take action on another computer to cause damage."
+   },
+   "category_id_ms_name": {
+      "message": "Malicious Sites"
+   },
+   "category_id_mv_description": {
+      "message": "Websites for manufacturers and dealerships of consumer transportation vehicles, such as cars, vans, trucks, SUVs, motorcycles, and scooters. This category also includes sites that provide product marketing, reviews, comparisons, pricing information, auto fairs, auto expos, and general consumer information about motor vehicles."
+   },
+   "category_id_mv_name": {
+      "message": "Motor Vehicles"
+   },
+   "category_id_na_description": {
+      "message": "Web pages that provide access (http://) to Usenet newsgroups and archives of files uploaded to newsgroups. This category also includes online groups that offer similar community-oriented content posting. URLs in this category might contain offensive content."
+   },
+   "category_id_na_name": {
+      "message": "Usenet News"
+   },
+   "category_id_nd_description": {
+      "message": "Web pages that have non-pornographic images of the bare human body. This category includes classic sculpture and paintings, artistic nude photographs, some naturism pictures, and detailed medical illustrations."
+   },
+   "category_id_nd_name": {
+      "message": "Nudity"
+   },
+   "category_id_np_description": {
+      "message": "Web pages from charitable or educational groups that fulfill a stated mission, benefiting the larger community, such as clubs, lobbies, communities, non-profit organizations, labor unions, and advocacy groups. Examples are Masons, Elks, Boy and Girl Scouts, or Big Brothers."
+   },
+   "category_id_np_name": {
+      "message": "Non-Profit/Advocacy/NGO"
+   },
+   "category_id_ns_description": {
+      "message": "Web pages that allow users to upload folders and files to an online network server in order to backup, share, edit, or retrieve files or folders from any web browser."
+   },
+   "category_id_ns_name": {
+      "message": "Personal Network Storage"
+   },
+   "category_id_nt_description": {
+      "message": "Web pages that provide social networking exclusively for professional or business purposes. This category includes sites that provide personal or group profiles, and enable their members to interact through real-time communication, message posting, public bulletins, and media sharing. This category also contains alumni sites that have a networking function."
+   },
+   "category_id_nt_name": {
+      "message": "Professional Networking"
+   },
+   "category_id_nw_description": {
+      "message": "Web pages that provide online news media, such as international or regional news broadcasting and publication. This category includes portal sites that provide news content."
+   },
+   "category_id_nw_name": {
+      "message": "General News"
+   },
+   "category_id_os_description": {
+      "message": "Web pages that sell products or services online. Web pages selling a broad range of products might pose a risk to users by offering access to items that are normally in other categories such as Pornography, Weapons, Nudity, or Violence. Some sites might offer access to items in other categories such as Pornography and Weapons."
+   },
+   "category_id_os_name": {
+      "message": "Online Shopping"
+   },
+   "category_id_pa_description": {
+      "message": "Web pages with pictures that include alluring or revealing attire, lingerie and swimsuits, or supermodel or celebrity photograph collections, but do not involve nudity."
+   },
+   "category_id_pa_name": {
+      "message": "Provocative Attire"
+   },
+   "category_id_pc_description": {
+      "message": "IP addresses (and any domains associated with them) that access the Internet by DSL modems or cable modems. Because this content is not generally intended for Internet access via HTTP, access to the Internet through these IP addresses can indicate suspicious behavior. This behavior might be related to malware located on the home computer or homegrown gateways set up to allow anonymous Internet access."
+   },
+   "category_id_pc_name": {
+      "message": "Residential IP Addresses"
+   },
+   "category_id_pd_description": {
+      "message": "Web pages that once served content, but their domains have been sold or abandoned and are no longer registered. Parked domains do not host their own content, but usually redirect users to a generic page that states the domain name is for sale, or redirect users to a generic search engine and portal page, some of which provide valid search engine results."
+   },
+   "category_id_pd_name": {
+      "message": "Parked Domain"
+   },
+   "category_id_ph_description": {
+      "message": "Links to web pages that typically arrive in hoax email, established to steal user account information. These sites falsely represent themselves and appear as legitimate company web pages in order to deceive and obtain user account information for perpetrating fraud or theft."
+   },
+   "category_id_ph_name": {
+      "message": "Phishing"
+   },
+   "category_id_pm_description": {
+      "message": "Web pages that provide reviews, descriptions, and market or sell prescription-based drugs, over-the-counter drugs, birth control, or dietary supplements."
+   },
+   "category_id_pm_name": {
+      "message": "Pharmacy"
+   },
+   "category_id_pn_description": {
+      "message": "Web pages that allow the exchange of files between computers and users for business or personal use, such as downloadable music. P2P clients allow users to search for and exchange files from a peer-user network. They often include spyware or real-time chat capabilities. This category includes BitTorrent web pages."
+   },
+   "category_id_pn_name": {
+      "message": "P2P/File Sharing"
+   },
+   "category_id_po_description": {
+      "message": "Web pages covering political parties, individuals in political life, and opinion on various topics. This category might also cover laws and political opinion about drugs. This category includes URLs for political parties, political campaigning, and opinions on various topics, including political debates."
+   },
+   "category_id_po_name": {
+      "message": "Politics/Opinion"
+   },
+   "category_id_pp_description": {
+      "message": "Personal home pages that share a common domain such as those hosted by ISPs, university/education servers, or free web page hosts. This category also includes unique domains that contain personal information, such as a personal home page. Personal home pages might contain offensive content."
+   },
+   "category_id_pp_name": {
+      "message": "Personal Pages"
+   },
+   "category_id_pr_description": {
+      "message": "Web pages that contain crude, vulgar, or obscene language or gestures."
+   },
+   "category_id_pr_name": {
+      "message": "Profanity"
+   },
+   "category_id_ps_description": {
+      "message": "Web pages that serve as major gateways or directories to content on the web. Many portal sites also provide a variety of internal site features or services such as search engines, email, news, and entertainment. Mailing list sites with a variety of content are in this category."
+   },
+   "category_id_ps_name": {
+      "message": "Portal Sites"
+   },
+   "category_id_pu_description": {
+      "message": "Web pages that contain Potentially Unwanted Programs (PUPs). PUPs are often made for a beneficial purpose but they alter the security of a computer or the computer user’s privacy. Computer users who are concerned about security or privacy might want to be informed about this software, and in some cases, they might want to remove this software from their computers."
+   },
+   "category_id_pu_name": {
+      "message": "PUPs"
+   },
+   "category_id_ra_description": {
+      "message": "Web pages that provide remote access to a program, online service, or an entire computer system. Although remote access is often used legitimately to run a computer from a remote location, it creates a security risk, such as backdoor access. Backdoor access, written by the original programmer, allows the system to be controlled by another party without the user's knowledge."
+   },
+   "category_id_ra_name": {
+      "message": "Remote Access"
+   },
+   "category_id_rb_description": {
+      "message": "Web pages that provide information about restaurants, bars, catering, take-out and delivery, including online ordering. This category includes sites that provide information about location, hours, prices, menus and related dietary information. This category also includes restaurant guides and reviews, and cafes and coffee shops."
+   },
+   "category_id_rb_name": {
+      "message": "Restaurants"
+   },
+   "category_id_re_description": {
+      "message": "Web pages that provide commercial or residential real estate services and information. Service and information includes sales and rental of living space or retail space and guides for apartments, housing, and property, and information on appraisal and brokerage. This category includes sites that allow you to browse model homes."
+   },
+   "category_id_re_name": {
+      "message": "Real Estate"
+   },
+   "category_id_rh_description": {
+      "message": "Web pages for recreational organizations and facilities that include content devoted to recreational activities and hobbies. This category includes information about public swimming pools, zoos, fairs, festivals, amusement parks, recreation guides, hiking, fishing, bird watching, or stamp collecting."
+   },
+   "category_id_rh_name": {
+      "message": "Recreation/Hobbies"
+   },
+   "category_id_rl_description": {
+      "message": "Web pages with content related to religious topics and beliefs in human spirituality that are not within the major religions. This category includes religious discussion, beliefs, articles, and information for local congregations or groups such as a church homepage, unless the site is already in the Major Global Religions category. This category also includes comparative religion, or sites that include religions and ideologies."
+   },
+   "category_id_rl_name": {
+      "message": "Religion/Ideology"
+   },
+   "category_id_rm_description": {
+      "message": "Web pages with content about religious topics and information related to major religions. This category includes sites that cover religious content such as discussion, beliefs, non-controversial commentary, articles, and information for local congregations such as a church or synagogue homepage. The religions in this category are Baha'I, Buddhism, Chinese Traditional, Christianity, Hinduism, Islam, Jainism, Judaism, Shinto, Sikhism, Tenrikyo, Zoroastrianism."
+   },
+   "category_id_rm_name": {
+      "message": "Major Global Religions"
+   },
+   "category_id_rs_description": {
+      "message": "Web pages that harness idle or unused computer resources to focus on a common task. The task can be on a company or an international basis. Well known examples are the SETI program and the Human Genome Project, which use the idle time of thousands of volunteered computers to analyze data."
+   },
+   "category_id_rs_name": {
+      "message": "Resource Sharing"
+   },
+   "category_id_sc_description": {
+      "message": "Web pages that promote plagiarism or cheating by providing free or fee-based term papers, written essays, or exam answers."
+   },
+   "category_id_sc_name": {
+      "message": "School Cheating Information"
+   },
+   "category_id_se_description": {
+      "message": "Web pages that provide search results that enable users to find information on the Internet based on key words."
+   },
+   "category_id_se_name": {
+      "message": "Search Engines"
+   },
+   "category_id_sm_description": {
+      "message": "Web pages that describe or depict sexual acts, but are not intended to be arousing or erotic. Examples of sexual materials include sex education, sexual innuendo, humor, or sex related merchandise."
+   },
+   "category_id_sm_name": {
+      "message": "Sexual Materials"
+   },
+   "category_id_sn_description": {
+      "message": "Web pages that enable social networking for a variety of purposes, such as friendship, dating, professional, or topics of interest. These sites provide personal or group profiles and enable interaction among their members through real-time communication, message posting, public bulletins, and media sharing. Sites in this category might also enable contact with undesirable parties and member profiles that contain objectionable information."
+   },
+   "category_id_sn_name": {
+      "message": "Social Networking"
+   },
+   "category_id_sp_description": {
+      "message": "Web pages related to professional or organized recreational sports. This category includes sporting news, events, and information such as playing tips, strategies, game scores, or player trades."
+   },
+   "category_id_sp_name": {
+      "message": "Sports"
+   },
+   "category_id_st_description": {
+      "message": "Web pages that provide streaming media, or contain software plug-ins for displaying audio and visual data before the entire file has been transmitted."
+   },
+   "category_id_st_name": {
+      "message": "Streaming Media"
+   },
+   "category_id_su_description": {
+      "message": "Links to web pages that arrive in unsolicited spam email. Spam URL content ranges from product marketing to potentially offensive or fraudulent sites. This category includes sites built only for spamming purposes such as spam blogs or comment spam."
+   },
+   "category_id_su_name": {
+      "message": "Spam URLs"
+   },
+   "category_id_sw_description": {
+      "message": "Web pages that are repositories of downloadable copies of shareware and freeware. Shareware is distributed on an honor system by which the shareware is delivered free of charge, but the author requests a small fee if the program is suitable and is regularly used. Freeware is software that is available without any cost."
+   },
+   "category_id_sw_name": {
+      "message": "Shareware/Freeware"
+   },
+   "category_id_sx_description": {
+      "message": "Web pages, which McAfee believes contain materials intended to be sexually arousing or erotic. This category includes fetish pages, animation, cartoons, stories, and illegal pornography."
+   },
+   "category_id_sx_name": {
+      "message": "Pornography"
+   },
+   "category_id_sy_description": {
+      "message": "Web pages that violate personal or corporate privacy and security. This category includes:\u003Cbr/>\u003Cbr/>\u003Cul>\u003Cli>URLs that download software or execute programs that gather user information and send it to a third party without the user's explicit knowledge or consent.\u003C/li>\u003Cli>Software that monitors or tracks activity on others’ computer by recording the key strokes (Keyloggers).\u003C/li>\u003Cli>Sites that distribute software known to contain spyware or adware.\u003C/li>\u003C/ul>This category is different from the Malicious Sites category because of its intent. Spyware and keyloggers covertly gather and send information to another party. A malicious site intends to install software or take an action without user approval or knowledge."
+   },
+   "category_id_sy_name": {
+      "message": "Spyware/Adware/Keyloggers"
+   },
+   "category_id_tb_description": {
+      "message": "Web pages that sell, promote, or advocate the use of tobacco products, tobacco paraphernalia, including cigarettes, cigars, pipes, snuff and chewing tobacco."
+   },
+   "category_id_tb_name": {
+      "message": "Tobacco"
+   },
+   "category_id_tf_description": {
+      "message": "Web pages with a technical or business focus that provide online message posting or real-time chatting, such as technical support or interactive business communication. Although users can post any type of content, these forums tend to present less risk of containing offensive content. Sites that offer a variety of forums with themes, including technical and business content, are only in the categories of Forum/Bulletin Boards or Chat. Forums with a primary technical or business focus only are in the Technical/Business Forums category."
+   },
+   "category_id_tf_name": {
+      "message": "Technical/Business Forums"
+   },
+   "category_id_tg_description": {
+      "message": "Web pages with content that can be considered tasteless, gross, shocking, or gruesome. This category includes tasteless humor, bodily excretory functions, graphic medical or accident scene photographs (containing blood or wounds), extreme forms of body modification (cutting, branding, or genital piercing), or shocking depictions of inhumane animal treatment."
+   },
+   "category_id_tg_name": {
+      "message": "Gruesome Content"
+   },
+   "category_id_ti_description": {
+      "message": "Web pages that provide computing information with an educational focus in areas such as Information Technology, computer programming, and certification. Examples include Linux user groups, UNIX commands, software tutorials, or dictionaries of technical terms. Most sites in this category might be subdirectories of larger domains."
+   },
+   "category_id_ti_name": {
+      "message": "Technical Information"
+   },
+   "category_id_to_description": {
+      "message": "Content that is text or audio only, and does not contain pictures. This category can be used as an exception to allow explicit text and recorded material to be accessed when you want pictures blocked using the Pornography, Violence, or Sexual Materials categories. Libraries or universities can use this category to prevent the display of offensive graphics in their public facilities."
+   },
+   "category_id_to_name": {
+      "message": "Text/Spoken Only"
+   },
+   "category_id_tr_description": {
+      "message": "Web pages that promote personal or business travel, such as hotels, resorts, airlines, ground transportation, car rentals, travel agencies, and general tourist and travel information. This category also includes sites for buying tickets or accommodation."
+   },
+   "category_id_tr_name": {
+      "message": "Travel"
+   },
+   "category_id_tt_description": {
+      "message": "Web pages that allow users to type phrases or a block of text to translate it from one language into another. This category also includes language identifier web pages."
+   },
+   "category_id_tt_name": {
+      "message": "Text Translators"
+   },
+   "category_id_uk_description": {
+      "message": "Web pages that contain child sexual abuse content hosted anywhere in the world, and criminally obscene and incitement to racial hatred content hosted in the UK."
+   },
+   "category_id_uk_name": {
+      "message": "Illegal UK"
+   },
+   "category_id_vi_description": {
+      "message": "Web pages that contain real or lifelike images or text that portray, describe, or advocate physical assaults against people, animals, or institutions, such as depictions of war, suicide, mutilation, or dismemberment."
+   },
+   "category_id_vi_name": {
+      "message": "Violence"
+   },
+   "category_id_vs_description": {
+      "message": "Web pages that provide image-specific search results such as thumbnail pictures."
+   },
+   "category_id_vs_name": {
+      "message": "Visual Search Engine"
+   },
+   "category_id_wa_description": {
+      "message": "Web pages that provide advertisement-hosting or programs that create advertisements. Examples include links, source code or applets for banners, popups, and other kinds of static or dynamically generated advertisements that appear on web pages. This category is intended to block advertisements on web pages, not the companies that provide the advertisements or advertising services."
+   },
+   "category_id_wa_name": {
+      "message": "Web Ads"
+   },
+   "category_id_we_description": {
+      "message": "Web pages that provide information about buying, making, modifying, or using weapons, such as guns, knives, swords, paintball guns, and ammunition, explosives, and weapon accessories."
+   },
+   "category_id_we_name": {
+      "message": "Weapons"
+   },
+   "category_id_wm_description": {
+      "message": "Web pages that enable users to send or receive email through the Internet. These sites can expose users to harmful content delivered by email file attachments, or might present a security risk such as leaking or loss of proprietary data."
+   },
+   "category_id_wm_name": {
+      "message": "Web Mail"
+   },
+   "category_id_wp_description": {
+      "message": "Web pages that enable users to make telephone calls via the Internet or obtain information or software for this purpose. Web Phone service is also called Internet Telephony, or VoIP. Web phone service includes PC-to-PC, PC-to-phone, and phone-to-phone services connecting via TCP/IP networks."
+   },
+   "category_id_wp_name": {
+      "message": "Web Phone"
+   },
+   "category_id_wx_description": {
+      "message": "Web pages that host live meetings, video conferences, and interactive presentations mainly for businesses. Web meetings generally include streaming audio and video, and allow data transfer or office-oriented application sharing, such as online presentations. URLs in this category can present bandwidth risks, and security risks such as the loss or leakage of proprietary data."
+   },
+   "category_id_wx_name": {
+      "message": "Web Meetings"
+   },
+   "dfd_landing_desc1": {
+      "message": "Explore and watch videos on websites like Youtube and Facebook"
+   },
+   "dfd_landing_desc2": {
+      "message": "We'll alert you in seconds if a deepfake is detected"
+   },
+   "dfd_landing_desc3": {
+      "message": "You'll then be able to see real-time analysis of the results"
+   },
+   "dfd_landing_home_btn": {
+      "message": "Go to home"
+   },
+   "dfd_landing_title": {
+      "message": "You're now protected from scams on this device"
+   },
+   "download_scan_popup_expanded_descriptions": {
+      "message": "Your download's being scanned. We'll let you know if there's an issue."
+   },
+   "dws_do_not_ask_again_btn": {
+      "message": "Don’t ask again"
+   },
+   "dws_do_not_ask_again_close_btn": {
+      "message": "Thanks"
+   },
+   "dws_do_not_ask_again_title": {
+      "message": "We won't ask again when you use this email address."
+   },
+   "dws_email_input_error": {
+      "message": "That doesn’t look right."
+   },
+   "dws_email_input_label": {
+      "message": "Email address"
+   },
+   "dws_remind_later_btn": {
+      "message": "Remind me next time"
+   },
+   "dws_remind_later_title": {
+      "message": "We'll ask again the next time you use this email address."
+   },
+   "dws_scan_btn": {
+      "message": "Check for my email address"
+   },
+   "dws_scan_btn_first_time": {
+      "message": "Check for my email address"
+   },
+   "dws_scan_email_description": {
+      "message": "Our service checks dark web databases to see if personal info was stolen. Want to check for your email address?"
+   },
+   "dws_scan_email_title": {
+      "message": "Protect your identity"
+   },
+   "dws_thanks_btn": {
+      "message": "Thanks"
+   },
+   "efficacy_meter_excellent": {
+      "message": "Excellent"
+   },
+   "efficacy_meter_fair": {
+      "message": "Fair"
+   },
+   "efficacy_meter_good": {
+      "message": "Good"
+   },
+   "efficacy_meter_poor": {
+      "message": "Poor"
+   },
+   "efficacy_meter_title": {
+      "message": "Security Score"
+   },
+   "esd_toast_desc": {
+      "message": "We'll automatically check new emails for scams before you open them. It's already included in your plan and takes just a moment to set up."
+   },
+   "esd_toast_dont_remind_me": {
+      "message": "Don't remind me again"
+   },
+   "esd_toast_get_protected": {
+      "message": "Get protected"
+   },
+   "esd_toast_get_protected2": {
+      "message": "Protect my inbox"
+   },
+   "esd_toast_remind_me": {
+      "message": "Remind me later"
+   },
+   "esd_toast_title": {
+      "message": "Get protected from email scams"
+   },
+   "esd_toast_title2": {
+      "message": "Your inbox might not be protected"
+   },
+   "ffpolicy_accept_prompt": {
+      "message": "*Accept Prompt to Activate"
+   },
+   "ffpolicy_activity_main_title": {
+      "message": "Other ways we're using your data to help protect you online:"
+   },
+   "ffpolicy_activity_message": {
+      "message": "We use this info to understand which WebAdvisor features are most helpful to you."
+   },
+   "ffpolicy_activity_title": {
+      "message": "Activity data collection"
+   },
+   "ffpolicy_header_message": {
+      "message": "Turn on personal data collection so we can help keep you safe from threats while browsing the web. Otherwise, you'll need to uninstall McAfee® WebAdvisor."
+   },
+   "ffpolicy_header_message_2": {
+      "message": "Enable extension permissions so we can help keep you safe from threats while browsing the web."
+   },
+   "ffpolicy_header_message_uninstall": {
+      "message": "uninstall"
+   },
+   "ffpolicy_header_title": {
+      "message": "You're not protected"
+   },
+   "ffpolicy_header_title_protected": {
+      "message": "McAfee® WebAdvisor is now protecting you"
+   },
+   "ffpolicy_page_tab_title": {
+      "message": "McAfee - One more step"
+   },
+   "ffpolicy_permissions_accept_button": {
+      "message": "Grant Permission"
+   },
+   "ffpolicy_permissions_message": {
+      "message": "We need to read and change data on sites you visit so we can identify and notify you of security risks. This setting is required for us to protect you while browsing the web."
+   },
+   "ffpolicy_permissions_message_line_2": {
+      "message": "Initiate the permission request by clicking \"Grant Permission\" below and choosing \"Allow\" in the pop-up."
+   },
+   "ffpolicy_permissions_on": {
+      "message": "ON"
+   },
+   "ffpolicy_permissions_title": {
+      "message": "Extension permissions (Required)"
+   },
+   "ffpolicy_personal_data_accept_button": {
+      "message": "Yes, please collect my personal data in accord with McAfee's Privacy Policy"
+   },
+   "ffpolicy_personal_data_decline_button": {
+      "message": "No, do not collect my personal data"
+   },
+   "ffpolicy_personal_message_intro": {
+      "message": "We send our experts the web addresses of sites you browse to check for their security status. Rest assured, we never sell your info. Can we collect the following data that personally identifies you:"
+   },
+   "ffpolicy_personal_message_outro": {
+      "message": "If you choose not to allow us to collect your personal data, McAfee® WebAdvisor will not be able to provide any of its security features and you will need to uninstall it."
+   },
+   "ffpolicy_personal_message_outro_line_2": {
+      "message": "Full details about the personal data we collect and what we do with it are provided in $link$",
+      "placeholders": {
+         "link": {
+            "content": "$1"
+         }
+      }
+   },
+   "ffpolicy_personal_message_point_1": {
+      "message": "The web addresses (URL) of the sites you visit, which we collect to check their security status and provide you with up-to-date security."
+   },
+   "ffpolicy_personal_message_point_2": {
+      "message": "The web addresses (URL) of the sites listed in your Search engine results, which we collect to check their security status and provide you with security annotations."
+   },
+   "ffpolicy_personal_message_point_3": {
+      "message": "Your current browser version, which we collect to diagnose possible issues with McAfee® WebAdvisor's security service."
+   },
+   "ffpolicy_personal_message_point_4": {
+      "message": "The version of McAfee® WebAdvisor you're using, which we collect to diagnose possible issues with its security service."
+   },
+   "ffpolicy_personal_title": {
+      "message": "Personal data collection"
+   },
+   "ffpolicy_personal_title_required": {
+      "message": "(Required)"
+   },
+   "ffpolicy_privacy_policy_link": {
+      "message": "our Privacy Policy"
+   },
+   "ffpolicy_privacy_text": {
+      "message": "For more details on how we collect, use, and share your personal data, see our"
+   },
+   "ffpolicy_privacy_text_link": {
+      "message": "McAfee® WebAdvisor Privacy Notice"
+   },
+   "ffpolicy_required_suffix_1": {
+      "message": "1/2"
+   },
+   "ffpolicy_required_suffix_2": {
+      "message": "2/2"
+   },
+   "ffpolicy_see_settings": {
+      "message": "See settings"
+   },
+   "ffpolicy_uninstall_popup_message": {
+      "message": "Unfortunately, without the indicated personal data McAfee® WebAdvisor won't work because it will not have up-to-date security information to provide security features.  Unless you wish to reconsider the data you allow McAfee® WebAdvisor to collect we recommend you remove McAfee® WebAdvisor."
+   },
+   "howitworks_about": {
+      "message": "About"
+   },
+   "howitworks_about_careers": {
+      "message": "Careers"
+   },
+   "howitworks_about_contact": {
+      "message": "Contact Us"
+   },
+   "howitworks_about_legal": {
+      "message": "Privacy & Legal Terms"
+   },
+   "howitworks_about_map": {
+      "message": "Site Map"
+   },
+   "howitworks_about_mcafee": {
+      "message": "About McAfee"
+   },
+   "howitworks_about_req": {
+      "message": "System Requirements"
+   },
+   "howitworks_address": {
+      "message": "Corporate Headquarters 6220 America Center Drive San Jose, CA 95002 USA"
+   },
+   "howitworks_description": {
+      "message": "McAfee is your first line of defense while you surf the web, helping you sidestep malware and phishing attacks before they happen."
+   },
+   "howitworks_download_description": {
+      "message": "Keep your PC protected from viruses and other threats. We'll alert you if you download a suspicious file and block malware hidden on web pages.*"
+   },
+   "howitworks_download_title": {
+      "message": "Safer Downloads"
+   },
+   "howitworks_legal": {
+      "message": "Your subscription is subject to our $howitworks_legal_license$ and $howitworks_legal_notice$ and is for personal use on the number of supported devices allowed under your subscription. Subscriptions covering “all” devices are limited to supported devices that you own. Product features may be added, changed or removed during the subscription term, and not all features are available for all operating systems—see $howitworks_legal_req$ for supported devices. Software does not guarantee protection against all possible threats.",
+      "placeholders": {
+         "howitworks_legal_license": {
+            "content": "$1"
+         },
+         "howitworks_legal_notice": {
+            "content": "$2"
+         },
+         "howitworks_legal_req": {
+            "content": "$3"
+         }
+      }
+   },
+   "howitworks_legal_license": {
+      "message": "License Agreement"
+   },
+   "howitworks_legal_notice": {
+      "message": "Privacy Notice"
+   },
+   "howitworks_legal_req": {
+      "message": "System Requirements"
+   },
+   "howitworks_lets_connect": {
+      "message": "Let's connect."
+   },
+   "howitworks_page_title": {
+      "message": "McAfee - How It Works"
+   },
+   "howitworks_phishing_description": {
+      "message": "Hackers try to steal your information through official-looking emails or enticing search results. We'll help protect your personal info by making sure you don't take the bait."
+   },
+   "howitworks_phishing_title": {
+      "message": "Phishing Protection"
+   },
+   "howitworks_products": {
+      "message": "Products"
+   },
+   "howitworks_products_identity": {
+      "message": "McAfee® Identity Theft Protection"
+   },
+   "howitworks_products_livesafe": {
+      "message": "McAfee® LiveSafe"
+   },
+   "howitworks_products_totalprotection": {
+      "message": "McAfee® Total Protection"
+   },
+   "howitworks_refund_trademark": {
+      "message": "McAfee and the McAfee logo are trademarks or registered trademarks of McAfee, LLC or its subsidiaries in the United States and other countries. Other names and brands may be claimed as the property of others. Copyright © $year$ McAfee, LLC",
+      "placeholders": {
+         "year": {
+            "content": "$1"
+         }
+      }
+   },
+   "howitworks_share": {
+      "message": "We'll share news and tips to help you be aware and safe."
+   },
+   "howitworks_social_description": {
+      "message": "Scroll your social feeds with confidence on sites like Facebook, LinkedIn, Reddit and more – we'll color-code links so you'll know which ones are safe to click.*"
+   },
+   "howitworks_social_title": {
+      "message": "Social Media Protection"
+   },
+   "howitworks_star_message": {
+      "message": "*Only available on Windows"
+   },
+   "howitworks_support": {
+      "message": "Support"
+   },
+   "howitworks_support_consumer": {
+      "message": "Consumer Support"
+   },
+   "howitworks_tech_scam": {
+      "message": "Tech Scam Protection"
+   },
+   "howitworks_tech_scam_description": {
+      "message": "Stay in control and outsmart scammers trying to gain remote access to your computer and personal information with clear security alerts."
+   },
+   "howitworks_title": {
+      "message": "McAfee Has Your Back"
+   },
+   "howitworks_url_description": {
+      "message": "Hackers create malicious sites using addresses that look almost identical to the real thing. We'll steer you back to safety if a URL typo or misleading link lead you astray.*"
+   },
+   "howitworks_url_title": {
+      "message": "URL Hijacking Protection"
+   },
+   "iframe_banner_message": {
+      "message": "We tested this page and blocked content coming from potentially dangerous or risky sites. Allow this content only if you're sure it comes from safe sites."
+   },
+   "iframe_banner_view_all_btn": {
+      "message": "View all blocked content"
+   },
+   "mb_back_btn_message": {
+      "message": "Back"
+   },
+   "mb_banner_learn_more": {
+      "message": "Learn more"
+   },
+   "mb_banner_manage_settings": {
+      "message": "Manage settings"
+   },
+   "mb_faq_back_btn_message": {
+      "message": "Back"
+   },
+   "mb_faq_description": {
+      "message": "Learn more about audio deepfakes, how we detect them, and the risks they can pose."
+   },
+   "mb_faq_title": {
+      "message": "Video scam protection FAQs"
+   },
+   "mb_graph_error": {
+      "message": "We're unable to display audio data right now. Try again later."
+   },
+   "mb_graph_feature_off": {
+      "message": "Deepfake Detector is turned off"
+   },
+   "mb_graph_label_detected": {
+      "message": "Deepfake detected"
+   },
+   "mb_graph_label_scanning": {
+      "message": "Scanning for deepfakes..."
+   },
+   "mb_graph_no_audio": {
+      "message": "No audio is playing right now"
+   },
+   "mb_graph_no_video": {
+      "message": "No video is playing right now"
+   },
+   "mb_info_link_need_help": {
+      "message": "Need help?"
+   },
+   "mb_info_link_need_support": {
+      "message": "Contact Support"
+   },
+   "mb_main_audio_detection_off": {
+      "message": "Off"
+   },
+   "mb_main_audio_detection_on": {
+      "message": "On"
+   },
+   "mb_main_audio_detection_title": {
+      "message": "Scam protection"
+   },
+   "mb_main_cur_video": {
+      "message": "Current video"
+   },
+   "mb_main_deepfake": {
+      "message": "deepfake"
+   },
+   "mb_main_deepfakes": {
+      "message": "deepfakes"
+   },
+   "mb_main_faq_message": {
+      "message": "Learn how video scam protection works and how we help keep you safe."
+   },
+   "mb_main_faq_title": {
+      "message": "Video scam protection FAQs"
+   },
+   "mb_main_feedback_btn": {
+      "message": "Submit"
+   },
+   "mb_main_feedback_message": {
+      "message": "Share your feedback."
+   },
+   "mb_main_feedback_text": {
+      "message": "Did we get it right?"
+   },
+   "mb_main_feedback_thank_you": {
+      "message": "Thanks!"
+   },
+   "mb_main_hr_flagged": {
+      "message": "hr flagged"
+   },
+   "mb_main_hr_scanned": {
+      "message": "hr scanned"
+   },
+   "mb_main_hrs_flagged": {
+      "message": "hrs flagged"
+   },
+   "mb_main_hrs_scanned": {
+      "message": "hrs scanned"
+   },
+   "mb_main_min_flagged": {
+      "message": "min flagged"
+   },
+   "mb_main_min_scanned": {
+      "message": "min scanned"
+   },
+   "mb_main_mins_flagged": {
+      "message": "mins flagged"
+   },
+   "mb_main_mins_scanned": {
+      "message": "mins scanned"
+   },
+   "mb_main_my_data": {
+      "message": "My detection data"
+   },
+   "mb_main_pause_day": {
+      "message": "$day$ day",
+      "placeholders": {
+         "day": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_hour": {
+      "message": "$hour$ hour",
+      "placeholders": {
+         "hour": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_hours": {
+      "message": "$hours$ hours",
+      "placeholders": {
+         "hours": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_pause_notification": {
+      "message": "Pause notifications"
+   },
+   "mb_main_snooze": {
+      "message": "Snooze"
+   },
+   "mb_main_snooze_until": {
+      "message": "Snoozed until $time$",
+      "placeholders": {
+         "time": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_subscription_banner_buy": {
+      "message": "Buy now"
+   },
+   "mb_main_title": {
+      "message": "Video Scams"
+   },
+   "mb_main_trial_end_in_hours_text": {
+      "message": "Trial ends in 24 hours"
+   },
+   "mb_main_trial_end_in_plural_text": {
+      "message": "Trial ends in $days$ days",
+      "placeholders": {
+         "days": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_trial_end_in_single_text": {
+      "message": "Trial ends in $day$ day",
+      "placeholders": {
+         "day": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_main_trial_expired_text": {
+      "message": "Your trial has expired"
+   },
+   "mb_main_what_we_found": {
+      "message": "Here's what we found so far"
+   },
+   "mb_prompt_banner_desc": {
+      "message": "McAfee's video scam protection is now on. $mb_banner_learn_more$",
+      "placeholders": {
+         "mb_banner_learn_more": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_prompt_banner_desc_page": {
+      "message": "Video scam protection is on. $mb_banner_manage_settings$",
+      "placeholders": {
+         "mb_banner_manage_settings": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_sidebar_faq_a1": {
+      "message": "Video scam protection scans for AI-generated audio playing in your browser. \u003Cbr>\u003Cbr> We'll notify you if we detect AI audio in something you're watching. When we do, you can find out which parts of the audio are fake. \u003Cbr>\u003Cbr> Although we scan audio in video content, video scam protection only identifies AI audio and doesn't check for AI-generated videos or images."
+   },
+   "mb_sidebar_faq_a2": {
+      "message": "We need to scan the audio playing in your browser to identify deepfakes. But since video scam protection is loaded directly onto your device, all audio processing and scanning occurs locally. \u003Cbr>\u003Cbr> This means the info scanned does not interact with our servers or the cloud. We do not collect or record your audio in any way, and you can turn off audio detection whenever you want more privacy. \u003Cbr>\u003Cbr> Check out our $mb_sidebar_faq_privacy_notice$ for more info.",
+      "placeholders": {
+         "mb_sidebar_faq_privacy_notice": {
+            "content": "$1"
+         }
+      }
+   },
+   "mb_sidebar_faq_a3": {
+      "message": "A deepfake is an audio clip, video, or image that uses AI to copy a person's voice or appearance — or to generate a fake person from scratch. \u003Cbr>\u003Cbr> For example, a deepfake of a celebrity might show them endorsing a product they've never heard of. Or a deepfake of a political leader might use fake audio to alter a speech they gave. \u003Cbr>\u003Cbr> Because deepfakes are so believable, they make it harder to trust whether what you're watching or listening to online is real. This can make you more vulnerable to scams or misinformation."
+   },
+   "mb_sidebar_faq_a4": {
+      "message": "We use AI technology that's already in your device to run an AI model that analyzes any audio playing in your browser. This model checks if the audio was cloned or faked by AI."
+   },
+   "mb_sidebar_faq_privacy_notice": {
+      "message": "Privacy Notice"
+   },
+   "mb_sidebar_faq_q1": {
+      "message": "What does video scam protection do?"
+   },
+   "mb_sidebar_faq_q2": {
+      "message": "Is my privacy secure?"
+   },
+   "mb_sidebar_faq_q3": {
+      "message": "What is a deepfake and how does it affect me?"
+   },
+   "mb_sidebar_faq_q4": {
+      "message": "How are deepfakes detected?"
+   },
+   "mb_video_banner_AI_audio_title": {
+      "message": "Deepfake detected"
+   },
+   "mb_video_banner_no_AI_audio_title": {
+      "message": "Scanning for deepfakes"
+   },
+   "no_native_toast_button_s1_v1": {
+      "message": "Install WebAdvisor"
+   },
+   "no_native_toast_button_s1_v3": {
+      "message": "Set up WebAdvisor"
+   },
+   "no_native_toast_decline_protection_s1_final": {
+      "message": "Decline protection"
+   },
+   "no_native_toast_desc_highlight_text_s1_v1": {
+      "message": "Install WebAdvisor"
+   },
+   "no_native_toast_desc_highlight_text_s1_v4": {
+      "message": "WebAdvisor"
+   },
+   "no_native_toast_desc_highlight_text_s2_v1": {
+      "message": "WebAdvisorInstaller.exe"
+   },
+   "no_native_toast_desc_text_s1_final": {
+      "message": "WebAdvisor protects against risky downloads and malware. Now's the best time to install (we won't notify you about this again)."
+   },
+   "no_native_toast_desc_text_s1_v1": {
+      "message": "$highlight_txt$ to protect against malware and phishing attempts. Your full (and free) WebAdvisor protection starts when installation is complete.",
+      "placeholders": {
+         "highlight_txt": {
+            "content": "$1"
+         }
+      }
+   },
+   "no_native_toast_desc_text_s1_v2": {
+      "message": "$highlight_txt$ to protect against risky downloads that could infect your PC. Your full (and free) WebAdvisor protection starts when installation is complete.",
+      "placeholders": {
+         "highlight_txt": {
+            "content": "$1"
+         }
+      }
+   },
+   "no_native_toast_desc_text_s1_v3": {
+      "message": "Set up WebAdvisor to protect against malware and block harmful downloads so you can bank, shop, and browse safely."
+   },
+   "no_native_toast_desc_text_s1_v4": {
+      "message": "$highlight_txt$ alerts you when a third party has turned off your firewall. Your full (and free) WebAdvisor protection starts when installation is complete.",
+      "placeholders": {
+         "highlight_txt": {
+            "content": "$1"
+         }
+      }
+   },
+   "no_native_toast_desc_text_s1_v5": {
+      "message": "$highlight_txt$ to get firewall alerts and protect against risky downloads. Your full (and free) WebAdvisor protection starts when installation is complete.",
+      "placeholders": {
+         "highlight_txt": {
+            "content": "$1"
+         }
+      }
+   },
+   "no_native_toast_desc_text_s2_v1": {
+      "message": "Run $highlight_txt$ from the download menu above to complete setup.",
+      "placeholders": {
+         "highlight_txt": {
+            "content": "$1"
+         }
+      }
+   },
+   "no_native_toast_help_link_text_s1_v6": {
+      "message": "What's WebAdvisor?"
+   },
+   "no_native_toast_need_help_btn_s2_v3": {
+      "message": "I need help"
+   },
+   "no_native_toast_product_comm": {
+      "message": "WebAdvisor"
+   },
+   "no_native_toast_title_text_s1_final": {
+      "message": "You haven't set up WebAdvisor"
+   },
+   "no_native_toast_title_text_s1_v1": {
+      "message": "Boost your online safety"
+   },
+   "no_native_toast_title_text_s1_v2": {
+      "message": "Block harmful downloads"
+   },
+   "no_native_toast_title_text_s1_v3": {
+      "message": "Protect your online life"
+   },
+   "no_native_toast_title_text_s1_v4": {
+      "message": "Stay secure online"
+   },
+   "no_native_toast_title_text_s1_v5": {
+      "message": "Unlock full protection"
+   },
+   "no_native_toast_title_text_s2_final": {
+      "message": "Finish installing"
+   },
+   "no_native_toast_title_text_s2_v1": {
+      "message": "You're almost there"
+   },
+   "nps_btns__btn__close": {
+      "message": "Close"
+   },
+   "nps_btns__btn__ratereview": {
+      "message": "Rate and review"
+   },
+   "nps_btns__btn__submit": {
+      "message": "Submit"
+   },
+   "nps_feedback__comment__label": {
+      "message": "Can you tell us why? $option$",
+      "placeholders": {
+         "option": {
+            "content": "$1"
+         }
+      }
+   },
+   "nps_feedback__form__acknowledgment": {
+      "message": "By clicking $button$, you acknowledge that you have read and understand McAfee's $privacyNotice$.",
+      "placeholders": {
+         "button": {
+            "content": "$1"
+         },
+         "privacyNotice": {
+            "content": "$2"
+         }
+      }
+   },
+   "nps_feedback__form__acknowledgment_link": {
+      "message": "Privacy Notice"
+   },
+   "nps_feedback__form__description": {
+      "message": "We'd love to learn more about what you think. We promise that you'll only be contacted about your response."
+   },
+   "nps_feedback__form__email_label": {
+      "message": "Email"
+   },
+   "nps_feedback__form__phone_label": {
+      "message": "Phone number"
+   },
+   "nps_feedback__form__question": {
+      "message": "Can we contact you? $option$",
+      "placeholders": {
+         "option": {
+            "content": "$1"
+         }
+      }
+   },
+   "nps_feedback__optional": {
+      "message": "optional"
+   },
+   "nps_rate_review__message": {
+      "message": "Please share your enthusiasm with a 5-star rating and (optional) review on the Chrome Web Store."
+   },
+   "nps_rating_label_1": {
+      "message": "Not likely at all"
+   },
+   "nps_rating_label_2": {
+      "message": "Not sure"
+   },
+   "nps_rating_label_3": {
+      "message": "Extremely likely"
+   },
+   "nps_subtitle": {
+      "message": "How likely are you to recommend WebAdvisor to your friends and family?"
+   },
+   "nps_thank_you__message_subtitle": {
+      "message": "Your feedback will help us improve WebAdvisor."
+   },
+   "nps_thank_you__message_title": {
+      "message": "Thanks for your help!"
+   },
+   "nps_title": {
+      "message": "Got a minute? We'd love your feedback."
+   },
+   "overlay_accept_ss": {
+      "message": "Now agree to change your search engine to McAfee® Secure Search"
+   },
+   "overlay_add_ss": {
+      "message": "Add McAfee® Secure Search to your browser"
+   },
+   "overlay_form_button": {
+      "message": "Done"
+   },
+   "overlay_form_length_measurement": {
+      "message": "characters"
+   },
+   "overlay_form_question": {
+      "message": "Sorry you didn't find this information helpful. Please tell us what we got wrong so we can categorize this correctly."
+   },
+   "overlay_form_text": {
+      "message": "Enter comments (optional)"
+   },
+   "overlay_ss_description": {
+      "message": "We flag risky sites in your search results, so you know which sites are safe to visit, and which aren't."
+   },
+   "overlay_step_1": {
+      "message": "STEP 1"
+   },
+   "overlay_step_2": {
+      "message": "STEP 2"
+   },
+   "overlay_thank_you_close_button": {
+      "message": "Close"
+   },
+   "overlay_thank_you_message": {
+      "message": "Thank you for your valuable feedback!"
+   },
+   "page_title": {
+      "message": "McAfee Protection Center"
+   },
+   "read_more_about_typosquatting": {
+      "message": "Read more about typosquatting."
+   },
+   "res_PRODUCT_NAME": {
+      "message": "%PRODUCTNAME%"
+   },
+   "res_PRODUCT_NAME_NOT_TRADEMARKED": {
+      "message": "WebAdvisor"
+   },
+   "res_PRODUCT_NAME_TRADEMARKED": {
+      "message": "McAfee® WebAdvisor"
+   },
+   "search_suggest_input": {
+      "message": "Get colour-coded search results"
+   },
+   "settings_about_block_download": {
+      "message": "Block risky downloads"
+   },
+   "settings_about_dfd_whitelist_version": {
+      "message": "Video Scams DAT version: $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_firewall_antivirus": {
+      "message": "Make sure your firewall and anti-virus are on"
+   },
+   "settings_about_flag_website": {
+      "message": "Flag dangerous websites"
+   },
+   "settings_about_help_link_message": {
+      "message": "Get help now"
+   },
+   "settings_about_help_message": {
+      "message": "We all need a hand sometimes."
+   },
+   "settings_about_help_title": {
+      "message": "Get help and technical support"
+   },
+   "settings_about_privacy_link_message": {
+      "message": "Read the Privacy Notice"
+   },
+   "settings_about_privacy_message": {
+      "message": "McAfee takes your privacy seriously."
+   },
+   "settings_about_privacy_title": {
+      "message": "Privacy Notice"
+   },
+   "settings_about_product_affid": {
+      "message": "Affiliate ID: $affid$",
+      "placeholders": {
+         "affid": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_binary_version": {
+      "message": "Binary version: $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_extension_version": {
+      "message": "Extension version: $version$",
+      "placeholders": {
+         "version": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_about_product_title": {
+      "message": "Product version"
+   },
+   "settings_about_share_title": {
+      "message": "Share %PRODUCTNAME% with friends"
+   },
+   "settings_about_subtitle": {
+      "message": "%PRODUCTNAME% helps you make better decisions about what you do online."
+   },
+   "settings_about_title": {
+      "message": "ABOUT"
+   },
+   "settings_page_title": {
+      "message": "%PRODUCTNAME%"
+   },
+   "settings_preference_annotation_all": {
+      "message": "Tell me if a search result is safe in any search engine."
+   },
+   "settings_preference_annotation_none": {
+      "message": "Don't tell me about search results."
+   },
+   "settings_preference_annotation_ss": {
+      "message": "Tell me if a search result is safe only in Secure Search."
+   },
+   "settings_preference_annotation_ss_with_tip": {
+      "message": "Tell me if a search result is safe with Secure Search (Tip: access Secure Search by searching in your address bar)."
+   },
+   "settings_preference_annotation_subtitle": {
+      "message": "We'll color-code your search results to show you which sites are safe."
+   },
+   "settings_preference_annotation_title": {
+      "message": "Secure Search"
+   },
+   "settings_preference_aps_toggle_label_message": {
+      "message": "Browse confidently with reassuring alerts that certain financial, shopping, and other sites are legitimate and not dangerous."
+   },
+   "settings_preference_aps_toggle_label_title": {
+      "message": "Advance protection signals"
+   },
+   "settings_preference_aps_toggle_subtitle": {
+      "message": "Having this setting turned on will help us keep you safer."
+   },
+   "settings_preference_aps_toggle_title": {
+      "message": "Advance Protection Signal"
+   },
+   "settings_preference_ffpolicy_activity_message": {
+      "message": "We'll use this info to understand which WebAdvisor features are most helpful to you. "
+   },
+   "settings_preference_ffpolicy_activity_title": {
+      "message": "Activity data collection"
+   },
+   "settings_preference_ffpolicy_permissions__title": {
+      "message": "Extension Permissions"
+   },
+   "settings_preference_ffpolicy_permissions_message": {
+      "message": "We need to read and change data on sites you visit so we can identify and notify you of security risks. This setting is required for us to protect you while browsing the web."
+   },
+   "settings_preference_ffpolicy_permissions_on": {
+      "message": "ON"
+   },
+   "settings_preference_ffpolicy_permissions_toggle__title": {
+      "message": "Extension permissions (Required)"
+   },
+   "settings_preference_ffpolicy_personal_message_intro": {
+      "message": "We send our experts the web addresses of sites you browse to check for their security status. Rest assured, we never sell your info. Can we collect the following data that personally identifies you:"
+   },
+   "settings_preference_ffpolicy_personal_message_outro": {
+      "message": "If you choose not to allow us to collect your personal data, McAfee® WebAdvisor will not be able to provide any of its security features and you will need to uninstall it."
+   },
+   "settings_preference_ffpolicy_personal_message_outro_line_2": {
+      "message": "Full details about the personal data we collect and what we do with it are provided in $link$",
+      "placeholders": {
+         "link": {
+            "content": "$1"
+         }
+      }
+   },
+   "settings_preference_ffpolicy_personal_message_point_1": {
+      "message": "The web addresses (URL) of the sites you visit, which we collect to check their security status and provide you with up-to-date security."
+   },
+   "settings_preference_ffpolicy_personal_message_point_2": {
+      "message": "The web addresses (URL) of the sites listed in your Search engine results, which we collect to check their security status and provide you with security annotations."
+   },
+   "settings_preference_ffpolicy_personal_message_point_3": {
+      "message": "Your current browser version, which we collect to diagnose possible issues with McAfee® WebAdvisor's security service."
+   },
+   "settings_preference_ffpolicy_personal_message_point_4": {
+      "message": "The version of McAfee® WebAdvisor you're using, which we collect to diagnose possible issues with its security service."
+   },
+   "settings_preference_ffpolicy_personal_title": {
+      "message": "Personal data collection"
+   },
+   "settings_preference_ffpolicy_personal_title_required": {
+      "message": "(Required)"
+   },
+   "settings_preference_ffpolicy_privacy_policy_link": {
+      "message": "our Privacy Policy"
+   },
+   "settings_preference_ffpolicy_subtitle": {
+      "message": "Having both of these settings turned on will help us keep you safe and provide a useful experience."
+   },
+   "settings_preference_ffpolicy_title": {
+      "message": "Data permissions"
+   },
+   "settings_preference_reset_button": {
+      "message": "Reset"
+   },
+   "settings_preference_reset_subtitle": {
+      "message": "Did you ignore a %PRODUCTNAME% notification and wish you didn't? Reset notifications to start getting every type of %PRODUCTNAME% message again."
+   },
+   "settings_preference_reset_title": {
+      "message": "Reset Settings"
+   },
+   "settings_preference_sma_facebook": {
+      "message": "Facebook"
+   },
+   "settings_preference_sma_facebook_label": {
+      "message": "Facebook"
+   },
+   "settings_preference_sma_instagram": {
+      "message": "Instagram"
+   },
+   "settings_preference_sma_instagram_label": {
+      "message": "Instagram"
+   },
+   "settings_preference_sma_linkedin": {
+      "message": "Linkedin"
+   },
+   "settings_preference_sma_linkedin_label": {
+      "message": "Linkedin"
+   },
+   "settings_preference_sma_message": {
+      "message": "These are the sites we'll annotate."
+   },
+   "settings_preference_sma_reddit": {
+      "message": "Reddit"
+   },
+   "settings_preference_sma_reddit_label": {
+      "message": "Reddit"
+   },
+   "settings_preference_sma_subtitle": {
+      "message": "We'll color-code links in your social media feeds to show you which ones are safe."
+   },
+   "settings_preference_sma_title": {
+      "message": "Social Media Protection"
+   },
+   "settings_preference_sma_twitter": {
+      "message": "X"
+   },
+   "settings_preference_sma_twitter_label": {
+      "message": "X"
+   },
+   "settings_preference_sma_youtube": {
+      "message": "Youtube"
+   },
+   "settings_preference_sma_youtube_label": {
+      "message": "Youtube"
+   },
+   "settings_preference_title": {
+      "message": "ADDITIONAL SERVICES"
+   },
+   "settings_statistics_ads_blocked": {
+      "message": "intrusive ads blocked"
+   },
+   "settings_statistics_downloads_blocked": {
+      "message": "unsafe downloads blocked"
+   },
+   "settings_statistics_downloads_scanned": {
+      "message": "downloads scanned"
+   },
+   "settings_statistics_links_scanned": {
+      "message": "links scanned"
+   },
+   "settings_statistics_message": {
+      "message": "Here's what we've done so far:"
+   },
+   "settings_statistics_pages_blocked": {
+      "message": "dangerous pages blocked"
+   },
+   "settings_statistics_pages_scanned": {
+      "message": "pages scanned"
+   },
+   "settings_statistics_subtitle": {
+      "message": "We're here to keep you safe online."
+   },
+   "settings_statistics_title": {
+      "message": "STATISTICS"
+   },
+   "settings_statistics_trackers_blocked": {
+      "message": "trackers blocked"
+   },
+   "settings_subtitle": {
+      "message": "Customize your web protection."
+   },
+   "settings_tab_about": {
+      "message": "About"
+   },
+   "settings_tab_preference": {
+      "message": "Preferences"
+   },
+   "settings_tab_statistics": {
+      "message": "Statistics"
+   },
+   "settings_tab_whitelist": {
+      "message": "Trusted sites"
+   },
+   "settings_title": {
+      "message": "Web Protection"
+   },
+   "settings_whitelist_input": {
+      "message": "Type in a web address..."
+   },
+   "settings_whitelist_title": {
+      "message": "SITES YOU TRUST"
+   },
+   "sidebar_dangerous_blocked": {
+      "message": "dangerous pages blocked"
+   },
+   "sidebar_deepfake_found": {
+      "message": "deepfake found"
+   },
+   "sidebar_deepfakes_found": {
+      "message": "deepfakes found"
+   },
+   "sidebar_get_help": {
+      "message": "Get help"
+   },
+   "sidebar_pages_scanned": {
+      "message": "pages scanned"
+   },
+   "sidebar_privacy_terms": {
+      "message": "Privacy & Terms"
+   },
+   "sidebar_rat_detection_got_it_btn_text": {
+      "message": "Got it"
+   },
+   "sidebar_rat_detection_information_I": {
+      "message": "Software from this site gives other people access to your device. Hackers or scammers might use it to secretly gain access to your personal data."
+   },
+   "sidebar_rat_detection_information_II": {
+      "message": "Only download software or give out your info if it's someone you trust."
+   },
+   "sidebar_rat_detection_title": {
+      "message": "This site allows others to control your device"
+   },
+   "sidebar_rat_detection_whitelist_btn": {
+      "message": "Don't warn me on this site again"
+   },
+   "sidebar_subtitle": {
+      "message": "Here's what we've done so far:"
+   },
+   "sidebar_title": {
+      "message": "We're helping keep you safe online"
+   },
+   "sidebar_unsafe_blocked": {
+      "message": "unsafe items blocked"
+   },
+   "sidebar_version": {
+      "message": "Version"
+   },
+   "sidebar_view_site_report": {
+      "message": "View site report"
+   },
+   "site_status_block_page_accept_risk": {
+      "message": "Visit anyway"
+   },
+   "site_status_block_page_go_back": {
+      "message": "Go back"
+   },
+   "site_status_body_text_danger": {
+      "message": "This site contains potentially dangerous content that could harm your computer. We blocked it so you can continue browsing with confidence."
+   },
+   "site_status_body_text_site_report_danger": {
+      "message": "We regularly scan websites for dangerous or risky activity, and this site might contain content that could harm your computer."
+   },
+   "site_status_body_text_site_report_safe": {
+      "message": "We combed through this website and everything looks good to us. You're safe!"
+   },
+   "site_status_body_text_site_report_unknown": {
+      "message": "Looks like we haven't scanned this site yet. We'll update the safety rating next time we do a scan."
+   },
+   "site_status_body_text_site_report_warning": {
+      "message": "We regularly scan websites for dangerous or risky activity, and this site looks a little suspicious to us."
+   },
+   "site_status_body_text_typosquatting": {
+      "message": "When you mistype a web address, you can end up at sites you didn't mean to visit. These sites might bombard you with malware, request your personal info, and more. We're here to make sure you avoid these sites."
+   },
+   "site_status_body_text_warning": {
+      "message": "This site looks a little risky to us, so we flagged it just in case. Make sure you trust this site if you choose to proceed. Better safe than sorry!"
+   },
+   "site_status_feedback_question": {
+      "message": "Did you find this information useful?"
+   },
+   "site_status_footer_note": {
+      "message": "Choosing to visit this site will add the blocked URL to your list of trusted sites."
+   },
+   "site_status_header_text": {
+      "message": "Website status:"
+   },
+   "site_status_search_input": {
+      "message": "Get your color-coded search results"
+   },
+   "site_status_state_danger": {
+      "message": "Risky"
+   },
+   "site_status_state_safe": {
+      "message": "Safe"
+   },
+   "site_status_state_typosquatting": {
+      "message": "Typosquatting"
+   },
+   "site_status_state_unknown": {
+      "message": "Unknown"
+   },
+   "site_status_state_warning": {
+      "message": "Suspicious"
+   },
+   "site_status_submit_ticket_text": {
+      "message": "Think this site is actually safe? $submitTicketLink$.",
+      "placeholders": {
+         "submitTicketLink": {
+            "content": "$1"
+         }
+      }
+   },
+   "site_status_submit_ticket_text_link": {
+      "message": "Submit a ticket"
+   },
+   "site_status_title": {
+      "message": "%PRODUCTNAME% - Website Safety Ratings"
+   },
+   "site_status_typosquatting_go_back": {
+      "message": "Go back"
+   },
+   "site_status_typosquatting_suggest_url_text": {
+      "message": "Did you mean $suggestUrl$?",
+      "placeholders": {
+         "suggestUrl": {
+            "content": "$1"
+         }
+      }
+   },
+   "site_status_typosquatting_take_me_there": {
+      "message": "Take me there"
+   },
+   "site_status_typosquatting_visit_anyway": {
+      "message": "Visit anyway"
+   },
+   "wb_container__right__cancel": {
+      "message": "No, thanks"
+   },
+   "wb_container__right__content": {
+      "message": "Browse faster with $ph1$. We'll stop videos from auto-playing and slowing down your browsing.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   },
+   "wb_container__right__content_second": {
+      "message": "$ph1$ stops videos from auto-playing and slowing down your browsing. If you're not interested in Web Boost, we won't ask again.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   },
+   "wb_container__right__eula": {
+      "message": "By clicking $ph1$, you agree to our $ph2$ and $ph3$.",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         },
+         "ph2": {
+            "content": "$2"
+         },
+         "ph3": {
+            "content": "$3"
+         }
+      }
+   },
+   "wb_container__right__eula_licence_agreement": {
+      "message": "License Agreement"
+   },
+   "wb_container__right__eula_privacy_notice": {
+      "message": "Privacy Notice"
+   },
+   "wb_container__right__submit": {
+      "message": "Get Web Boost"
+   },
+   "wb_container__right__title": {
+      "message": "Annoying auto-playing videos slowing you down?"
+   },
+   "wb_container__right__title_second": {
+      "message": "Checking one last time--want to stop auto-playing videos?"
+   },
+   "wb_name_title": {
+      "message": "McAfee&reg; Web Boost"
+   },
+   "wb_top__body__action_message": {
+      "message": "Speed up browsing"
+   },
+   "wb_top_banner_left_text": {
+      "message": "Get $ph1$",
+      "placeholders": {
+         "ph1": {
+            "content": "$1"
+         }
+      }
+   }
+}

@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react'
-import { X, Camera } from 'lucide-react'
-import { useShowStore } from '../store/useShowStore'
+import { X } from 'lucide-react'
+import { useSequencerStore } from '../store/useSequencerStore'
 import { networkService } from '../services/network-service'
 
 import { cn } from '../lib/utils'
 
 const CameraStreamer: React.FC = () => {
-    const { isCameraActive, setCameraActive, updateCameraFrame, isSelfPreviewVisible } = useShowStore()
+    const { isCameraActive, setCameraActive, updateCameraFrame, isSelfPreviewVisible } = useSequencerStore()
     const videoRef = useRef<HTMLVideoElement>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const streamRef = useRef<MediaStream | null>(null)
@@ -70,7 +70,7 @@ const CameraStreamer: React.FC = () => {
                     const clientId = networkService.getSocketId()
 
                     if (clientId) {
-                        const { clientUUID } = useShowStore.getState()
+                        const { clientUUID } = useSequencerStore.getState()
                         networkService.sendCommand({ type: 'CAMERA_FRAME', clientId, clientUUID, frame })
                         updateCameraFrame(clientId, frame)
                     }
@@ -107,7 +107,7 @@ const CameraStreamer: React.FC = () => {
                     />
 
                     <button
-                        onClick={() => useShowStore.getState().setSelfPreviewVisible(false)}
+                        onClick={() => useSequencerStore.getState().setSelfPreviewVisible(false)}
                         className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-red-500/20 text-red-500 rounded-full border border-white/10 opacity-0 group-hover/camera:opacity-100 transition-all"
                         title="Preview verbergen"
                     >

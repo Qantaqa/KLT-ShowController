@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import {
   Menu,
   Activity,
@@ -27,13 +27,16 @@ import {
   Maximize,
   Minimize,
   Layers,
-  Download
+  Download,
+  Radar,
+  Hash
 } from 'lucide-react'
-import { useShowStore } from './store/useShowStore'
+import { useSequencerStore } from './store/useSequencerStore'
 import SequenceGrid from './components/SequenceGrid'
 import ProjectSettings from './components/ProjectSettings'
 import PdfViewer from './components/PdfViewer'
 import AppSettings from './components/AppSettings'
+import { useRemoteKeyboard } from './hooks/useRemoteKeyboard'
 import { DatabaseManager } from './components/DatabaseManager'
 import SimpleModal from './components/SimpleModal'
 import CameraStreamer from './components/CameraStreamer'
@@ -89,7 +92,7 @@ export default function App() {
     lastTransitionTime,
     autoFollowScript,
     toggleAutoFollowScript,
-    setCurrentScriptPage,
+    setEventPage,
     connectedClients,
     isCameraActive,
     setCameraActive,
@@ -116,9 +119,12 @@ export default function App() {
     completeRegistration,
     verifyClientPin,
     setAppLocked
-  } = useShowStore()
+  } = useSequencerStore()
 
   const isHost = !!(window as any).require
+
+  // Start keyboard shortcut listener (remote keyboard)
+  useRemoteKeyboard()
 
   const handleImportShow = useCallback(async () => {
     if (!isHost) return
@@ -158,7 +164,7 @@ export default function App() {
         message: `Voer de naam in voor de nieuwe show gebaseerd op script:\n${scriptPath.split(/[\\/]/).pop()}`,
         type: 'prompt',
         defaultValue: scriptPath.split(/[\\/]/).pop()?.replace('.pdf', '') || 'Mijn LedShow',
-        onConfirm: (name) => {
+        onConfirm: (name: string) => {
           if (name) createNewShow(name, scriptPath);
         }
       })
@@ -204,6 +210,109 @@ export default function App() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [hasInitialSync, setHasInitialSync] = useState(false)
   const [isWebcamExpanded, setIsWebcamExpanded] = useState(true)
+  const [displays, setDisplays] = useState<any[]>([])
+  const [pinInput, setPinInput] = useState('')
+  const [setupWizardStep, setSetupWizardStep] = useState<number | null>(null)
+  const [foundAgent, setFoundAgent] = useState<any>(null)
+  const [isWizardScanning, setIsWizardScanning] = useState(false)
+
+  // Clear PIN input when switching between auth screens
+  useEffect(() => {
+    setPinInput('')
+  }, [registrationStatus, appLocked])
+
+  // Fetch displays for status sidebar
+  useEffect(() => {
+    if (isHost) {
+      const { ipcRenderer } = (window as any).require('electron')
+      ipcRenderer.invoke('get-displays').then(setDisplays)
+
+      // Periodically refresh displays
+      const interval = setInterval(() => {
+        ipcRenderer.invoke('get-displays').then(setDisplays)
+      }, 10000)
+      return () => clearInterval(interval)
+    }
+  }, [isHost])
+
+  const isScanning = useRef<boolean>(false);
+
+  // Auto-discovery for Wizard (uses fast UDP-only scan, ~2.5s per cycle)
+  useEffect(() => {
+    let interval: any;
+    if (isWizardScanning && isHost) {
+      const { ipcRenderer } = (window as any).require('electron')
+
+      const checkNewAgents = async () => {
+        if (isScanning.current) return;
+        isScanning.current = true;
+
+        try {
+          // Use fast UDP-only scan instead of full network sweep
+          const agents = await ipcRenderer.invoke('scan-agents-only')
+          console.log(`[Wizard] Fast scan complete. Found ${agents.length} agent(s).`, agents)
+
+          if (agents.length > 0) {
+            const agent = agents[0]; // Take the first found agent
+            const currentDevices = useSequencerStore.getState().appSettings.devices || []
+
+            // Check if this agent is already in our device list (only check other videowall_agents)
+            const matchedDevice = currentDevices.find((d: any) =>
+              d.type === 'videowall_agent' && (
+                d.ip === agent.ip || (d.mac && agent.mac && agent.mac !== 'unknown' && d.mac === agent.mac)
+              )
+            )
+            const alreadyExists = !!matchedDevice;
+            console.log(`[Wizard] Agent IP: ${agent.ip}, MAC: ${agent.mac}. Already exists: ${alreadyExists}`, matchedDevice || 'no match');
+
+            if (!alreadyExists) {
+              // Auto-add to device settings
+              const deviceId = `VideoWall_${agent.mac && agent.mac !== 'unknown' ? agent.mac.replace(/:/g, '') : agent.ip.replace(/\./g, '_')}`;
+              console.log(`[Wizard] Will add device with id: ${deviceId}`);
+
+              try {
+                const { addDevice } = useSequencerStore.getState();
+                await addDevice({
+                  id: deviceId,
+                  name: agent.name || 'VideoWall Agent',
+                  type: 'videowall_agent',
+                  enabled: true,
+                  mac: agent.mac || 'unknown',
+                  ip: agent.ip,
+                  port: agent.details?.port || 3003,
+                  model: agent.details?.model || '4-screen',
+                  layout: agent.details?.layout || '2x2',
+                  orientation: agent.details?.orientation || 'landscape',
+                } as any);
+                console.log(`[Wizard] addDevice completed successfully.`);
+                addToast(`Agent ${agent.name} toegevoegd aan apparaten!`, 'info')
+              } catch (addErr) {
+                console.error('[Wizard] addDevice FAILED:', addErr);
+                addToast(`Fout bij toevoegen agent: ${addErr}`, 'error')
+              }
+            } else {
+              console.log('[Wizard] Agent already in settings, proceeding anyway.');
+              addToast(`Agent herkend op ${agent.ip}`, 'info')
+            }
+
+            // Always proceed to Step 3
+            setFoundAgent(agent)
+            setSetupWizardStep(3)
+            setIsWizardScanning(false)
+          }
+        } catch (e) {
+          console.error('Wizard scan failed:', e)
+        } finally {
+          isScanning.current = false;
+        }
+      }
+
+      checkNewAgents()
+      // Poll every 4 seconds (scan itself takes ~2.5s, leaves 1.5s gap)
+      interval = setInterval(checkNewAgents, 4000)
+    }
+    return () => { if (interval) clearInterval(interval) }
+  }, [isWizardScanning, isHost, addToast])
 
   // Set initial sync to true if we are the host
   useEffect(() => {
@@ -230,7 +339,7 @@ export default function App() {
   useEffect(() => {
     if (!isHost) {
       const checkSync = () => {
-        const state = useShowStore.getState();
+        const state = useSequencerStore.getState();
         if (state.isSynced) {
           setHasInitialSync(true);
         }
@@ -354,10 +463,11 @@ export default function App() {
     if (activeEventIndex !== -1 && autoFollowScript && isLocked) {
       const activeEvent = events[activeEventIndex]
       if (activeEvent && activeEvent.scriptPg) {
-        setCurrentScriptPage(activeEvent.scriptPg)
+        // setEventPage updates local view AND broadcasts EVENT_PAGE to remote clients
+        setEventPage(activeEvent.scriptPg)
       }
     }
-  }, [activeEventIndex, events, autoFollowScript, isLocked, setCurrentScriptPage])
+  }, [activeEventIndex, events, autoFollowScript, isLocked, setEventPage])
 
   // Sync back to extension when page changes locally
   useEffect(() => {
@@ -371,7 +481,7 @@ export default function App() {
   // Broadcast full state when show or index changes (for remote notebooks)
   useEffect(() => {
     if ((window as any).require && activeShow) { // Only the Host (Electron) should broadcast the source of truth
-      useShowStore.getState().broadcastState()
+      useSequencerStore.getState().broadcastState()
     }
   }, [activeShow?.id, activeEventIndex])
 
@@ -418,7 +528,7 @@ export default function App() {
         const ip = await ipcRenderer.invoke('get-ip-address')
         setServerIp(ip)
         // Store the IP in appSettings so broadcastState can use it for logo URL rewriting
-        useShowStore.getState().updateAppSettings({ serverIp: ip })
+        useSequencerStore.getState().updateAppSettings({ serverIp: ip })
       } catch (e) {
         console.error('IP Check failed', e)
       }
@@ -451,7 +561,7 @@ export default function App() {
     }
   }
 
-  console.log('--- App.tsx: Render check ---', { isAuthorized, hasInitialSync, isHost })
+
 
   if (isAuthorized && !hasInitialSync) {
     return (
@@ -604,7 +714,7 @@ export default function App() {
                               message: 'Voer de naam in voor de nieuwe show:',
                               type: 'prompt',
                               defaultValue: 'Mijn LedShow',
-                              onConfirm: (name) => {
+                              onConfirm: (name: string) => {
                                 if (name) createNewShow(name);
                               }
                             });
@@ -691,17 +801,7 @@ export default function App() {
                           </div>
 
                           <button onClick={() => {
-                            const port = appSettings.serverPort || 3001;
-                            const filePort = port + 1;
-                            const setupUrl = `http://${serverIp}:${filePort}/setup`;
-
-                            openModal({
-                              title: 'VideoWall agent installatie',
-                              message: `Gebruik de setup portal om nieuwe VideoWall Agents te installeren en configureren.\n\nOpen op de externe computer een browser en ga naar:\n\n${setupUrl}\n\nZorg dat de computer verbonden is met hetzelfde netwerk als deze host.`,
-                              type: 'confirm',
-                              confirmLabel: 'Sluiten',
-                              onConfirm: () => { }
-                            });
+                            setSetupWizardStep(1);
                             setIsMenuOpen(false);
                           }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white border-t border-white/5" title="Configureer externe VideoWall Agents">
                             <Monitor className="w-3.5 h-3.5 text-purple-500" /> VideoWall agent setup
@@ -747,9 +847,9 @@ export default function App() {
                   message: 'Er is nog geen pincode ingesteld voor dit systeem. Voer een pincode in om de LedShow te kunnen vergrendelen:',
                   type: 'prompt',
                   confirmLabel: 'Opslaan & Vergrendelen',
-                  onConfirm: (pin) => {
+                  onConfirm: (pin: string) => {
                     if (pin && pin.trim()) {
-                      useShowStore.getState().updateAppSettings({ accessPin: pin.trim() });
+                      useSequencerStore.getState().updateAppSettings({ accessPin: pin.trim() });
                       setAppLocked(true);
                       addToast('Pincode opgeslagen en systeem vergrendeld', 'info');
                     } else {
@@ -847,10 +947,10 @@ export default function App() {
                       message: 'Voer de naam in voor de nieuwe show:',
                       type: 'prompt',
                       defaultValue: 'Mijn LedShow',
-                      onConfirm: (name) => {
-                        if (name) createNewShow(name)
+                      onConfirm: (name: string) => {
+                        if (name) createNewShow(name);
                       }
-                    })
+                    });
                   }}
                   className="w-full py-3 bg-primary text-black font-black uppercase tracking-[0.2em] rounded-xl hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] flex items-center justify-center gap-3"
                 >
@@ -860,6 +960,7 @@ export default function App() {
             </div>
           </div>
         )}
+
         <div className="flex-1 flex overflow-hidden">
           {/* Main Content Area */}
           <section className="flex-1 flex flex-col border-r border-white/5 min-w-[400px] relative">
@@ -878,13 +979,32 @@ export default function App() {
               <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-2">Sequence</span>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <button onClick={() => useShowStore.getState().expandAll()} className="h-7 px-2 rounded-lg glass border-white/10 flex items-center gap-1.5 hover:bg-white/10 transition-all text-[9px] font-bold uppercase tracking-wider group" title="Alles open">
-                    <ChevronRight className="w-3 h-3 opacity-40 group-hover:opacity-100" />
+                  <button
+                    onClick={() => useSequencerStore.getState().expandAll()}
+                    className="h-8 px-3 rounded-xl bg-black border border-white/20 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white group"
+                    title="Alles uitklappen"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
                     <span>Open</span>
                   </button>
-                  <button onClick={() => useShowStore.getState().collapseAll()} className="h-7 px-2 rounded-lg glass border-white/10 flex items-center gap-1.5 hover:bg-white/10 transition-all text-[9px] font-bold uppercase tracking-wider group" title="Alles dicht">
-                    <ChevronDown className="w-3 h-3 opacity-40 group-hover:opacity-100 rotate-[-90deg]" />
+                  <button
+                    onClick={() => useSequencerStore.getState().collapseAll()}
+                    className="h-8 px-3 rounded-xl bg-black border border-white/20 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white group"
+                    title="Alles inklappen"
+                  >
+                    <ChevronDown className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform rotate-[-90deg]" />
                     <span>Dicht</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      useSequencerStore.getState().reindexEvents();
+                      useSequencerStore.getState().addToast('Sequence succesvol hernummerd', 'info');
+                    }}
+                    className="h-8 px-3 rounded-xl bg-black border border-white/20 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white group"
+                    title="Acts, Scenes en Events hernummeren"
+                  >
+                    <Hash className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+                    <span>Hernummeren</span>
                   </button>
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-mono opacity-40 border-l border-white/5 pl-4">
@@ -908,12 +1028,7 @@ export default function App() {
             <div className="absolute inset-y-0 -left-2 -right-2" />
           </div>
 
-          {/* Right: PDF Viewer (Resizable) */}
-          <section
-            // eslint-disable-next-line react/no-unknown-property
-            style={{ '--sidebar-width': `${activeShow?.sidebarWidth || 600}px` } as React.CSSProperties}
-            className="sidebar-resizable flex flex-col bg-black/40 shrink-0"
-          >
+          <section className="sidebar-resizable flex flex-col bg-black/40 shrink-0">
             <div className="flex flex-col flex-1">
               {/* Camera Viewing Boxes */}
               {selectedCameraClients.length > 0 && (
@@ -957,7 +1072,7 @@ export default function App() {
                           {uuid && (
                             <button
                               onClick={() => {
-                                useShowStore.getState().clearCameraStream(uuid)
+                                useSequencerStore.getState().clearCameraStream(uuid)
                                 toggleCameraSelection(uuid)
                               }}
                               className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/20 text-red-500"
@@ -1012,7 +1127,7 @@ export default function App() {
                   { id: 'wled', label: 'WLED', color: 'text-green-500/60' },
                   { id: 'wiz', label: 'WIZ', color: 'text-green-500/60' },
                   { id: 'local_monitor', label: 'LOCAL', color: 'text-blue-400/60' },
-                  { id: 'remote_ledwall', label: 'WALL', color: 'text-blue-400/60' }
+                  { id: 'remote_VideoWall', label: 'WALL', color: 'text-blue-400/60' }
                 ].map(group => {
                   const devices = appSettings.devices?.filter(d => d.enabled && d.type === group.id) || []
                   if (devices.length === 0) return null
@@ -1024,11 +1139,20 @@ export default function App() {
                       </span>
                       <div className="flex flex-col items-center gap-2">
                         {devices.map(device => {
-                          const status = deviceAvailability[device.id]?.status || 'offline'
-                          const colorClass = status === 'online' ? "bg-green-500 shadow-[0_0_5px_#22c55e]" : "bg-red-500 animate-pulse"
+                          const availability = deviceAvailability[device.id]?.status || 'offline'
+                          let isOnline = availability === 'online'
+
+                          // Local override for Host: if it's a local monitor, double check against displays
+                          if (isHost && device.type === 'local_monitor') {
+                            const monitorId = (device as any).monitorId;
+                            const hasDisplay = displays.some(d => d.index === monitorId);
+                            if (!hasDisplay) isOnline = false;
+                          }
+
+                          const colorClass = isOnline ? "bg-green-500 shadow-[0_0_5px_#22c55e]" : "bg-red-500 animate-pulse"
                           return (
-                            <div key={device.id} className="flex flex-col items-center gap-1" title={`${device.name}: ${status}`}>
-                              <span className="text-[5px] font-black opacity-20 uppercase tracking-tighter leading-none">
+                            <div key={device.id} className="flex flex-col items-center gap-1" title={`${device.name}: ${isOnline ? 'On-air' : 'OFFLINE'}`}>
+                              <span className={cn("text-[5px] font-black uppercase tracking-tighter leading-none transition-colors", isOnline ? "opacity-20" : "text-red-500 opacity-100")}>
                                 {device.name.substring(0, 3)}
                               </span>
                               <div className={cn("w-1.5 h-1.5 rounded-full transition-all", colorClass)} />
@@ -1132,20 +1256,39 @@ export default function App() {
                   <Cpu className="w-3 h-3" /> Media Servers
                 </div>
                 <div className="grid grid-cols-1 gap-1.5 px-1">
-                  {appSettings.devices?.filter(d => d.type === 'local_monitor' || d.type === 'remote_ledwall').map(device => {
-                    const status = deviceAvailability[device.id]?.status || 'offline'
-                    const isOnline = status === 'online'
+                  {appSettings.devices?.filter(d => d.type === 'local_monitor' || d.type === 'remote_VideoWall').map(device => {
+                    const availability = deviceAvailability[device.id]?.status || 'offline'
+                    let isOnline = availability === 'online'
+
+                    let subtext = device.type as string;
+                    if (device.type === 'local_monitor') {
+                      const monitorId = (device as any).monitorId;
+                      const disp = displays.find(d => d.index === monitorId);
+
+                      // Force offline if display is missing on host
+                      if (isHost && !disp) isOnline = false;
+
+                      if (disp) {
+                        subtext = `${disp.isPrimary ? 'Hoofdscherm ' : ''}${disp.bounds.width}x${disp.bounds.height}`;
+                      } else {
+                        subtext = `Monitor ${monitorId + 1} (Niet gevonden)`;
+                      }
+                    }
+
                     return (
-                      <div key={device.id} className="flex items-center justify-between text-[10px] p-2 rounded-lg bg-white/5 border border-white/5 font-mono transition-all hover:bg-white/10">
-                        <span className={cn("truncate max-w-[120px]", isOnline ? "opacity-80" : "text-red-400 font-bold")}>{device.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[8px] opacity-40">{device.type}</span>
-                          <div className={cn("w-1.5 h-1.5 rounded-full", isOnline ? "bg-green-500 shadow-[0_0_8px_#22c55e]" : "bg-red-500")} />
+                      <div key={device.id} className="flex items-center justify-between text-[10px] p-2 rounded-lg bg-white/5 border border-white/5 font-mono transition-all hover:bg-white/10" title={device.name}>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className={cn("truncate transition-colors", isOnline ? "opacity-80 text-white" : "text-red-500 font-bold")}>{device.name}</span>
+                          <span className={cn("text-[7px] truncate transition-colors", isOnline ? "opacity-30" : "text-red-400 font-black italic uppercase")}>{subtext}</span>
+                        </div>
+                        <div className="flex items-center gap-2 ml-2">
+                          {device.type === 'local_monitor' ? <Monitor className={cn("w-2.5 h-2.5 transition-opacity", isOnline ? "opacity-40" : "opacity-100 text-red-500")} /> : <Layers className="w-2.5 h-2.5 opacity-40" />}
+                          <div className={cn("w-2 h-2 rounded-full transition-all", isOnline ? "bg-green-500 shadow-[0_0_8px_#22c55e]" : "bg-red-500 animate-pulse")} />
                         </div>
                       </div>
                     )
                   })}
-                  {(!appSettings.devices || appSettings.devices.filter(d => d.type === 'local_monitor' || d.type === 'remote_ledwall').length === 0) && (
+                  {(!appSettings.devices || appSettings.devices.filter(d => d.type === 'local_monitor' || d.type === 'remote_VideoWall').length === 0) && (
                     <div className="text-[10px] opacity-20 italic px-2 font-mono">Geen media devices</div>
                   )}
                 </div>
@@ -1222,7 +1365,7 @@ export default function App() {
                   <div className="grid grid-cols-1 gap-1.5">
                     {/* Show Host First (usually index 0) */}
                     {connectedClients.length > 0 && (() => {
-                      const { clientUUID: myUUID } = useShowStore.getState()
+                      const { clientUUID: myUUID } = useSequencerStore.getState()
                       return connectedClients.map((clientObj, idx) => {
                         const { id: clientId, uuid: clientUUID } = clientObj
                         const isSelf = clientUUID === myUUID
@@ -1275,7 +1418,7 @@ export default function App() {
                           const label = client?.friendlyName || (uuid.slice(0, 8))
                           return (
                             <div key={uuid} className="relative rounded-lg overflow-hidden border border-white/10 bg-black group/cam">
-                              <img src={frame} className="w-full object-cover" alt={label} style={{ aspectRatio: '4/3' }} />
+                              <img src={frame} className="camera-preview-img" alt={label} />
                               <div className="absolute top-1 left-1 bg-black/70 px-1.5 py-0.5 rounded text-[7px] font-black uppercase tracking-widest text-white/70 flex items-center gap-1">
                                 <div className="w-1 h-1 rounded-full bg-green-400 animate-pulse" />
                                 {label}
@@ -1283,7 +1426,7 @@ export default function App() {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  useShowStore.getState().clearCameraStream(uuid)
+                                  useSequencerStore.getState().clearCameraStream(uuid)
                                   if (selectedCameraClients.includes(uuid)) {
                                     toggleCameraSelection(uuid)
                                   }
@@ -1516,250 +1659,408 @@ export default function App() {
       />
 
       {/* Registration Overlay */}
-      {!isAuthorized && registrationStatus && registrationStatus !== 'AUTHORIZED' && (
-        <div className="fixed inset-0 z-[10000] bg-[#050505] flex flex-col items-center justify-center p-8 animate-in fade-in duration-500">
-          <div className="glass border border-white/10 p-10 rounded-[2.5rem] w-full max-w-md flex flex-col items-center gap-10 shadow-2xl relative overflow-hidden group">
-            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+      {
+        !isAuthorized && registrationStatus && registrationStatus !== 'AUTHORIZED' && (
+          <div className="fixed inset-0 z-[10000] bg-[#050505] flex flex-col items-center justify-center p-8 animate-in fade-in duration-500">
+            <div className="glass border border-white/10 p-10 rounded-[2.5rem] w-full max-w-md flex flex-col items-center gap-10 shadow-2xl relative overflow-hidden group">
+              <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
 
-            <div className="relative">
-              <div className="w-20 h-20 rounded-3xl bg-primary/20 flex items-center justify-center text-primary animate-pulse">
-                <Fingerprint className="w-10 h-10" />
-              </div>
-              <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-black border-4 border-[#050505]">
-                <ShieldAlert className="w-4 h-4" />
-              </div>
-            </div>
-
-            <div className="text-center space-y-3 relative z-10">
-              <h2 className="text-3xl font-black uppercase tracking-tighter">Connecting to Hub</h2>
-              <p className="text-sm text-white/40 font-medium">Beveiligde verbinding vereist autorisatie</p>
-            </div>
-
-            <div className="w-full space-y-6 relative z-10">
-              {(!registrationStatus || registrationStatus === 'STARTING') && (
-                <div className="flex flex-col items-center justify-center py-10 gap-4">
-                  <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-                  <p className="text-xs text-white/40 font-bold tracking-widest uppercase animate-pulse">Verbinden met Hub...</p>
+              <div className="relative">
+                <div className="w-20 h-20 rounded-3xl bg-primary/20 flex items-center justify-center text-primary animate-pulse">
+                  <Fingerprint className="w-10 h-10" />
                 </div>
-              )}
+                <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-black border-4 border-[#050505]">
+                  <ShieldAlert className="w-4 h-4" />
+                </div>
+              </div>
 
-              {registrationStatus === 'NOT_FOUND' && (
-                <div className="space-y-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-primary/60 text-center mb-6">Selecteer uw station</p>
-                  <div className="grid gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-                    {registrationData?.existingClients?.map(client => (
-                      <button
-                        key={client.id}
-                        onClick={() => {
-                          localStorage.setItem('ledshow_client_uuid', client.id)
-                          useShowStore.setState({
-                            clientUUID: client.id,
-                            registrationStatus: 'WAITING_PIN',
-                            registrationData: { ...registrationData, selectedClientId: client.id }
-                          })
-                          networkService.registerClient()
+              <div className="text-center space-y-3 relative z-10">
+                <h2 className="text-3xl font-black uppercase tracking-tighter">Connecting to Hub</h2>
+                <p className="text-sm text-white/40 font-medium">Beveiligde verbinding vereist autorisatie</p>
+              </div>
+
+              <div className="w-full space-y-6 relative z-10">
+                {(!registrationStatus || registrationStatus === 'STARTING') && (
+                  <div className="flex flex-col items-center justify-center py-10 gap-4">
+                    <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                    <p className="text-xs text-white/40 font-bold tracking-widest uppercase animate-pulse">Verbinden met Hub...</p>
+                  </div>
+                )}
+
+                {registrationStatus === 'NOT_FOUND' && (
+                  <div className="space-y-4">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-primary/60 text-center mb-6">Selecteer uw station</p>
+                    <div className="grid gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                      {registrationData?.existingClients?.map((client: { id: string, friendlyName: string }) => (
+                        <button
+                          key={client.id}
+                          onClick={() => {
+                            localStorage.setItem('ledshow_client_uuid', client.id)
+                            useSequencerStore.setState({
+                              clientUUID: client.id,
+                              registrationStatus: 'WAITING_PIN',
+                              registrationData: { ...registrationData, selectedClientId: client.id }
+                            })
+                            networkService.registerClient()
+                          }}
+                          className="w-full p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-left flex items-center justify-between group/item"
+                        >
+                          <span className="font-bold text-sm tracking-wide">{client.friendlyName}</span>
+                          <ChevronRight className="w-4 h-4 opacity-20 group-hover/item:opacity-100 group-hover/item:translate-x-1 transition-all" />
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => useSequencerStore.setState({ registrationStatus: 'WAITING_HOST_PIN' })}
+                      className="w-full p-4 rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/50 hover:bg-primary/5 transition-all text-xs font-black uppercase tracking-widest text-white/40 hover:text-primary"
+                    >
+                      + Nieuw Station Toevoegen
+                    </button>
+                  </div>
+                )}
+
+                {registrationStatus === 'WAITING_HOST_PIN' && (
+                  <div className="space-y-6">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-orange-500 text-center">Beheerder Verificatie</p>
+                    <p className="text-xs text-white/40 text-center -mt-4 italic">Voer de Host PIN in om een nieuw station te registreren.</p>
+                    <div className="space-y-4">
+                      <input
+                        id="host-pin-input"
+                        type="password"
+                        placeholder="HOST PIN"
+                        value={pinInput}
+                        onChange={(e) => setPinInput(e.target.value.replace(/[^0-9]/g, '').slice(-4))}
+                        maxLength={4}
+                        autoComplete="one-time-code"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-5 text-center text-3xl font-mono tracking-[0.8em] focus:border-primary/50 outline-none transition-all shadow-inner"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') verifyHostPin(pinInput)
                         }}
-                        className="w-full p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all text-left flex items-center justify-between group/item"
+                        autoFocus
+                      />
+                      <button
+                        onClick={() => {
+                          verifyHostPin(pinInput)
+                        }}
+                        className="w-full p-4 rounded-2xl bg-orange-500 text-black font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
                       >
-                        <span className="font-bold text-sm tracking-wide">{client.friendlyName}</span>
-                        <ChevronRight className="w-4 h-4 opacity-20 group-hover/item:opacity-100 group-hover/item:translate-x-1 transition-all" />
+                        Verifiëren
                       </button>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => useShowStore.setState({ registrationStatus: 'WAITING_HOST_PIN' })}
-                    className="w-full p-4 rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/50 hover:bg-primary/5 transition-all text-xs font-black uppercase tracking-widest text-white/40 hover:text-primary"
-                  >
-                    + Nieuw Station Toevoegen
-                  </button>
-                </div>
-              )}
-
-              {registrationStatus === 'WAITING_HOST_PIN' && (
-                <div className="space-y-6">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-orange-500 text-center">Beheerder Verificatie</p>
-                  <p className="text-xs text-white/40 text-center -mt-4 italic">Voer de Host PIN in om een nieuw station te registreren.</p>
-                  <div className="space-y-4">
-                    <input
-                      id="host-pin-input"
-                      type="password"
-                      placeholder="HOST PIN"
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-5 text-center text-3xl font-mono tracking-[0.8em] focus:border-primary/50 outline-none transition-all shadow-inner"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') verifyHostPin((e.target as HTMLInputElement).value)
-                      }}
-                      autoFocus
-                    />
+                    </div>
                     <button
-                      onClick={() => {
-                        const input = document.getElementById('host-pin-input') as HTMLInputElement
-                        if (input) verifyHostPin(input.value)
-                      }}
-                      className="w-full p-4 rounded-2xl bg-orange-500 text-black font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+                      onClick={() => useSequencerStore.setState({ registrationStatus: 'NOT_FOUND' })}
+                      className="w-full text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors"
                     >
-                      Verifiëren
+                      Terug naar lijst
                     </button>
                   </div>
-                  <button
-                    onClick={() => useShowStore.setState({ registrationStatus: 'NOT_FOUND' })}
-                    className="w-full text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors"
-                  >
-                    Terug naar lijst
-                  </button>
-                </div>
-              )}
+                )}
 
-              {registrationStatus === 'WAITING_REGISTRATION' && (
-                <div className="space-y-6">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-primary text-center">Nieuw Station Instellen</p>
-                  <div className="space-y-3">
-                    <input
-                      id="reg-name"
-                      type="text"
-                      placeholder="STATION NAAM (bijv. Lichtregie)"
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-center text-sm font-bold tracking-widest focus:border-primary/50 outline-none transition-all"
-                      autoFocus
-                    />
-                    <input
-                      id="reg-pin"
-                      type="password"
-                      placeholder="NIEUWE CLIENT PIN"
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-center text-xl font-mono tracking-[0.5em] focus:border-primary/50 outline-none transition-all"
-                    />
-                  </div>
-                  <button
-                    onClick={() => {
-                      const name = (document.getElementById('reg-name') as HTMLInputElement).value
-                      const pin = (document.getElementById('reg-pin') as HTMLInputElement).value
-                      if (name && pin) completeRegistration(name, pin)
-                    }}
-                    className="w-full p-4 rounded-2xl bg-primary text-black font-black uppercase tracking-widest text-sm shadow-[0_10px_30px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
-                  >
-                    Registratie Voltooien
-                  </button>
-                </div>
-              )}
-
-              {registrationStatus === 'WAITING_PIN' && (
-                <div className="space-y-6">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-primary text-center">Toegang Station</p>
-                  <p className="text-xs text-white/40 text-center -mt-4 italic">Voer de PIN in voor dit station.</p>
-                  <div className="space-y-4">
-                    <input
-                      id="client-pin-input"
-                      type="password"
-                      placeholder="PIN"
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-5 text-center text-3xl font-mono tracking-[0.8em] focus:border-primary/50 outline-none transition-all shadow-inner"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') verifyClientPin((e.target as HTMLInputElement).value)
-                      }}
-                      autoFocus
-                    />
+                {registrationStatus === 'WAITING_REGISTRATION' && (
+                  <div className="space-y-6">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-primary text-center">Nieuw Station Instellen</p>
+                    <div className="space-y-3">
+                      <input
+                        id="reg-name"
+                        type="text"
+                        placeholder="STATION NAAM (bijv. Lichtregie)"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-center text-sm font-bold tracking-widest focus:border-primary/50 outline-none transition-all"
+                        autoFocus
+                      />
+                      <input
+                        id="reg-pin"
+                        type="password"
+                        placeholder="NIEUWE CLIENT PIN"
+                        value={pinInput}
+                        onChange={(e) => setPinInput(e.target.value.replace(/[^0-9]/g, '').slice(-4))}
+                        maxLength={4}
+                        autoComplete="new-password"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-center text-xl font-mono tracking-[0.5em] focus:border-primary/50 outline-none transition-all"
+                      />
+                    </div>
                     <button
                       onClick={() => {
-                        const input = document.getElementById('client-pin-input') as HTMLInputElement
-                        if (input) verifyClientPin(input.value)
+                        const name = (document.getElementById('reg-name') as HTMLInputElement).value
+                        if (name && pinInput) completeRegistration(name, pinInput)
                       }}
-                      className="w-full p-4 rounded-2xl bg-primary text-black font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+                      className="w-full p-4 rounded-2xl bg-primary text-black font-black uppercase tracking-widest text-sm shadow-[0_10px_30px_rgba(var(--primary-rgb),0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all"
                     >
-                      Verbinden
+                      Registratie Voltooien
                     </button>
                   </div>
-                  <button
-                    onClick={() => useShowStore.setState({ registrationStatus: 'NOT_FOUND' })}
-                    className="w-full text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors"
-                  >
-                    Andere station kiezen
-                  </button>
-                </div>
-              )}
-            </div>
+                )}
 
-            <div className="text-[10px] text-white/20 uppercase tracking-[0.3em] font-black relative z-10 flex items-center gap-2">
-              <Wifi className="w-3 h-3 text-primary animate-pulse" />
-
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Lock Overlay */}
-      {appLocked && (
-        <div className="fixed inset-0 z-[20000] bg-black flex flex-col items-center justify-center p-8 animate-in backdrop-blur-3xl duration-700">
-          <div className="flex flex-col items-center gap-12 max-w-sm w-full">
-            <div className="relative">
-              <div className="w-32 h-32 rounded-[2.5rem] bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500">
-                <Lock className="w-16 h-16 animate-pulse" />
-              </div>
-              <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-black border border-white/10 flex items-center justify-center text-white/40 rotate-12">
-                <SkipForward className="w-6 h-6" />
-              </div>
-            </div>
-
-            <div className="text-center space-y-4">
-              <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Systeem Gesloten</h2>
-              <p className="text-sm text-white/40 font-medium">Voer uw pincode in om dit station te ontgrendelen</p>
-            </div>
-
-            <div className="w-full space-y-4">
-              <input
-                type="password"
-                placeholder="PIN"
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-6 text-center text-4xl font-mono tracking-[1em] focus:border-red-500/50 focus:bg-red-500/5 outline-none transition-all"
-                onKeyDown={(e) => {
-                  const val = (e.target as HTMLInputElement).value
-                  if (e.key === 'Enter') {
-                    if (isHost) {
-                      (async () => {
-                        try {
-                          // Force refresh app settings from DB first
-                          if ((window as any).require) {
-                            const { ipcRenderer } = (window as any).require('electron')
-                            const settings = await ipcRenderer.invoke('db:get-app-settings')
-                            console.log('--- HOST AUTH: Refreshed DB Settings:', settings)
-                            useShowStore.setState({ appSettings: { ...useShowStore.getState().appSettings, ...settings } })
-                          }
-                          const currentSettings = useShowStore.getState().appSettings;
-                          const inputPin = val.trim()
-                          const masterPin = (currentSettings.accessPin || '').trim()
-                          console.log('--- HOST AUTH: Comparing input', `[${inputPin}]`, 'with stored', `[${masterPin}]`)
-
-                          if (inputPin === masterPin) setAppLocked(false)
-                          else useShowStore.getState().addToast('Ongeldige Host Pin', 'error')
-                        } catch (err) {
-                          console.error('Auth Error:', err)
-                          useShowStore.getState().addToast('Fout bij verifiëren', 'error')
-                        }
-                      })()
-                    } else {
-                      // Remote clients check their own PIN via server
-                      verifyClientPin(val)
-                    }
-                  }
-                }}
-                autoFocus
-              />
-              <div className="flex justify-between px-2 items-center">
-                <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Station: {clientFriendlyName || (isHost ? 'Host Controller' : 'Unknown')}</span>
-                {isHost && (
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-orange-500/40">Host Authentication</span>
+                {registrationStatus === 'WAITING_PIN' && (
+                  <div className="space-y-6">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-primary text-center">Toegang Station</p>
+                    <p className="text-xs text-white/40 text-center -mt-4 italic">Voer de PIN in voor dit station.</p>
+                    <div className="space-y-4">
+                      <input
+                        id="client-pin-input"
+                        type="password"
+                        placeholder="PIN"
+                        value={pinInput}
+                        onChange={(e) => setPinInput(e.target.value.replace(/[^0-9]/g, '').slice(-4))}
+                        maxLength={4}
+                        autoComplete="one-time-code"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-5 text-center text-3xl font-mono tracking-[0.8em] focus:border-primary/50 outline-none transition-all shadow-inner"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') verifyClientPin(pinInput)
+                        }}
+                        autoFocus
+                      />
+                      <button
+                        onClick={() => {
+                          verifyClientPin(pinInput)
+                        }}
+                        className="w-full p-4 rounded-2xl bg-primary text-black font-black uppercase tracking-widest text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+                      >
+                        Verbinden
+                      </button>
+                    </div>
                     <button
-                      className="text-[9px] text-red-500/50 hover:text-red-500 underline decoration-red-500/30 font-bold uppercase tracking-widest cursor-pointer"
-                      onClick={() => {
-                        console.log('--- EMERGENCY UNLOCK TRIGGERED ---');
-                        console.log('Current Stored PIN:', appSettings.accessPin);
-                        if (confirm(`Noodstop: Lock geforceerd verwijderen?\n(Huidige PIN is: '${appSettings.accessPin}')`)) {
-                          setAppLocked(false);
-                        }
-                      }}
+                      onClick={() => useSequencerStore.setState({ registrationStatus: 'NOT_FOUND' })}
+                      className="w-full text-[10px] font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors"
                     >
-                      NOOD-UNLOCK
+                      Andere station kiezen
                     </button>
                   </div>
                 )}
               </div>
+
+              <div className="text-[10px] text-white/20 uppercase tracking-[0.3em] font-black relative z-10 flex items-center gap-2">
+                <Wifi className="w-3 h-3 text-primary animate-pulse" />
+
+              </div>
             </div>
+          </div>
+        )
+      }
+
+      {/* Lock Overlay */}
+      {
+        appLocked && (
+          <div className="fixed inset-0 z-[20000] bg-black flex flex-col items-center justify-center p-8 animate-in backdrop-blur-3xl duration-700">
+            <div className="flex flex-col items-center gap-12 max-w-sm w-full">
+              <div className="relative">
+                <div className="w-32 h-32 rounded-[2.5rem] bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500">
+                  <Lock className="w-16 h-16 animate-pulse" />
+                </div>
+                <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-black border border-white/10 flex items-center justify-center text-white/40 rotate-12">
+                  <SkipForward className="w-6 h-6" />
+                </div>
+              </div>
+
+              <div className="text-center space-y-4">
+                <h2 className="text-4xl font-black uppercase tracking-tighter text-white">Systeem Gesloten</h2>
+                <p className="text-sm text-white/40 font-medium">Voer uw pincode in om dit station te ontgrendelen</p>
+              </div>
+
+              <div className="w-full space-y-4">
+                <input
+                  type="password"
+                  placeholder="PIN"
+                  value={pinInput}
+                  onChange={(e) => setPinInput(e.target.value.replace(/[^0-9]/g, '').slice(-4))}
+                  maxLength={4}
+                  autoComplete="one-time-code"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-6 text-center text-4xl font-mono tracking-[1em] focus:border-red-500/50 focus:bg-red-500/5 outline-none transition-all"
+                  onKeyDown={(e) => {
+                    const val = pinInput
+                    if (e.key === 'Enter') {
+                      if (isHost) {
+                        (async () => {
+                          try {
+                            // Force refresh app settings from DB first
+                            if ((window as any).require) {
+                              const { ipcRenderer } = (window as any).require('electron')
+                              const settings = await ipcRenderer.invoke('db:get-app-settings')
+                              console.log('--- HOST AUTH: Refreshed DB Settings:', settings)
+                              useSequencerStore.setState({ appSettings: { ...useSequencerStore.getState().appSettings, ...settings } })
+                            }
+                            const currentSettings = useSequencerStore.getState().appSettings;
+                            const inputPin = val.trim()
+                            const masterPin = (currentSettings.accessPin || '').trim()
+                            console.log('--- HOST AUTH: Comparing input', `[${inputPin}]`, 'with stored', `[${masterPin}]`)
+
+                            if (inputPin === masterPin) setAppLocked(false)
+                            else useSequencerStore.getState().addToast('Ongeldige Host Pin', 'error')
+                          } catch (err) {
+                            console.error('Auth Error:', err)
+                            useSequencerStore.getState().addToast('Fout bij verifiëren', 'error')
+                          }
+                        })()
+                      } else {
+                        // Remote clients check their own PIN via server
+                        verifyClientPin(val)
+                      }
+                    }
+                  }}
+                  autoFocus
+                />
+                <div className="flex justify-between px-2 items-center">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Station: {clientFriendlyName || (isHost ? 'Host Controller' : 'Unknown')}</span>
+                  {isHost && (
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-orange-500/40">Host Authentication</span>
+                      <button
+                        className="text-[9px] text-red-500/50 hover:text-red-500 underline decoration-red-500/30 font-bold uppercase tracking-widest cursor-pointer"
+                        onClick={() => {
+                          console.log('--- EMERGENCY UNLOCK TRIGGERED ---');
+                          console.log('Current Stored PIN:', appSettings.accessPin);
+                          if (confirm(`Noodstop: Lock geforceerd verwijderen?\n(Huidige PIN is: '${appSettings.accessPin}')`)) {
+                            setAppLocked(false);
+                          }
+                        }}
+                      >
+                        NOOD-UNLOCK
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
+      {setupWizardStep !== null && (
+        <div className="fixed inset-0 z-[11000] bg-black/80 backdrop-blur-md flex items-center justify-center p-8 animate-in fade-in duration-300">
+          <div className="glass border border-white/10 p-8 rounded-[2rem] w-full max-w-xl shadow-2xl space-y-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+                  <Monitor className="w-6 h-6" />
+                </div>
+                <h2 className="text-xl font-black uppercase tracking-tight">VideoWall Agent Wizard</h2>
+              </div>
+              <button
+                onClick={() => { setSetupWizardStep(null); setIsWizardScanning(false); }}
+                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                title="Sluiten"
+              >
+                <X className="w-5 h-5 opacity-40 hover:opacity-100" />
+              </button>
+            </div>
+
+            <div className="flex gap-2">
+              {[1, 2, 3].map(s => (
+                <div key={s} className={cn(
+                  "flex-1 h-1.5 rounded-full transition-all",
+                  setupWizardStep >= s ? "bg-primary" : "bg-white/10"
+                )} />
+              ))}
+            </div>
+
+            {setupWizardStep === 1 && (
+              <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                <div className="space-y-2">
+                  <h3 className="font-bold text-white">Stap 1: Client Voorbereiden</h3>
+                  <p className="text-sm text-white/40 leading-relaxed">
+                    Open op de externe computer (waar de Videowall op aangesloten is) een browser en ga naar de volgende URL om de software te downloaden en configureren:
+                  </p>
+                </div>
+
+                <div className="bg-black/40 border border-white/5 p-6 rounded-2xl flex items-center justify-center text-center">
+                  <code className="text-primary text-xl font-mono font-bold tracking-wider">
+                    http://{serverIp}:{(appSettings.serverPort || 3001) + 1}/setup
+                  </code>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <p className="text-[10px] text-white/20 uppercase font-black tracking-widest text-center">
+                    Gezien op hetzelfde netwerk: {serverIp}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSetupWizardStep(2);
+                      setIsWizardScanning(true);
+                    }}
+                    className="w-full bg-primary text-black font-black uppercase py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_10px_30px_rgba(var(--primary-rgb),0.3)]"
+                  >
+                    Ik ga downloaden & starten
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {setupWizardStep === 2 && (
+              <div className="space-y-8 py-4 animate-in slide-in-from-right-4 duration-300">
+                <div className="flex flex-col items-center gap-6 text-center">
+                  <div className="relative">
+                    <Radar className="w-16 h-16 text-primary animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-4 h-4 bg-primary rounded-full animate-ping" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-white">Stap 2: Wachten op Agent...</h3>
+                    <p className="text-sm text-white/40 leading-relaxed max-w-sm mx-auto">
+                      Start de agent op de externe computer. De Hub zal de agent automatisch herkennen zodra deze verbinding maakt.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 border border-white/5 p-4 rounded-xl flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-black tracking-widest text-white/20">Status</span>
+                  <span className="text-xs font-bold text-primary animate-pulse">Scannen naar nieuwe agents op netwerk...</span>
+                </div>
+
+                <button
+                  onClick={() => setIsWizardScanning(false)}
+                  className="w-full py-4 text-xs font-black uppercase tracking-widest text-white/20 hover:text-white transition-colors"
+                >
+                  Pauzeer scannen
+                </button>
+              </div>
+            )}
+
+            {setupWizardStep === 3 && (
+              <div className="space-y-6 animate-in zoom-in-95 duration-300">
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 animate-bounce">
+                    <Plus className="w-10 h-10 rotate-45" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-2xl font-black text-white uppercase tracking-tight">Agent Gevonden!</h3>
+                    <p className="text-xs text-white/40">Een nieuwe VideoWall Agent is succesvol aangemeld.</p>
+                  </div>
+                </div>
+
+                <div className="bg-green-500/10 border border-green-500/20 p-6 rounded-2xl space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center text-green-500">
+                      <Monitor className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-white uppercase">{foundAgent?.name}</div>
+                      <div className="text-xs font-mono text-green-500/60">{foundAgent?.ip}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => { setSetupWizardStep(null); setIsWizardScanning(false); }}
+                    className="flex-1 py-4 border border-white/10 rounded-xl text-xs font-black uppercase tracking-widest text-white/40 hover:bg-white/5 transition-all"
+                  >
+                    Sluiten
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSetupWizardStep(null);
+                      setIsWizardScanning(false);
+                      setIsAppSettingsOpen(true);
+                      // Wait a bit for settings to open then search? 
+                      // For now just opening is enough.
+                    }}
+                    className="flex-1 bg-primary text-black font-black uppercase py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_10px_30px_rgba(var(--primary-rgb),0.3)]"
+                  >
+                    Naar Instellingen
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

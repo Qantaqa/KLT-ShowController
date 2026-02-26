@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Save, Clock, FileText, ToggleLeft, ToggleRight, Calendar, Check } from 'lucide-react'
-import { useShowStore } from '../store/useShowStore'
+import { useSequencerStore } from '../store/useSequencerStore'
 
 const WEEKDAYS = [
     { id: 1, name: 'Maandag' },
@@ -19,7 +19,7 @@ interface ProjectSettingsProps {
 }
 
 const ProjectSettings: React.FC<ProjectSettingsProps> = ({ isOpen, onClose }) => {
-    const { activeShow, updateActiveShow, addToast } = useShowStore()
+    const { activeShow, updateActiveShow, addToast } = useSequencerStore()
     const [isSaving, setIsSaving] = useState(false)
     const [formData, setFormData] = useState({
         name: '',

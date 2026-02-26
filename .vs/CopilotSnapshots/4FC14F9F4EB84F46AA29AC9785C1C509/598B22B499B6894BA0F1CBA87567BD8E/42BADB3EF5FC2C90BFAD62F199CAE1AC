@@ -1,0 +1,747 @@
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Partial Class ColorPickerExtented
+    Inherits System.Windows.Forms.Form
+
+    'Form overrides dispose to clean up the component list.
+    <System.Diagnostics.DebuggerNonUserCode()> _
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+        Try
+            If disposing AndAlso components IsNot Nothing Then
+                components.Dispose()
+            End If
+        Finally
+            MyBase.Dispose(disposing)
+        End Try
+    End Sub
+
+    'Required by the Windows Form Designer
+    Private components As System.ComponentModel.IContainer
+
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
+    <System.Diagnostics.DebuggerStepThrough()> _
+    Private Sub InitializeComponent()
+        btnOK = New Button()
+        btnCancel = New Button()
+        pbColorArea = New PictureBox()
+        GroupBox1 = New GroupBox()
+        GroupBox2 = New GroupBox()
+        GroupBox3 = New GroupBox()
+        pbColorWheel = New PictureBox()
+        btnDefaultWindowColorSelector = New Button()
+        lblRedTitle = New Label()
+        trkRed = New TrackBar()
+        trkGreen = New TrackBar()
+        lblGreenTitle = New Label()
+        Me.trkBlue = New TrackBar()
+        lblBlueTitle = New Label()
+        Me.trkHue = New TrackBar()
+        lblHueTitle = New Label()
+        Me.trkAlpha = New TrackBar()
+        Label9 = New Label()
+        valueRed = New NumericUpDown()
+        valueGreen = New NumericUpDown()
+        ValueBlue = New NumericUpDown()
+        ValueHue = New NumericUpDown()
+        valueAlpha = New NumericUpDown()
+        Label1 = New Label()
+        valueHTML = New TextBox()
+        Label2 = New Label()
+        valueSlot = New NumericUpDown()
+        btnRestoreFromSlot = New Button()
+        btnSaveToSlot = New Button()
+        slot_01 = New PictureBox()
+        slot_02 = New PictureBox()
+        slot_03 = New PictureBox()
+        slot_06 = New PictureBox()
+        slot_05 = New PictureBox()
+        slot_04 = New PictureBox()
+        slot_09 = New PictureBox()
+        slot_08 = New PictureBox()
+        slot_07 = New PictureBox()
+        slot_12 = New PictureBox()
+        slot_11 = New PictureBox()
+        slot_10 = New PictureBox()
+        slot_15 = New PictureBox()
+        slot_14 = New PictureBox()
+        slot_13 = New PictureBox()
+        slot_18 = New PictureBox()
+        slot_17 = New PictureBox()
+        slot_16 = New PictureBox()
+        slot_21 = New PictureBox()
+        slot_20 = New PictureBox()
+        slot_19 = New PictureBox()
+        slot_24 = New PictureBox()
+        slot_23 = New PictureBox()
+        slot_22 = New PictureBox()
+        lblHTMLValue = New Label()
+        lbRGBValues = New Label()
+        CType(pbColorArea, ComponentModel.ISupportInitialize).BeginInit()
+        GroupBox1.SuspendLayout()
+        GroupBox2.SuspendLayout()
+        GroupBox3.SuspendLayout()
+        CType(pbColorWheel, ComponentModel.ISupportInitialize).BeginInit()
+        CType(trkRed, ComponentModel.ISupportInitialize).BeginInit()
+        CType(trkGreen, ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.trkBlue, ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.trkHue, ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.trkAlpha, ComponentModel.ISupportInitialize).BeginInit()
+        CType(valueRed, ComponentModel.ISupportInitialize).BeginInit()
+        CType(valueGreen, ComponentModel.ISupportInitialize).BeginInit()
+        CType(ValueBlue, ComponentModel.ISupportInitialize).BeginInit()
+        CType(ValueHue, ComponentModel.ISupportInitialize).BeginInit()
+        CType(valueAlpha, ComponentModel.ISupportInitialize).BeginInit()
+        CType(valueSlot, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_01, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_02, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_03, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_06, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_05, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_04, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_09, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_08, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_07, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_12, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_11, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_10, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_15, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_14, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_13, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_18, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_17, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_16, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_21, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_20, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_19, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_24, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_23, ComponentModel.ISupportInitialize).BeginInit()
+        CType(slot_22, ComponentModel.ISupportInitialize).BeginInit()
+        SuspendLayout()
+        ' 
+        ' btnOK
+        ' 
+        btnOK.Location = New Point(632, 415)
+        btnOK.Name = "btnOK"
+        btnOK.Size = New Size(126, 23)
+        btnOK.TabIndex = 0
+        btnOK.Text = "Ok"
+        btnOK.UseVisualStyleBackColor = True
+        ' 
+        ' btnCancel
+        ' 
+        btnCancel.Location = New Point(12, 415)
+        btnCancel.Name = "btnCancel"
+        btnCancel.Size = New Size(112, 23)
+        btnCancel.TabIndex = 1
+        btnCancel.Text = "Annuleren"
+        btnCancel.UseVisualStyleBackColor = True
+        ' 
+        ' pbColorArea
+        ' 
+        pbColorArea.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
+        pbColorArea.Cursor = Cursors.Cross
+        pbColorArea.Location = New Point(12, 12)
+        pbColorArea.Name = "pbColorArea"
+        pbColorArea.Size = New Size(746, 50)
+        pbColorArea.TabIndex = 2
+        pbColorArea.TabStop = False
+        ' 
+        ' GroupBox1
+        ' 
+        GroupBox1.Controls.Add(btnDefaultWindowColorSelector)
+        GroupBox1.Controls.Add(pbColorWheel)
+        GroupBox1.Location = New Point(12, 81)
+        GroupBox1.Name = "GroupBox1"
+        GroupBox1.Size = New Size(284, 331)
+        GroupBox1.TabIndex = 3
+        GroupBox1.TabStop = False
+        GroupBox1.Text = "Colorwheel"
+        ' 
+        ' GroupBox2
+        ' 
+        GroupBox2.Controls.Add(valueHTML)
+        GroupBox2.Controls.Add(Label1)
+        GroupBox2.Controls.Add(valueAlpha)
+        GroupBox2.Controls.Add(ValueHue)
+        GroupBox2.Controls.Add(ValueBlue)
+        GroupBox2.Controls.Add(valueGreen)
+        GroupBox2.Controls.Add(valueRed)
+        GroupBox2.Controls.Add(Me.trkAlpha)
+        GroupBox2.Controls.Add(Label9)
+        GroupBox2.Controls.Add(Me.trkHue)
+        GroupBox2.Controls.Add(lblHueTitle)
+        GroupBox2.Controls.Add(Me.trkBlue)
+        GroupBox2.Controls.Add(lblBlueTitle)
+        GroupBox2.Controls.Add(trkGreen)
+        GroupBox2.Controls.Add(lblGreenTitle)
+        GroupBox2.Controls.Add(trkRed)
+        GroupBox2.Controls.Add(lblRedTitle)
+        GroupBox2.Location = New Point(313, 81)
+        GroupBox2.Name = "GroupBox2"
+        GroupBox2.Size = New Size(256, 331)
+        GroupBox2.TabIndex = 4
+        GroupBox2.TabStop = False
+        GroupBox2.Text = "RGB && HTML"
+        ' 
+        ' GroupBox3
+        ' 
+        GroupBox3.Controls.Add(slot_24)
+        GroupBox3.Controls.Add(slot_23)
+        GroupBox3.Controls.Add(slot_22)
+        GroupBox3.Controls.Add(slot_21)
+        GroupBox3.Controls.Add(slot_20)
+        GroupBox3.Controls.Add(slot_19)
+        GroupBox3.Controls.Add(slot_18)
+        GroupBox3.Controls.Add(slot_17)
+        GroupBox3.Controls.Add(slot_16)
+        GroupBox3.Controls.Add(slot_15)
+        GroupBox3.Controls.Add(slot_14)
+        GroupBox3.Controls.Add(slot_13)
+        GroupBox3.Controls.Add(slot_12)
+        GroupBox3.Controls.Add(slot_11)
+        GroupBox3.Controls.Add(slot_10)
+        GroupBox3.Controls.Add(slot_09)
+        GroupBox3.Controls.Add(slot_08)
+        GroupBox3.Controls.Add(slot_07)
+        GroupBox3.Controls.Add(slot_06)
+        GroupBox3.Controls.Add(slot_05)
+        GroupBox3.Controls.Add(slot_04)
+        GroupBox3.Controls.Add(slot_03)
+        GroupBox3.Controls.Add(slot_02)
+        GroupBox3.Controls.Add(slot_01)
+        GroupBox3.Location = New Point(632, 81)
+        GroupBox3.Name = "GroupBox3"
+        GroupBox3.Size = New Size(126, 331)
+        GroupBox3.TabIndex = 5
+        GroupBox3.TabStop = False
+        GroupBox3.Text = "Saved Slots"
+        ' 
+        ' pbColorWheel
+        ' 
+        pbColorWheel.Image = My.Resources.Resources.colorwheel
+        pbColorWheel.Location = New Point(6, 61)
+        pbColorWheel.Name = "pbColorWheel"
+        pbColorWheel.Size = New Size(272, 264)
+        pbColorWheel.SizeMode = PictureBoxSizeMode.StretchImage
+        pbColorWheel.TabIndex = 0
+        pbColorWheel.TabStop = False
+        ' 
+        ' btnDefaultWindowColorSelector
+        ' 
+        btnDefaultWindowColorSelector.Location = New Point(4, 19)
+        btnDefaultWindowColorSelector.Name = "btnDefaultWindowColorSelector"
+        btnDefaultWindowColorSelector.Size = New Size(274, 36)
+        btnDefaultWindowColorSelector.TabIndex = 1
+        btnDefaultWindowColorSelector.Text = "Standaard kleuren"
+        btnDefaultWindowColorSelector.UseVisualStyleBackColor = True
+        ' 
+        ' lblRedTitle
+        ' 
+        lblRedTitle.AutoSize = True
+        lblRedTitle.Location = New Point(7, 35)
+        lblRedTitle.Name = "lblRedTitle"
+        lblRedTitle.Size = New Size(21, 15)
+        lblRedTitle.TabIndex = 0
+        lblRedTitle.Text = "Rd"
+        ' 
+        ' trkRed
+        ' 
+        trkRed.Location = New Point(27, 33)
+        trkRed.Maximum = 255
+        trkRed.Name = "trkRed"
+        trkRed.Size = New Size(167, 45)
+        trkRed.TabIndex = 1
+        ' 
+        ' trkGreen
+        ' 
+        trkGreen.Location = New Point(27, 72)
+        trkGreen.Maximum = 255
+        trkGreen.Name = "trkGreen"
+        trkGreen.Size = New Size(167, 45)
+        trkGreen.TabIndex = 4
+        ' 
+        ' lblGreenTitle
+        ' 
+        lblGreenTitle.AutoSize = True
+        lblGreenTitle.Location = New Point(7, 74)
+        lblGreenTitle.Name = "lblGreenTitle"
+        lblGreenTitle.Size = New Size(19, 15)
+        lblGreenTitle.TabIndex = 3
+        lblGreenTitle.Text = "Gr"
+        ' 
+        ' trkBlue
+        ' 
+        Me.trkBlue.Location = New Point(27, 114)
+        Me.trkBlue.Maximum = 255
+        Me.trkBlue.Name = "trkBlue"
+        Me.trkBlue.Size = New Size(167, 45)
+        Me.trkBlue.TabIndex = 7
+        ' 
+        ' lblBlueTitle
+        ' 
+        lblBlueTitle.AutoSize = True
+        lblBlueTitle.Location = New Point(7, 116)
+        lblBlueTitle.Name = "lblBlueTitle"
+        lblBlueTitle.Size = New Size(17, 15)
+        lblBlueTitle.TabIndex = 6
+        lblBlueTitle.Text = "Bl"
+        ' 
+        ' trkHue
+        ' 
+        Me.trkHue.Location = New Point(27, 154)
+        Me.trkHue.Maximum = 255
+        Me.trkHue.Name = "trkHue"
+        Me.trkHue.Size = New Size(167, 45)
+        Me.trkHue.TabIndex = 10
+        ' 
+        ' lblHueTitle
+        ' 
+        lblHueTitle.AutoSize = True
+        lblHueTitle.Location = New Point(7, 156)
+        lblHueTitle.Name = "lblHueTitle"
+        lblHueTitle.Size = New Size(29, 15)
+        lblHueTitle.TabIndex = 9
+        lblHueTitle.Text = "Hue"
+        ' 
+        ' trkAlpha
+        ' 
+        Me.trkAlpha.Location = New Point(27, 196)
+        Me.trkAlpha.Maximum = 255
+        Me.trkAlpha.Name = "trkAlpha"
+        Me.trkAlpha.Size = New Size(167, 45)
+        Me.trkAlpha.TabIndex = 13
+        ' 
+        ' Label9
+        ' 
+        Label9.AutoSize = True
+        Label9.Location = New Point(7, 198)
+        Label9.Name = "Label9"
+        Label9.Size = New Size(25, 15)
+        Label9.TabIndex = 12
+        Label9.Text = "Alp"
+        ' 
+        ' valueRed
+        ' 
+        valueRed.Location = New Point(194, 33)
+        valueRed.Maximum = New Decimal(New Integer() {255, 0, 0, 0})
+        valueRed.Name = "valueRed"
+        valueRed.Size = New Size(56, 23)
+        valueRed.TabIndex = 14
+        ' 
+        ' valueGreen
+        ' 
+        valueGreen.Location = New Point(194, 72)
+        valueGreen.Maximum = New Decimal(New Integer() {255, 0, 0, 0})
+        valueGreen.Name = "valueGreen"
+        valueGreen.Size = New Size(56, 23)
+        valueGreen.TabIndex = 15
+        ' 
+        ' ValueBlue
+        ' 
+        ValueBlue.Location = New Point(194, 114)
+        ValueBlue.Maximum = New Decimal(New Integer() {255, 0, 0, 0})
+        ValueBlue.Name = "ValueBlue"
+        ValueBlue.Size = New Size(56, 23)
+        ValueBlue.TabIndex = 16
+        ' 
+        ' ValueHue
+        ' 
+        ValueHue.Location = New Point(194, 154)
+        ValueHue.Maximum = New Decimal(New Integer() {255, 0, 0, 0})
+        ValueHue.Name = "ValueHue"
+        ValueHue.Size = New Size(56, 23)
+        ValueHue.TabIndex = 17
+        ' 
+        ' valueAlpha
+        ' 
+        valueAlpha.Location = New Point(194, 196)
+        valueAlpha.Maximum = New Decimal(New Integer() {255, 0, 0, 0})
+        valueAlpha.Name = "valueAlpha"
+        valueAlpha.Size = New Size(56, 23)
+        valueAlpha.TabIndex = 18
+        ' 
+        ' Label1
+        ' 
+        Label1.AutoSize = True
+        Label1.Location = New Point(11, 269)
+        Label1.Name = "Label1"
+        Label1.Size = New Size(95, 15)
+        Label1.TabIndex = 19
+        Label1.Text = "HTML kleurcode"
+        ' 
+        ' valueHTML
+        ' 
+        valueHTML.Location = New Point(11, 290)
+        valueHTML.Name = "valueHTML"
+        valueHTML.Size = New Size(239, 23)
+        valueHTML.TabIndex = 20
+        ' 
+        ' Label2
+        ' 
+        Label2.AutoSize = True
+        Label2.Location = New Point(584, 177)
+        Label2.Name = "Label2"
+        Label2.Size = New Size(27, 15)
+        Label2.TabIndex = 7
+        Label2.Text = "Slot"
+        ' 
+        ' valueSlot
+        ' 
+        valueSlot.Location = New Point(575, 195)
+        valueSlot.Maximum = New Decimal(New Integer() {10, 0, 0, 0})
+        valueSlot.Name = "valueSlot"
+        valueSlot.Size = New Size(47, 23)
+        valueSlot.TabIndex = 24
+        ' 
+        ' btnRestoreFromSlot
+        ' 
+        btnRestoreFromSlot.Location = New Point(575, 223)
+        btnRestoreFromSlot.Name = "btnRestoreFromSlot"
+        btnRestoreFromSlot.Size = New Size(47, 23)
+        btnRestoreFromSlot.TabIndex = 9
+        btnRestoreFromSlot.Text = "←"
+        btnRestoreFromSlot.UseVisualStyleBackColor = True
+        ' 
+        ' btnSaveToSlot
+        ' 
+        btnSaveToSlot.Location = New Point(575, 250)
+        btnSaveToSlot.Name = "btnSaveToSlot"
+        btnSaveToSlot.Size = New Size(47, 23)
+        btnSaveToSlot.TabIndex = 10
+        btnSaveToSlot.Text = "→"
+        btnSaveToSlot.UseVisualStyleBackColor = True
+        ' 
+        ' slot_01
+        ' 
+        slot_01.Location = New Point(7, 22)
+        slot_01.Name = "slot_01"
+        slot_01.Size = New Size(32, 32)
+        slot_01.TabIndex = 0
+        slot_01.TabStop = False
+        ' 
+        ' slot_02
+        ' 
+        slot_02.Location = New Point(45, 22)
+        slot_02.Name = "slot_02"
+        slot_02.Size = New Size(32, 32)
+        slot_02.TabIndex = 1
+        slot_02.TabStop = False
+        ' 
+        ' slot_03
+        ' 
+        slot_03.Location = New Point(83, 22)
+        slot_03.Name = "slot_03"
+        slot_03.Size = New Size(32, 32)
+        slot_03.TabIndex = 2
+        slot_03.TabStop = False
+        ' 
+        ' slot_06
+        ' 
+        slot_06.Location = New Point(83, 60)
+        slot_06.Name = "slot_06"
+        slot_06.Size = New Size(32, 32)
+        slot_06.TabIndex = 5
+        slot_06.TabStop = False
+        ' 
+        ' slot_05
+        ' 
+        slot_05.Location = New Point(45, 60)
+        slot_05.Name = "slot_05"
+        slot_05.Size = New Size(32, 32)
+        slot_05.TabIndex = 4
+        slot_05.TabStop = False
+        ' 
+        ' slot_04
+        ' 
+        slot_04.Location = New Point(7, 60)
+        slot_04.Name = "slot_04"
+        slot_04.Size = New Size(32, 32)
+        slot_04.TabIndex = 3
+        slot_04.TabStop = False
+        ' 
+        ' slot_09
+        ' 
+        slot_09.Location = New Point(83, 99)
+        slot_09.Name = "slot_09"
+        slot_09.Size = New Size(32, 32)
+        slot_09.TabIndex = 8
+        slot_09.TabStop = False
+        ' 
+        ' slot_08
+        ' 
+        slot_08.Location = New Point(45, 99)
+        slot_08.Name = "slot_08"
+        slot_08.Size = New Size(32, 32)
+        slot_08.TabIndex = 7
+        slot_08.TabStop = False
+        ' 
+        ' slot_07
+        ' 
+        slot_07.Location = New Point(7, 99)
+        slot_07.Name = "slot_07"
+        slot_07.Size = New Size(32, 32)
+        slot_07.TabIndex = 6
+        slot_07.TabStop = False
+        ' 
+        ' slot_12
+        ' 
+        slot_12.Location = New Point(83, 137)
+        slot_12.Name = "slot_12"
+        slot_12.Size = New Size(32, 32)
+        slot_12.TabIndex = 11
+        slot_12.TabStop = False
+        ' 
+        ' slot_11
+        ' 
+        slot_11.Location = New Point(45, 137)
+        slot_11.Name = "slot_11"
+        slot_11.Size = New Size(32, 32)
+        slot_11.TabIndex = 10
+        slot_11.TabStop = False
+        ' 
+        ' slot_10
+        ' 
+        slot_10.Location = New Point(7, 137)
+        slot_10.Name = "slot_10"
+        slot_10.Size = New Size(32, 32)
+        slot_10.TabIndex = 9
+        slot_10.TabStop = False
+        ' 
+        ' slot_15
+        ' 
+        slot_15.Location = New Point(83, 175)
+        slot_15.Name = "slot_15"
+        slot_15.Size = New Size(32, 32)
+        slot_15.TabIndex = 14
+        slot_15.TabStop = False
+        ' 
+        ' slot_14
+        ' 
+        slot_14.Location = New Point(45, 175)
+        slot_14.Name = "slot_14"
+        slot_14.Size = New Size(32, 32)
+        slot_14.TabIndex = 13
+        slot_14.TabStop = False
+        ' 
+        ' slot_13
+        ' 
+        slot_13.Location = New Point(7, 175)
+        slot_13.Name = "slot_13"
+        slot_13.Size = New Size(32, 32)
+        slot_13.TabIndex = 12
+        slot_13.TabStop = False
+        ' 
+        ' slot_18
+        ' 
+        slot_18.Location = New Point(83, 213)
+        slot_18.Name = "slot_18"
+        slot_18.Size = New Size(32, 32)
+        slot_18.TabIndex = 17
+        slot_18.TabStop = False
+        ' 
+        ' slot_17
+        ' 
+        slot_17.Location = New Point(45, 213)
+        slot_17.Name = "slot_17"
+        slot_17.Size = New Size(32, 32)
+        slot_17.TabIndex = 16
+        slot_17.TabStop = False
+        ' 
+        ' slot_16
+        ' 
+        slot_16.Location = New Point(7, 213)
+        slot_16.Name = "slot_16"
+        slot_16.Size = New Size(32, 32)
+        slot_16.TabIndex = 15
+        slot_16.TabStop = False
+        ' 
+        ' slot_21
+        ' 
+        slot_21.Location = New Point(83, 251)
+        slot_21.Name = "slot_21"
+        slot_21.Size = New Size(32, 32)
+        slot_21.TabIndex = 20
+        slot_21.TabStop = False
+        ' 
+        ' slot_20
+        ' 
+        slot_20.Location = New Point(45, 251)
+        slot_20.Name = "slot_20"
+        slot_20.Size = New Size(32, 32)
+        slot_20.TabIndex = 19
+        slot_20.TabStop = False
+        ' 
+        ' slot_19
+        ' 
+        slot_19.Location = New Point(7, 251)
+        slot_19.Name = "slot_19"
+        slot_19.Size = New Size(32, 32)
+        slot_19.TabIndex = 18
+        slot_19.TabStop = False
+        ' 
+        ' slot_24
+        ' 
+        slot_24.Location = New Point(83, 289)
+        slot_24.Name = "slot_24"
+        slot_24.Size = New Size(32, 32)
+        slot_24.TabIndex = 23
+        slot_24.TabStop = False
+        ' 
+        ' slot_23
+        ' 
+        slot_23.Location = New Point(45, 289)
+        slot_23.Name = "slot_23"
+        slot_23.Size = New Size(32, 32)
+        slot_23.TabIndex = 22
+        slot_23.TabStop = False
+        ' 
+        ' slot_22
+        ' 
+        slot_22.Location = New Point(7, 289)
+        slot_22.Name = "slot_22"
+        slot_22.Size = New Size(32, 32)
+        slot_22.TabIndex = 21
+        slot_22.TabStop = False
+        ' 
+        ' lblHTMLValue
+        ' 
+        lblHTMLValue.AutoSize = True
+        lblHTMLValue.Location = New Point(21, 18)
+        lblHTMLValue.Name = "lblHTMLValue"
+        lblHTMLValue.Size = New Size(50, 15)
+        lblHTMLValue.TabIndex = 26
+        lblHTMLValue.Text = "#000000"
+        ' 
+        ' lbRGBValues
+        ' 
+        lbRGBValues.AutoSize = True
+        lbRGBValues.Location = New Point(21, 33)
+        lbRGBValues.Name = "lbRGBValues"
+        lbRGBValues.Size = New Size(113, 15)
+        lbRGBValues.TabIndex = 27
+        lbRGBValues.Text = "R: 000  G: 000  B: 000"
+        ' 
+        ' ColorPickerExtented
+        ' 
+        AutoScaleDimensions = New SizeF(7F, 15F)
+        AutoScaleMode = AutoScaleMode.Font
+        ClientSize = New Size(767, 450)
+        Controls.Add(lbRGBValues)
+        Controls.Add(lblHTMLValue)
+        Controls.Add(btnSaveToSlot)
+        Controls.Add(btnRestoreFromSlot)
+        Controls.Add(valueSlot)
+        Controls.Add(Label2)
+        Controls.Add(GroupBox3)
+        Controls.Add(GroupBox2)
+        Controls.Add(GroupBox1)
+        Controls.Add(pbColorArea)
+        Controls.Add(btnCancel)
+        Controls.Add(btnOK)
+        FormBorderStyle = FormBorderStyle.FixedDialog
+        MaximizeBox = False
+        MinimizeBox = False
+        Name = "ColorPickerExtented"
+        ShowInTaskbar = False
+        Text = "Kleurkiezer"
+        CType(pbColorArea, ComponentModel.ISupportInitialize).EndInit()
+        GroupBox1.ResumeLayout(False)
+        GroupBox2.ResumeLayout(False)
+        GroupBox2.PerformLayout()
+        GroupBox3.ResumeLayout(False)
+        CType(pbColorWheel, ComponentModel.ISupportInitialize).EndInit()
+        CType(trkRed, ComponentModel.ISupportInitialize).EndInit()
+        CType(trkGreen, ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.trkBlue, ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.trkHue, ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.trkAlpha, ComponentModel.ISupportInitialize).EndInit()
+        CType(valueRed, ComponentModel.ISupportInitialize).EndInit()
+        CType(valueGreen, ComponentModel.ISupportInitialize).EndInit()
+        CType(ValueBlue, ComponentModel.ISupportInitialize).EndInit()
+        CType(ValueHue, ComponentModel.ISupportInitialize).EndInit()
+        CType(valueAlpha, ComponentModel.ISupportInitialize).EndInit()
+        CType(valueSlot, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_01, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_02, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_03, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_06, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_05, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_04, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_09, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_08, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_07, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_12, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_11, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_10, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_15, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_14, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_13, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_18, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_17, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_16, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_21, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_20, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_19, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_24, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_23, ComponentModel.ISupportInitialize).EndInit()
+        CType(slot_22, ComponentModel.ISupportInitialize).EndInit()
+        ResumeLayout(False)
+        PerformLayout()
+    End Sub
+
+    Friend WithEvents btnOK As Button
+    Friend WithEvents btnCancel As Button
+    Friend WithEvents pbColorArea As PictureBox
+    Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents btnDefaultWindowColorSelector As Button
+    Friend WithEvents pbColorWheel As PictureBox
+    Friend WithEvents GroupBox2 As GroupBox
+    Friend WithEvents lblRedTitle As Label
+    Friend WithEvents trkRed As TrackBar
+    Friend WithEvents trkGreen As TrackBar
+    Friend WithEvents lblGreenTitle As Label
+    Friend WithEvents trkBlue As TrackBar
+    Friend WithEvents lblBlueTitle As Label
+    Friend WithEvents trkHue As TrackBar
+    Friend WithEvents lblHueTitle As Label
+    Friend WithEvents trkAlpha As TrackBar
+    Friend WithEvents Label9 As Label
+    Friend WithEvents valueAlpha As NumericUpDown
+    Friend WithEvents ValueHue As NumericUpDown
+    Friend WithEvents ValueBlue As NumericUpDown
+    Friend WithEvents valueGreen As NumericUpDown
+    Friend WithEvents valueRed As NumericUpDown
+    Friend WithEvents valueHTML As TextBox
+    Friend WithEvents Label1 As Label
+    Friend WithEvents Label2 As Label
+    Friend WithEvents slot_24 As PictureBox
+    Friend WithEvents slot_23 As PictureBox
+    Friend WithEvents slot_22 As PictureBox
+    Friend WithEvents slot_21 As PictureBox
+    Friend WithEvents slot_20 As PictureBox
+    Friend WithEvents slot_19 As PictureBox
+    Friend WithEvents slot_18 As PictureBox
+    Friend WithEvents slot_17 As PictureBox
+    Friend WithEvents slot_16 As PictureBox
+    Friend WithEvents slot_15 As PictureBox
+    Friend WithEvents slot_14 As PictureBox
+    Friend WithEvents slot_13 As PictureBox
+    Friend WithEvents slot_12 As PictureBox
+    Friend WithEvents slot_11 As PictureBox
+    Friend WithEvents slot_10 As PictureBox
+    Friend WithEvents slot_09 As PictureBox
+    Friend WithEvents slot_08 As PictureBox
+    Friend WithEvents slot_07 As PictureBox
+    Friend WithEvents slot_06 As PictureBox
+    Friend WithEvents slot_05 As PictureBox
+    Friend WithEvents slot_04 As PictureBox
+    Friend WithEvents slot_03 As PictureBox
+    Friend WithEvents slot_02 As PictureBox
+    Friend WithEvents slot_01 As PictureBox
+    Friend WithEvents valueSlot As NumericUpDown
+    Friend WithEvents btnRestoreFromSlot As Button
+    Friend WithEvents btnSaveToSlot As Button
+    Friend WithEvents lblHTMLValue As Label
+    Friend WithEvents lbRGBValues As Label
+End Class

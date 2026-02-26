@@ -1,0 +1,162 @@
+﻿Imports UglyToad.PdfPig
+Imports UglyToad.PdfPig.Content
+Imports System.Text
+Imports System.IO
+
+Module ScriptEditor
+
+    Private isInitialized As Boolean = False
+
+    Public Sub InitializeScriptEditor()
+        If isInitialized Then Return
+        ' Hook available buttons via the ToolStrip dropdown items
+        If FrmMain IsNot Nothing Then
+            For Each tsi In FrmMain.ToolStrip_ScriptEditor.Items
+                Dim dd = TryCast(tsi, ToolStripDropDownButton)
+                If dd Is Nothing Then Continue For
+                For Each mi As ToolStripItem In dd.DropDownItems
+                    Select Case mi.Text.ToLowerInvariant()
+                        Case "import"
+                            AddHandler mi.Click, AddressOf OnImportScriptClick
+                        Case "load"
+                            AddHandler mi.Click, AddressOf OnLoadScriptClick
+                        Case "save"
+                            AddHandler mi.Click, AddressOf OnSaveScriptClick
+                    End Select
+                Next
+            Next
+        End If
+        isInitialized = True
+    End Sub
+
+    ' Ask user for PDF (PDF/A also supported) and import plain text into RichTextBox_ScriptEditor
+    Private Sub OnImportScriptClick(sender As Object, e As EventArgs)
+        Dim ofd As New OpenFileDialog() With {
+            .Title = "Importeer Script (PDF/PDF-A)",
+            .Filter = "PDF bestanden (*.pdf)|*.pdf",
+            .Multiselect = False
+        }
+        If ofd.ShowDialog() <> DialogResult.OK Then Return
+
+        Try
+            Dim sb As New StringBuilder()
+            Using pdf = PdfDocument.Open(ofd.FileName)
+                Dim pageIndex As Integer = 1
+                For Each page In pdf.GetPages()
+                    ' Extract raw text lines preserving some structure
+                    Dim words = page.GetWords()
+                    If words IsNot Nothing AndAlso words.Count > 0 Then
+                        Dim lineBuilder As New StringBuilder()
+                        Dim lastBottom As Double = -1
+                        For Each w In words
+                            Dim bottom = Math.Round(w.BoundingBox.Bottom, 1)
+                            If lastBottom <> -1 AndAlso Math.Abs(bottom - lastBottom) > 1.5 Then
+                                ' New line detected
+                                sb.AppendLine(lineBuilder.ToString().Trim())
+                                lineBuilder.Clear()
+                            End If
+                            lineBuilder.Append(w.Text & " ")
+                            lastBottom = bottom
+                        Next
+                        If lineBuilder.Length > 0 Then
+                            sb.AppendLine(lineBuilder.ToString().Trim())
+                        End If
+                    Else
+                        sb.AppendLine(page.Text)
+                    End If
+
+                    ' Page delimiter (optional)
+                    sb.AppendLine($"--- Pagina {pageIndex} ---")
+                    pageIndex += 1
+                Next
+            End Using
+
+            Dim cleaned = PostProcessImportedText(sb.ToString())
+            FrmMain.RichTextBox_ScriptEditor.Clear()
+            FrmMain.RichTextBox_ScriptEditor.Text = cleaned
+
+            ' Build index (simple scene detection )
+            BuildScriptIndex(cleaned)
+            ToonFlashBericht("Script geïmporteerd.", 2)
+        Catch ex As Exception
+            MessageBox.Show("Fout bij importeren PDF: " & ex.Message, "Fout", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    ' Simple heuristic post-processing (recognize SCENE headers, timestamps etc.)
+    Private Function PostProcessImportedText(raw As String) As String
+        Dim lines = raw.Split({Environment.NewLine}, StringSplitOptions.None)
+        Dim sb As New StringBuilder()
+        Dim sceneNr As Integer = 0
+        For Each lRaw In lines
+            Dim l = lRaw.Trim()
+            If l = String.Empty Then Continue For
+
+            ' Detect lines like "SCENE 1" or "SCÈNE 1" or "SCENE: 1"
+            If System.Text.RegularExpressions.Regex.IsMatch(l.ToUpper(), "^SC[ÈE]NE[ :]+\d+") Then
+                sceneNr += 1
+                sb.AppendLine($"[SCENE {sceneNr}] {l}")
+                Continue For
+            End If
+
+            ' Time stamp 00:00 or 0:00:00
+            If System.Text.RegularExpressions.Regex.IsMatch(l, "\b\d{1,2}:\d{2}(:\d{2})?\b") Then
+                sb.AppendLine($"[TIME] {l}")
+                Continue For
+            End If
+
+            sb.AppendLine(l)
+        Next
+        Return sb.ToString()
+    End Function
+
+    Private Sub BuildScriptIndex(allText As String)
+        FrmMain.ListBox_ScriptIndex.Items.Clear()
+        Dim lines = allText.Split({Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
+        For Each line In lines
+            If line.StartsWith("[SCENE ") Then
+                FrmMain.ListBox_ScriptIndex.Items.Add(line)
+            End If
+        Next
+    End Sub
+
+    Private Sub OnSaveScriptClick(sender As Object, e As EventArgs)
+        Dim sfd As New SaveFileDialog() With {
+            .Title = "Bewaar script",
+            .Filter = "Script bestanden (*.txt)|*.txt|Rich Text (*.rtf)|*.rtf",
+            .DefaultExt = "txt"
+        }
+        If sfd.ShowDialog() <> DialogResult.OK Then Return
+        Try
+            If sfd.FileName.EndsWith(".rtf", StringComparison.OrdinalIgnoreCase) Then
+                FrmMain.RichTextBox_ScriptEditor.SaveFile(sfd.FileName, RichTextBoxStreamType.RichText)
+            Else
+                System.IO.File.WriteAllText(sfd.FileName, FrmMain.RichTextBox_ScriptEditor.Text, Encoding.UTF8)
+            End If
+            ToonFlashBericht("Script opgeslagen.", 2)
+        Catch ex As Exception
+            MessageBox.Show("Fout bij opslaan: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub OnLoadScriptClick(sender As Object, e As EventArgs)
+        Dim ofd As New OpenFileDialog() With {
+            .Title = "Laad script",
+            .Filter = "Alle ondersteunde (*.rtf;*.txt)|*.rtf;*.txt|Tekst (*.txt)|*.txt|Rich Text (*.rtf)|*.rtf",
+            .Multiselect = False
+        }
+        If ofd.ShowDialog() <> DialogResult.OK Then Return
+        Try
+            If ofd.FileName.EndsWith(".rtf", StringComparison.OrdinalIgnoreCase) Then
+                FrmMain.RichTextBox_ScriptEditor.LoadFile(ofd.FileName, RichTextBoxStreamType.RichText)
+            Else
+                FrmMain.RichTextBox_ScriptEditor.Text = System.IO.File.ReadAllText(ofd.FileName, Encoding.UTF8)
+            End If
+            BuildScriptIndex(FrmMain.RichTextBox_ScriptEditor.Text)
+            ToonFlashBericht("Script geladen.", 2)
+        Catch ex As Exception
+            MessageBox.Show("Fout bij laden: " & ex.Message)
+        End Try
+    End Sub
+
+End Module

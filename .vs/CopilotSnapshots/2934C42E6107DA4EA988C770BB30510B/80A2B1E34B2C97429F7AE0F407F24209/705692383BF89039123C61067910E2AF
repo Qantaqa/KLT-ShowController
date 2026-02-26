@@ -1,0 +1,128 @@
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Partial Class ColorPickerExtended
+    Inherits System.Windows.Forms.Form
+
+    'Form overrides dispose to clean up the component list.
+    <System.Diagnostics.DebuggerNonUserCode()> _
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+        Try
+            If disposing AndAlso components IsNot Nothing Then
+                components.Dispose()
+            End If
+        Finally
+            MyBase.Dispose(disposing)
+        End Try
+    End Sub
+
+    'Required by the Windows Form Designer
+    Private components As System.ComponentModel.IContainer
+
+    Friend WithEvents pbPreview As PictureBox
+    Friend WithEvents tbR As TrackBar
+    Friend WithEvents tbG As TrackBar
+    Friend WithEvents tbB As TrackBar
+    Friend WithEvents nudR As NumericUpDown
+    Friend WithEvents nudG As NumericUpDown
+    Friend WithEvents nudB As NumericUpDown
+    Friend WithEvents btnStandard As Button
+    Friend WithEvents btnOk As Button
+    Friend WithEvents btnCancel As Button
+    Friend WithEvents flowSaved As FlowLayoutPanel
+    Friend WithEvents btnSaveSlot As Button
+    Friend WithEvents nudSlot As NumericUpDown
+    Friend WithEvents btnClearSlot As Button
+
+    'NOTE: The following procedure is required by the Windows Form Designer
+    'It can be modified using the Windows Form Designer.  
+    'Do not modify it using the code editor.
+    <System.Diagnostics.DebuggerStepThrough()> _
+    Private Sub InitializeComponent()
+        components = New System.ComponentModel.Container()
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.ClientSize = New System.Drawing.Size(420, 260)
+        Me.Text = "Kleurkiezer"
+        Me.FormBorderStyle = FormBorderStyle.FixedDialog
+        Me.StartPosition = FormStartPosition.CenterParent
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
+
+        pbPreview = New PictureBox()
+        pbPreview.Location = New Point(12, 12)
+        pbPreview.Size = New Size(120, 80)
+        pbPreview.BorderStyle = BorderStyle.FixedSingle
+        Me.Controls.Add(pbPreview)
+
+        Dim lblR As New Label() With {.Text = "R", .Location = New Point(140, 12), .AutoSize = True}
+        tbR = New TrackBar() With {.Minimum = 0, .Maximum = 255, .TickFrequency = 16, .Location = New Point(160, 6), .Size = New Size(240, 45)}
+        nudR = New NumericUpDown() With {.Minimum = 0, .Maximum = 255, .Location = New Point(160, 36), .Size = New Size(60, 20)}
+        Me.Controls.Add(lblR)
+        Me.Controls.Add(tbR)
+        Me.Controls.Add(nudR)
+
+        Dim lblG As New Label() With {.Text = "G", .Location = New Point(140, 66), .AutoSize = True}
+        tbG = New TrackBar() With {.Minimum = 0, .Maximum = 255, .TickFrequency = 16, .Location = New Point(160, 60), .Size = New Size(240, 45)}
+        nudG = New NumericUpDown() With {.Minimum = 0, .Maximum = 255, .Location = New Point(160, 96), .Size = New Size(60, 20)}
+        Me.Controls.Add(lblG)
+        Me.Controls.Add(tbG)
+        Me.Controls.Add(nudG)
+
+        Dim lblB As New Label() With {.Text = "B", .Location = New Point(140, 120), .AutoSize = True}
+        tbB = New TrackBar() With {.Minimum = 0, .Maximum = 255, .TickFrequency = 16, .Location = New Point(160, 114), .Size = New Size(240, 45)}
+        nudB = New NumericUpDown() With {.Minimum = 0, .Maximum = 255, .Location = New Point(160, 150), .Size = New Size(60, 20)}
+        Me.Controls.Add(lblB)
+        Me.Controls.Add(tbB)
+        Me.Controls.Add(nudB)
+
+        btnStandard = New Button() With {.Text = "Standaard dialoog...", .Location = New Point(12, 100), .Size = New Size(120, 28)}
+        Me.Controls.Add(btnStandard)
+
+        Dim lblSaved As New Label() With {.Text = "Snelle kleuren:", .Location = New Point(12, 140), .AutoSize = True}
+        Me.Controls.Add(lblSaved)
+
+        flowSaved = New FlowLayoutPanel() With {.Location = New Point(12, 160), .Size = New Size(120, 80), .FlowDirection = FlowDirection.LeftToRight}
+        Me.Controls.Add(flowSaved)
+        For i As Integer = 0 To SavedColors.Length - 1
+            Dim b As New Button() With {.Size = New Size(36, 36), .Tag = i}
+            AddHandler b.Click, AddressOf SavedColor_Click
+            b.BackColor = If(SavedColors(i).HasValue, SavedColors(i).Value, Color.Gray)
+            flowSaved.Controls.Add(b)
+        Next
+
+        nudSlot = New NumericUpDown() With {.Minimum = 1, .Maximum = 6, .Location = New Point(160, 180), .Size = New Size(50, 20)}
+        Me.Controls.Add(nudSlot)
+
+        btnSaveSlot = New Button() With {.Text = "Opslaan naar slot", .Location = New Point(220, 176), .Size = New Size(120, 24)}
+        Me.Controls.Add(btnSaveSlot)
+
+        btnClearSlot = New Button() With {.Text = "Wis slot", .Location = New Point(220, 204), .Size = New Size(120, 24)}
+        Me.Controls.Add(btnClearSlot)
+
+        btnOk = New Button() With {.Text = "OK", .Location = New Point(320, 200), .Size = New Size(80, 28), .DialogResult = DialogResult.OK}
+        Me.Controls.Add(btnOk)
+
+        btnCancel = New Button() With {.Text = "Annuleren", .Location = New Point(232, 200), .Size = New Size(80, 28), .DialogResult = DialogResult.Cancel}
+        Me.Controls.Add(btnCancel)
+
+        ' Wire event handlers
+        AddHandler btnStandard.Click, AddressOf BtnStandard_Click
+        AddHandler btnSaveSlot.Click, AddressOf BtnSaveSlot_Click
+        AddHandler btnClearSlot.Click, AddressOf BtnClearSlot_Click
+        AddHandler btnOk.Click, AddressOf BtnOk_Click
+
+        AddHandler tbR.Scroll, AddressOf TrackBar_Scroll
+        AddHandler tbG.Scroll, AddressOf TrackBar_Scroll
+        AddHandler tbB.Scroll, AddressOf TrackBar_Scroll
+        AddHandler nudR.ValueChanged, AddressOf Nud_ValueChanged
+        AddHandler nudG.ValueChanged, AddressOf Nud_ValueChanged
+        AddHandler nudB.ValueChanged, AddressOf Nud_ValueChanged
+
+        ' Initialize control values from SelectedColor (constructor sets SelectedColor before calling InitializeComponent)
+        tbR.Value = SelectedColor.R
+        tbG.Value = SelectedColor.G
+        tbB.Value = SelectedColor.B
+        nudR.Value = SelectedColor.R
+        nudG.Value = SelectedColor.G
+        nudB.Value = SelectedColor.B
+        UpdatePreview()
+    End Sub
+End Class

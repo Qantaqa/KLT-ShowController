@@ -1,4 +1,4 @@
-import type { WiZDevice } from "../store/useShowStore";
+import type { WiZDevice } from "../types/devices";
 
 /**
  * Service verantwoordelijk voor het aansturen van WiZ lampen via de Electron Main process (UDP).
@@ -6,90 +6,102 @@ import type { WiZDevice } from "../store/useShowStore";
  */
 
 /**
- * Doel: Algemene functie om de status van een WiZ lamp aan te passen.
- * Input: device (WiZDevice), state (on, r, g, b, dimming, transitionTime).
- * Output: Promise<void>.
- * Condities: Werkt alleen binnen een Electron omgeving waar 'ipcRenderer' beschikbaar is.
- * Integriteit: Valideert parameters en converteert transitionTime naar milliseconden voor het protocol.
+ * Adjusts the operational state of a WiZ lamp (on/off, color, brightness).
+ * This service acts as a bridge between the React UI and the Electron IPC layer.
+ * 
+ * @param device The WiZDevice configuration object.
+ * @param state Object containing the desired operational parameters.
+ * @returns A promise that resolves once the command is dispatched to the background process.
  */
 export const SetWizState = async (device: WiZDevice, state: { on?: boolean, r?: number, g?: number, b?: number, dimming?: number, transitionTime?: number }) => {
+    // Test if the application is running in the Electron environment (Host mode)
     if ((window as any).require) {
         const { ipcRenderer } = (window as any).require('electron');
 
-        // Protocol specificatie: WiZ verwacht duration in ms, we ontvangen seconds van de UI
+        /**
+         * Protocol Normalization:
+         * The WiZ UDP protocol expects transition duration in milliseconds.
+         * The UI provides this value in seconds, so we perform a 1000x conversion.
+         */
         const duration = state.transitionTime !== undefined ? Math.round(state.transitionTime * 1000) : undefined;
 
+        // Dispatch the command to the main process for UDP transmission
         await ipcRenderer.invoke('wiz-command', {
             ip: device.ip,
             method: 'setPilot',
             params: {
+                // Determine which parameters to include in the JSON payload
                 ...(state.on !== undefined ? { state: state.on } : {}),
+                // Clamp RGB values to the standard 0-255 range
                 ...(state.r !== undefined ? { r: Math.min(255, Math.max(0, state.r)) } : {}),
                 ...(state.g !== undefined ? { g: Math.min(255, Math.max(0, state.g)) } : {}),
                 ...(state.b !== undefined ? { b: Math.min(255, Math.max(0, state.b)) } : {}),
-                ...(state.dimming !== undefined ? { dimming: Math.min(100, Math.max(10, state.dimming)) } : {}), // WiZ minimum is vaak 10
+                // Clamp dimming to 10-100 (WiZ hardware often fails or strobes below 10%)
+                ...(state.dimming !== undefined ? { dimming: Math.min(100, Math.max(10, state.dimming)) } : {}),
                 ...(duration !== undefined ? { duration } : {})
             }
         });
     } else {
-        console.warn("SetWizState aangeroepen buiten Electron omgeving.");
+        // Log a warning if called from an unauthorized environment (e.g. standard browser)
+        console.warn("SetWizState invoked outside Electron environment. Hardware control is disabled.");
     }
 };
 
 /**
- * Doel: Zet een WiZ lamp aan met optionele dimming.
- * Input: device, dimming (default 100).
- * Output: Promise<void>.
- * Condities: Gebruikt de 'fadeInTime' van het device als overgangstijd.
- * Integriteit: Delegeert naar SetWizState.
+ * Activates a WiZ lamp with a specific brightness level.
+ * @param device The WiZ device to control.
+ * @param dimming Target brightness (default 100%).
  */
 export const TurnOnWiz = async (device: WiZDevice, dimming: number = 100) => {
+    // Use the device's default fade-in time or fallback to 0.5s
     const transition = device.fadeInTime || 0.5;
     await SetWizState(device, { on: true, dimming, transitionTime: transition });
 };
 
 /**
- * Doel: Zet een WiZ lamp volledig uit.
- * Input: device.
- * Output: Promise<void>.
- * Condities: Gebruikt de 'fadeOutTime' van het device.
- * Integriteit: Delegeert naar SetWizState.
+ * Deactivates a WiZ lamp gracefully.
+ * @param device The WiZ device to control.
  */
 export const TurnOffWiz = async (device: WiZDevice) => {
+    // Use the device's default fade-out time or fallback to 0.5s
     const transition = device.fadeOutTime || 0.5;
     await SetWizState(device, { on: false, transitionTime: transition });
 };
 
 /**
- * Doel: Stelt een specifieke RGB kleur in voor een WiZ lamp.
- * Input: device, r, g, b, dimming.
- * Output: Promise<void>.
- * Condities: Gebruikt 'transitionTime' van het device.
- * Integriteit: Garandeert dat de lamp ook 'aan' gaat bij een kleurwijziging.
+ * Sets a specific RGB color and brightness for a WiZ lamp.
+ * Effectively turns the lamp 'on' if it was previously off.
+ * @param device The WiZ device to control.
+ * @param r Red component (0-255).
+ * @param g Green component (0-255).
+ * @param b Blue component (0-255).
+ * @param dimming Brightness level (default 100%).
  */
 export const SetWizColor = async (device: WiZDevice, r: number, g: number, b: number, dimming: number = 100) => {
+    // Use the standard transition time or fallback to 0.5s
     const transition = device.transitionTime || 0.5;
     await SetWizState(device, { on: true, r, g, b, dimming, transitionTime: transition });
 };
 
 /**
- * Doel: Haalt de huidige status (kleur, dimming, etc.) op van een WiZ lamp.
- * Input: device.
- * Output: Promise met statusobject of null.
- * Condities: UDP communicatie kan timenouten via NetworkManager.
- * Integriteit: Retourneert null bij falen om crashes in de UI te voorkomen.
+ * Queries the hardware for its current operational status (color, brightness, reachability).
+ * @param device The WiZ device to query.
+ * @returns A promise resolving to the device response object or null if unreachable.
  */
 export const GetWizStatus = async (device: WiZDevice) => {
+    // Test for Electron environment
     if ((window as any).require) {
         const { ipcRenderer } = (window as any).require('electron');
         try {
+            // Forward the status request to the main process
             return await ipcRenderer.invoke('wiz-command', {
                 ip: device.ip,
                 method: 'getPilot',
                 params: {}
             });
         } catch (error) {
-            console.error(`Fout bij ophalen WiZ status voor ${device.ip}:`, error);
+            // Silently log failures (e.g. device offline) and return null to the UI
+            console.error(`Failed to fetch WiZ status for ${device.ip}:`, error);
             return null;
         }
     }
