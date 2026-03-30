@@ -15,6 +15,8 @@ export interface ParsedScript {
     acts: ParsedAct[];
 }
 
+const AI_PARSE_TIMEOUT_MS = 5000;
+
 /**
  * Orchestrates the parsing of a PDF script file.
  * Automatically chooses between AI-enhanced parsing (if API key provided) and rule-based regex parsing.
@@ -56,7 +58,15 @@ export async function parsePdfScript(filePath: string, apiKey?: string): Promise
         // Test if an AI API key is provided and valid; if true, use AI for parsing
         if (apiKey && apiKey.trim().length > 10) {
             try {
-                return await parseScriptWithAi(text, apiKey);
+                // Offline-safe: if there's no internet, we want a fast fallback to regex parsing.
+                const aiPromise = parseScriptWithAi(text, apiKey);
+                const timeoutPromise = new Promise<ParsedScript>((_, reject) => {
+                    const t = setTimeout(() => {
+                        clearTimeout(t);
+                        reject(new Error(`AI parse timeout after ${AI_PARSE_TIMEOUT_MS}ms`));
+                    }, AI_PARSE_TIMEOUT_MS);
+                });
+                return await Promise.race([aiPromise, timeoutPromise]);
             } catch (aiErr) {
                 // If AI parsing fails (e.g. rate limit, content block), fall back to regex
                 console.error('[Backend] AI parsing failed, falling back to regex:', aiErr);

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>LedShow Output</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+            cursor: none;
+            user-select: none;
+            /* Checkered B&W border via outline + box-shadow trick */
+            box-sizing: border-box;
+            border: 0;
+        }
+        /* Checkered border overlay rendered via body::before */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            pointer-events: none;
+            border: 24px solid transparent;
+            border-image: repeating-linear-gradient(
+                45deg,
+                #fff 0px, #fff 12px,
+                #000 12px, #000 24px
+            ) 24;
+            box-shadow: inset 0 0 0 24px transparent;
+        }
+        /* Hide checkered border while media is playing */
+        body.playing::before { display: none; }
+        #video-player {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: contain;
+            display: none;
+            z-index: 2;
+        }
+        #image-display {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: contain;
+            display: none;
+            z-index: 2;
+        }
+        #test-pattern {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: none;
+            z-index: 2;
+            background: #000;
+        }
+        /* SMPTE-style test pattern using pure CSS */
+        .color-bars {
+            display: flex;
+            height: 70%;
+        }
+        .color-bars div { flex: 1; }
+        .bar-white { background: #fff; }
+        .bar-yellow { background: #ff0; }
+        .bar-cyan { background: #0ff; }
+        .bar-green { background: #0f0; }
+        .bar-magenta { background: #f0f; }
+        .bar-red { background: #f00; }
+        .bar-blue { background: #00f; }
+        .bar-black { background: #000; }
+        .gradient-bar {
+            height: 15%;
+            background: linear-gradient(to right, #000, #fff);
+        }
+        .info-bar {
+            height: 15%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #111;
+            color: #fff;
+            font-family: monospace;
+            font-size: 1.5vw;
+            letter-spacing: 0.1em;
+            gap: 0.4em;
+        }
+        .info-bar .agent-name {
+            font-size: 2vw;
+            font-weight: bold;
+            color: #fbbf24;
+            letter-spacing: 0.2em;
+        }
+        .info-bar .info-url {
+            font-size: 1.1vw;
+            color: #9ca3af;
+        }
+        .info-bar .status-line {
+            font-size: 1.1vw;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        .info-bar .status-dot {
+            width: 0.8vw;
+            height: 0.8vw;
+            border-radius: 50%;
+            background: #ef4444;
+            display: inline-block;
+            transition: background 0.4s;
+        }
+        .info-bar .status-dot.connected { background: #22c55e; animation: pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        #status-overlay {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #22c55e;
+            font-family: monospace;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            z-index: 100;
+            display: none;
+        }
+        #status-overlay.disconnected { color: #ef4444; }
+
+        /* Sync overlay — shown during file transfers */
+        #sync-overlay {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.95) 40%);
+            padding: 40px 40px 30px;
+            z-index: 50;
+            display: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        #sync-overlay .sync-label {
+            color: #fbbf24;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 6px;
+        }
+        #sync-overlay .sync-filename {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+        #sync-overlay .sync-bar-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        #sync-overlay .sync-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        #sync-overlay .sync-percent {
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            margin-top: 6px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <video id="video-player" autoplay></video>
+    <img id="image-display" />
+    <div id="test-pattern">
+        <div class="color-bars">
+            <div class="bar-white"></div>
+            <div class="bar-yellow"></div>
+            <div class="bar-cyan"></div>
+            <div class="bar-green"></div>
+            <div class="bar-magenta"></div>
+            <div class="bar-red"></div>
+            <div class="bar-blue"></div>
+            <div class="bar-black"></div>
+        </div>
+        <div class="gradient-bar"></div>
+        <div class="info-bar" id="test-pattern-info">
+            <div class="agent-name">VideoWall-Agent</div>
+            <div class="info-url">Dashboard: http://localhost:3003</div>
+            <div class="status-line">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text">Verbinding verbroken&hellip;</span>
+            </div>
+        </div>
+    </div>
+    <div id="status-overlay">Connected</div>
+    <div id="sync-overlay">
+        <div class="sync-label">⬇ Bestand ontvangen</div>
+        <div class="sync-filename" id="sync-filename"></div>
+        <div class="sync-bar-track"><div class="sync-bar-fill" id="sync-bar-fill"></div></div>
+        <div class="sync-percent" id="sync-percent"></div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video-player');
+        const image = document.getElementById('image-display');
+        const testPattern = document.getElementById('test-pattern');
+        const statusOverlay = document.getElementById('status-overlay');
+
+        /**
+         * Registers the correct onended handler based on loop mode.
+         * loop=true  → manual restart fallback (some browsers ignore video.loop)
+         * loop=false → hideAll() for a clean black screen
+         */
+        function setVideoEndedHandler(loop) {
+            video.onended = null;
+            if (loop) {
+                video.onended = () => {
+                    console.log('[Output] Video ended, restarting (manual loop fallback)');
+                    video.currentTime = 0;
+                    video.play().catch(() => {});
+                };
+            } else {
+                video.onended = () => {
+                    console.log('[Output] Video ended, stopping (black screen)');
+                    hideAll();
+                };
+            }
+        }
+
+        let ws;
+        let reconnectInterval;
+
+        function hideAll() {
+            video.style.display = 'none';
+            video.pause();
+            video.src = '';
+            image.style.display = 'none';
+            image.src = '';
+            testPattern.style.display = 'none';
+            document.body.classList.remove('playing');
+        }
+
+        function showVideo(filename, opts) {
+            opts = opts || {};
+            const isRepeat = opts.loop === true || opts.repeat === true || (opts.action === 'repeat' && opts.repeat === true);
+            const volume   = typeof opts.volume === 'number' ? opts.volume : 100;
+            const mute     = opts.mute === true;
+            const fadeMs   = typeof opts.fadeInTime === 'number' ? (opts.fadeInTime < 10 ? opts.fadeInTime * 1000 : opts.fadeInTime) : 0;
+
+            console.log('[Output] Play Video: ' + filename + ', Loop: ' + isRepeat + ', Volume: ' + volume + ', Mute: ' + mute);
+
+            hideAll();
+            let cleanName;
+            try { cleanName = decodeURIComponent(filename); } catch(e) { cleanName = filename; }
+
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+
+            // Set loop immediately
+            video.loop = isRepeat;
+            if (isRepeat) video.setAttribute('loop', 'loop');
+            else video.removeAttribute('loop');
+
+            video.muted  = true;
+            video.volume = 0;
+            video.style.display = 'block';
+            document.body.classList.add('playing');
+
+            // Register onended handler: loop → restart, no-loop → black screen
+            setVideoEndedHandler(isRepeat);
+
+            const onCanPlay = () => {
+                video.removeEventListener('canplay', onCanPlay);
+                
+                // Re-enforce loop on canplay (some browsers reset it)
+                video.loop = isRepeat;
+                
+                video.play()
+                    .then(() => {
+                        if (mute) {
+                            video.muted  = true;
+                            video.volume = 0;
+                        } else {
+                            video.muted = false;
+                            const targetVol = Math.max(0, Math.min(1, volume / 100));
+                            if (fadeMs > 0) {
+                                const start = performance.now();
+                                function ramp(ts) {
+                                    const t = Math.min((ts - start) / fadeMs, 1);
+                                    video.volume = t * targetVol;
+                                    if (t < 1) requestAnimationFrame(ramp);
+                                }
+                                requestAnimationFrame(ramp);
+                            } else {
+                                video.volume = targetVol;
+                            }
+                        }
+                    })
+                    .catch(e => {
+                        console.warn('[Output] Autoplay prevented, retrying muted...', e);
+                        video.muted = true;
+                        video.play().catch(e2 => console.error('[Output] Play failed:', e2));
+                    });
+            };
+
+            video.addEventListener('canplay', onCanPlay);
+            video.src = '/media/' + encodeURIComponent(cleanName);
+            video.load();
+        }
+
+        function showImage(filename) {
+            hideAll();
+            let cleanName;
+            try { cleanName = decodeURIComponent(filename); } catch(e) { cleanName = filename; }
+            image.style.display = 'block';
+            image.src = '/media/' + encodeURIComponent(cleanName);
+            document.body.classList.add('playing');
+        }
+
+        function showTestPattern() {
+            hideAll();
+            testPattern.style.display = 'block';
+        }
+
+        function stopAll() { hideAll(); }
+
+        function connect() {
+            const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(protocol + '//' + location.host + '/output-ws');
+
+            ws.onopen = () => {
+                statusOverlay.textContent = 'Connected';
+                statusOverlay.className = '';
+                statusOverlay.style.display = 'block';
+                setTimeout(() => { statusOverlay.style.display = 'none'; }, 3000);
+                if (reconnectInterval) { clearInterval(reconnectInterval); reconnectInterval = null; }
+                // Update test-pattern status indicator
+                const dot = document.getElementById('status-dot');
+                const txt = document.getElementById('status-text');
+                if (dot) dot.className = 'status-dot connected';
+                if (txt) txt.textContent = 'Verbonden met Hub';
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    switch (data.action) {
+                        case 'play':
+                            if (data.filename) {
+                                const ext = data.filename.split('.').pop().toLowerCase();
+                                if (['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'].includes(ext)) {
+                                    showVideo(data.filename, data);
+                                } else {
+                                    showImage(data.filename);
+                                }
+                            }
+                            break;
+                        case 'test-pattern': showTestPattern(); break;
+                        case 'stop': stopAll(); break;
+                        case 'pause': video.pause(); break;
+                        case 'resume': video.play().catch(e => {}); break;
+                        case 'volume': if (typeof data.level === 'number') video.volume = Math.max(0, Math.min(1, data.level / 100)); break;
+                        case 'repeat':
+                            if (typeof data.repeat === 'boolean') {
+                                video.loop = data.repeat;
+                                setVideoEndedHandler(data.repeat);
+                            }
+                            break;
+                        case 'sync-start': showSyncOverlay(data.filename); break;
+                        case 'sync-progress': updateSyncProgress(data.percent || 0, data.filename); break;
+                        case 'sync-complete': completeSyncOverlay(data.filename); break;
+                        case 'sync-error': errorSyncOverlay(data.filename, data.error); break;
+                    }
+                } catch (e) {}
+            };
+
+            ws.onclose = () => {
+                statusOverlay.textContent = 'Disconnected — reconnecting...';
+                statusOverlay.className = 'disconnected';
+                statusOverlay.style.display = 'block';
+                if (!reconnectInterval) reconnectInterval = setInterval(connect, 3000);
+                // Update test-pattern status indicator
+                const dot = document.getElementById('status-dot');
+                const txt = document.getElementById('status-text');
+                if (dot) dot.className = 'status-dot';
+                if (txt) txt.textContent = 'Verbinding verbroken — opnieuw verbinden...';
+            };
+
+            ws.onerror = (err) => { ws.close(); };
+        }
+
+        document.body.addEventListener('click', () => {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+        });
+
+        const syncOverlay = document.getElementById('sync-overlay');
+        const syncFilename = document.getElementById('sync-filename');
+        const syncBarFill = document.getElementById('sync-bar-fill');
+        const syncPercent = document.getElementById('sync-percent');
+        let syncHideTimer = null;
+
+        function showSyncOverlay(filename) {
+            if (syncHideTimer) { clearTimeout(syncHideTimer); syncHideTimer = null; }
+            syncFilename.textContent = filename || 'Onbekend bestand';
+            syncBarFill.style.width = '0%';
+            syncPercent.textContent = 'Voorbereiden...';
+            syncOverlay.style.display = 'block';
+        }
+
+        function updateSyncProgress(percent, filename) {
+            if (syncOverlay.style.display === 'none') showSyncOverlay(filename);
+            syncBarFill.style.width = percent + '%';
+            syncPercent.textContent = percent + '%';
+        }
+
+        function completeSyncOverlay(filename) {
+            syncBarFill.style.width = '100%';
+            syncPercent.textContent = 'Voltooid';
+            syncHideTimer = setTimeout(() => { syncOverlay.style.display = 'none'; }, 2500);
+        }
+
+        function errorSyncOverlay(filename, error) {
+            syncBarFill.style.width = '100%';
+            syncBarFill.style.background = '#ef4444';
+            syncPercent.textContent = 'Fout: ' + (error || 'Onbekend');
+            syncHideTimer = setTimeout(() => {
+                syncOverlay.style.display = 'none';
+                syncBarFill.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+            }, 5000);
+        }
+
+        connect();
+        showTestPattern();
+    </script>
+</body>
+</html>

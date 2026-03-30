@@ -111,21 +111,43 @@ const fileServer = http.createServer((req: any, res: any) => {
 
     // Serve Agent Package
     if (url.pathname === '/agent-package') {
-        let zipPath = path.join(__dirname, './VideoWall-agent-v1.1.0.zip');
-        if (!fs.existsSync(zipPath)) {
-            zipPath = path.join(__dirname, '../electron/VideoWall-agent-v1.1.0.zip'); // Fallback for dev
-        }
+        const agentDir = fs.existsSync(path.join(__dirname, './VideoWall-agent-v1.1.3.zip'))
+            ? __dirname
+            : path.join(__dirname, '../electron');
+        const files = fs.existsSync(agentDir) ? fs.readdirSync(agentDir) : [];
+        const zipFile = files.find((f: string) => f.startsWith('VideoWall-agent-v') && f.endsWith('.zip'))
+            || 'VideoWall-agent-v1.1.3.zip';
+        const zipPath = path.join(agentDir, zipFile);
 
         if (fs.existsSync(zipPath)) {
             res.writeHead(200, {
                 'Content-Type': 'application/zip',
                 'Access-Control-Allow-Origin': '*',
-                'Content-Disposition': 'attachment; filename="VideoWall-agent-v1.1.0.zip"'
+                'Content-Disposition': `attachment; filename="${zipFile}"`
             });
             fs.createReadStream(zipPath).pipe(res);
         } else {
             console.error('[Main] Agent package not found at:', zipPath);
             res.writeHead(404); res.end('Agent package not found');
+        }
+        return;
+    }
+
+    // Serve Agent Version — used by agents at startup to check for updates
+    if (url.pathname === '/agent-version') {
+        try {
+            const agentDir = fs.existsSync(path.join(__dirname, './VideoWall-agent-v1.1.3.zip'))
+                ? __dirname
+                : path.join(__dirname, '../electron');
+            const files = fs.existsSync(agentDir) ? fs.readdirSync(agentDir) : [];
+            const zipFile = files.find((f: string) => f.startsWith('VideoWall-agent-v') && f.endsWith('.zip'));
+            const version = zipFile
+                ? zipFile.replace('VideoWall-agent-v', '').replace('.zip', '')
+                : '1.1.3';
+            res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            res.end(JSON.stringify({ version }));
+        } catch (e) {
+            res.writeHead(500); res.end('{}');
         }
         return;
     }
@@ -740,6 +762,17 @@ ipcMain.on('projection-ready', (event: any, rendererDeviceId?: string) => {
         if (lastState) {
             event.sender.send(`media-${lastState.command}`, lastState.payload);
         }
+
+        // Send device config (includes masks)
+        const shows = dbManager.getShows();
+        for (const show of shows) {
+            const devices = dbManager.getDevices(show.id);
+            const device = devices.find((d: any) => d.id === deviceId);
+            if (device) {
+                event.sender.send('projection-config', device);
+                break;
+            }
+        }
     }
 });
 
@@ -774,9 +807,99 @@ ipcMain.on('media-status-update', (_e: any, { deviceId, status }: any) => {
     }
 });
 
+// Projection Configuration & Calibration
+ipcMain.on('projection-update-masks', (_e: any, { deviceId, masks }: { deviceId: string, masks: any[] }) => {
+    console.log(`[Main] Updating projection masks for device ${deviceId}`, masks);
+    const shows = dbManager.getShows();
+    for (const show of shows) {
+        const devices = dbManager.getDevices(show.id);
+        const device = devices.find((d: any) => d.id === deviceId);
+        if (device && (device.type === 'local_monitor' || device.type === 'remote_VideoWall')) {
+            device.projectionMasks = masks;
+            dbManager.saveDevices(show.id, devices);
+
+            // Notify Hub UI if it's listening
+            const hostWin = BrowserWindow.getAllWindows().find((w: any) => w.title === 'KLT LedShow Host');
+            if (hostWin) {
+                hostWin.webContents.send('projection-masks-updated', { deviceId, masks });
+            }
+            break;
+        }
+    }
+});
+
+ipcMain.on('projection-set-calibration', (_e: any, { deviceId, enabled }: { deviceId: string, enabled: boolean }) => {
+    console.log(`[Main] Setting calibration mode for ${deviceId}: ${enabled}`);
+    const win = projectionWindows.get(deviceId);
+    if (win && !win.isDestroyed()) {
+        win.webContents.send('projection-calibration-mode', { enabled });
+    }
+});
+
+ipcMain.on('projection-test-image', (_e: any, { enabled, url }: { enabled: boolean, url?: string }) => {
+    console.log(`[Main] Toggling projection test image: ${enabled} (${url})`);
+    for (const win of projectionWindows.values()) {
+        if (win && !win.isDestroyed()) {
+            win.webContents.send('projection-test-image', { enabled, url });
+        }
+    }
+});
+
+ipcMain.on('projection-test-video', (_e: any, { enabled, url, playing }: { enabled: boolean, url?: string, playing?: boolean }) => {
+    console.log(`[Main] Toggling projection test video: ${enabled} (${url})`);
+    for (const win of projectionWindows.values()) {
+        if (win && !win.isDestroyed()) {
+            win.webContents.send('projection-test-video', { enabled, url, playing });
+        }
+    }
+});
+
+ipcMain.on('projection-finish-calibration', (_e: any, { deviceId }: { deviceId: string }) => {
+    console.log(`[Main] Finishing calibration for device ${deviceId}`);
+    const hostWin = BrowserWindow.getAllWindows().find((w: any) => w.title === 'KLT LedShow Host');
+    if (hostWin) {
+        hostWin.webContents.send('projection-calibration-finished', { deviceId });
+    }
+    const win = projectionWindows.get(deviceId);
+    if (win && !win.isDestroyed()) {
+        win.webContents.send('projection-calibration-mode', { enabled: false });
+    }
+});
+
+function initializeProjectionWindows() {
+    console.log('[Main] Initializing projection windows for all local monitors...');
+    const shows = dbManager.getShows();
+    // Use a Set to avoid duplicates if multiple shows have the same device (though usually there's one active show)
+    const processedMonitors = new Set<string>();
+
+    for (const show of shows) {
+        const devices = dbManager.getDevices(show.id);
+        const localMonitors = devices.filter((d: any) => d.type === 'local_monitor');
+
+        for (const device of localMonitors) {
+            const monitorId = device.monitorId !== undefined ? device.monitorId : 1;
+            const key = `${device.id}_${monitorId}`;
+            if (!processedMonitors.has(key)) {
+                ensureProjectionWindow(device.id, monitorId);
+                processedMonitors.add(key);
+            }
+        }
+    }
+}
+
+
 // Media Control - One way from Main Window to Projection Window
 ipcMain.on('media-command', (_e: any, { deviceId, command, payload }: any) => {
     console.log(`[Main] Media command: ${command} for device ${deviceId}`, payload);
+
+    // If it's a global config update, broadcast to window
+    if (command === 'config-update') {
+        const win = projectionWindows.get(deviceId);
+        if (win && !win.isDestroyed()) {
+            win.webContents.send('projection-config', payload);
+        }
+        return;
+    }
 
     // Save state for sync when window (re)loads
     const currentState = lastMediaStates.get(deviceId) || { command: 'stop', payload: {} };
@@ -908,10 +1031,15 @@ ipcMain.handle('prepare-agent-update', async () => {
 
         const child_process = require('node:child_process');
 
-        // Windows: use PowerShell to compress-archive
-        // We move to the dist directory and zip its content
-        const cmd = `powershell -Command "cd '${distPath}'; Compress-Archive -Path '*' -DestinationPath '${tempZipPath}' -Force"`;
-        child_process.execSync(cmd);
+        // Use Windows built-in tar.exe (available since Windows 10 build 17063)
+        // tar creates POSIX-compatible ZIPs with forward slashes, unlike PowerShell
+        // Compress-Archive which creates backslash paths that break Linux unzip.
+        // -a = auto-detect format from extension (.zip)
+        // -c = create
+        // -f = output file
+        // -C = change to directory first (so paths in zip are relative, e.g. "index.js" not "dist\index.js")
+        const cmd = `tar -a -c -f "${tempZipPath}" -C "${distPath}" .`;
+        child_process.execSync(cmd, { stdio: 'pipe' });
 
         return tempZipPath;
     } catch (error) {
@@ -1023,6 +1151,9 @@ if (app) {
         }
 
         createWindow();
+
+        // Initialize projection windows slightly after main window to avoid resource contention
+        setTimeout(initializeProjectionWindows, 2000);
     });
 
     app.on('window-all-closed', () => {

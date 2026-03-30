@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Plus, Trash2, Settings2, Monitor, Wifi, Tv, ChevronDown, Radar, RefreshCw, Play, X, StopCircle, Save } from 'lucide-react'
+import { Plus, Trash2, Settings2, Monitor, Wifi, Tv, ChevronDown, Radar, RefreshCw, Play, X, StopCircle, Save, Upload } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { useSequencerStore } from '../store/useSequencerStore'
-import type { Device, DeviceType, LocalMonitorDevice, RemoteVideoWallDevice, WiZDevice, VideoWallAgentDevice, WLEDDevice } from '../types/devices'
+import type { Device, DeviceType, RemoteVideoWallDevice, WiZDevice, VideoWallAgentDevice, WLEDDevice, LocalMonitorDevice } from '../types/devices'
 import { StartMediaPlayer, StopMediaPlayer, SetVolumeMediaPlayer } from '../services/media-player-service'
 import { videoWallAgentService } from '../services/videowall-agent-service'
 import { TurnOnWiz, SetWizColor, TurnOffWiz } from '../services/wiz-service'
@@ -39,6 +39,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
     const [isReadingConfig, setIsReadingConfig] = useState<string | null>(null)
     const [activeTests, setActiveTests] = useState<Record<string, any>>({})
 
+
     // Cleanup active tests on unmount
     React.useEffect(() => {
         return () => {
@@ -58,7 +59,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                 // Update segments in state
                 const segments = result.segments.map((s: any) => ({
                     id: s.id,
-                    name: s.n || `Segment ${s.id}`,
+                    name: s.n || `Segment ${s.id} `,
                     start: s.start,
                     stop: s.stop,
                     offset: s.of || 0,
@@ -73,7 +74,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                 addToast(result.error || "Fout bij het lezen van segmenten", "error");
             }
         } catch (e: any) {
-            addToast(`Fout: ${e.message}`, "error");
+            addToast(`Fout: ${e.message} `, "error");
         } finally {
             setIsReadingConfig(null);
         }
@@ -98,9 +99,9 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                 }))
             };
             await ipcRenderer.invoke('wled:send-command', { ip: device.ip, payload });
-            addToast(`Configuratie toegepast op ${device.name}`, "info");
+            addToast(`Configuratie toegepast op ${device.name} `, "info");
         } catch (e: any) {
-            addToast(`Fout bij toepassen: ${e.message}`, "error");
+            addToast(`Fout bij toepassen: ${e.message} `, "error");
         } finally {
             setIsReadingConfig(null);
         }
@@ -204,7 +205,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                 const segmentCount = device.details?.leds?.segs?.length || 1;
                 const segments = Array.from({ length: segmentCount }, (_, i) => ({
                     id: i,
-                    name: device.details?.leds?.segs?.[i]?.n || `Segment ${i}`
+                    name: device.details?.leds?.segs?.[i]?.n || `Segment ${i} `
                 }));
                 (updates as any).segments = segments;
             }
@@ -220,21 +221,21 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
             if (hasChanges || !isAuto) {
                 updateDevice(existingDevice.id, updates)
                 if (isAuto && hasChanges) {
-                    addToast(`VideoWall "${existingDevice.name}" automatisch bijgewerkt naar ${device.ip}`, "info");
+                    addToast(`VideoWall "${existingDevice.name}" automatisch bijgewerkt naar ${device.ip} `, "info");
                 } else if (!isAuto) {
                     addToast(`${existingDevice.name} bijgewerkt`, "info");
                 }
             }
         } else {
             // Add new
-            const id = `device_${Date.now()}`
+            const id = `device_${Date.now()} `
             let newDevice: Device | null = null;
 
             if (device.type === 'wled') {
                 const segmentCount = device.details?.leds?.segs?.length || 1;
                 const segments = Array.from({ length: segmentCount }, (_, i) => ({
                     id: i,
-                    name: device.details?.leds?.segs?.[i]?.n || `Segment ${i}`,
+                    name: device.details?.leds?.segs?.[i]?.n || `Segment ${i} `,
                     start: device.details?.leds?.segs?.[i]?.start || 0,
                     stop: device.details?.leds?.segs?.[i]?.stop || 0,
                     offset: device.details?.leds?.segs?.[i]?.of || 0,
@@ -294,7 +295,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
     }
 
     const handleAddDevice = (type: DeviceType) => {
-        const id = `device_${Date.now()}`
+        const id = `device_${Date.now()} `
         let newDevice: Device
 
         switch (type) {
@@ -337,13 +338,13 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
 
                     await StartMediaPlayer(device, testVideoPath, true, 100, fadeInTime, undefined, transitionTime);
                     setTestVolumes(prev => ({ ...prev, [device.id]: 100 }))
-                    addToast(`Test gestart op monitor: ${device.name}`, "info");
+                    addToast(`Test gestart op monitor: ${device.name} `, "info");
                 } else {
                     addToast("Test video bestand niet gevonden!", "error");
                 }
             } else if (device.type === 'wiz') {
                 const wiz = device as WiZDevice;
-                addToast(`Continue WiZ test gestart: ${device.name}`, "info");
+                addToast(`Continue WiZ test gestart: ${device.name} `, "info");
 
                 const runWizTest = async () => {
                     const r = Math.floor(Math.random() * 256);
@@ -363,7 +364,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
 
             } else if (device.type === 'wled') {
                 const wled = device as WLEDDevice;
-                addToast(`Continue WLED test gestart: ${device.name}`, "info");
+                addToast(`Continue WLED test gestart: ${device.name} `, "info");
 
                 // Get effects and palettes count/list if possible, or just use reasonable random ranges
                 let fxCount = 100; // Fallback
@@ -407,7 +408,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                 if (testVideoPath) {
                     await StartMediaPlayer(device, testVideoPath, true, 100, 500, undefined, 500);
                     setTestVolumes(prev => ({ ...prev, [device.id]: 100 }))
-                    addToast(`Test video gestuurd naar agent: ${device.name}`, "info");
+                    addToast(`Test video gestuurd naar agent: ${device.name} `, "info");
                 } else {
                     addToast("Test video bestand niet gevonden!", "error");
                 }
@@ -435,7 +436,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                 }
             }
 
-            addToast(`Test gestopt voor ${device.name}`, "info");
+            addToast(`Test gestopt voor ${device.name} `, "info");
         }
 
         if (device.type === 'videowall_agent' || device.type === 'local_monitor') {
@@ -467,6 +468,30 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
         } else {
             addToast(`Update van ${device.name} mislukt!`, "error");
         }
+    }
+
+    const handleRestartAgent = (device: VideoWallAgentDevice) => {
+        openModal({
+            title: 'Agent Herstarten',
+            message: `Agent "${device.name}" herstarten? De start.sh loop herstart de agent automatisch.`,
+            type: 'confirm',
+            onConfirm: async () => {
+                const ok = await videoWallAgentService.restartAgent(device);
+                addToast(ok ? `Agent ${device.name} wordt herstart...` : `Herstart van ${device.name} mislukt!`, ok ? "info" : "error");
+            }
+        });
+    }
+
+    const handleShutdownHost = (device: VideoWallAgentDevice) => {
+        openModal({
+            title: '⚠️ Host Afsluiten',
+            message: `De Linux host van "${device.name}" afsluiten? Dit kan niet ongedaan worden gemaakt. De machine wordt uitgeschakeld.`,
+            type: 'confirm',
+            onConfirm: async () => {
+                const ok = await videoWallAgentService.shutdownHost(device);
+                addToast(ok ? `Host van ${device.name} wordt afgesloten...` : `Afsluiten van ${device.name} mislukt!`, ok ? "info" : "error");
+            }
+        });
     }
 
 
@@ -552,7 +577,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button onClick={() => handleIgnoreScanResult(result.ip)} className="p-2 text-muted-foreground hover:text-white rounded-lg transition-colors" title="Negeren"><X className="w-4 h-4" /></button>
-                                        <button onClick={() => handleAddFromScan(result)} className={`p-2 rounded-lg transition-colors ${existing ? 'bg-warning/20 text-warning hover:bg-warning hover:text-white' : 'bg-primary text-primary-foreground hover:bg-white shadow-lg shadow-primary/20'}`} title={existing ? "Bijwerken" : "Toevoegen"}>
+                                        <button onClick={() => handleAddFromScan(result)} className={`p - 2 rounded - lg transition - colors ${existing ? 'bg-warning/20 text-warning hover:bg-warning hover:text-white' : 'bg-primary text-primary-foreground hover:bg-white shadow-lg shadow-primary/20'} `} title={existing ? "Bijwerken" : "Toevoegen"}>
                                             {existing ? <RefreshCw className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                                         </button>
                                     </div>
@@ -586,7 +611,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
 
                                 <div className="p-4 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => setExpandedDevice(isExpanded ? null : device.id)}>
                                     <div className="flex items-center gap-4">
-                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${device.enabled ? 'bg-primary/20 text-primary' : 'bg-white/5 opacity-40'}`}>{renderDeviceIcon(device.type)}</div>
+                                        <div className={`w - 8 h - 8 rounded - lg flex items - center justify - center ${device.enabled ? 'bg-primary/20 text-primary' : 'bg-white/5 opacity-40'} `}>{renderDeviceIcon(device.type)}</div>
                                         <div className="flex-1 pr-4">
                                             <div className="text-sm font-bold flex items-center gap-2">
                                                 {device.name}
@@ -612,7 +637,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                                 {device.type === 'local_monitor' ? (() => {
                                                     const monitorId = (device as LocalMonitorDevice).monitorId;
                                                     const disp = displays.find(d => d.index === monitorId);
-                                                    return disp ? `Scherm ${monitorId + 1}: ${disp.isPrimary ? '(Hoofdscherm) ' : ''}${disp.bounds.width}x${disp.bounds.height}` : `Scherm ${monitorId + 1}: (Niet verbonden)`;
+                                                    return disp ? `Scherm ${monitorId + 1}: ${disp.isPrimary ? '(Hoofdscherm) ' : ''}${disp.bounds.width}x${disp.bounds.height} ` : `Scherm ${monitorId + 1}: (Niet verbonden)`;
                                                 })() : (device as any).ip || 'Geen IP opgegeven'}
                                             </div>
                                         </div>
@@ -624,7 +649,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                     if (transfers.length === 0) return null;
                                     const t = transfers[0];
                                     const barColor = t.status === 'error' ? 'bg-red-500' : t.status === 'complete' || t.status === 'skipped' ? 'bg-green-500' : 'bg-amber-400';
-                                    const label = t.status === 'checking' ? 'Controleren...' : t.status === 'uploading' ? `Uploaden: ${t.filename}` : t.status === 'complete' ? `Voltooid: ${t.filename}` : t.status === 'skipped' ? `Al aanwezig: ${t.filename}` : `Fout: ${t.error || t.filename}`;
+                                    const label = t.status === 'checking' ? 'Controleren...' : t.status === 'uploading' ? `Uploaden: ${t.filename} ` : t.status === 'complete' ? `Voltooid: ${t.filename} ` : t.status === 'skipped' ? `Al aanwezig: ${t.filename} ` : `Fout: ${t.error || t.filename} `;
                                     return (
                                         <div className="px-4 pb-2">
                                             <div className="flex items-center justify-between mb-1">
@@ -632,7 +657,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                                 <span className="text-[10px] font-mono text-white/40">{t.percent}%</span>
                                             </div>
                                             <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                                                <div className={cn("progress-bar-fill", barColor)} ref={el => el?.style.setProperty('--percent', `${t.percent}%`)} />
+                                                <div className={cn("progress-bar-fill", barColor)} ref={el => el?.style.setProperty('--percent', `${t.percent}% `)} />
                                             </div>
                                         </div>
                                     );
@@ -680,22 +705,6 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                                         placeholder="3003"
                                                         onChange={e => updateDevice(device.id, { port: parseInt(e.target.value) || 3003 } as any)}
                                                     />
-                                                </div>
-                                            )}
-                                            {device.type === 'local_monitor' && (
-                                                <div className="space-y-1.5 col-span-2">
-                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Fysiek Scherm</label>
-                                                    <select
-                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all appearance-none"
-                                                        value={(device as LocalMonitorDevice).monitorId}
-                                                        title="Selecteer Scherm"
-                                                        onChange={e => updateDevice(device.id, { monitorId: parseInt(e.target.value) } as any)}
-                                                    >
-                                                        {[0, 1, 2, 3].map(idx => {
-                                                            const d = displays.find(disp => disp.index === idx);
-                                                            return <option key={idx} value={idx} className="bg-background">{d ? `✅ Scherm ${idx + 1}: ${d.isPrimary ? '(Hoofdscherm) ' : ''}${d.bounds.width}x${d.bounds.height}` : `🔴 Scherm ${idx + 1}: (Niet verbonden)`}</option>
-                                                        })}
-                                                    </select>
                                                 </div>
                                             )}
                                         </div>
@@ -924,23 +933,40 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                                     </div>
                                                 </div>
 
-                                                {/* Agent Update Action */}
-                                                {(device as any).version < latestAgentVersion && (
-                                                    <div className="mt-4 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 flex items-center justify-between group">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-500">
-                                                                <RefreshCw className={cn("w-5 h-5", updateStatuses[device.id] && "animate-spin")} />
+                                                {/* Agent Update Action — always visible for videowall_agent */}
+                                                {(() => {
+                                                    const agentVersion = (device as any).version;
+                                                    const hasUpdate = agentVersion && agentVersion < latestAgentVersion;
+                                                    return (
+                                                        <div className={`mt-4 p-4 rounded-xl flex items-center justify-between group ${hasUpdate ? 'bg-amber-500/5 border border-amber-500/20' : 'bg-white/5 border border-white/10'}`}>
+                                                            <div className="flex items-center gap-3">
+                                                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${hasUpdate ? 'bg-amber-500/10 text-amber-500' : 'bg-white/5 text-white/40'}`}>
+                                                                    <RefreshCw className={cn("w-5 h-5", updateStatuses[device.id] && "animate-spin")} />
+                                                                </div>
+                                                                <div>
+                                                                    <div className={`text-xs font-bold uppercase tracking-widest ${hasUpdate ? 'text-amber-500' : 'text-white/40'}`}>
+                                                                        {hasUpdate ? 'Update Beschikbaar' : 'Agent Software'}
+                                                                    </div>
+                                                                    <div className="text-[10px] text-white/40 mt-0.5">
+                                                                        {updateStatuses[device.id] || (hasUpdate
+                                                                            ? `Nieuwe versie v${latestAgentVersion} is klaar.`
+                                                                            : agentVersion
+                                                                                ? `Versie v${agentVersion} (actueel) — v${latestAgentVersion} opnieuw installeren`
+                                                                                : `v${latestAgentVersion} pushen naar agent`
+                                                                        )}
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div>
-                                                                <div className="text-xs font-bold text-amber-500 uppercase tracking-widest">Update Beschikbaar</div>
-                                                                <div className="text-[10px] text-white/40 mt-0.5">{updateStatuses[device.id] || `Nieuwe versie v${latestAgentVersion} is klaar.`}</div>
-                                                            </div>
+                                                            <button
+                                                                onClick={() => handleUpdateAgent(device as VideoWallAgentDevice)}
+                                                                disabled={!!updateStatuses[device.id]}
+                                                                className={`px-4 py-2 font-black uppercase text-[10px] rounded-lg tracking-widest transition-all disabled:opacity-50 ${hasUpdate ? 'bg-amber-500 hover:bg-white text-black' : 'bg-white/10 hover:bg-white/20 text-white/60 hover:text-white'}`}
+                                                            >
+                                                                {updateStatuses[device.id] ? 'Updating...' : hasUpdate ? 'Nu Bijwerken' : 'Herinstalleren'}
+                                                            </button>
                                                         </div>
-                                                        <button onClick={() => handleUpdateAgent(device as VideoWallAgentDevice)} disabled={!!updateStatuses[device.id]} className="px-4 py-2 bg-amber-500 hover:bg-white text-black font-black uppercase text-[10px] rounded-lg tracking-widest transition-all disabled:opacity-50">
-                                                            {updateStatuses[device.id] ? 'Updating...' : 'Nu Bijwerken'}
-                                                        </button>
-                                                    </div>
-                                                )}
+                                                    );
+                                                })()}
 
                                                 <div className="space-y-2 mt-2">
                                                     <div className="flex justify-between items-center px-1">
@@ -957,6 +983,48 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                                         title="Bezel Grootte"
                                                         onChange={e => updateDevice(device.id, { bezelSize: parseInt(e.target.value) } as any)}
                                                     />
+                                                </div>
+
+                                                {/* Media Upload Section */}
+                                                <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 space-y-3">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                                                            <Upload className="w-5 h-5" />
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-xs font-bold text-primary uppercase tracking-widest">Media Uploaden</div>
+                                                            <div className="text-[10px] text-white/40 mt-0.5">Upload videobestanden rechtstreeks naar deze agent.</div>
+                                                        </div>
+                                                    </div>
+                                                    <label className="flex items-center justify-center gap-3 px-4 py-2.5 bg-primary/20 hover:bg-primary text-primary hover:text-black font-black uppercase text-[10px] rounded-lg tracking-widest transition-all cursor-pointer">
+                                                        <Upload className="w-3.5 h-3.5" />
+                                                        Bestanden Kiezen &amp; Uploaden
+                                                        <input
+                                                            type="file"
+                                                            accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
+                                                            multiple
+                                                            className="hidden"
+                                                            title="Selecteer videobestanden om te uploaden"
+                                                            onChange={async (e) => {
+                                                                if (!e.target.files || e.target.files.length === 0) return;
+                                                                const files = Array.from(e.target.files);
+                                                                for (const file of files) {
+                                                                    const filename = file.name;
+                                                                    if ((window as any).require) {
+                                                                        try {
+                                                                            const { ipcRenderer } = (window as any).require('electron');
+                                                                            const localPath = await ipcRenderer.invoke('get-media-path', filename);
+                                                                            await videoWallAgentService.syncFileWithProgress(device as VideoWallAgentDevice, localPath, filename);
+                                                                            addToast(`'${filename}' geüpload naar ${device.name}`, 'info');
+                                                                        } catch (err: any) {
+                                                                            addToast(`Upload fout: ${err.message}`, 'error');
+                                                                        }
+                                                                    }
+                                                                }
+                                                                e.target.value = '';
+                                                            }}
+                                                        />
+                                                    </label>
                                                 </div>
                                             </div>
                                         )}
@@ -1002,7 +1070,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
 
                                         <div className="flex items-center justify-between pt-2">
                                             <div className="flex gap-2">
-                                                <button onClick={() => updateDevice(device.id, { enabled: !device.enabled })} className={`px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${device.enabled ? 'bg-primary text-white' : 'bg-white/5 text-muted-foreground border border-white/10'}`}>
+                                                <button onClick={() => updateDevice(device.id, { enabled: !device.enabled })} className={`px - 4 py - 1.5 rounded - lg text - [10px] font - bold uppercase tracking - widest transition - all ${device.enabled ? 'bg-primary text-white' : 'bg-white/5 text-muted-foreground border border-white/10'} `}>
                                                     {device.enabled ? 'Actief' : 'Gedeactiveerd'}
                                                 </button>
                                                 <div className="flex bg-white/5 border border-white/10 rounded-lg overflow-hidden">
@@ -1037,6 +1105,26 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                                             <button onClick={() => handleVolumeTest(device, 10)} className="w-6 h-full flex items-center justify-center hover:bg-white/10 text-white/40 hover:text-white transition-all text-sm font-bold">+</button>
                                                         </div>
                                                     )}
+                                                    {device.type === 'videowall_agent' && (
+                                                        <>
+                                                            <div className="w-px bg-white/10" />
+                                                            <button
+                                                                onClick={() => handleRestartAgent(device as VideoWallAgentDevice)}
+                                                                className="px-3 py-1.5 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest transition-all"
+                                                                title="Agent Herstarten"
+                                                            >
+                                                                <RefreshCw className="w-3 h-3" /> Herstart
+                                                            </button>
+                                                            <div className="w-px bg-white/10" />
+                                                            <button
+                                                                onClick={() => handleShutdownHost(device as VideoWallAgentDevice)}
+                                                                className="px-3 py-1.5 hover:bg-red-900/40 text-red-500/70 hover:text-red-400 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest transition-all"
+                                                                title="Linux Host Afsluiten"
+                                                            >
+                                                                🖥️ Shutdown
+                                                            </button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
                                             <button
@@ -1044,7 +1132,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                                     e.stopPropagation()
                                                     openModal({
                                                         title: 'Apparaat Verwijderen',
-                                                        message: `Weet je zeker dat je apparaat "${device.name}" wilt verwijderen?`,
+                                                        message: `Weet je zeker dat je apparaat "${device.name}" wilt verwijderen ? `,
                                                         type: 'confirm',
                                                         onConfirm: () => deleteDevice(device.id)
                                                     })

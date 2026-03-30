@@ -51,6 +51,15 @@ export interface WiZDevice extends BaseDevice {
 }
 
 /**
+ * Configuration for a mask area in projection mapping.
+ */
+export interface ProjectionMask {
+    id: string;
+    name?: string;
+    points: { x: number, y: number }[]; // Coordinates as percentages (0-100)
+}
+
+/**
  * Configuration for a secondary screen attached to the host PC.
  */
 export interface LocalMonitorDevice extends BaseDevice {
@@ -58,6 +67,7 @@ export interface LocalMonitorDevice extends BaseDevice {
     monitorId: number;
     fadeOutTime?: number;
     transitionTime?: number;
+    projectionMasks?: ProjectionMask[];
 }
 
 /**

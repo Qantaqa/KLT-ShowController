@@ -1,7 +1,8 @@
 import { type StateCreator } from 'zustand';
 import { type ShowState } from '../types';
 import * as MediaPlayer from '../../services/media-player-service';
-import type { LocalMonitorDevice } from '../../types/devices';
+import { PlayDirectOnAgent } from '../../services/media-player-service';
+import type { LocalMonitorDevice, VideoWallAgentDevice } from '../../types/devices';
 
 export interface MediaSlice {
     playingMedia: Record<string, {
@@ -29,6 +30,7 @@ export interface MediaSlice {
     setMediaVolume: (index: number, volume: number) => void;
     toggleAudio: (index: number) => void;
     toggleRepeat: (index: number) => void;
+    setMediaBrightness: (index: number, brightness: number) => void;
     startProjection: (deviceId: string, monitorIndex: number) => void;
     mediaAction: (deviceId: string, action: string, payload?: any) => void;
 
@@ -75,8 +77,16 @@ export const createMediaSlice: StateCreator<
             const repeat = event.type === 'media' && event.effect === 'repeat'
             const volume = event.intensity !== undefined ? event.intensity : 100
             const mute = !event.sound
+            const projectionMaskIds = event.projectionMaskIds
 
-            MediaPlayer.StartMediaPlayer(d, mediaUrl, repeat, volume, 0, undefined, event.transition, mute)
+            const brightness = event.brightness !== undefined ? event.brightness : 100
+
+            if (d.type === 'videowall_agent') {
+                // Direct play — no sync — pre-flight check ensures media is present
+                PlayDirectOnAgent(d as VideoWallAgentDevice, mediaUrl, repeat, volume, event.transition, mute, brightness)
+            } else {
+                MediaPlayer.StartMediaPlayer(d, mediaUrl, repeat, volume, 0, undefined, event.transition, mute, projectionMaskIds, brightness)
+            }
             newPlaying[d.id] = { filename: event.filename || '', timestamp: Date.now() }
         })
         set({ playingMedia: newPlaying })
@@ -181,6 +191,27 @@ export const createMediaSlice: StateCreator<
                 MediaPlayer.SetRepeatMediaPlayer(d, newState)
             })
         }
+    },
+
+    setMediaBrightness: (index: number, brightness: number) => {
+        const { events, appSettings, updateEvent } = get()
+        const event = events[index]
+        if (!event) return
+
+        updateEvent(index, { brightness })
+
+        const targetName = (event.fixture || '').trim().toLowerCase()
+        const devices = appSettings.devices || []
+        const targets = devices.filter((d: any) => {
+            const isTypeMatch = d.type === 'local_monitor' || d.type === 'remote_VideoWall' || d.type === 'videowall_agent'
+            const isEnabled = (d as any).enabled !== false
+            const isNameMatch = !targetName || targetName === '*' || d.name.trim().toLowerCase() === targetName
+            return isTypeMatch && isEnabled && isNameMatch
+        })
+
+        targets.forEach((d: any) => {
+            MediaPlayer.SetBrightnessMediaPlayer(d, brightness)
+        })
     },
 
     setCameraActive: (active: boolean) => {

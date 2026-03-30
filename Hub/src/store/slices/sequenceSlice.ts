@@ -8,6 +8,7 @@ export interface SequenceSlice {
     activeEventIndex: number;
     selectedEventIndex: number;
     isLocked: boolean;
+    freezeRuntimeCollapsedGroups: boolean;
     blinkingNextEvent: boolean;
     blinkingNextScene: boolean;
     blinkingNextAct: boolean;
@@ -55,6 +56,8 @@ export interface SequenceSlice {
     deleteAct: (act: string) => void;
     deleteScene: (act: string, sceneId: number) => void;
     addCommentToEvent: (index: number) => void;
+    addActComment: (actId: string) => void;
+    addSceneComment: (actId: string, sceneId: number) => void;
     updateEvent: (index: number, partial: Partial<ShowEvent>) => void;
     resendEvent: (index: number) => void;
     reindexEvents: () => void;
@@ -77,6 +80,7 @@ export const createSequenceSlice: StateCreator<
     activeEventIndex: -1,
     selectedEventIndex: -1,
     isLocked: true,
+    freezeRuntimeCollapsedGroups: false,
     blinkingNextEvent: false,
     blinkingNextScene: false,
     blinkingNextAct: false,
@@ -100,7 +104,7 @@ export const createSequenceSlice: StateCreator<
             networkService.sendCommand({ type: 'REMOTE_CONTROL', action: 'setActiveEvent', index })
             return
         }
-        const { events, activeEventIndex, actualStartTime, isPaused, isTimeTracking, lastTransitionTime, isLocked, saveCurrentShow, autoFollowScript, setCurrentScriptPage, updateBlinkRecommendations, broadcastState } = get()
+        const { events, activeEventIndex, actualStartTime, isPaused, isTimeTracking, lastTransitionTime, isLocked, freezeRuntimeCollapsedGroups, saveCurrentShow, autoFollowScript, setCurrentScriptPage, updateBlinkRecommendations, broadcastState } = get()
         if (index === -1) {
             set({
                 activeEventIndex: -1,
@@ -175,16 +179,18 @@ export const createSequenceSlice: StateCreator<
             updates.isPaused = false
             updates.pauseStartTime = null
         }
-        if (isLocked) {
+        if (isLocked && !freezeRuntimeCollapsedGroups) {
             const allGroupKeys = new Set<string>()
             newEvents.forEach((e: ShowEvent) => {
+                const normalizedSceneId = e.sceneId ?? 0
                 allGroupKeys.add(`act-${e.act}`)
-                allGroupKeys.add(`scene-${e.act}-${e.sceneId}`)
+                allGroupKeys.add(`scene-${e.act}-${normalizedSceneId}`)
             })
             const nextRuntimeCollapsed: Record<string, boolean> = {}
             allGroupKeys.forEach(k => nextRuntimeCollapsed[k] = true)
+            const currentSceneId = currentEvent.sceneId ?? 0
             nextRuntimeCollapsed[`act-${currentEvent.act}`] = false
-            nextRuntimeCollapsed[`scene-${currentEvent.act}-${currentEvent.sceneId}`] = false
+            nextRuntimeCollapsed[`scene-${currentEvent.act}-${currentSceneId}`] = false
             let nextGroupIdx = -1
             for (let i = index + 1; i < newEvents.length; i++) {
                 const e = newEvents[i]
@@ -195,8 +201,9 @@ export const createSequenceSlice: StateCreator<
             }
             if (nextGroupIdx !== -1) {
                 const nextE = newEvents[nextGroupIdx]
+                const nextSceneId = nextE.sceneId ?? 0
                 nextRuntimeCollapsed[`act-${nextE.act}`] = false
-                nextRuntimeCollapsed[`scene-${nextE.act}-${nextE.sceneId}`] = false
+                nextRuntimeCollapsed[`scene-${nextE.act}-${nextSceneId}`] = false
             }
             updates.runtimeCollapsedGroups = nextRuntimeCollapsed
         }
@@ -219,7 +226,7 @@ export const createSequenceSlice: StateCreator<
 
     setLocked: async (isLocked) => {
         const { activeShow, events, activeEventIndex, saveCurrentShow, broadcastState } = get()
-        set({ isLocked })
+        set({ isLocked, freezeRuntimeCollapsedGroups: false })
         broadcastState()
 
         if (isLocked) {
@@ -228,11 +235,11 @@ export const createSequenceSlice: StateCreator<
             if (events && events.length > 0) {
                 const target = events[targetIndex]
                 const actKey = `act-${target.act}`
-                const sceneKey = `scene-${target.act}-${target.sceneId}`
+                const sceneKey = `scene-${target.act}-${target.sceneId ?? 0}`
                 const newRuntimeCollapsed: Record<string, boolean> = {}
                 const acts = new Set(events.map((e: ShowEvent) => e.act))
                 acts.forEach(a => newRuntimeCollapsed[`act-${a}`] = true)
-                const scenes = new Set(events.map((e: ShowEvent) => `scene-${e.act}-${e.sceneId}`))
+                const scenes = new Set(events.map((e: ShowEvent) => `scene-${e.act}-${e.sceneId ?? 0}`))
                 scenes.forEach((s: string) => newRuntimeCollapsed[s] = true)
                 newRuntimeCollapsed[actKey] = false
                 newRuntimeCollapsed[sceneKey] = false
@@ -258,7 +265,14 @@ export const createSequenceSlice: StateCreator<
             return
         }
         const current = events[activeEventIndex]
-        const next = events.find((e: ShowEvent, i: number) => i > activeEventIndex && (e.act !== current.act || e.sceneId !== current.sceneId || e.eventId !== current.eventId))
+
+        // Find next event Title
+        const next = events.find((e: ShowEvent, i: number) =>
+            i > activeEventIndex &&
+            e.type?.toLowerCase() === 'title' &&
+            (e.act !== current.act || e.sceneId !== current.sceneId || e.eventId !== current.eventId)
+        )
+
         if (next) {
             setActiveEvent(events.indexOf(next))
         } else {
@@ -279,7 +293,13 @@ export const createSequenceSlice: StateCreator<
             set({ navigationWarning: 'scene' })
             return
         }
-        const nextSceneEvent = events.find((e: ShowEvent, i: number) => i > activeEventIndex && (e.act !== current.act || e.sceneId > current.sceneId))
+
+        // Find next Scene or Title that crosses the scene boundary
+        const nextSceneEvent = events.find((e: ShowEvent, i: number) =>
+            i > activeEventIndex &&
+            (e.type?.toLowerCase() === 'scene' || e.type?.toLowerCase() === 'title') &&
+            (e.act !== current.act || (e.sceneId && current.sceneId && e.sceneId > current.sceneId))
+        )
         if (nextSceneEvent) {
             setActiveEvent(events.indexOf(nextSceneEvent))
         }
@@ -313,8 +333,8 @@ export const createSequenceSlice: StateCreator<
             const e = events[i]
             if (e.act === current.act && e.sceneId === current.sceneId && e.eventId === current.eventId) continue
             if (e.act === current.act) {
-                if (e.sceneId === current.sceneId && e.eventId > current.eventId && nextEventIdx === -1) nextEventIdx = i
-                if (e.sceneId > current.sceneId && nextSceneIdx === -1) nextSceneIdx = i
+                if (e.sceneId === current.sceneId && e.eventId !== undefined && current.eventId !== undefined && e.eventId > current.eventId && nextEventIdx === -1) nextEventIdx = i
+                if (e.sceneId !== undefined && current.sceneId !== undefined && e.sceneId > current.sceneId && nextSceneIdx === -1) nextSceneIdx = i
             } else if (nextActIdx === -1) nextActIdx = i
         }
         set({
@@ -329,32 +349,102 @@ export const createSequenceSlice: StateCreator<
         const current = !!runtimeCollapsedGroups[id]
         const next = !current
         const newCollapsed = { ...runtimeCollapsedGroups, [id]: next }
-        set({ runtimeCollapsedGroups: newCollapsed })
+        set({ runtimeCollapsedGroups: newCollapsed, freezeRuntimeCollapsedGroups: isLocked })
         if (!isLocked && activeShow) {
             updateActiveShow({ viewState: { ...activeShow.viewState, collapsedGroups: newCollapsed } })
         }
     },
 
     collapseAll: () => {
-        const { events, activeShow, isLocked, updateActiveShow } = get()
-        const newCollapsed: Record<string, boolean> = {}
-        events.forEach(e => {
-            newCollapsed[`act-${e.act}`] = false
-            newCollapsed[`scene-${e.act}-${e.sceneId}`] = false
-            newCollapsed[`${e.act}-${e.sceneId}-${e.eventId}`] = true
-        })
-        set({ runtimeCollapsedGroups: newCollapsed })
-        if (!isLocked && activeShow) {
-            updateActiveShow({ viewState: { ...activeShow.viewState, collapsedGroups: newCollapsed } })
+        const { events, activeShow, isLocked, updateActiveShow, activeEventIndex } = get()
+
+        // EDIT MODE: keep act/scene structure visible, collapse event details (light/media).
+        if (!isLocked) {
+            const newCollapsed: Record<string, boolean> = {}
+            events.forEach(e => {
+                const normalizedSceneId = e.sceneId ?? 0
+                const normalizedEventId = e.eventId ?? 0
+                newCollapsed[`act-${e.act}`] = false
+                newCollapsed[`scene-${e.act}-${normalizedSceneId}`] = false
+                newCollapsed[`${e.act}-${normalizedSceneId}-${normalizedEventId}`] = true
+            })
+            set({ runtimeCollapsedGroups: newCollapsed, freezeRuntimeCollapsedGroups: false })
+            if (activeShow) {
+                updateActiveShow({ viewState: { ...activeShow.viewState, collapsedGroups: newCollapsed } })
+            }
+            return
         }
+
+        // SHOW MODE: collapse the tree down to the active + next act/scene,
+        // but keep the active/next position clear. Also hide light/media blocks.
+        const newCollapsed: Record<string, boolean> = {}
+
+        const current = activeEventIndex >= 0 ? events[activeEventIndex] : events[0]
+        const normalizedCurrentSceneId = current?.sceneId ?? 0
+
+        // Default: collapse all acts and scenes.
+        new Set(events.map(e => e.act)).forEach((act: string) => {
+            newCollapsed[`act-${act}`] = true
+        })
+        events.forEach(e => {
+            const normalizedSceneId = e.sceneId ?? 0
+            newCollapsed[`scene-${e.act}-${normalizedSceneId}`] = true
+        })
+
+        // Expand active act/scene.
+        if (current) {
+            newCollapsed[`act-${current.act}`] = false
+            newCollapsed[`scene-${current.act}-${normalizedCurrentSceneId}`] = false
+        }
+
+        // Expand next act/scene (first differing group).
+        if (current) {
+            let nextE: ShowEvent | null = null
+            for (let i = activeEventIndex + 1; i < events.length; i++) {
+                const e = events[i]
+                if (e.act !== current.act || e.sceneId !== current.sceneId || e.eventId !== current.eventId) {
+                    nextE = e
+                    break
+                }
+            }
+            if (nextE) {
+                newCollapsed[`act-${nextE.act}`] = false
+                newCollapsed[`scene-${nextE.act}-${(nextE.sceneId ?? 0)}`] = false
+            }
+        }
+
+        // Collapse event nodes (hide light/media).
+        events.forEach(e => {
+            const normalizedSceneId = e.sceneId ?? 0
+            const normalizedEventId = e.eventId ?? 0
+            newCollapsed[`${e.act}-${normalizedSceneId}-${normalizedEventId}`] = true
+        })
+
+        set({ runtimeCollapsedGroups: newCollapsed, freezeRuntimeCollapsedGroups: true })
     },
 
     expandAll: () => {
         const { activeShow, isLocked, updateActiveShow } = get()
-        set({ runtimeCollapsedGroups: {} })
-        if (!isLocked && activeShow) {
-            updateActiveShow({ viewState: { ...activeShow.viewState, collapsedGroups: {} } })
+        if (!isLocked) {
+            set({ runtimeCollapsedGroups: {}, freezeRuntimeCollapsedGroups: false })
+            if (activeShow) {
+                updateActiveShow({ viewState: { ...activeShow.viewState, collapsedGroups: {} } })
+            }
+            return
         }
+
+        // In Show-mode is the default fallback in the UI "collapsed" when keys are missing.
+        // So we must explicitly set all act/scene/event nodes to expanded.
+        const { events } = get()
+        const newCollapsed: Record<string, boolean> = {}
+        events.forEach(e => {
+            const normalizedSceneId = e.sceneId ?? 0
+            const normalizedEventId = e.eventId ?? 0
+            newCollapsed[`act-${e.act}`] = false
+            newCollapsed[`scene-${e.act}-${normalizedSceneId}`] = false
+            newCollapsed[`${e.act}-${normalizedSceneId}-${normalizedEventId}`] = false
+        })
+        set({ runtimeCollapsedGroups: newCollapsed, freezeRuntimeCollapsedGroups: true })
     },
 
     toggleTimeTracking: () => set((state) => ({ isTimeTracking: !state.isTimeTracking })),
@@ -453,13 +543,13 @@ export const createSequenceSlice: StateCreator<
         }
 
         // 👉 NIEUW sceneId (tijdelijk — reindexEvents corrigeert)
-        const newSceneId = target.sceneId + 1
+        const newSceneId = (target.sceneId || 0) + 1
 
         const newRows: ShowEvent[] = [
-            { act: target.act, sceneId: newSceneId, eventId: 1, type: 'Scene', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent,
-            { act: target.act, sceneId: newSceneId, eventId: 1, type: 'Title', cue: 'Nieuw Event', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent,
-            { act: target.act, sceneId: newSceneId, eventId: 1, type: 'Comment', cue: 'Nieuw commentaar', fixture: '', effect: '', palette: '', color1: '#ffffff', color2: '#ffffff', color3: '#ffffff', brightness: 0, speed: 0, intensity: 0, transition: 0, sound: false } as ShowEvent,
-            { act: target.act, sceneId: newSceneId, eventId: 1, type: 'Trigger', cue: 'Handmatige overgang', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent
+            { act: target.act, sceneId: newSceneId, type: 'Scene', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true },
+            { act: target.act, sceneId: newSceneId, eventId: 1, type: 'Title', cue: 'Nieuw Event', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true },
+            { act: target.act, sceneId: newSceneId, eventId: 1, type: 'Comment', cue: 'Nieuw commentaar', fixture: '', effect: '', palette: '', color1: '#ffffff', color2: '#ffffff', color3: '#ffffff', brightness: 0, speed: 0, intensity: 0, transition: 0, sound: false },
+            { act: target.act, sceneId: newSceneId, eventId: 1, type: 'Trigger', cue: 'Handmatige overgang', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true }
         ]
 
         const newEvents = [...events]
@@ -476,6 +566,8 @@ export const createSequenceSlice: StateCreator<
     insertEvent: (index, position) => {
         const { events, setEvents, reindexEvents, saveCurrentShow } = get()
         const target = events[index]
+        if (target.sceneId === undefined || target.eventId === undefined) return;
+
         let insertAt = index
         if (position === 'after') {
             for (let i = index; i < events.length; i++) {
@@ -543,12 +635,16 @@ export const createSequenceSlice: StateCreator<
         let newEvents = [...events]
         if (direction === 'up' && firstIndex > 0 && events[firstIndex - 1].act === actName) {
             const prevSceneId = events[firstIndex - 1].sceneId
-            const prevSceneEvents = events.filter((e: ShowEvent) => e.act === actName && e.sceneId === prevSceneId)
-            newEvents.splice(firstIndex - prevSceneEvents.length, sceneEvents.length + prevSceneEvents.length, ...sceneEvents, ...prevSceneEvents)
+            if (prevSceneId !== undefined) {
+                const prevSceneEvents = events.filter((e: ShowEvent) => e.act === actName && e.sceneId === prevSceneId)
+                newEvents.splice(firstIndex - prevSceneEvents.length, sceneEvents.length + prevSceneEvents.length, ...sceneEvents, ...prevSceneEvents)
+            }
         } else if (direction === 'down' && lastIndex < events.length - 1 && events[lastIndex + 1].act === actName) {
             const nextSceneId = events[lastIndex + 1].sceneId
-            const nextSceneEvents = events.filter((e: ShowEvent) => e.act === actName && e.sceneId === nextSceneId)
-            newEvents.splice(firstIndex, sceneEvents.length + nextSceneEvents.length, ...nextSceneEvents, ...sceneEvents)
+            if (nextSceneId !== undefined) {
+                const nextSceneEvents = events.filter((e: ShowEvent) => e.act === actName && e.sceneId === nextSceneId)
+                newEvents.splice(firstIndex, sceneEvents.length + nextSceneEvents.length, ...nextSceneEvents, ...sceneEvents)
+            }
         }
         setEvents(newEvents)
         reindexEvents()
@@ -607,7 +703,7 @@ export const createSequenceSlice: StateCreator<
 
     deleteScene: (act: string, sceneId: number) => {
         const { events, setEvents, reindexEvents, saveCurrentShow } = get()
-        const scenesInAct = new Set(events.filter((e: ShowEvent) => e.act === act).map((e: ShowEvent) => e.sceneId))
+        const scenesInAct = new Set(events.filter((e: ShowEvent) => e.act === act && e.sceneId !== undefined).map((e: ShowEvent) => e.sceneId))
         if (scenesInAct.size <= 1) return
         const newEvents = events.filter((e: ShowEvent) => !(e.act === act && e.sceneId === sceneId))
         setEvents(newEvents)
@@ -618,9 +714,53 @@ export const createSequenceSlice: StateCreator<
     addCommentToEvent: (index: number) => {
         const { events, setEvents, reindexEvents, saveCurrentShow } = get()
         const target = events[index]
-        const newComment = { act: target.act, sceneId: target.sceneId, eventId: target.eventId, type: 'Comment', fixture: '', effect: '', palette: '', color1: '#ffffff', color2: '#ffffff', color3: '#ffffff', brightness: 0, speed: 0, intensity: 0, transition: 0, sound: false, cue: 'Nieuw commentaar' } as ShowEvent
+        const newComment = { act: target.act, sceneId: target.sceneId, eventId: target.eventId, actionId: target.actionId, type: 'Comment', fixture: '', effect: '', palette: '', color1: '#ffffff', color2: '#ffffff', color3: '#ffffff', brightness: 0, speed: 0, intensity: 0, transition: 0, sound: false, cue: 'Nieuw commentaar' } as ShowEvent
         const newEvents = [...events]
         newEvents.splice(index + 1, 0, newComment)
+        setEvents(newEvents)
+        reindexEvents()
+        saveCurrentShow()
+    },
+
+    addActComment: (actId: string) => {
+        const { events, setEvents, reindexEvents, saveCurrentShow, addToast } = get()
+        // Check if there's already a comment for this act (where sceneId is undefined or 0)
+        const hasComment = events.some(e => e.act === actId && (!e.sceneId || e.sceneId === 0) && e.type?.toLowerCase() === 'comment')
+        if (hasComment) {
+            addToast('Er is al een commentaar-regel voor deze Act.', 'warning')
+            return
+        }
+
+        // Find the insert position: right after the first row of this act
+        const firstRowIndex = events.findIndex(e => e.act === actId)
+        if (firstRowIndex === -1) return
+
+        const newComment = { act: actId, type: 'Comment', cue: 'Nieuw act commentaar', fixture: '', effect: '', palette: '', color1: '#ffffff', color2: '#ffffff', color3: '#ffffff', brightness: 0, speed: 0, intensity: 0, transition: 0, sound: false } as ShowEvent
+
+        const newEvents = [...events]
+        newEvents.splice(firstRowIndex + 1, 0, newComment)
+        setEvents(newEvents)
+        reindexEvents()
+        saveCurrentShow()
+    },
+
+    addSceneComment: (actId: string, sceneId: number) => {
+        const { events, setEvents, reindexEvents, saveCurrentShow, addToast } = get()
+        // Check if there's already a comment for this scene
+        const hasComment = events.some(e => e.act === actId && e.sceneId === sceneId && (!e.eventId || e.eventId === 0) && e.type?.toLowerCase() === 'comment')
+        if (hasComment) {
+            addToast('Er is al een commentaar-regel voor deze Scene.', 'warning')
+            return
+        }
+
+        // Find the insert position: right after the first row of this scene
+        const firstRowIndex = events.findIndex(e => e.act === actId && e.sceneId === sceneId)
+        if (firstRowIndex === -1) return
+
+        const newComment = { act: actId, sceneId, type: 'Comment', cue: 'Nieuw scene commentaar', fixture: '', effect: '', palette: '', color1: '#ffffff', color2: '#ffffff', color3: '#ffffff', brightness: 0, speed: 0, intensity: 0, transition: 0, sound: false } as ShowEvent
+
+        const newEvents = [...events]
+        newEvents.splice(firstRowIndex + 1, 0, newComment)
         setEvents(newEvents)
         reindexEvents()
         saveCurrentShow()
@@ -644,11 +784,13 @@ export const createSequenceSlice: StateCreator<
 
     reindexEvents: () => {
         const { events, setEvents } = get()
-        let currentAct = '', currentSceneId = 0, currentEventId = 0
+        let currentAct = ''
+        let currentSceneId = 0
+        let currentEventId = 0
+        let currentActionId = 0
         let actCounter = 0
+
         const actNamesMap = new Map<string, string>()
-        let isFirstInScene = true
-        let isFirstSceneInAct = true
 
         const newEvents = events.map((e: ShowEvent) => {
             const type = e.type?.toLowerCase() || ''
@@ -663,35 +805,48 @@ export const createSequenceSlice: StateCreator<
                 } else {
                     currentAct = e.act
                 }
-                currentSceneId = 1
-                currentEventId = 1
-                isFirstSceneInAct = true
-                isFirstInScene = true
+                currentSceneId = 0
+                currentEventId = 0
+                currentActionId = 0
             } else if (type === 'scene') {
-                if (isFirstSceneInAct) {
-                    isFirstSceneInAct = false
-                    currentSceneId = 1
-                } else {
-                    currentSceneId++
-                }
-                currentEventId = 1
-                isFirstInScene = true
+                currentSceneId++
+                currentEventId = 0
+                currentActionId = 0
             } else if (type === 'title') {
-                if (!isFirstInScene) {
-                    currentEventId++
-                }
-                isFirstInScene = false
-                isFirstSceneInAct = false
+                currentEventId++
+                currentActionId = 0
+            } else if (type === 'action' || type === 'media' || type === 'light') {
+                currentActionId++
             }
 
             const finalAct = actNamesMap.get(e.act) || currentAct || e.act
 
-            return {
+            const updatedEvent: ShowEvent = {
                 ...e,
                 act: finalAct,
-                sceneId: currentSceneId || e.sceneId,
-                eventId: currentEventId || e.eventId
             }
+
+            // Alleen toewijzen wat van toepassing is voor de specifieke laag van de hiërarchie
+            if (type === 'act' || (type === 'comment' && currentSceneId === 0)) {
+                updatedEvent.sceneId = undefined
+                updatedEvent.eventId = undefined
+                updatedEvent.actionId = undefined
+            } else if (type === 'scene' || (type === 'comment' && currentEventId === 0)) {
+                updatedEvent.sceneId = currentSceneId
+                updatedEvent.eventId = undefined
+                updatedEvent.actionId = undefined
+            } else if (type === 'title' || type === 'trigger' || (type === 'comment' && currentActionId === 0)) {
+                updatedEvent.sceneId = currentSceneId
+                updatedEvent.eventId = currentEventId
+                updatedEvent.actionId = undefined
+            } else {
+                // Alles wat hieronder valt zijn actions: light/media/action
+                updatedEvent.sceneId = currentSceneId
+                updatedEvent.eventId = currentEventId
+                updatedEvent.actionId = currentActionId
+            }
+
+            return updatedEvent
         })
         setEvents(newEvents)
     },

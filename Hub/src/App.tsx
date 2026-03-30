@@ -40,6 +40,7 @@ import { useRemoteKeyboard } from './hooks/useRemoteKeyboard'
 import { DatabaseManager } from './components/DatabaseManager'
 import SimpleModal from './components/SimpleModal'
 import CameraStreamer from './components/CameraStreamer'
+import MediaPreflightModal from './components/MediaPreflightModal'
 import { networkService } from './services/network-service'
 
 import { cn } from './lib/utils'
@@ -215,6 +216,7 @@ export default function App() {
   const [setupWizardStep, setSetupWizardStep] = useState<number | null>(null)
   const [foundAgent, setFoundAgent] = useState<any>(null)
   const [isWizardScanning, setIsWizardScanning] = useState(false)
+  const [showPreflight, setShowPreflight] = useState(false)
 
   // Clear PIN input when switching between auth screens
   useEffect(() => {
@@ -589,6 +591,32 @@ export default function App() {
 
   return (
     <div className="h-screen w-screen bg-background text-foreground flex flex-col overflow-hidden font-sans select-none relative">
+      {/* Pre-flight media check modal */}
+      {showPreflight && (
+        <MediaPreflightModal
+          agents={(appSettings.devices || []).filter((d: any) => d.type === 'videowall_agent' && d.enabled !== false) as any[]}
+          events={events}
+          onComplete={() => {
+            setShowPreflight(false)
+            setLocked(true)
+          }}
+          onCancel={() => setShowPreflight(false)}
+        />
+      )}
+
+      {/* Pre-flight media check modal — runs when transitioning from edit to show mode */}
+      {showPreflight && (
+        <MediaPreflightModal
+          agents={(appSettings.devices || []).filter((d: any) => d.type === 'videowall_agent' && d.enabled !== false) as any[]}
+          events={events}
+          onComplete={() => {
+            setShowPreflight(false)
+            setLocked(true)
+          }}
+          onCancel={() => setShowPreflight(false)}
+        />
+      )}
+
       <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 items-end pointer-events-none">
         {toasts.map(toast => (
           <div key={toast.id} className={cn(
@@ -655,7 +683,15 @@ export default function App() {
         <div className="flex items-center gap-4 flex-1 justify-end">
           {activeShow && isHost && (
             <button
-              onClick={() => setLocked(!isLocked)}
+              onClick={() => {
+                if (!isLocked) {
+                  // Transitioning edit → show: run pre-flight check first
+                  setShowPreflight(true)
+                } else {
+                  // Transitioning show → edit: unlock immediately
+                  setLocked(false)
+                }
+              }}
               className={cn(
                 "h-10 px-4 rounded-xl flex items-center gap-3 transition-all font-bold text-xs uppercase tracking-widest border border-white/10",
                 isLocked
@@ -977,39 +1013,8 @@ export default function App() {
             )}
             <div className="p-3 border-b border-white/5 flex items-center justify-between bg-black/20">
               <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-2">Sequence</span>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => useSequencerStore.getState().expandAll()}
-                    className="h-8 px-3 rounded-xl bg-black border border-white/20 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white group"
-                    title="Alles uitklappen"
-                  >
-                    <ChevronRight className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
-                    <span>Open</span>
-                  </button>
-                  <button
-                    onClick={() => useSequencerStore.getState().collapseAll()}
-                    className="h-8 px-3 rounded-xl bg-black border border-white/20 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white group"
-                    title="Alles inklappen"
-                  >
-                    <ChevronDown className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform rotate-[-90deg]" />
-                    <span>Dicht</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      useSequencerStore.getState().reindexEvents();
-                      useSequencerStore.getState().addToast('Sequence succesvol hernummerd', 'info');
-                    }}
-                    className="h-8 px-3 rounded-xl bg-black border border-white/20 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white group"
-                    title="Acts, Scenes en Events hernummeren"
-                  >
-                    <Hash className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
-                    <span>Hernummeren</span>
-                  </button>
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-mono opacity-40 border-l border-white/5 pl-4">
-                  {activeEventIndex + 1} / {events.length}
-                </div>
+              <div className="flex items-center gap-2 text-[10px] font-mono opacity-40 border-l border-white/5 pl-4">
+                {activeEventIndex + 1} / {events.length}
               </div>
             </div>
             <div className="flex-1 overflow-auto p-2 custom-scrollbar">
@@ -1574,7 +1579,7 @@ export default function App() {
                   !isLocked && "opacity-20"
                 )}
               >
-                <SkipForward className={cn("w-5 h-5 rotate-90", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-orange-400")} />
+                <SkipForward className={cn("w-5 h-5 rotate-2700", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-orange-400")} />
                 <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-muted-foreground")}>
                   {navigationWarning === 'act' ? 'Override?' : 'Next Act'}
                 </span>

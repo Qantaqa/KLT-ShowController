@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import child_process from 'node:child_process';
 import cors from 'cors';
+import os from 'node:os';
 import { PlayerService } from './player.js';
 import { DiscoveryService } from './discovery.js';
 
@@ -37,8 +38,19 @@ export class ServerService {
             }
         });
 
-        this.upload = multer({ storage });
+        this.upload = multer({
+            storage,
+            limits: {
+                fileSize: 2 * 1024 * 1024 * 1024 // 2 GB max
+            }
+        });
         this.server = http.createServer(this.app);
+
+        // Increase timeout for large video uploads over wifi (default is 2 min, needs 10+ min)
+        this.server.setTimeout(10 * 60 * 1000); // 10 minutes
+        this.server.requestTimeout = 10 * 60 * 1000;
+        this.server.headersTimeout = (10 * 60 + 1) * 1000; // slightly longer than requestTimeout
+
         this.wss = new WebSocketServer({ server: this.server });
 
         this.setupRoutes();
@@ -63,9 +75,44 @@ export class ServerService {
         try {
             const pkgPath = path.join(process.cwd(), 'package.json');
             const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
-            return pkg.version || '1.1.0';
+            return pkg.version || '1.1.2';
         } catch (e) {
-            return '1.1.0';
+            return '1.1.2';
+        }
+    }
+
+    /** Get the primary non-loopback IPv4 address of this machine */
+    private getLocalIp(): string {
+        const ifaces = os.networkInterfaces();
+        for (const name of Object.keys(ifaces)) {
+            for (const iface of ifaces[name] ?? []) {
+                if (iface.family === 'IPv4' && !iface.internal) {
+                    return iface.address;
+                }
+            }
+        }
+        return 'localhost';
+    }
+
+    /**
+     * Recursively copies files from src to dest, skipping any files whose names
+     * are in the protected list. Used during self-update to preserve start scripts.
+     */
+    private copyExcluding(src: string, dest: string, excluded: string[]): void {
+        const entries = fs.readdirSync(src, { withFileTypes: true });
+        for (const entry of entries) {
+            if (excluded.includes(entry.name)) {
+                console.log(`[Update] Skipping protected file: ${entry.name}`);
+                continue;
+            }
+            const srcPath = path.join(src, entry.name);
+            const destPath = path.join(dest, entry.name);
+            if (entry.isDirectory()) {
+                fs.mkdirSync(destPath, { recursive: true });
+                this.copyExcluding(srcPath, destPath, excluded);
+            } else {
+                fs.copyFileSync(srcPath, destPath);
+            }
         }
     }
 
@@ -182,21 +229,22 @@ export class ServerService {
                 this.log(`[Update] Received update: ${req.file.filename}`);
 
                 try {
-                    // Windows: use PowerShell to expand
                     if (process.platform === 'win32') {
-                        const cmd = `powershell -Command "Expand-Archive -Path '${zipPath}' -DestinationPath '${extractPath}' -Force"`;
+                        const cmd = `powershell -Command "Expand-Archive -Path '${zipPath}' -DestinationPath '${extractPath}\\dist' -Force"`;
                         child_process.execSync(cmd);
                     } else {
-                        // Linux: use unzip
-                        child_process.execSync(`unzip -o "${zipPath}" -d "${extractPath}"`);
+                        // Hub sends a tar-created ZIP with files directly in root (./index.js etc.)
+                        // Extract into dist/ subdirectory
+                        const distPath = `${extractPath}/dist`;
+                        child_process.execSync(`mkdir -p "${distPath}" && unzip -o "${zipPath}" -d "${distPath}"`, { stdio: 'pipe' });
                     }
 
-                    this.log('[Update] Extraction successful. Restarting...');
+                    this.log('[Update] Extraction successful. Restarting via exit(1)...');
                     res.send({ message: 'Update geïnstalleerd, agent wordt herstart...' });
 
-                    // Exit after a short delay to allow response to be sent
+                    // Exit with code 1 so start.sh loop restarts the agent
                     setTimeout(() => {
-                        process.exit(0);
+                        process.exit(1);
                     }, 1000);
 
                 } catch (error: any) {
@@ -209,21 +257,16 @@ export class ServerService {
         this.app.post('/trigger-hub-update', async (req, res) => {
             const hubIp = this.discovery.getHubIp();
             if (!hubIp) {
-                this.log('[Update] FOUT: Geen Hub IP gevonden via discovery. Voer een scan uit op de Hub.');
-                return res.status(400).send({ error: 'Hub IP niet gevonden. Voer een scan uit op de Hub.' });
+                this.log('[Update] FOUT: Geen Hub IP gevonden via discovery.');
+                return res.status(400).send({ error: 'Hub IP niet gevonden.' });
             }
 
-            const version = this.getVersion();
-            const pkgName = `VideoWall-agent-v${version}.zip`; // Usually matches the current version but we want the zip from hub
             const updateUrl = `http://${hubIp}:3002/agent-package`;
-
             this.log(`[Update] Starten van update vanaf Hub: ${updateUrl}`);
 
             try {
-                // We'll reuse downloadFile logic but specifically for update.zip
                 const updateZipPath = path.join(process.cwd(), 'media', 'agent-update.zip');
 
-                // Manual fetch for the update zip
                 const response = await fetch(updateUrl);
                 if (!response.ok) throw new Error(`Hub reageerde met ${response.status}: ${response.statusText}`);
 
@@ -232,23 +275,92 @@ export class ServerService {
                 this.log(`[Update] Update gedownload (${buffer.length} bytes)`);
 
                 const extractPath = process.cwd();
+
+                // Protected files — these contain per-installation config and must never be overwritten
+                // start.sh / start.bat contain AGENT_NAME, AGENT_PORT etc. set by the Hub at install time
+                const PROTECTED = ['start.sh', 'start.bat', 'install.sh', 'install.bat', 'INSTALL.md'];
+
                 if (process.platform === 'win32') {
-                    const cmd = `powershell -Command "Expand-Archive -Path '${updateZipPath}' -DestinationPath '${extractPath}' -Force"`;
+                    // Windows: extract to temp dir first, then selectively copy
+                    const tempExtract = path.join(require('node:os').tmpdir(), `agent-update-${Date.now()}`);
+                    fs.mkdirSync(tempExtract, { recursive: true });
+                    const cmd = `powershell -Command "Expand-Archive -Path '${updateZipPath}' -DestinationPath '${tempExtract}' -Force"`;
                     child_process.execSync(cmd);
+
+                    // Find the extracted subfolder (zip may contain a single top-level dir)
+                    const entries = fs.readdirSync(tempExtract);
+                    const firstEntry = entries[0] as string | undefined;
+                    const subDirEntry = firstEntry && entries.length === 1 && fs.statSync(path.join(tempExtract, firstEntry)).isDirectory()
+                        ? firstEntry
+                        : undefined;
+                    const subDir = subDirEntry ? path.join(tempExtract, subDirEntry) : tempExtract;
+
+                    this.copyExcluding(subDir, extractPath, PROTECTED);
+                    fs.rmSync(tempExtract, { recursive: true, force: true });
                 } else {
-                    child_process.execSync(`unzip -o "${updateZipPath}" -d "${extractPath}"`);
+                    // Linux: use Python's zipfile module to handle Windows-created ZIPs
+                    // (PowerShell Compress-Archive uses backslashes, which 'unzip' can't handle)
+                    const protectedJson = JSON.stringify(PROTECTED);
+
+                    // Python script written as raw lines — no TypeScript escape interpolation
+                    const pyLines = [
+                        'import zipfile, os, json, sys',
+                        '',
+                        'zip_path = sys.argv[1]',
+                        'dest = sys.argv[2]',
+                        'protected = json.loads(sys.argv[3])',
+                        '',
+                        'with zipfile.ZipFile(zip_path, "r") as zf:',
+                        '    for info in zf.infolist():',
+                        '        name = info.filename.replace("\\\\", "/").replace("\\\\\\\\", "/")',
+                        '        parts = [p for p in name.split("/") if p]',
+                        '        if len(parts) > 1:',
+                        '            parts = parts[1:]',
+                        '        if not parts:',
+                        '            continue',
+                        '        if parts[-1] in protected:',
+                        '            print("Skipping protected: " + parts[-1])',
+                        '            continue',
+                        '        dest_path = os.path.join(dest, *parts)',
+                        '        if name.endswith("/") or not parts[-1]:',
+                        '            os.makedirs(dest_path, exist_ok=True)',
+                        '        else:',
+                        '            os.makedirs(os.path.dirname(dest_path), exist_ok=True)',
+                        '            with zf.open(info) as src, open(dest_path, "wb") as dst:',
+                        '                dst.write(src.read())',
+                        '            print("Extracted: " + dest_path)',
+                        'print("Extraction complete.")',
+                    ];
+                    const pythonScript = pyLines.join('\n');
+
+                    // Write script to a temp file — avoids ALL shell-quoting / escape mangling
+                    const tmpScript = path.join(os.tmpdir(), `agent_extract_${Date.now()}.py`);
+                    fs.writeFileSync(tmpScript, pythonScript, 'utf-8');
+                    this.log(`[Update] Python script written to ${tmpScript}`);
+
+                    try {
+                        child_process.execSync(
+                            `python3 "${tmpScript}" "${updateZipPath}" "${extractPath}" '${protectedJson}'`,
+                            { stdio: 'pipe' }
+                        );
+                    } finally {
+                        try { fs.unlinkSync(tmpScript); } catch (_) {}
+                    }
                 }
 
-                this.log('[Update] Installatie voltooid. Herstarten...');
+                fs.unlinkSync(updateZipPath);
+                this.log('[Update] Installatie voltooid. Herstarten via exitcode 1...');
                 res.send({ message: 'Update gedownload en geïnstalleerd. Agent herstart...' });
 
-                setTimeout(() => process.exit(0), 1000);
+                // Exit with code 1 so start.sh/bat loop restarts the agent
+                setTimeout(() => process.exit(1), 1000);
 
             } catch (error: any) {
                 this.log(`[Update] Update mislukt: ${error.message}`);
                 res.status(500).send({ error: `Update mislukt: ${error.message}` });
             }
         });
+
 
         this.app.post('/test-pattern', async (req, res) => {
             this.log('[Dashboard] Request: Test Pattern');
@@ -261,11 +373,10 @@ export class ServerService {
         });
 
         this.app.post('/play', async (req, res) => {
-            const { filename, loop, volume, mute } = req.body;
-            if (!filename) return res.status(400).send({ error: 'Missing filename' });
-            this.log(`[Dashboard] Request: Play ${filename}`);
+            const { filename, loop, volume, mute, brightness } = req.body;
+            this.log(`[Dashboard] Request: Play ${filename} (Loop: ${loop}, Vol: ${volume}%, Bri: ${brightness}%)`);
             try {
-                await this.player.play(filename, { loop, volume, mute });
+                await this.player.play(filename, { loop, volume, mute, brightness });
                 res.send({ status: 'ok' });
             } catch (error) {
                 res.status(500).send({ error: 'Failed to play' });
@@ -314,6 +425,17 @@ export class ServerService {
             }
         });
 
+        this.app.post('/brightness', async (req, res) => {
+            const { level } = req.body;
+            this.log(`[Dashboard] Request: Brightness ${level}%`);
+            try {
+                this.player.setBrightness(level);
+                res.send({ status: 'ok' });
+            } catch (error) {
+                res.status(500).send({ error: 'Failed to set brightness' });
+            }
+        });
+
         this.app.post('/stop', async (req, res) => {
             this.log('[Dashboard] Request: Stop');
             try {
@@ -325,9 +447,22 @@ export class ServerService {
         });
 
         this.app.post('/shutdown', (req, res) => {
-            this.log('[Dashboard] Request: Shutdown');
-            res.send('Agent wordt afgesloten...');
+            this.log('[System] Request: Agent afsluiten (clean stop, geen herstart)');
+            res.send({ message: 'Agent wordt gestopt (exitcode 42, geen herstart)...' });
+            setTimeout(() => process.exit(42), 1000);
+        });
+
+        this.app.post('/restart', (req, res) => {
+            this.log('[System] Request: Agent herstarten');
+            res.send({ message: 'Agent wordt herstart...' });
             setTimeout(() => process.exit(0), 1000);
+        });
+
+        this.app.post('/host-shutdown', (req, res) => {
+            this.log('[System] Request: Host systeem afsluiten (exitcode 43)');
+            res.send({ message: 'Host wordt afgesloten...' });
+            // Exit with code 43 — start.sh will pick this up and call "sudo shutdown -h now"
+            setTimeout(() => process.exit(43), 1000);
         });
 
         // ---------- Status Dashboard ----------
@@ -342,7 +477,10 @@ export class ServerService {
 
         // ---------- Output Display Page ----------
         this.app.get('/output', (req, res) => {
-            res.send(this.getOutputPageHTML());
+            const name = process.env.AGENT_NAME || 'VideoWall-Agent';
+            const port = process.env.AGENT_PORT || '3003';
+            const localIp = this.getLocalIp();
+            res.send(this.getOutputPageHTML(name, port, localIp));
         });
     }
 
@@ -423,6 +561,7 @@ export class ServerService {
                                     mute: data.mute,
                                     fadeInTime: data.fadeInTime,
                                     crossoverTime: data.crossoverTime,
+                                    brightness: data.brightness,
                                 });
                             }
                             break;
@@ -480,6 +619,12 @@ export class ServerService {
                                 this.player.setRepeat(data.repeat);
                             }
                             break;
+                        case 'brightness':
+                            if (typeof data.level === 'number') {
+                                this.log(`[Host] Command: Brightness ${data.level}%`);
+                                this.player.setBrightness(data.level);
+                            }
+                            break;
                         default:
                             console.warn('Unknown WebSocket action:', data.action);
                     }
@@ -499,7 +644,8 @@ export class ServerService {
     //  This is the fullscreen page that drives
     //  the LED wall. It runs in Chromium kiosk.
     // ==========================================
-    private getOutputPageHTML(): string {
+    private getOutputPageHTML(agentName: string = 'VideoWall-Agent', agentPort: string = '3003', localIp: string = 'localhost'): string {
+        const dashboardUrl = `http://${localIp}:${agentPort}`;
         return `<!DOCTYPE html>
 <html>
 <head>
@@ -514,6 +660,35 @@ export class ServerService {
             overflow: hidden;
             cursor: none;
             user-select: none;
+            /* Checkered B&W border via outline + box-shadow trick */
+            box-sizing: border-box;
+            border: 0;
+        }
+        /* Checkered border overlay rendered via body::before */
+        /* Initially hidden, only shown during manual 'test-pattern' mode */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            pointer-events: none;
+            border: 24px solid transparent;
+            border-image: repeating-linear-gradient(
+                45deg,
+                #fff 0px, #fff 12px,
+                #000 12px, #000 24px
+            ) 24;
+            box-shadow: inset 0 0 0 24px transparent;
+            display: none; 
+        }
+        /* Show checkered border ONLY when explicitly requested (Test Pattern) */
+        body.test-pattern-active::before { display: block !important; }
+
+        /* Hide checkered border while media is playing (redundant safety) */
+        body.playing::before { display: none !important; }
+
+        #video-player, #image-display {
+            filter: brightness(var(--brightness, 100%));
         }
         #video-player {
             position: fixed;
@@ -560,14 +735,48 @@ export class ServerService {
         .info-bar {
             height: 15%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             background: #111;
             color: #fff;
             font-family: monospace;
+            font-size: 1.5vw;
+            letter-spacing: 0.1em;
+            gap: 0.4em;
+        }
+        .info-bar .agent-name {
             font-size: 2vw;
+            font-weight: bold;
+            color: #fbbf24;
             letter-spacing: 0.2em;
         }
+        .info-bar .info-ip {
+            font-size: 1.3vw;
+            color: #e5e7eb;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+        .info-bar .info-url {
+            font-size: 1.1vw;
+            color: #9ca3af;
+        }
+        .info-bar .status-line {
+            font-size: 1.1vw;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        .info-bar .status-dot {
+            width: 0.8vw;
+            height: 0.8vw;
+            border-radius: 50%;
+            background: #ef4444;
+            display: inline-block;
+            transition: background 0.4s;
+        }
+        .info-bar .status-dot.connected { background: #22c55e; animation: pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.4} }
         #status-overlay {
             position: fixed;
             bottom: 20px;
@@ -645,7 +854,15 @@ export class ServerService {
             <div class="bar-black"></div>
         </div>
         <div class="gradient-bar"></div>
-        <div class="info-bar" id="test-pattern-text">LEDSHOW AGENT — TEST PATTERN</div>
+        <div class="info-bar" id="test-pattern-info">
+            <div class="agent-name">${agentName}</div>
+            <div class="info-ip">IP: ${localIp} &nbsp;•&nbsp; Poort: ${agentPort}</div>
+            <div class="info-url">Console: ${dashboardUrl}</div>
+            <div class="status-line">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text">Verbinding verbroken&hellip;</span>
+            </div>
+        </div>
     </div>
     <div id="status-overlay">Connected</div>
     <div id="sync-overlay">
@@ -661,6 +878,27 @@ export class ServerService {
         const testPattern = document.getElementById('test-pattern');
         const statusOverlay = document.getElementById('status-overlay');
 
+        /**
+         * Registers the correct onended handler based on loop mode.
+         * loop=true  → manual restart fallback (some browsers ignore video.loop)
+         * loop=false → hideAll() for a clean black screen
+         */
+        function setVideoEndedHandler(loop) {
+            video.onended = null;
+            if (loop) {
+                video.onended = () => {
+                    console.log('[Output] Video ended, restarting (manual loop fallback)');
+                    video.currentTime = 0;
+                    video.play().catch(() => {});
+                };
+            } else {
+                video.onended = () => {
+                    console.log('[Output] Video ended, stopping (black screen)');
+                    hideAll();
+                };
+            }
+        }
+
         let ws;
         let reconnectInterval;
 
@@ -671,49 +909,55 @@ export class ServerService {
             image.style.display = 'none';
             image.src = '';
             testPattern.style.display = 'none';
+            document.body.classList.remove('playing');
+            document.body.classList.remove('test-pattern-active');
+            document.body.style.setProperty('--brightness', '100%');
         }
 
         function showVideo(filename, opts) {
             opts = opts || {};
+            // Accept 'loop' or 'repeat' from properties, or from the action-specific payload
             const isRepeat = opts.loop === true || opts.repeat === true || (opts.action === 'repeat' && opts.repeat === true);
             const volume   = typeof opts.volume === 'number' ? opts.volume : 100;
             const mute     = opts.mute === true;
             const fadeMs   = typeof opts.fadeInTime === 'number' ? (opts.fadeInTime < 10 ? opts.fadeInTime * 1000 : opts.fadeInTime) : 0;
+            const brightness = typeof opts.brightness === 'number' ? opts.brightness : 100;
 
-            console.log('[Output] Play Video: ' + filename + ', Loop: ' + isRepeat + ', Volume: ' + volume + ', Mute: ' + mute);
+            console.log('[Output] Play Video: ' + filename + ', Loop: ' + isRepeat + ', Volume: ' + volume + ', Brightness: ' + brightness + '%');
 
             hideAll();
             let cleanName;
             try { cleanName = decodeURIComponent(filename); } catch(e) { cleanName = filename; }
 
+            // Set brightness CSS variable
+            document.body.style.setProperty('--brightness', brightness + '%');
+
             video.pause();
             video.removeAttribute('src');
             video.load();
 
-            // Set loop immediately
+            // Set loop immediately and via attribute
             video.loop = isRepeat;
-            if (isRepeat) video.setAttribute('loop', 'loop');
-            else video.removeAttribute('loop');
+            if (isRepeat) {
+                video.setAttribute('loop', 'loop');
+            } else {
+                video.removeAttribute('loop');
+            }
 
             video.muted  = true;
             video.volume = 0;
             video.style.display = 'block';
+            document.body.classList.add('playing');
 
-            // Clear old listeners to avoid stacking
-            video.onended = null;
-            if (isRepeat) {
-                video.onended = () => {
-                    console.log('[Output] Video ended, restarting (manual loop fallback)');
-                    video.currentTime = 0;
-                    video.play().catch(() => {});
-                };
-            }
+            // Register onended handler: manual restart fallback for loop, black screen for stop
+            setVideoEndedHandler(isRepeat);
 
             const onCanPlay = () => {
                 video.removeEventListener('canplay', onCanPlay);
                 
-                // Re-enforce loop on canplay (some browsers reset it)
+                // Re-enforce loop on canplay (some browsers reset it when src changes)
                 video.loop = isRepeat;
+                if (isRepeat) video.setAttribute('loop', 'loop');
                 
                 video.play()
                     .then(() => {
@@ -748,17 +992,23 @@ export class ServerService {
             video.load();
         }
 
-        function showImage(filename) {
+        function showImage(filename, opts) {
             hideAll();
+            opts = opts || {};
+            const brightness = typeof opts.brightness === 'number' ? opts.brightness : 100;
+            document.body.style.setProperty('--brightness', brightness + '%');
+
             let cleanName;
             try { cleanName = decodeURIComponent(filename); } catch(e) { cleanName = filename; }
             image.style.display = 'block';
             image.src = '/media/' + encodeURIComponent(cleanName);
+            document.body.classList.add('playing');
         }
 
         function showTestPattern() {
             hideAll();
             testPattern.style.display = 'block';
+            document.body.classList.add('test-pattern-active');
         }
 
         function stopAll() { hideAll(); }
@@ -773,6 +1023,11 @@ export class ServerService {
                 statusOverlay.style.display = 'block';
                 setTimeout(() => { statusOverlay.style.display = 'none'; }, 3000);
                 if (reconnectInterval) { clearInterval(reconnectInterval); reconnectInterval = null; }
+                // Update test-pattern status indicator
+                const dot = document.getElementById('status-dot');
+                const txt = document.getElementById('status-text');
+                if (dot) dot.className = 'status-dot connected';
+                if (txt) txt.textContent = 'Verbonden met Hub';
             };
 
             ws.onmessage = (event) => {
@@ -794,7 +1049,17 @@ export class ServerService {
                         case 'pause': video.pause(); break;
                         case 'resume': video.play().catch(e => {}); break;
                         case 'volume': if (typeof data.level === 'number') video.volume = Math.max(0, Math.min(1, data.level / 100)); break;
-                        case 'repeat': if (typeof data.repeat === 'boolean') video.loop = data.repeat; break;
+                        case 'repeat':
+                            if (typeof data.repeat === 'boolean') {
+                                video.loop = data.repeat;
+                                setVideoEndedHandler(data.repeat);
+                            }
+                            break;
+                        case 'brightness':
+                            if (typeof data.level === 'number') {
+                                document.body.style.setProperty('--brightness', data.level + '%');
+                            }
+                            break;
                         case 'sync-start': showSyncOverlay(data.filename); break;
                         case 'sync-progress': updateSyncProgress(data.percent || 0, data.filename); break;
                         case 'sync-complete': completeSyncOverlay(data.filename); break;
@@ -808,6 +1073,11 @@ export class ServerService {
                 statusOverlay.className = 'disconnected';
                 statusOverlay.style.display = 'block';
                 if (!reconnectInterval) reconnectInterval = setInterval(connect, 3000);
+                // Update test-pattern status indicator
+                const dot = document.getElementById('status-dot');
+                const txt = document.getElementById('status-text');
+                if (dot) dot.className = 'status-dot';
+                if (txt) txt.textContent = 'Verbinding verbroken — opnieuw verbinden...';
             };
 
             ws.onerror = (err) => { ws.close(); };
@@ -870,9 +1140,6 @@ export class ServerService {
 <html>
 <head>
     <title>LedShow Agent Status</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #0b0f19;
@@ -888,7 +1155,8 @@ export class ServerService {
         }
         * { box-sizing: border-box; }
         body {
-            font-family: 'Outfit', sans-serif;
+            /* Offline-safe: no external font fetch (Google Fonts). */
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
             background: var(--bg);
             background-image: 
                 radial-gradient(circle at 0% 0%, rgba(30, 58, 138, 0.15) 0%, transparent 50%),
@@ -1110,7 +1378,9 @@ export class ServerService {
                 <div class="section-title">Systeem</div>
                 <div class="controls-grid">
                     <button onclick="playback('test-pattern')">🏁 Testbeeld</button>
-                    <button class="btn-danger" onclick="shutdown()">🔌 Afsluiten</button>
+                    <button onclick="restartAgent()">🔄 Herstart Agent</button>
+                    <button class="btn-danger" onclick="shutdownAgent()">⏹ Agent Stoppen</button>
+                    <button class="btn-danger" onclick="hostShutdown()" style="background: rgba(239,68,68,0.25); border-color: rgba(239,68,68,0.5);">🖥️ Host Afsluiten</button>
                 </div>
 
                 <a href="/output" target="_blank" style="display: block; text-align: center; color: var(--accent); font-size: 0.85rem; margin-top: 1.5rem; text-decoration: none; border: 1px dashed var(--accent); padding: 0.75rem; border-radius: 0.75rem;">
@@ -1230,9 +1500,20 @@ export class ServerService {
             } catch(e) {}
         }
 
-        async function shutdown() {
-            if (!confirm('Weet je zeker dat je de agent wilt afsluiten?')) return;
-            try { fetch('/shutdown', { method: 'POST' }); alert('Agent wordt afgesloten...'); } catch(e) {}
+        async function shutdownAgent() {
+            if (!confirm('Agent stoppen? De agent herstart NIET (exitcode 42).')) return;
+            try { await fetch('/shutdown', { method: 'POST' }); alert('Agent wordt gestopt...'); } catch(e) {}
+        }
+
+        async function restartAgent() {
+            if (!confirm('Agent herstarten? De agent stopt en wordt automatisch opnieuw opgestart door start.sh.')) return;
+            try { await fetch('/restart', { method: 'POST' }); alert('Agent wordt herstart...'); } catch(e) {}
+        }
+
+        async function hostShutdown() {
+            if (!confirm('⚠️ De Linux HOST computer afsluiten? Dit is niet ongedaan te maken.')) return;
+            if (!confirm('Zeker weten? De host wordt afgesloten via "sudo shutdown -h now".')) return;
+            try { await fetch('/host-shutdown', { method: 'POST' }); alert('Host wordt afgesloten...'); } catch(e) {}
         }
 
         async function runUpdate() {

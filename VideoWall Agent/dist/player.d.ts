@@ -13,13 +13,13 @@ export declare class PlayerService {
     addOutputClient(ws: WebSocket): void;
     /** Send a command to all connected output clients */
     private broadcast;
-    /** Play a media file on all output displays */
     play(filename: string, options?: {
         loop?: boolean;
         volume?: number;
         mute?: boolean;
         fadeInTime?: number;
         crossoverTime?: number;
+        brightness?: number;
     }): Promise<void>;
     /** Stop playback on all output displays */
     stop(): Promise<void>;

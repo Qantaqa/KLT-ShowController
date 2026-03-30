@@ -1,38 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import {
-    MoreVertical,
-    Trash2,
-    Edit2,
-    Send,
-    ArrowUp, ArrowDown,
-    Info,
-    Type,
-    User,
-    Zap,
-    Check,
-    Plus,
-    PlusSquare,
-    Loader2,
-    AlertCircle,
-    ChevronDown,
-    ChevronRight,
-    Layers,
-    Play,
-    Square,
-    Volume2,
-    VolumeX,
-    Repeat,
-    FolderOpen,
-    Monitor,
-    Pipette,
-    Copy,
-    ClipboardPaste,
-    Lightbulb,
-    Clock,
-    MousePointer2,
-    SkipForward
-} from 'lucide-react'
+import { ChevronDown, ChevronRight, Play, Square, Volume2, VolumeX, Repeat, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, ArrowUp, ArrowDown, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, Type, User, MousePointer2, Lightbulb, Pipette, MessageSquare, FolderOpen, Layers, Hash } from 'lucide-react'
 import { useSequencerStore } from '../store/useSequencerStore'
 import type { Device } from '../types/devices'
 import type { ShowEvent, ClipboardItem } from '../types/show'
@@ -457,6 +425,105 @@ const VideoWallPreviewOverlay: React.FC<{ layout: string, bezelSize?: number }> 
     );
 };
 
+// Transition strip rendered BETWEEN event cards (replaces trigger rows in the card body)
+const EventTransition: React.FC<{
+    triggerEvent: ShowEvent | null
+    isLastEvent: boolean
+    isLocked: boolean
+    onEditTrigger?: (index: number) => void
+    triggerIndex?: number
+}> = ({ triggerEvent, isLastEvent, isLocked, onEditTrigger, triggerIndex }) => {
+    if (!triggerEvent && isLastEvent) return null
+
+    const triggerType = (triggerEvent?.effect || 'manual').toLowerCase()
+    const cueText = triggerEvent?.cue || ''
+    const isManualNoCue = !triggerEvent || (triggerType === 'manual' && !cueText)
+
+    const canEdit = !isLocked && onEditTrigger && triggerIndex !== undefined
+
+    const editHint = canEdit ? (
+        <button
+            onClick={(e) => { e.stopPropagation(); if (canEdit) onEditTrigger(triggerIndex!) }}
+            className="opacity-0 group-hover/trans:opacity-60 hover:!opacity-100 transition-opacity p-0.5 hover:bg-white/10 rounded"
+            title="Overgang bewerken"
+        >
+            <Edit2 className="w-2.5 h-2.5" />
+        </button>
+    ) : null
+
+    if (isManualNoCue) {
+        return (
+            <div
+                className={cn("flex items-center gap-2 px-4 py-0.5 group/trans", canEdit && "cursor-pointer")}
+                onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger!(triggerIndex!) } : undefined}
+            >
+                <div className="flex-1 border-t border-dashed border-white/10 group-hover/trans:border-white/20 transition-colors" />
+                <div className="flex items-center gap-1">
+                    <span className="text-[8px] opacity-20 uppercase tracking-widest font-bold group-hover/trans:opacity-40 transition-opacity select-none">handmatig</span>
+                    {editHint}
+                </div>
+                <div className="flex-1 border-t border-dashed border-white/10 group-hover/trans:border-white/20 transition-colors" />
+            </div>
+        )
+    }
+
+    if (triggerType === 'timed') {
+        const duration = triggerEvent?.duration || 0
+        const mins = Math.floor(duration / 60)
+        const secs = (duration % 60).toString().padStart(2, '0')
+        return (
+            <div
+                className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
+                onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger!(triggerIndex!) } : undefined}
+            >
+                <div className="flex-1 border-t border-dashed border-yellow-500/30" />
+                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/30 rounded text-[9px] text-yellow-300 font-bold group-hover/trans:bg-yellow-500/20 transition-colors">
+                    <Clock className="w-3 h-3" />
+                    <span>Automatisch na {mins}:{secs}</span>
+                    {editHint}
+                </div>
+                <div className="flex-1 border-t border-dashed border-yellow-500/30" />
+            </div>
+        )
+    }
+
+    if (triggerType === 'media') {
+        const mediaName = triggerEvent?.mediaTriggerId
+            ? triggerEvent.mediaTriggerId.split('|')[0]?.split(/[/\\]/).pop() || 'media'
+            : 'media afgerond'
+        return (
+            <div
+                className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
+                onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger!(triggerIndex!) } : undefined}
+            >
+                <div className="flex-1 border-t border-dashed border-blue-500/30" />
+                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-[9px] text-blue-300 font-bold group-hover/trans:bg-blue-500/20 transition-colors">
+                    <SkipForward className="w-3 h-3" />
+                    <span>Na: {mediaName}</span>
+                    {editHint}
+                </div>
+                <div className="flex-1 border-t border-dashed border-blue-500/30" />
+            </div>
+        )
+    }
+
+    // Manual WITH cue text — prominent yellow cue block
+    return (
+        <div
+            className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
+            onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger!(triggerIndex!) } : undefined}
+        >
+            <div className="flex-1 border-t border-yellow-500/40" />
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-yellow-500/15 border border-yellow-500/50 rounded text-[10px] text-yellow-200 font-bold max-w-[400px] group-hover/trans:bg-yellow-500/25 transition-colors">
+                <Zap className="w-3 h-3 text-yellow-400 shrink-0" />
+                <span className="truncate">{cueText}</span>
+                {editHint}
+            </div>
+            <div className="flex-1 border-t border-yellow-500/40" />
+        </div>
+    )
+}
+
 
 const RowItem: React.FC<{
     event: ShowEvent
@@ -481,7 +548,7 @@ const RowItem: React.FC<{
 }> = ({
     event, originalIndex, id, isShadow, isActiveGroup, isNextGroup, handleRowClick, handleRowDoubleClick,
     editingIndex, setEditingIndex, menuOpenIndex, setMenuOpenIndex, isLocked,
-    activeEventIndex, eventStatuses, selectedEventIndex, selectedEvent, ongoingEffects
+    activeEventIndex, eventStatuses, ongoingEffects
 }) => {
         const [currentTime, setCurrentTime] = useState(new Date())
         const menuButtonRef = useRef<HTMLButtonElement>(null)
@@ -514,6 +581,7 @@ const RowItem: React.FC<{
         const stopMedia = useSequencerStore(s => s.stopMedia)
         const toggleAudio = useSequencerStore(s => s.toggleAudio)
         const toggleRepeat = useSequencerStore(s => s.toggleRepeat)
+        const setMediaBrightness = useSequencerStore(s => s.setMediaBrightness)
         const setMediaVolume = useSequencerStore(s => s.setMediaVolume)
         const copyToClipboard = useSequencerStore(s => s.copyToClipboard)
         const loadClipboard = useSequencerStore(s => s.loadClipboard)
@@ -586,12 +654,6 @@ const RowItem: React.FC<{
         }
 
         const isRowActive = originalIndex === activeEventIndex
-        const isRowSelected = !isLocked && selectedEvent &&
-            event.act === selectedEvent.act &&
-            event.sceneId === selectedEvent.sceneId &&
-            event.eventId === selectedEvent.eventId;
-
-        const isExactSelection = !isLocked && originalIndex === selectedEventIndex;
         const type = event.type?.toLowerCase() || ''
         const status = eventStatuses[originalIndex]
         const videoRef = useRef<HTMLVideoElement>(null)
@@ -669,19 +731,14 @@ const RowItem: React.FC<{
                     "group/row relative flex items-center px-4 py-2 transition-all border-l-2",
                     isShadow ? "cursor-default opacity-50 grayscale bg-white/5 border-l-dashed border-l-primary/30" : "cursor-pointer",
                     isRowActive ? "bg-green-500/20 border-green-500 shadow-[inset_0_0_10px_rgba(34,197,94,0.1)]" : "border-transparent hover:bg-white/5",
-                    isRowSelected && !isRowActive && "bg-blue-500/10 border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.15)] z-10",
-                    isExactSelection && !isRowActive && "bg-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.5)] border-white/60 ring-1 ring-blue-400/50 scale-[1.01] z-20",
-                    isActiveGroup && !isRowActive && !isRowSelected && "border-l-green-500/30",
-                    isNextGroup && !isRowActive && !isRowSelected && "border-l-yellow-500/30",
-                    type === 'title' && (
-                        isRowActive ? "bg-green-500/10 font-bold" :
-                            isNextGroup ? "bg-yellow-500/5 font-bold border-l-yellow-500/50" :
-                                "bg-white/5 font-bold border-l-primary/40"
-                    ),
+                    isActiveGroup && !isRowActive && "border-l-green-500/30",
+                    isNextGroup && !isRowActive && "border-l-orange-500/30",
                     type === 'comment' && "opacity-60 italic text-[11px]",
-                    type === 'action' && "bg-yellow-500/10 border-l-yellow-500 text-yellow-200",
-                    type === 'trigger' && "bg-primary/10 border-l-primary text-primary-foreground font-bold",
-                    isShadow && "shadow-none hover:bg-white/5" // Keep hover subtle for shadow
+                    type === 'action' && "border-l-yellow-500 text-yellow-100",
+                    type === 'light' && "border-l-purple-500/50",
+                    type === 'media' && "border-l-blue-500/40",
+                    type === 'trigger' && "opacity-40 text-[10px] font-mono",
+                    isShadow && "shadow-none hover:bg-white/5"
                 )}
             >
                 {/* Visual Indicators for Ongoing Effects (Persistence lines) */}
@@ -822,6 +879,42 @@ const RowItem: React.FC<{
                                         </div>
                                     )}
 
+                                    {type === 'media' && event.fixture && (() => {
+                                        const device = getDevices().find(d => d.name === event.fixture)
+                                        if (device?.type === 'local_monitor' && device.projectionMasks && device.projectionMasks.length > 0) {
+                                            return (
+                                                <div className="flex flex-col gap-1.5 p-2 bg-primary/5 border border-primary/10 rounded mt-1">
+                                                    <span className="text-[9px] opacity-40 uppercase font-black tracking-widest">Projection Masks:</span>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {device.projectionMasks.map(mask => (
+                                                            <label key={mask.id} className="flex items-center gap-1.5 cursor-pointer group/mask">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    className="w-3 h-3 rounded border border-white/20 bg-black/40 checked:bg-primary checked:border-primary transition-all cursor-pointer"
+                                                                    checked={event.projectionMaskIds?.includes(mask.id)}
+                                                                    onChange={(e) => {
+                                                                        const current = event.projectionMaskIds || []
+                                                                        const next = e.target.checked
+                                                                            ? [...current, mask.id]
+                                                                            : current.filter(id => id !== mask.id)
+                                                                        updateEvent(originalIndex, { projectionMaskIds: next })
+                                                                    }}
+                                                                />
+                                                                <span className="text-[10px] text-white/60 group-hover/mask:text-white transition-colors">
+                                                                    {mask.name || (mask.id.length > 8 ? `${mask.id.slice(0, 8)}...` : mask.id)}
+                                                                </span>
+                                                            </label>
+                                                        ))}
+                                                        {(!event.projectionMaskIds || event.projectionMaskIds.length === 0) && (
+                                                            <span className="text-[10px] italic text-white/30">Alle maskers actief</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+                                        return null
+                                    })()}
+
                                     {type === 'light' && (
                                         <LightConfigurator
                                             event={event}
@@ -953,7 +1046,7 @@ const RowItem: React.FC<{
                                     {type === 'title' && event.scriptPg !== undefined && event.scriptPg > 0 && <div className="text-[10px] font-mono opacity-40 bg-white/5 px-1.5 rounded flex items-center justify-center min-w-[32px]">Pg {event.scriptPg}</div>}
                                 </div>
                             </div>
-                            {(type !== 'media' && event.fixture) && (type !== 'title' && type !== 'comment') && <div className="text-[10px] opacity-40 truncate">{event.fixture} {event.effect ? `• ${event.effect}` : ''}</div>}
+                            {(type !== 'media' && type !== 'action' && event.fixture) && (type !== 'title' && type !== 'comment') && <div className="text-[10px] opacity-40 truncate">{event.fixture} {event.effect ? `• ${event.effect}` : ''}</div>}
                         </>
                     )}
 
@@ -974,6 +1067,24 @@ const RowItem: React.FC<{
                                     <button onClick={(e) => { e.stopPropagation(); setMediaVolume(originalIndex, Math.min(100, (event.intensity !== undefined ? event.intensity : 100) + 10)); }} className="p-1 hover:bg-white/10 rounded w-5 h-5 flex items-center justify-center text-white/60 hover:text-white">+</button>
                                 </div>
                                 <div className="w-px h-6 bg-white/10 mx-2" />
+                                {(() => {
+                                    const targetDev = event.fixture ? getDevices().find(d => d.name === event.fixture) : null;
+                                    const isVideoWall = targetDev?.type === 'videowall_agent' || targetDev?.type === 'remote_VideoWall' || targetDev?.type === 'local_monitor';
+                                    
+                                    if (!isVideoWall) return null;
+                                    
+                                    return (
+                                        <>
+                                            <div className="flex items-center gap-1.5 bg-white/5 rounded p-0.5" title="Brightness">
+                                                <Sun className="w-3 h-3 opacity-40 mx-0.5" />
+                                                <button onClick={(e) => { e.stopPropagation(); setMediaBrightness(originalIndex, Math.max(0, (event.brightness !== undefined ? event.brightness : 100) - 10)); }} className="p-1 hover:bg-white/10 rounded w-5 h-5 flex items-center justify-center text-white/60 hover:text-white">-</button>
+                                                <span className="text-[10px] w-6 text-center tabular-nums font-mono opacity-60">{event.brightness !== undefined ? event.brightness : 100}%</span>
+                                                <button onClick={(e) => { e.stopPropagation(); setMediaBrightness(originalIndex, Math.min(200, (event.brightness !== undefined ? event.brightness : 100) + 10)); }} className="p-1 hover:bg-white/10 rounded w-5 h-5 flex items-center justify-center text-white/60 hover:text-white">+</button>
+                                            </div>
+                                            <div className="w-px h-6 bg-white/10 mx-2" />
+                                        </>
+                                    );
+                                })()}
                                 <button onClick={(e) => { e.stopPropagation(); toggleRepeat(originalIndex) }} className={cn("p-1.5 rounded transition-colors", event.effect === 'repeat' ? "bg-green-500/20 text-green-500" : "bg-white/10 text-white/40")} title="Repeat"><Repeat className="w-3.5 h-3.5" /></button>
                                 {/* Transfer Progress (Sync) */}
                                 {(() => {
@@ -990,70 +1101,78 @@ const RowItem: React.FC<{
                                     );
                                 })()}
                             </div>
-                            {event.filename && (
-                                <div className={cn(
-                                    "w-32 bg-black rounded border border-white/10 overflow-hidden relative group/preview",
-                                    (event.fixture && getDevices().find(d => d.name === event.fixture)?.type === 'videowall_agent' && (getDevices().find(d => d.name === event.fixture) as any)?.orientation === 'portrait')
-                                        ? "aspect-[9/16]"
-                                        : "aspect-video"
-                                )}>
-                                    <video
-                                        ref={videoRef}
-                                        src={getMediaUrlWithContext(event.filename)}
-                                        className="w-full h-full object-cover"
-                                        muted
-                                        onTimeUpdate={(e) => {
-                                            const v = e.currentTarget;
-                                            if (v.duration) {
-                                                const progress = (v.currentTime / v.duration) * 100;
-                                                const bar = v.parentElement?.querySelector('.video-progress-bar') as HTMLElement;
-                                                if (bar) bar.style.width = `${progress}%`;
-                                                setVideoTimes({ current: Math.floor(v.currentTime), total: Math.floor(v.duration) });
-                                            }
-                                        }}
-                                        onLoadedMetadata={(e) => {
-                                            const v = e.currentTarget;
-                                            setVideoTimes({ current: 0, total: Math.floor(v.duration) });
-                                        }}
-                                    />
-                                    {event.fixture && getDevices().find((d: Device) => d.name === event.fixture)?.type === 'videowall_agent' && (
-                                        <VideoWallPreviewOverlay
-                                            layout={(getDevices().find((d: Device) => d.name === event.fixture) as any)?.layout || '1x1'}
-                                            bezelSize={(getDevices().find((d: Device) => d.name === event.fixture) as any)?.bezelSize}
-                                        />
-                                    )}
+                            {event.filename && (() => {
+                                const isPortrait = event.fixture && getDevices().find(d => d.name === event.fixture)?.type === 'videowall_agent' && (getDevices().find(d => d.name === event.fixture) as any)?.orientation === 'portrait';
+                                return (
                                     <div className={cn(
-                                        "absolute top-1 right-1 px-1 text-[7px] font-black rounded uppercase tracking-wider transition-colors",
-                                        isActuallyPlaying && isLocked ? "bg-red-500 text-white animate-pulse" : "bg-black/60 text-white/50"
+                                        "w-32 bg-black rounded border border-white/10 overflow-hidden relative group/preview",
+                                        isPortrait ? "aspect-[9/16]" : "aspect-video"
                                     )}>
-                                        {isActuallyPlaying && isLocked ? 'Live' : 'Preview'}
-                                    </div>
+                                        <div className={cn(
+                                            "absolute",
+                                            isPortrait ? "top-1/2 left-1/2" : "inset-0"
+                                        )} style={isPortrait ? { width: '177.77%', height: '56.25%', transform: 'translate(-50%, -50%) rotate(-90deg)' } : {}}>
+                                            <video
+                                                ref={videoRef}
+                                                src={getMediaUrlWithContext(event.filename)}
+                                                className="w-full h-full object-cover"
+                                                muted
+                                                onTimeUpdate={(e) => {
+                                                    const v = e.currentTarget;
+                                                    if (v.duration) {
+                                                        const progress = (v.currentTime / v.duration) * 100;
+                                                        const bar = v.closest('.group\\/preview')?.querySelector('.video-progress-bar') as HTMLElement;
+                                                        if (bar) bar.style.width = `${progress}%`;
+                                                        setVideoTimes({ current: Math.floor(v.currentTime), total: Math.floor(v.duration) });
+                                                    }
+                                                }}
+                                                onLoadedMetadata={(e) => {
+                                                    const v = e.currentTarget;
+                                                    setVideoTimes({ current: 0, total: Math.floor(v.duration) });
+                                                }}
+                                            />
+                                        </div>
+                                        {event.fixture && getDevices().find((d: Device) => d.name === event.fixture)?.type === 'videowall_agent' && (
+                                            <VideoWallPreviewOverlay
+                                                layout={(getDevices().find((d: Device) => d.name === event.fixture) as any)?.layout || '1x1'}
+                                                bezelSize={(getDevices().find((d: Device) => d.name === event.fixture) as any)?.bezelSize}
+                                            />
+                                        )}
+                                        <div className={cn(
+                                            "absolute top-1 right-1 px-1 text-[7px] font-black rounded uppercase tracking-wider transition-colors",
+                                            isActuallyPlaying && isLocked ? "bg-red-500 text-white animate-pulse" : "bg-black/60 text-white/50"
+                                        )}>
+                                            {isActuallyPlaying && isLocked ? 'Live' : 'Preview'}
+                                        </div>
 
-                                    {/* Numeric Time Overlay */}
-                                    <div className="absolute top-1 left-1 px-1 bg-black/60 text-[7px] font-mono rounded text-white/70 tabular-nums">
-                                        {Math.floor(videoTimes.current / 60)}:{(videoTimes.current % 60).toString().padStart(2, '0')} / {Math.floor(videoTimes.total / 60)}:{(videoTimes.total % 60).toString().padStart(2, '0')}
-                                    </div>
+                                        {/* Numeric Time Overlay */}
+                                        <div className="absolute top-1 left-1 px-1 bg-black/60 text-[7px] font-mono rounded text-white/70 tabular-nums">
+                                            {Math.floor(videoTimes.current / 60)}:{(videoTimes.current % 60).toString().padStart(2, '0')} / {Math.floor(videoTimes.total / 60)}:{(videoTimes.total % 60).toString().padStart(2, '0')}
+                                        </div>
 
-                                    {/* Progress Bar */}
-                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
-                                        <div
-                                            className="video-progress-bar h-full bg-primary transition-[width] duration-300 ease-linear progress-bar-fill"
-                                            ref={el => el?.style.setProperty('--percent', '0%')}
-                                        />
+                                        {/* Progress Bar */}
+                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/10">
+                                            <div
+                                                className="video-progress-bar h-full bg-primary transition-[width] duration-300 ease-linear progress-bar-fill"
+                                                ref={el => el?.style.setProperty('--percent', '0%')}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                )
+                            })()}
                         </div>
                     )}
                 </div>
 
-                {(type === 'light' || type === 'media') && status && (
-                    <div className="flex-shrink-0 px-2 flex items-center gap-1.5 overflow-hidden">
-                        {status === 'sending' && <div className="flex items-center gap-1 text-[9px] font-black uppercase text-blue-400 animate-pulse"><Loader2 className="w-3 h-3 animate-spin" /> Sending</div>}
-                        {status === 'ok' && <div className="flex items-center gap-1 text-[9px] font-black uppercase text-green-400"><Check className="w-3 h-3" /> OK</div>}
-                        {status === 'failed' && <div className="flex items-center gap-1 text-[9px] font-black uppercase text-red-500"><AlertCircle className="w-3 h-3" /> Failed</div>}
-                    </div>
-                )}
+                {
+                    (type === 'light' || type === 'media') && status && (
+                        <div className="flex-shrink-0 px-2 flex items-center gap-1.5 overflow-hidden">
+                            {status === 'sending' && <div className="flex items-center gap-1 text-[9px] font-black uppercase text-blue-400 animate-pulse"><Loader2 className="w-3 h-3 animate-spin" /> Sending</div>}
+                            {status === 'ok' && <div className="flex items-center gap-1 text-[9px] font-black uppercase text-green-400"><Check className="w-3 h-3" /> OK</div>}
+                            {status === 'failed' && <div className="flex items-center gap-1 text-[9px] font-black uppercase text-red-500"><AlertCircle className="w-3 h-3" /> Failed</div>}
+                        </div>
+                    )
+                }
 
                 <div className="flex-shrink-0 flex items-center gap-2 opacity-0 group-hover/row:opacity-100 transition-opacity">
                     {editingIndex === originalIndex || isShadow ? null : (
@@ -1088,7 +1207,7 @@ const RowItem: React.FC<{
                         </div>
                     )}
                 </div>
-            </div>
+            </div >
         )
     }
 
@@ -1408,6 +1527,10 @@ const SequenceGrid: React.FC = () => {
         setActiveEvent,
         activeShow,
         isLocked,
+        expandAll,
+        collapseAll,
+        reindexEvents,
+        addToast,
         deleteAct,
         deleteScene,
         openModal,
@@ -1421,6 +1544,8 @@ const SequenceGrid: React.FC = () => {
     const selectedEvent = events[selectedEventIndex] || null;
 
     const lastTransitionTime = useSequencerStore(s => s.lastTransitionTime)
+    const isPaused = useSequencerStore(s => s.isPaused)
+    const pauseStartTime = useSequencerStore(s => s.pauseStartTime)
 
     // Actions
     const deleteGroup = useSequencerStore(s => s.deleteGroup)
@@ -1432,7 +1557,8 @@ const SequenceGrid: React.FC = () => {
     const insertAct = useSequencerStore(s => s.insertAct)
     const insertScene = useSequencerStore(s => s.insertScene)
     const insertEvent = useSequencerStore(s => s.insertEvent)
-    const addToast = useSequencerStore(s => s.addToast)
+    const addActComment = useSequencerStore(s => s.addActComment)
+    const addSceneComment = useSequencerStore(s => s.addSceneComment)
 
 
     const [editingIndex, setEditingIndex] = useState<number | null>(null)
@@ -1475,6 +1601,79 @@ const SequenceGrid: React.FC = () => {
         return () => clearInterval(t)
     }, [])
 
+    const showHud = useMemo(() => {
+        if (!isLocked || events.length === 0) return null
+
+        const safeIdx = activeEventIndex >= 0 ? activeEventIndex : 0
+        const current = events[safeIdx] as ShowEvent | undefined
+        if (!current) return null
+
+        const groupRows = events.filter((e: ShowEvent) =>
+            e.act === current.act &&
+            e.sceneId === current.sceneId &&
+            e.eventId === current.eventId
+        )
+        const titleRow = groupRows.find((e: ShowEvent) => e.type?.toLowerCase() === 'title')
+        const triggerRow = groupRows.find((e: ShowEvent) => e.type?.toLowerCase() === 'trigger')
+
+        const sceneLabelKey = `${current.act}-${current.sceneId}`
+        const sceneLabel = activeShow?.viewState?.sceneNames?.[sceneLabelKey] || ''
+
+        // Find first row of the next group (event/scene/act boundary)
+        let nextGroupIdx = -1
+        if (activeEventIndex >= 0) {
+            for (let i = activeEventIndex + 1; i < events.length; i++) {
+                const e = events[i]
+                if (e.act !== current.act || e.sceneId !== current.sceneId || e.eventId !== current.eventId) {
+                    nextGroupIdx = i
+                    break
+                }
+            }
+        } else {
+            nextGroupIdx = 0
+        }
+
+        const next = nextGroupIdx >= 0 ? (events[nextGroupIdx] as ShowEvent) : null
+        const nextKind = !next
+            ? null
+            : next.act !== current.act
+                ? 'act'
+                : next.sceneId !== current.sceneId
+                    ? 'scene'
+                    : 'event'
+
+        const nextGroupRows = next
+            ? events.filter((e: ShowEvent) => e.act === next.act && e.sceneId === next.sceneId && e.eventId === next.eventId)
+            : []
+        const nextTitle = nextGroupRows.find((e: ShowEvent) => e.type?.toLowerCase() === 'title')?.cue || ''
+        const nextSceneKey = next ? `${next.act}-${next.sceneId}` : ''
+        const nextSceneLabel = next ? (activeShow?.viewState?.sceneNames?.[nextSceneKey] || '') : ''
+
+        const triggerType = (triggerRow?.effect || 'manual').toLowerCase()
+        const isTimed = triggerType === 'timed' && (triggerRow?.duration || 0) > 0
+        const isManual = !isTimed
+        const plannedDur = isTimed ? (triggerRow?.duration || 0) : (titleRow?.duration || 0)
+
+        const elapsedSec = lastTransitionTime
+            ? Math.round(((isPaused ? (pauseStartTime || currentTime.getTime()) : currentTime.getTime()) - lastTransitionTime) / 1000)
+            : 0
+        const remainingSec = plannedDur > 0 ? Math.max(0, plannedDur - elapsedSec) : 0
+
+        return {
+            current,
+            currentTitle: titleRow?.cue || '',
+            currentSceneLabel: sceneLabel,
+            next,
+            nextKind,
+            nextTitle,
+            nextSceneLabel,
+            isTimed,
+            isManual,
+            plannedDur,
+            remainingSec,
+        }
+    }, [isLocked, events, activeEventIndex, activeShow?.viewState?.sceneNames, lastTransitionTime, isPaused, pauseStartTime, currentTime])
+
 
 
 
@@ -1498,6 +1697,7 @@ const SequenceGrid: React.FC = () => {
 
 
     // Hierarchical Data Structure
+
     interface EventRow {
         event: ShowEvent
         originalIndex: number
@@ -1506,19 +1706,19 @@ const SequenceGrid: React.FC = () => {
     }
 
     interface EventNode {
-        id: number // eventId
-        uniqueId: string // act-scene-event
+        id: number | undefined
+        uniqueId: string
         rows: EventRow[]
         isActive: boolean
         isNext: boolean
-        duration: number // saved duration for this event (from Title row)
-        activeDuration: number // duration of the active event (for next-node blinking)
+        duration: number
+        activeDuration: number
         isMinimal: boolean
-        ongoingEffects?: { type: 'media' | 'light', id: string }[]
+        ongoingEffects?: { type: 'media' | 'light'; id: string }[]
     }
 
     interface SceneNode {
-        id: number // sceneId
+        id: number | undefined // sceneId
         events: EventNode[]
         isActive: boolean
     }
@@ -1536,29 +1736,35 @@ const SequenceGrid: React.FC = () => {
 
         // 1. Build Hierarchy
         events.forEach((event: ShowEvent, index: number) => {
-            // Find or Create Act
+            // Act Node Vinden/Maken
             let act = acts.find(a => a.id === event.act)
             if (!act) {
                 act = { id: event.act, scenes: [], isActive: false }
                 acts.push(act)
             }
 
-            // Find or Create Scene
-            let scene = act.scenes.find(s => s.id === event.sceneId)
+            // Als dit een puur Act-level item is (zoals Type 'Act' of een commentaar zonder sceneId),
+            // kunnen we het niet opslaan in het *huidige* weergavemodel omdat dat model verwacht 
+            // dat alles in een event zit. We pushen het als een speciale 'dummy' scene/event.
+            let targetSceneId = event.sceneId
+            let targetEventId = event.eventId
+
+            if (targetSceneId === undefined) targetSceneId = 0 // Dummy ID voor weergave
+            if (targetEventId === undefined) targetEventId = 0 // Dummy ID voor weergave
+
+            let scene = act.scenes.find(s => s.id === targetSceneId)
             if (!scene) {
-                scene = { id: event.sceneId, events: [], isActive: false }
+                scene = { id: targetSceneId, events: [], isActive: false }
                 act.scenes.push(scene)
             }
 
-            // Find or Create Event Node
-            const uniqueId = `${event.act}-${event.sceneId}-${event.eventId}`
+            const uniqueId = `${event.act}-${targetSceneId}-${targetEventId}`
             let eventNode = scene.events.find(e => e.uniqueId === uniqueId)
             if (!eventNode) {
-                eventNode = { id: event.eventId, uniqueId, rows: [], isActive: false, isNext: false, duration: 0, activeDuration: 0, isMinimal: false }
+                eventNode = { id: targetEventId, uniqueId, rows: [], isActive: false, isNext: false, duration: 0, activeDuration: 0, isMinimal: false }
                 scene.events.push(eventNode)
             }
 
-            // Add Row
             eventNode.rows.push({ event, originalIndex: index, id: index })
             eventNodeMap.set(index, { act, scene, eventNode })
         })
@@ -1716,6 +1922,110 @@ const SequenceGrid: React.FC = () => {
                 </div>
             )}
 
+            {/* Fixed Sequence Controls HUD (blijft zichtbaar tijdens scrollen) */}
+            {events.length > 0 && (
+                <div className="fixed top-28 left-0 right-0 z-30 px-4">
+                    <div className="rounded-xl border border-white/10 bg-[#0b0b0bcc] backdrop-blur-md shadow-2xl pointer-events-auto">
+                        <div className="px-4 py-3 flex items-start justify-between gap-4">
+                            <div className="min-w-0">
+                                {showHud ? (
+                                    <>
+                                        <div className="text-[9px] font-black uppercase tracking-widest opacity-50">Nu</div>
+                                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                                            <div className="px-2 py-1 rounded bg-primary/15 border border-primary/25 text-[10px] font-black uppercase tracking-widest text-primary">
+                                                {showHud.current.act}
+                                            </div>
+                                            {showHud.current.sceneId !== undefined && showHud.current.sceneId > 0 && (
+                                                <div className="px-2 py-1 rounded bg-green-500/10 border border-green-500/20 text-[10px] font-bold text-green-200">
+                                                    Scene {showHud.current.sceneId}{showHud.currentSceneLabel ? ` — ${showHud.currentSceneLabel}` : ''}
+                                                </div>
+                                            )}
+                                            <div className="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-white/90 truncate max-w-[520px]">
+                                                {showHud.currentTitle || showHud.current.cue || '—'}
+                                            </div>
+                                        </div>
+                                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                                            <div className="text-[10px] font-mono opacity-60">
+                                                Overgang: {showHud.isTimed ? 'Timed' : 'Handmatig'}
+                                                {showHud.plannedDur > 0 ? ` • Duur ${formatTime(showHud.plannedDur)}` : ''}
+                                                {showHud.isTimed && showHud.plannedDur > 0 ? ` • ToGo ${formatTime(showHud.remainingSec)}` : ''}
+                                                {isPaused ? ' • PAUZE' : ''}
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div>
+                                        <div className="text-[9px] font-black uppercase tracking-widest opacity-50">Edit</div>
+                                        <div className="mt-1 text-[10px] font-bold text-white/80">
+                                            Open/Dicht + Hernummeren
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex items-start justify-end gap-4 min-w-0">
+                                {showHud && (
+                                    <div className="min-w-0 text-right">
+                                        <div className="text-[9px] font-black uppercase tracking-widest opacity-50">Volgende</div>
+                                        <div className="mt-1 flex flex-col items-end gap-1">
+                                            {showHud.next ? (
+                                                <>
+                                                    <div className={cn(
+                                                        "px-2 py-1 rounded border text-[10px] font-black uppercase tracking-widest",
+                                                        showHud.nextKind === 'act' ? "bg-primary/15 border-primary/25 text-primary" :
+                                                            showHud.nextKind === 'scene' ? "bg-green-500/10 border-green-500/20 text-green-200" :
+                                                                "bg-orange-500/10 border-orange-500/20 text-orange-200"
+                                                    )}>
+                                                        {showHud.nextKind === 'act' ? 'Act overgang' : showHud.nextKind === 'scene' ? 'Scene overgang' : 'Event overgang'}
+                                                    </div>
+                                                    <div className="text-[10px] font-bold text-white/80 truncate max-w-[420px]">
+                                                        {showHud.nextKind !== 'event' && showHud.nextSceneLabel
+                                                            ? showHud.nextSceneLabel
+                                                            : showHud.nextTitle || showHud.next.cue || '—'}
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="text-[10px] font-bold text-white/40 italic">Einde show</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="flex items-center gap-2 flex-wrap justify-end pointer-events-auto">
+                                    <button
+                                        onClick={() => expandAll()}
+                                        className="h-8 px-3 rounded-xl bg-black border border-white/20 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white"
+                                        title="Open de boom (in beide modes)"
+                                    >
+                                        <ChevronDown className="w-3.5 h-3.5 text-primary" />
+                                        Open
+                                    </button>
+                                    <button
+                                        onClick={() => collapseAll()}
+                                        className="h-8 px-3 rounded-xl bg-black border border-white/20 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white"
+                                        title="Klap de boom dicht (in beide modes)"
+                                    >
+                                        <ChevronRight className="w-3.5 h-3.5 text-primary" />
+                                        Dicht
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            reindexEvents()
+                                            addToast('Sequence succesvol hernummerd', 'info')
+                                        }}
+                                        className="h-8 px-3 rounded-xl bg-primary text-black font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] flex items-center gap-2"
+                                        title="Acts, Scenes en Events hernummeren"
+                                    >
+                                        <Hash className="w-3.5 h-3.5" />
+                                        Hernummeren
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {hierarchy.map((act) => {
                 // Dynamic Collapse: everything collapsed except active and next group during playback
                 const actCollapsed = collapsedGroups[`act-${act.id}`]
@@ -1765,28 +2075,27 @@ const SequenceGrid: React.FC = () => {
                                         }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Voeg Act In (Na)"><Plus className="w-3 h-3" /></button>
                                     </div>
                                     <div className="w-px h-6 bg-white/10" />
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setHeaderMenuAnchor(e.currentTarget.getBoundingClientRect());
-                                            setMenuOpenIndex(`act-${act.id}`);
-                                        }}
-                                        title="Act Menu"
-                                        className="p-1 hover:bg-white/10 rounded"
-                                    >
-                                        <MoreVertical className="w-3.5 h-3.5" />
+                                    <button onClick={() => {
+                                        const firstEventIdx = act.scenes[0]?.events[0]?.rows[0]?.originalIndex ?? 0
+                                        insertEvent(firstEventIdx, 'before')
+                                    }} className="p-1.5 hover:bg-white/10 rounded flex items-center justify-center text-blue-400" title="Voeg Eerste Event Toe">
+                                        <PlusSquare className="w-3.5 h-3.5" />
                                     </button>
 
-                                    {menuOpenIndex === `act-${act.id}` && (
-                                        <HeaderContextMenu
-                                            type="act"
-                                            id={act.id}
-                                            onClose={() => setMenuOpenIndex(null)}
-                                            anchorRect={headerMenuAnchor}
-                                            handlers={{ insertAct, deleteAct, moveAct, addToast }}
-                                            act={act}
-                                        />
-                                    )}
+                                    <button onClick={(e) => { e.stopPropagation(); addActComment(act.id); }} className="p-1.5 hover:bg-white/10 rounded flex items-center justify-center text-white/50 hover:text-white" title="Voeg Commentaar Toe Aan Act">
+                                        <MessageSquare className="w-3.5 h-3.5" />
+                                    </button>
+
+                                    <button onClick={() => {
+                                        openModal({
+                                            title: 'Act Verwijderen',
+                                            message: `Weet je zeker dat je Act "${act.id}" en alle inhoud wilt verwijderen?`,
+                                            type: 'confirm',
+                                            onConfirm: () => deleteAct(act.id)
+                                        })
+                                    }} className="p-1.5 hover:bg-red-500/20 rounded flex items-center justify-center text-red-500/50 hover:text-red-500" title="Verwijder Act">
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
                                 </div>
                             )}
                         </div>
@@ -1803,36 +2112,43 @@ const SequenceGrid: React.FC = () => {
                                     return (
                                         <div key={scene.id} className="relative group/scene">
                                             {/* SCENE Header */}
-                                            <div className="flex items-center justify-between mb-2">
-                                                <div className="flex items-center gap-2 bg-white/5 px-3 py-1 rounded text-xs font-bold text-muted-foreground uppercase tracking-wider flex-1">
+                                            <div className={cn(
+                                                "flex items-center justify-between mb-2 border-l-4 pl-3 py-0.5",
+                                                scene.isActive ? "border-green-500/60" : "border-white/10"
+                                            )}>
+                                                <div className="flex items-center gap-2 flex-1 min-w-0">
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); toggleCollapse(`scene-${act.id}-${scene.id}`) }}
-                                                        className="p-0.5 hover:bg-white/10 rounded -ml-1"
+                                                        className="p-0.5 hover:bg-white/10 rounded shrink-0"
                                                     >
-                                                        {sceneCollapsed ? <ChevronRight className="w-3 h-3 opacity-70" /> : <ChevronDown className="w-3 h-3 opacity-70" />}
+                                                        {sceneCollapsed ? <ChevronRight className="w-3 h-3 opacity-60" /> : <ChevronDown className="w-3 h-3 opacity-60" />}
                                                     </button>
-                                                    <span className="whitespace-nowrap">Scene {scene.id}</span>
                                                     {!isLocked ? (
-                                                        <>
-                                                            <span className="opacity-20 mx-1">-</span>
+                                                        <div className="flex items-center gap-2 flex-1 min-w-0">
                                                             <RenamableInput
-                                                                className="bg-transparent flex-1 outline-none text-primary/80 placeholder:text-white/20 min-w-[200px]"
-                                                                placeholder="..."
+                                                                className="bg-transparent font-bold text-sm text-white/90 outline-none border-b border-transparent focus:border-white/30 flex-1 min-w-0"
+                                                                placeholder="Scene omschrijving..."
                                                                 value={sceneDesc}
-                                                                onRename={(val) => renameScene(act.id, scene.id, val)}
+                                                                onRename={(val) => renameScene(act.id, scene.id || 0, val)}
                                                             />
-                                                        </>
+                                                            <span className="text-[9px] opacity-25 uppercase tracking-widest font-mono shrink-0">Scene {scene.id}</span>
+                                                        </div>
                                                     ) : (
-                                                        sceneDesc && <span className="text-primary/60 normal-case ml-2">- {sceneDesc}</span>
+                                                        <span className={cn(
+                                                            "font-bold text-sm",
+                                                            scene.isActive ? "text-green-300" : "text-white/80"
+                                                        )}>
+                                                            {sceneDesc || <span className="opacity-30 italic text-xs">Scene {scene.id}</span>}
+                                                        </span>
                                                     )}
-                                                    {scene.isActive && <span className="w-1.5 h-1.5 rounded-full bg-primary ml-auto" />}
+                                                    {scene.isActive && <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse ml-1 shrink-0" />}
                                                 </div>
 
                                                 {!isLocked && (
                                                     <div className="flex items-center gap-1.5 opacity-0 group-hover/scene:opacity-100 transition-opacity ml-2">
                                                         <div className="flex flex-col gap-px">
-                                                            <button onClick={() => moveScene(act.id, scene.id, 'up')} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Verplaats Scene Omhoog"><ArrowUp className="w-3 h-3" /></button>
-                                                            <button onClick={() => moveScene(act.id, scene.id, 'down')} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Verplaats Scene Omlaag"><ArrowDown className="w-3 h-3" /></button>
+                                                            <button onClick={() => moveScene(act.id, scene.id || 0, 'up')} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Verplaats Scene Omhoog"><ArrowUp className="w-3 h-3" /></button>
+                                                            <button onClick={() => moveScene(act.id, scene.id || 0, 'down')} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Verplaats Scene Omlaag"><ArrowDown className="w-3 h-3" /></button>
                                                         </div>
                                                         <div className="w-px h-6 bg-white/10" />
 
@@ -1849,281 +2165,374 @@ const SequenceGrid: React.FC = () => {
                                                         </div>
                                                         <div className="w-px h-6 bg-white/10" />
 
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setHeaderMenuAnchor(e.currentTarget.getBoundingClientRect());
-                                                                setMenuOpenIndex(`scene-${act.id}-${scene.id}`);
-                                                            }}
-                                                            title="Scene Menu"
-                                                            className="p-1 hover:bg-white/10 rounded"
-                                                        >
-                                                            <MoreVertical className="w-3.5 h-3.5" />
+                                                        <button onClick={() => {
+                                                            const firstEventIdx = scene.events[0]?.rows[0]?.originalIndex ?? 0
+                                                            insertEvent(firstEventIdx, 'before')
+                                                        }} className="p-1.5 hover:bg-white/10 rounded flex items-center justify-center text-blue-400" title="Voeg Eerste Event Toe">
+                                                            <PlusSquare className="w-3.5 h-3.5" />
                                                         </button>
 
-                                                        {menuOpenIndex === `scene-${act.id}-${scene.id}` && (
-                                                            <HeaderContextMenu
-                                                                type="scene"
-                                                                id={`${act.id}-${scene.id}`}
-                                                                onClose={() => setMenuOpenIndex(null)}
-                                                                anchorRect={headerMenuAnchor}
-                                                                handlers={{ insertScene, deleteScene, moveScene, insertEvent, addToast }}
-                                                                actId={act.id}
-                                                                sceneId={scene.id}
-                                                                scene={scene}
-                                                            />
-                                                        )}
+                                                        <button onClick={(e) => { e.stopPropagation(); addSceneComment(act.id, scene.id || 0); }} className="p-1.5 hover:bg-white/10 rounded flex items-center justify-center text-white/50 hover:text-white" title="Voeg Commentaar Toe Aan Scene">
+                                                            <MessageSquare className="w-3.5 h-3.5" />
+                                                        </button>
+
+                                                        <button onClick={() => {
+                                                            openModal({
+                                                                title: 'Scene Verwijderen',
+                                                                message: `Weet je zeker dat je Scene "SCENE ${scene.id}" en alle inhoud wilt verwijderen?`,
+                                                                type: 'confirm',
+                                                                onConfirm: () => deleteScene(act.id, scene.id || 0)
+                                                            })
+                                                        }} className="p-1.5 hover:bg-red-500/20 rounded flex items-center justify-center text-red-500/50 hover:text-red-500" title="Verwijder Scene">
+                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                        </button>
                                                     </div>
                                                 )}
                                             </div>
 
-                                            {!sceneCollapsed && (
-                                                <div className="pl-4 space-y-3">
-                                                    {scene.events.map((eventNode) => {
-                                                        // Dynamic Collapse
-                                                        // If minimal (only Title + Trigger), collapse by default in Show Mode
-                                                        const eventCollapsed = collapsedGroups[eventNode.uniqueId] ?? (isLocked && eventNode.isMinimal)
+                                            {!sceneCollapsed && (() => {
+                                                // Pre-pass: extract trigger row per event for EventTransition strip
+                                                const eventNodesWithTriggers = scene.events.map(en => {
+                                                    const triggerRow = en.rows.find(r => r.event.type?.toLowerCase() === 'trigger')
+                                                    return { eventNode: en, triggerRow }
+                                                })
 
-                                                        const titleRow = eventNode.rows.find(r => r.event.type?.toLowerCase() === 'title')
-                                                        const otherRows = eventNode.rows.filter(r => {
-                                                            const type = r.event.type?.toLowerCase()
-                                                            return type !== 'title' && type !== 'act' && type !== 'scene'
-                                                        })
+                                                return (
+                                                    <div className="space-y-0">
+                                                        {eventNodesWithTriggers.map(({ eventNode, triggerRow }, eventIdx) => {
+                                                            // Dynamic Collapse
+                                                            const eventCollapsed = collapsedGroups[eventNode.uniqueId] ?? isLocked
 
-                                                        // Calculate summary for header tags
-                                                        const summaryCounts = otherRows.reduce((acc, r) => {
-                                                            const t = r.event.type?.toLowerCase() || 'unknown'
-                                                            acc[t] = (acc[t] || 0) + 1
-                                                            return acc
-                                                        }, {} as Record<string, number>)
+                                                            const titleRow = eventNode.rows.find(r => r.event.type?.toLowerCase() === 'title')
+                                                            // Rows inside card: exclude title, trigger, act, scene headers
+                                                            const allContentRows = eventNode.rows.filter(r => {
+                                                                const type = r.event.type?.toLowerCase()
+                                                                return type !== 'title' && type !== 'act' && type !== 'scene' && type !== 'trigger'
+                                                            })
 
-                                                        // Timing calculations using pre-computed data from useMemo
-                                                        const eventDuration = eventNode.duration
+                                                            // Actions and Comments are functional and should always be visible (even when collapsed)
+                                                            const alwaysVisibleRows = allContentRows.filter(r => {
+                                                                const type = r.event.type?.toLowerCase()
+                                                                return type === 'action' || type === 'comment'
+                                                            })
 
-                                                        // Check if the active event's timing has elapsed (for blinking "Next")
-                                                        let activeTimeElapsed = false
-                                                        if (eventNode.isNext && eventNode.activeDuration > 0 && lastTransitionTime) {
-                                                            const elapsed = Math.round((currentTime.getTime() - lastTransitionTime) / 1000)
-                                                            activeTimeElapsed = elapsed >= eventNode.activeDuration
-                                                        }
+                                                            // Light and Media are technical details and can be collapsed
+                                                            const collapsibleRows = allContentRows.filter(r => {
+                                                                const type = r.event.type?.toLowerCase()
+                                                                return type === 'light' || type === 'media'
+                                                            })
 
-                                                        // Calculate remaining time for the active event countdown
-                                                        let remainingTime = 0
-                                                        let showCountdown = false
-                                                        if (eventNode.isActive && eventDuration > 0 && lastTransitionTime) {
-                                                            const elapsed = Math.round((currentTime.getTime() - lastTransitionTime) / 1000)
-                                                            remainingTime = Math.max(0, eventDuration - elapsed)
-                                                            showCountdown = true
-                                                        }
+                                                            // Calculate summary for header tags
+                                                            const summaryCounts = eventNode.rows.reduce((acc, r) => {
+                                                                const t = r.event.type?.toLowerCase() || 'unknown'
+                                                                if (t !== 'title' && t !== 'trigger') acc[t] = (acc[t] || 0) + 1
+                                                                return acc
+                                                            }, {} as Record<string, number>)
 
-                                                        return (
-                                                            <div
-                                                                key={eventNode.uniqueId}
-                                                                ref={eventNode.isActive ? activeGroupRef : null}
-                                                                className={cn(
-                                                                    "relative rounded-lg transition-all duration-300 border border-white/5 overflow-hidden group/event",
-                                                                    eventNode.isActive ? "bg-green-500/5 border-green-500/30 ring-1 ring-green-500/20 shadow-[0_0_20px_rgba(34,197,94,0.05)]" :
-                                                                        eventNode.isNext ? "bg-yellow-500/5 border-yellow-500/30 ring-1 ring-yellow-500/20" :
-                                                                            "bg-black/20 hover:bg-white/5",
-                                                                )}
-                                                            >
-                                                                {/* Event Header */}
-                                                                <div className="px-3 py-1.5 bg-black/40 flex items-center justify-between border-b border-white/5">
-                                                                    <div className="flex items-center gap-2 text-[10px] font-mono opacity-60">
-                                                                        <button
-                                                                            onClick={(e) => { e.stopPropagation(); toggleCollapse(eventNode.uniqueId) }}
-                                                                            className="p-1 hover:bg-white/10 rounded -ml-1"
-                                                                        >
-                                                                            {eventCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                                                                        </button>
-                                                                        <span className="font-bold text-purple-400">{act.id}.{scene.id}.{eventNode.id}</span>
-                                                                        <span className="opacity-40">|</span>                                                                        {/* Transition status removed per feedback */}
-                                                                        {titleRow?.event.cue && (
-                                                                            <>
-                                                                                <span className="opacity-40">|</span>
-                                                                                <span className="text-orange-500 font-bold truncate max-w-[300px]">{titleRow.event.cue}</span>
-                                                                            </>
+                                                            const eventDuration = eventNode.duration
+
+                                                            // Check if the active event's timing has elapsed (for blinking "Next")
+                                                            let activeTimeElapsed = false
+                                                            if (eventNode.isNext && eventNode.activeDuration > 0 && lastTransitionTime) {
+                                                                const elapsed = Math.round((currentTime.getTime() - lastTransitionTime) / 1000)
+                                                                activeTimeElapsed = elapsed >= eventNode.activeDuration
+                                                            }
+
+                                                            // Calculate remaining time for the active event countdown
+                                                            let remainingTime = 0
+                                                            let showCountdown = false
+                                                            if (eventNode.isActive && eventDuration > 0 && lastTransitionTime) {
+                                                                const elapsed = Math.round((currentTime.getTime() - lastTransitionTime) / 1000)
+                                                                remainingTime = Math.max(0, eventDuration - elapsed)
+                                                                showCountdown = true
+                                                            }
+
+                                                            // Card-level selection: is any row in this event selected?
+                                                            const isCardSelected = !isLocked && selectedEvent &&
+                                                                selectedEvent.act === eventNode.rows[0]?.event.act &&
+                                                                selectedEvent.sceneId === eventNode.rows[0]?.event.sceneId &&
+                                                                selectedEvent.eventId === eventNode.rows[0]?.event.eventId
+
+                                                            const isLastEvent = eventIdx === eventNodesWithTriggers.length - 1
+
+                                                            return (
+                                                                <div key={eventNode.uniqueId} className="ml-6 pl-2 border-l border-white/5 relative">
+                                                                    {/* EVENT CARD */}
+                                                                    <div
+                                                                        ref={eventNode.isActive ? activeGroupRef : null}
+                                                                        className={cn(
+                                                                            "relative rounded-lg transition-all duration-300 overflow-hidden group/event mb-1",
+                                                                            // Base border & background
+                                                                            eventNode.isActive
+                                                                                ? "border-2 border-green-500/60 bg-green-500/5 shadow-[0_0_20px_rgba(34,197,94,0.08)]"
+                                                                                : eventNode.isNext
+                                                                                    ? "border-2 border-orange-400/50 bg-orange-500/5"
+                                                                                    : isCardSelected
+                                                                                        ? "border-2 border-blue-400/70 bg-blue-500/5 shadow-[0_0_12px_rgba(59,130,246,0.2)]"
+                                                                                        : "border border-white/8 bg-black/20 hover:border-white/15 hover:bg-white/3",
                                                                         )}
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2 mr-2">
-                                                                        {/* Meta Tags */}
-                                                                        {titleRow?.event.scriptPg !== undefined && titleRow.event.scriptPg > 0 && (
-                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-[9px] font-bold text-blue-300">
-                                                                                Pg {titleRow.event.scriptPg}
-                                                                            </div>
-                                                                        )}
-
-                                                                        {summaryCounts['comment'] > 0 && (
-                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] opacity-60">
-                                                                                <Info className="w-3 h-3" /> {summaryCounts['comment']}
-                                                                            </div>
-                                                                        )}
-                                                                        {summaryCounts['light'] > 0 && (
-                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-purple-500/10 border border-purple-500/30 rounded text-[9px] text-purple-200">
-                                                                                <Lightbulb className="w-3 h-3" /> {summaryCounts['light']}
-                                                                            </div>
-                                                                        )}
-                                                                        {summaryCounts['media'] > 0 && (
-                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-[9px] text-blue-200">
-                                                                                <Play className="w-3 h-3" /> {summaryCounts['media']}
-                                                                            </div>
-                                                                        )}
-
-                                                                        <div className="w-px h-4 bg-white/10 mx-1" />
-
-                                                                        {/* Timing Display */}
-                                                                        {eventNode.isActive && showCountdown && (
-                                                                            <span className={cn(
-                                                                                "text-[9px] font-mono font-bold px-1.5 py-0.5 rounded tabular-nums",
-                                                                                remainingTime === 0 ? "text-red-400 bg-red-500/10 border border-red-500/20 animate-bright-pulse" : "text-yellow-400 bg-yellow-500/10 border border-yellow-500/20"
-                                                                            )}>
-                                                                                <span className="opacity-50 mr-1 italic">ToGo:</span>{formatTime(remainingTime)}
-                                                                            </span>
-                                                                        )}
-
-                                                                        {eventNode.isActive && !showCountdown && (
-                                                                            <span className="text-[9px] font-black uppercase text-primary animate-bright-pulse">Active</span>
-                                                                        )}
-
-                                                                        {eventNode.isNext && (
-                                                                            <div className="flex items-center gap-1.5">
-                                                                                {eventDuration > 0 && (
-                                                                                    <span className="text-[9px] font-mono opacity-40 tabular-nums">
-                                                                                        <span className="opacity-50 mr-1 italic">Duur:</span>{formatTime(eventDuration)}
-                                                                                    </span>
-                                                                                )}
-                                                                                <span className={cn(
-                                                                                    "text-[9px] font-black uppercase px-1.5 py-0.5 rounded",
-                                                                                    activeTimeElapsed
-                                                                                        ? "text-white bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.8)] animate-bright-pulse"
-                                                                                        : "text-orange-400 animate-bright-pulse"
-                                                                                )}>
-                                                                                    Next
-                                                                                </span>
-                                                                            </div>
-                                                                        )}
-
-                                                                        {/* Event Controls */}
-                                                                        {!isLocked && (
-                                                                            <div className="flex items-center gap-1.5 opacity-0 group-hover/event:opacity-100 transition-opacity ml-2">
-                                                                                <div className="flex flex-col gap-px">
-                                                                                    <button onClick={() => {
-                                                                                        const firstIdx = eventNode.rows[0]?.originalIndex
-                                                                                        if (firstIdx !== undefined) moveEvent(firstIdx, 'up')
-                                                                                    }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Verplaats Event Omhoog"><ArrowUp className="w-2.5 h-2.5" /></button>
-                                                                                    <button onClick={() => {
-                                                                                        const firstIdx = eventNode.rows[0]?.originalIndex
-                                                                                        if (firstIdx !== undefined) moveEvent(firstIdx, 'down')
-                                                                                    }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Verplaats Event Omlaag"><ArrowDown className="w-2.5 h-2.5" /></button>
-                                                                                </div>
-                                                                                <div className="w-px h-6 bg-white/10" />
-                                                                                <div className="flex flex-col gap-px">
-                                                                                    <button onClick={() => {
-                                                                                        const firstIdx = eventNode.rows[0]?.originalIndex
-                                                                                        if (firstIdx !== undefined) insertEvent(firstIdx, 'before')
-                                                                                    }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Voeg Event In (Voor)"><Plus className="w-2.5 h-2.5" /></button>
-                                                                                    <button onClick={() => {
-                                                                                        const lastIdx = eventNode.rows[eventNode.rows.length - 1]?.originalIndex
-                                                                                        if (lastIdx !== undefined) insertEvent(lastIdx, 'after')
-                                                                                    }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Voeg Event In (Na)"><Plus className="w-2.5 h-2.5" /></button>
-                                                                                </div>
-                                                                                <div className="w-px h-6 bg-white/10" />
-                                                                                <button onClick={() => {
-                                                                                    openModal({
-                                                                                        title: 'Groep Verwijderen',
-                                                                                        message: `Weet je zeker dat je groep ${act.id} - ${scene.id}.${eventNode.id} wilt verwijderen?`,
-                                                                                        type: 'confirm',
-                                                                                        onConfirm: () => deleteGroup(act.id, scene.id, eventNode.id)
-                                                                                    })
-                                                                                }} className="p-1 hover:bg-red-500/10 rounded text-red-500/40 hover:text-red-500" title="Verwijder Event"><Trash2 className="w-3.5 h-3.5" /></button>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* Actual Grid Rows */}
-                                                                <div className="flex flex-col">
-                                                                    {titleRow && !eventCollapsed && <RowItem
-                                                                        key={`row-title-${titleRow.originalIndex}`}
-                                                                        event={titleRow.event}
-                                                                        originalIndex={titleRow.originalIndex}
-                                                                        id={titleRow.id}
-                                                                        isShadow={titleRow.isShadow}
-                                                                        isNextGroup={eventNode.isNext}
-                                                                        isActiveGroup={eventNode.isActive}
-                                                                        handleRowClick={handleRowClick}
-                                                                        handleRowDoubleClick={handleRowDoubleClick}
-                                                                        editingIndex={editingIndex}
-                                                                        setEditingIndex={setEditingIndex}
-                                                                        menuOpenIndex={menuOpenIndex}
-                                                                        setMenuOpenIndex={setMenuOpenIndex}
-                                                                        activeShow={activeShow}
-                                                                        isLocked={isLocked}
-                                                                        activeEventIndex={activeEventIndex}
-                                                                        eventStatuses={eventStatuses}
-                                                                        selectedEventIndex={selectedEventIndex}
-                                                                        selectedEvent={selectedEvent}
-                                                                        ongoingEffects={eventNode.ongoingEffects}
-                                                                    />}
-
-                                                                    {(() => {
-                                                                        const usedFixtures = eventNode.rows.map(r => r.event.fixture).filter(Boolean)
-                                                                        return otherRows.map(item => {
-                                                                            const isAction = item.event.type?.toLowerCase() === 'action'
-                                                                            const isTrigger = item.event.type?.toLowerCase() === 'trigger'
-
-                                                                            // User requested: Always show triggers when collapsed, 
-                                                                            // but HIDE if it's a manual trigger without a cue (text)
-                                                                            if (eventCollapsed) {
-                                                                                if (isAction) { /* continue */ }
-                                                                                else if (isTrigger) {
-                                                                                    const isManual = (item.event.effect || 'manual').toLowerCase() === 'manual';
-                                                                                    if (isManual && !item.event.cue) return null;
-                                                                                }
-                                                                                else return null;
-                                                                            }
-
+                                                                    >
+                                                                        {/* ═══ EVENT CARD HEADER (hidden for 1-event scenes where name = scene name) ═══ */}
+                                                                        {(() => {
+                                                                            const singleEventScene = scene.events.length === 1
+                                                                            const eventNameMatchesScene = titleRow?.event.cue?.trim() === sceneDesc?.trim()
+                                                                            const hideHeader = singleEventScene && eventNameMatchesScene
+                                                                            if (hideHeader) return null
+                                                                            return null // placeholder - full header below
+                                                                        })()}
+                                                                        {(() => {
+                                                                            const hideHeader = scene.events.length === 1 && titleRow?.event.cue?.trim() === sceneDesc?.trim()
+                                                                            if (hideHeader) return null
                                                                             return (
-                                                                                <RowItem
-                                                                                    key={`row-${item.id}`}
-                                                                                    event={{ ...item.event, usedFixtures } as any}
-                                                                                    originalIndex={item.originalIndex}
-                                                                                    id={item.id}
-                                                                                    isShadow={item.isShadow}
-                                                                                    isNextGroup={eventNode.isNext}
-                                                                                    isActiveGroup={eventNode.isActive}
-                                                                                    handleRowClick={handleRowClick}
-                                                                                    handleRowDoubleClick={handleRowDoubleClick}
-                                                                                    editingIndex={editingIndex}
-                                                                                    setEditingIndex={setEditingIndex}
-                                                                                    menuOpenIndex={menuOpenIndex}
-                                                                                    setMenuOpenIndex={setMenuOpenIndex}
-                                                                                    activeShow={activeShow}
-                                                                                    isLocked={isLocked}
-                                                                                    activeEventIndex={activeEventIndex}
-                                                                                    eventStatuses={eventStatuses}
-                                                                                    selectedEventIndex={selectedEventIndex}
-                                                                                    selectedEvent={selectedEvent}
-                                                                                    ongoingEffects={eventNode.ongoingEffects}
-                                                                                />
+                                                                                <div className={cn(
+                                                                                    "flex items-center justify-between px-3 py-2 border-b",
+                                                                                    eventNode.isActive ? "bg-green-500/10 border-green-500/20" :
+                                                                                        eventNode.isNext ? "bg-orange-500/8 border-orange-500/20" :
+                                                                                            isCardSelected ? "bg-blue-500/8 border-blue-500/20" :
+                                                                                                "bg-black/30 border-white/5"
+                                                                                )}>
+                                                                                    {/* Left: collapse toggle + event name */}
+                                                                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                                                        <button
+                                                                                            onClick={(e) => { e.stopPropagation(); toggleCollapse(eventNode.uniqueId) }}
+                                                                                            className="p-1 hover:bg-white/10 rounded -ml-1 shrink-0"
+                                                                                        >
+                                                                                            {eventCollapsed ? <ChevronRight className="w-3.5 h-3.5 opacity-60" /> : <ChevronDown className="w-3.5 h-3.5 opacity-60" />}
+                                                                                        </button>
+
+                                                                                        {/* Event name (from title row cue) */}
+                                                                                        {titleRow ? (
+                                                                                            !isLocked ? (
+                                                                                                <RenamableInput
+                                                                                                    className={cn(
+                                                                                                        "bg-transparent font-bold text-xs outline-none border-b border-transparent focus:border-white/30 flex-1 min-w-0 uppercase tracking-wider ml-4",
+                                                                                                        eventNode.isActive ? "text-green-400" :
+                                                                                                            eventNode.isNext ? "text-orange-400" :
+                                                                                                                "text-orange-500/90"
+                                                                                                    )}
+                                                                                                    value={titleRow.event.cue || ''}
+                                                                                                    placeholder="Event naam..."
+                                                                                                    onRename={(val) => {
+                                                                                                        const updateEvent = useSequencerStore.getState().updateEvent
+                                                                                                        updateEvent(titleRow.originalIndex, { cue: val })
+                                                                                                    }}
+                                                                                                />
+                                                                                            ) : (
+                                                                                                <span className={cn(
+                                                                                                    "font-bold text-xs truncate flex-1 uppercase tracking-wider ml-4",
+                                                                                                    eventNode.isActive ? "text-green-400" :
+                                                                                                        eventNode.isNext ? "text-orange-400" :
+                                                                                                            "text-orange-500/90"
+                                                                                                )}>
+                                                                                                    {titleRow.event.cue || <span className="opacity-30 italic">Naamloos event</span>}
+                                                                                                </span>
+                                                                                            )
+                                                                                        ) : (
+                                                                                            <span className="font-semibold text-sm opacity-30 italic">Event</span>
+                                                                                        )}
+                                                                                    </div>
+
+                                                                                    {/* Right: meta tags + status + controls */}
+                                                                                    <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                                                                                        {/* Script page */}
+                                                                                        {titleRow?.event.scriptPg !== undefined && titleRow.event.scriptPg > 0 && (
+                                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-[9px] font-bold text-blue-300">
+                                                                                                Pg {titleRow.event.scriptPg}
+                                                                                            </div>
+                                                                                        )}
+                                                                                        {/* Duration */}
+                                                                                        {!isLocked && titleRow?.event.duration !== undefined && titleRow.event.duration > 0 && (
+                                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] font-mono opacity-60">
+                                                                                                {formatTime(titleRow.event.duration)}
+                                                                                            </div>
+                                                                                        )}
+                                                                                        {/* Content summary tags */}
+                                                                                        {summaryCounts['action'] > 0 && (
+                                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-yellow-500/10 border border-yellow-500/30 rounded text-[9px] text-yellow-300">
+                                                                                                <User className="w-3 h-3" /> {summaryCounts['action']}
+                                                                                            </div>
+                                                                                        )}
+                                                                                        {summaryCounts['light'] > 0 && (
+                                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-purple-500/10 border border-purple-500/30 rounded text-[9px] text-purple-200">
+                                                                                                <Lightbulb className="w-3 h-3" /> {summaryCounts['light']}
+                                                                                            </div>
+                                                                                        )}
+                                                                                        {summaryCounts['media'] > 0 && (
+                                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-[9px] text-blue-200">
+                                                                                                <Play className="w-3 h-3" /> {summaryCounts['media']}
+                                                                                            </div>
+                                                                                        )}
+                                                                                        {summaryCounts['comment'] > 0 && (
+                                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] opacity-50">
+                                                                                                <Info className="w-3 h-3" /> {summaryCounts['comment']}
+                                                                                            </div>
+                                                                                        )}
+
+                                                                                        {/* Status indicators */}
+                                                                                        {eventNode.isActive && (
+                                                                                            <div className="flex items-center gap-1.5">
+                                                                                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                                                                                                {showCountdown ? (
+                                                                                                    <span className={cn(
+                                                                                                        "text-[9px] font-mono font-bold px-1.5 py-0.5 rounded tabular-nums",
+                                                                                                        remainingTime === 0 ? "text-red-400 bg-red-500/10 border border-red-500/20 animate-bright-pulse" : "text-yellow-400 bg-yellow-500/10 border border-yellow-500/20"
+                                                                                                    )}>
+                                                                                                        <span className="opacity-50 mr-1 italic">ToGo:</span>{formatTime(remainingTime)}
+                                                                                                    </span>
+                                                                                                ) : (
+                                                                                                    <span className="text-[9px] font-black uppercase text-green-400 animate-bright-pulse">Active</span>
+                                                                                                )}
+                                                                                            </div>
+                                                                                        )}
+
+                                                                                        {eventNode.isNext && (
+                                                                                            <div className="flex items-center gap-1.5">
+                                                                                                {eventDuration > 0 && (
+                                                                                                    <span className="text-[9px] font-mono opacity-40 tabular-nums">
+                                                                                                        <span className="opacity-50 mr-1 italic">Duur:</span>{formatTime(eventDuration)}
+                                                                                                    </span>
+                                                                                                )}
+                                                                                                <span className={cn(
+                                                                                                    "text-[9px] font-black uppercase px-1.5 py-0.5 rounded",
+                                                                                                    activeTimeElapsed
+                                                                                                        ? "text-white bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.8)] animate-bright-pulse"
+                                                                                                        : "text-orange-400 animate-bright-pulse"
+                                                                                                )}>Next</span>
+                                                                                            </div>
+                                                                                        )}
+
+                                                                                        {/* Event Controls (edit mode only) */}
+                                                                                        {!isLocked && (
+                                                                                            <div className="flex items-center gap-1.5 opacity-0 group-hover/event:opacity-100 transition-opacity ml-1">
+                                                                                                <div className="flex flex-col gap-px">
+                                                                                                    <button onClick={() => {
+                                                                                                        const firstIdx = eventNode.rows[0]?.originalIndex
+                                                                                                        if (firstIdx !== undefined) moveEvent(firstIdx, 'up')
+                                                                                                    }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Verplaats Event Omhoog"><ArrowUp className="w-2.5 h-2.5" /></button>
+                                                                                                    <button onClick={() => {
+                                                                                                        const firstIdx = eventNode.rows[0]?.originalIndex
+                                                                                                        if (firstIdx !== undefined) moveEvent(firstIdx, 'down')
+                                                                                                    }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Verplaats Event Omlaag"><ArrowDown className="w-2.5 h-2.5" /></button>
+                                                                                                </div>
+                                                                                                <div className="w-px h-6 bg-white/10" />
+                                                                                                <div className="flex flex-col gap-px">
+                                                                                                    <button onClick={() => {
+                                                                                                        const firstIdx = eventNode.rows[0]?.originalIndex
+                                                                                                        if (firstIdx !== undefined) insertEvent(firstIdx, 'before')
+                                                                                                    }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Voeg Event In (Voor)"><Plus className="w-2.5 h-2.5" /></button>
+                                                                                                    <button onClick={() => {
+                                                                                                        const lastIdx = eventNode.rows[eventNode.rows.length - 1]?.originalIndex
+                                                                                                        if (lastIdx !== undefined) insertEvent(lastIdx, 'after')
+                                                                                                    }} className="p-0.5 hover:bg-white/10 rounded text-white/40 hover:text-white leading-none" title="Voeg Event In (Na)"><Plus className="w-2.5 h-2.5" /></button>
+                                                                                                </div>
+                                                                                                <div className="w-px h-6 bg-white/10" />
+                                                                                                <button onClick={() => {
+                                                                                                    openModal({
+                                                                                                        title: 'Groep Verwijderen',
+                                                                                                        message: `Weet je zeker dat je groep ${act.id} - ${scene.id || 0}.${eventNode.id || 0} wilt verwijderen?`,
+                                                                                                        type: 'confirm',
+                                                                                                        onConfirm: () => deleteGroup(act.id, scene.id || 0, eventNode.id || 0)
+                                                                                                    })
+                                                                                                }} className="p-1 hover:bg-red-500/10 rounded text-red-500/40 hover:text-red-500" title="Verwijder Event"><Trash2 className="w-3.5 h-3.5" /></button>
+                                                                                            </div>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
                                                                             )
-                                                                        })
-                                                                    })()}
+                                                                        })()}
+
+                                                                        {/* ═══ ALWAYS VISIBLE ROWS (Comments, Actions) ═══ */}
+                                                                        {alwaysVisibleRows.length > 0 && (
+                                                                            <div className="flex flex-col divide-y divide-white/5 border-t border-white/5">
+                                                                                {alwaysVisibleRows.map(item => (
+                                                                                    <RowItem
+                                                                                        key={`always-${item.id}`}
+                                                                                        event={item.event}
+                                                                                        originalIndex={item.originalIndex}
+                                                                                        id={item.id}
+                                                                                        isShadow={item.isShadow}
+                                                                                        isActiveGroup={eventNode.isActive}
+                                                                                        isNextGroup={eventNode.isNext}
+                                                                                        handleRowClick={handleRowClick}
+                                                                                        handleRowDoubleClick={handleRowDoubleClick}
+                                                                                        editingIndex={editingIndex}
+                                                                                        setEditingIndex={setEditingIndex}
+                                                                                        menuOpenIndex={menuOpenIndex}
+                                                                                        setMenuOpenIndex={setMenuOpenIndex}
+                                                                                        activeShow={activeShow}
+                                                                                        isLocked={isLocked}
+                                                                                        activeEventIndex={activeEventIndex}
+                                                                                        eventStatuses={eventStatuses}
+                                                                                        selectedEventIndex={selectedEventIndex}
+                                                                                        selectedEvent={selectedEvent}
+                                                                                        ongoingEffects={eventNode.ongoingEffects}
+                                                                                    />
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+
+                                                                        {/* ═══ COLLAPSIBLE ROWS (Light, Media) ═══ */}
+                                                                        {!eventCollapsed && collapsibleRows.length > 0 && (
+                                                                            <div className="flex flex-col divide-y divide-white/5 border-t border-white/5">
+                                                                                {(() => {
+                                                                                    const usedFixtures = eventNode.rows.map(r => r.event.fixture).filter(Boolean)
+                                                                                    return collapsibleRows.map(item => (
+                                                                                        <RowItem
+                                                                                            key={`row-${item.id}`}
+                                                                                            event={{ ...item.event, usedFixtures } as any}
+                                                                                            originalIndex={item.originalIndex}
+                                                                                            id={item.id}
+                                                                                            isShadow={item.isShadow}
+                                                                                            isNextGroup={eventNode.isNext}
+                                                                                            isActiveGroup={eventNode.isActive}
+                                                                                            handleRowClick={handleRowClick}
+                                                                                            handleRowDoubleClick={handleRowDoubleClick}
+                                                                                            editingIndex={editingIndex}
+                                                                                            setEditingIndex={setEditingIndex}
+                                                                                            menuOpenIndex={menuOpenIndex}
+                                                                                            setMenuOpenIndex={setMenuOpenIndex}
+                                                                                            activeShow={activeShow}
+                                                                                            isLocked={isLocked}
+                                                                                            activeEventIndex={activeEventIndex}
+                                                                                            eventStatuses={eventStatuses}
+                                                                                            selectedEventIndex={selectedEventIndex}
+                                                                                            selectedEvent={selectedEvent}
+                                                                                            ongoingEffects={eventNode.ongoingEffects}
+                                                                                        />
+                                                                                    ))
+                                                                                })()}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+
+                                                                    {/* ═══ TRANSITION STRIP between events ═══ */}
+                                                                    <EventTransition
+                                                                        triggerEvent={triggerRow?.event || null}
+                                                                        isLastEvent={isLastEvent}
+                                                                        isLocked={isLocked}
+                                                                        triggerIndex={triggerRow?.originalIndex}
+                                                                        onEditTrigger={(idx) => {
+                                                                            handleRowClick(idx)
+                                                                            handleRowDoubleClick(idx)
+                                                                        }}
+                                                                    />
                                                                 </div>
-                                                            </div>
-                                                        )
-                                                    })}
-                                                </div>
-                                            )}
+                                                            )
+                                                        })}
+                                                    </div>
+                                                )
+                                            })()}
+
                                         </div>
                                     )
                                 })}
                             </div>
-                        )}
-                    </div>
+                        )
+                        }
+                    </div >
                 )
             })}
-        </div>
+        </div >
     )
 }
 

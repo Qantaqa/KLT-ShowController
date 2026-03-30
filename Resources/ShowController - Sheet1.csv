@@ -1,0 +1,15 @@
+ActId,SceneId,EventId,ActionId,Type,,Wat bevat het,IN-EDIT,,IN-SHOW,,,
+,,,,,,,Ingeklapt,Uitgeklapt,Ingeklapt,Uitgeklapt,,Menu
+x,,,,Title,Verplicht,Titel van een act,Ja,Ja,Ja,Ja,"Paarse achtergrond, header","Toevoegen act voor/na, Toevoegen comment (max 1 per act), verwijder hele act incl scenes/events/actions"
+x,,,,Comment,Optioneel,Commentaar van toepassing op een hele act.,Nee,Ja,Nee,Ja,Kleine tekst,
+,,,,,,,,,,,,
+x,y,,,Title ,Verplicht,Titel van een scene,Ja,Ja,Ja,Ja,Witte tekst,"Toevoegen scene voor/na, toevoegen comment (max 1 per scene), verwijder scene incl. events/action"
+x,y,,,Comment,Optioneel,Commentaar van toepassing op een hele scene,Nee,Ja,Nee,Ja,Kleine tekst,
+,,,,,,,,,,,,
+x,y,z,,Title ,Optioneel,Titel van een event,Ja,Ja,Ja,Ja,"Oranje tekst, mits er meerdere events zijn","Toevoegen event voor/na, toevoegen comment (max 1), toevoegen trigger na (max 1), toevoegen light/media/action, verwijder event incl actions"
+x,y,z,,Comment,Optioneel,Commentaar van toepassing op een hele event,Nee,Ja,Nee,Ja,Kleine tekst,
+x,y,z,,Trigger,Optioneel,Wanneer gaan we over van scene/event naar volgende act/scene/event,Ja,Ja,Ja,Ja,Geel - tonen als scheiding tussen deze en volgende scene/event,
+,,,,,,,,,,,,
+x,y,z,1,Light,"Optioneel, per device maar 1 keer per event",Bevat informatie voor aansturen van een lichtbron (WIZ/WLED),"Nee, tag weergeven",Ja,"Nee, tag weergeven",Ja,"Icontje lamp,",Verwijder light action
+x,y,z,1,Media,"Optioneel, per device maar 1 keer per event",Bevat informatie voor aansturen van een media (localscreen/videowall),"Nee, tag weergeven",Ja,"Nee, tag weergeven",Ja,Icontje projector,Verwijder media action
+x,y,z,1,Action,Optioneel,Bevat informatie voor stagehand om iets te doen,Ja,Ja,Ja,Ja,incontje person,Verwijder aktie action

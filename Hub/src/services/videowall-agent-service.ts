@@ -39,26 +39,28 @@ class VideoWallAgentService {
 
     /**
      * Retrieves or establishes a WebSocket connection for a specific VideoWall node.
+     * Always returns a socket that is either OPEN or CONNECTING.
      */
     private getSocket(device: VideoWallAgentDevice): WebSocket {
         const id = device.id;
         let ws = this.connections.get(id);
 
-        if (!ws || ws.readyState === WebSocket.CLOSED) {
+        // Recreate socket if it's gone or in a terminal state
+        if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
             const url = `ws://${device.ip}:${device.port || 3003}`;
-            console.log(`Connecting to VideoWall Agent at ${url}`);
+            console.log(`[WS] (Re)connecting to VideoWall Agent at ${url}`);
             ws = new WebSocket(url);
 
             ws.onopen = () => {
-                console.log(`Connected to VideoWall Agent: ${device.name}`);
+                console.log(`[WS] Connected to VideoWall Agent: ${device.name}`);
             };
 
             ws.onerror = (err) => {
-                console.error(`WebSocket error for ${device.name}:`, err);
+                console.error(`[WS] Error for ${device.name}:`, err);
             };
 
             ws.onclose = () => {
-                console.log(`Disconnected from VideoWall Agent: ${device.name}`);
+                console.log(`[WS] Disconnected from VideoWall Agent: ${device.name}`);
                 this.connections.delete(id);
             };
 
@@ -70,27 +72,48 @@ class VideoWallAgentService {
 
     /**
      * Dispatches a remote control command to the target hardware agent.
+     * Always reconnects if the WebSocket is closed or closing.
+     * Returns a Promise that resolves when the command has been sent.
      */
-    public async sendCommand(device: VideoWallAgentDevice, action: string, payload: any = {}) {
-        try {
-            const ws = this.getSocket(device);
+    public async sendCommand(device: VideoWallAgentDevice, action: string, payload: any = {}): Promise<void> {
+        return new Promise<void>((resolve) => {
+            try {
+                // getSocket() now always returns an OPEN or CONNECTING socket
+                const ws = this.getSocket(device);
+                const msg = JSON.stringify({ action, ...payload });
 
-            const execute = () => {
                 if (ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify({ action, ...payload }));
+                    ws.send(msg);
+                    console.log(`[WS] Sent '${action}' to ${device.name}`);
+                    resolve();
                 } else if (ws.readyState === WebSocket.CONNECTING) {
+                    // Wait for the connection to open — with a 10s timeout
+                    const timeout = setTimeout(() => {
+                        console.error(`[WS] Timeout waiting to send '${action}' to ${device.name}`);
+                        resolve();
+                    }, 10000);
+
                     ws.addEventListener('open', () => {
-                        ws.send(JSON.stringify({ action, ...payload }));
+                        clearTimeout(timeout);
+                        ws.send(msg);
+                        console.log(`[WS] Sent '${action}' to ${device.name} (after connect)`);
+                        resolve();
+                    }, { once: true });
+
+                    ws.addEventListener('error', () => {
+                        clearTimeout(timeout);
+                        console.error(`[WS] Failed to send '${action}' to ${device.name}: connection error`);
+                        resolve();
                     }, { once: true });
                 } else {
-                    console.error(`Cannot send command '${action}' to ${device.name}: WebSocket status ${ws.readyState}`);
+                    console.error(`[WS] Cannot send '${action}' to ${device.name}: socket in unexpected state ${ws.readyState}`);
+                    resolve();
                 }
-            };
-
-            execute();
-        } catch (error) {
-            console.error(`Critical failure in sendCommand to ${device.name}:`, error);
-        }
+            } catch (error) {
+                console.error(`[WS] Critical failure in sendCommand to ${device.name}:`, error);
+                resolve();
+            }
+        });
     }
 
     /**
@@ -116,24 +139,76 @@ class VideoWallAgentService {
     }
 
     /**
-     * Normalizes a file path or URL to a plain OS path.
-     * Strips file://, file:/// prefixes and decodes URI encoding.
+     * Normalizes any file path or URL to a plain OS path.
+     * Handles: file:///, file://, ledshow-file://, and plain paths.
      */
     private normalizeFilePath(filePathOrUrl: string): string {
         let p = filePathOrUrl.trim();
-        // Strip file:/// or file:// prefix (Windows: file:///C:/... → C:/...)
-        if (p.startsWith('file:///')) {
+
+        // Strip known custom protocol (ledshow-file:///C:/... → C:/...)
+        if (p.startsWith('ledshow-file:///')) {
+            p = p.slice(16);
+        } else if (p.startsWith('ledshow-file://')) {
+            p = p.slice(15);
+        } else if (p.startsWith('file:///')) {
             p = p.slice(8);
         } else if (p.startsWith('file://')) {
             p = p.slice(7);
         }
+
         // Decode URI encoding (%20 → space, etc.)
         try { p = decodeURIComponent(p); } catch (_) { }
-        // Normalize forward slashes to backslashes on Windows
-        if (p.match(/^[A-Za-z]:\//)) {
+
+        // Normalize separators: forward slashes after a drive letter → backslashes (Windows)
+        if (p.match(/^[A-Za-z]:[/\\]/)) {
             p = p.replace(/\//g, '\\');
         }
         return p;
+    }
+
+    /**
+     * Sends a play command to the agent via HTTP POST.
+     * More reliable than WebSocket after a long upload (no WS state issues).
+     */
+    public async playFile(
+        device: VideoWallAgentDevice,
+        filename: string,
+        options: { loop?: boolean; volume?: number; mute?: boolean; fadeInTime?: number; crossoverTime?: number; brightness?: number } = {}
+    ): Promise<boolean> {
+        try {
+            const url = `http://${device.ip}:${device.port || 3003}/play`;
+            const response = await axios.post(url, {
+                filename,
+                loop: options.loop ?? false,
+                volume: options.volume ?? 100,
+                mute: options.mute ?? false,
+                fadeInTime: options.fadeInTime ?? 0.5,
+                crossoverTime: options.crossoverTime ?? 1.0,
+                brightness: options.brightness ?? 100
+            }, { timeout: 5000 });
+            console.log(`[Agent] HTTP play '${filename}' on ${device.name}: ${response.status}`);
+            return response.status === 200;
+        } catch (error: any) {
+            console.error(`[Agent] HTTP play failed for ${device.name}:`, error.message);
+            return false;
+        }
+    }
+
+    /**
+     * Updates the brightness level on the remote agent in real-time.
+     */
+    public async sendBrightness(device: VideoWallAgentDevice, level: number): Promise<void> {
+        // Send via WebSocket for real-time responsiveness
+        await this.sendCommand(device, 'brightness', { level });
+        
+        // Also send via HTTP for persistence/reliability (in case WS is down)
+        try {
+            const url = `http://${device.ip}:${device.port || 3003}/brightness`;
+            await axios.post(url, { level }, { timeout: 2000 });
+        } catch (e) {
+            // Log but don't fail, WebSocket is the primary real-time path
+            console.warn(`[Agent] HTTP brightness sync failed for ${device.name}`);
+        }
     }
 
     /**
@@ -335,6 +410,47 @@ class VideoWallAgentService {
         } catch (error) {
             console.error(`[Update] Failed to update agent ${device.name}:`, error);
             onStatus('Fout tijdens updateproces.');
+            return false;
+        }
+    }
+    /**
+     * Restarts the remote agent process (exit 0 → start.sh loop picks it up).
+     */
+    public async restartAgent(device: VideoWallAgentDevice): Promise<boolean> {
+        try {
+            const url = `http://${device.ip}:${device.port || 3003}/restart`;
+            const response = await axios.post(url, {}, { timeout: 5000 });
+            return response.status === 200;
+        } catch (error) {
+            console.error(`[Agent] Failed to restart ${device.name}:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * Stops the remote agent cleanly (exit 42 → no restart by start.sh).
+     */
+    public async shutdownAgent(device: VideoWallAgentDevice): Promise<boolean> {
+        try {
+            const url = `http://${device.ip}:${device.port || 3003}/shutdown`;
+            const response = await axios.post(url, {}, { timeout: 5000 });
+            return response.status === 200;
+        } catch (error) {
+            console.error(`[Agent] Failed to shutdown agent ${device.name}:`, error);
+            return false;
+        }
+    }
+
+    /**
+     * Shuts down the Linux host machine (exit 43 → start.sh calls "sudo shutdown -h now").
+     */
+    public async shutdownHost(device: VideoWallAgentDevice): Promise<boolean> {
+        try {
+            const url = `http://${device.ip}:${device.port || 3003}/host-shutdown`;
+            const response = await axios.post(url, {}, { timeout: 5000 });
+            return response.status === 200;
+        } catch (error) {
+            console.error(`[Agent] Failed to shutdown host ${device.name}:`, error);
             return false;
         }
     }

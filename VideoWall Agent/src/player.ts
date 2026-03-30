@@ -33,15 +33,15 @@ export class PlayerService {
         }
     }
 
-    /** Play a media file on all output displays */
     public async play(filename: string, options?: {
         loop?: boolean;
         volume?: number;
         mute?: boolean;
         fadeInTime?: number;
         crossoverTime?: number;
+        brightness?: number;
     }) {
-        console.log(`Playing: ${filename}`);
+        console.log(`Playing: ${filename} (Brightness: ${options?.brightness ?? 100}%)`);
         this.broadcast({
             action: 'play',
             filename,
@@ -50,6 +50,7 @@ export class PlayerService {
             mute: options?.mute ?? false,
             fadeInTime: options?.fadeInTime ?? 0,
             crossoverTime: options?.crossoverTime ?? 0,
+            brightness: options?.brightness ?? 100,
         });
     }
 
@@ -87,6 +88,12 @@ export class PlayerService {
     public setRepeat(repeat: boolean) {
         console.log(`Setting repeat: ${repeat}`);
         this.broadcast({ action: 'repeat', repeat });
+    }
+
+    /** Set brightness (0-100+) on all output displays */
+    public setBrightness(level: number) {
+        console.log(`Setting brightness: ${level}%`);
+        this.broadcast({ action: 'brightness', level });
     }
 
     /** Check if any output clients are connected */

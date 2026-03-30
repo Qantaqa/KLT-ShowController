@@ -53,9 +53,11 @@ export const StartMediaPlayer = async (
     fadeouttime: number = 0,
     previewplayer?: any,
     transitiontime: number = 0,
-    mute: boolean = false
+    mute: boolean = false,
+    projectionMaskIds?: string[],
+    brightness: number = 100
 ) => {
-    console.log('StartMediaPlayer', { target, sourcefile, repeat, volume, fadeouttime, previewplayer, transitiontime, mute });
+    console.log('StartMediaPlayer', { target, sourcefile, repeat, volume, fadeouttime, previewplayer, transitiontime, mute, projectionMaskIds });
     const ipc = getIpc();
     const mediaUrl = getMediaUrl(sourcefile);
 
@@ -80,7 +82,9 @@ export const StartMediaPlayer = async (
                 loop: repeat,
                 volume: volume,
                 mute: mute,
-                transitionTime: transitiontime
+                transitionTime: transitiontime,
+                projectionMaskIds: projectionMaskIds,
+                brightness: brightness
             }
         });
     }
@@ -95,7 +99,8 @@ export const StartMediaPlayer = async (
                 loop: repeat,
                 volume: volume,
                 mute: mute,
-                deviceId: target.id
+                deviceId: target.id,
+                brightness: brightness
             }
         });
     }
@@ -107,25 +112,25 @@ export const StartMediaPlayer = async (
         try { rawFilename = decodeURIComponent(rawFilename); } catch (_) { }
         const filename = rawFilename;
 
-        // Sync file with checksum validation first, then play
+        // Sync file with checksum validation first, then play via HTTP POST (more reliable after long uploads)
         videoWallAgentService.syncFileWithProgress(d, sourcefile, filename).then(() => {
-            videoWallAgentService.sendCommand(d, 'play', {
-                filename: filename,
+            videoWallAgentService.playFile(d, filename, {
                 loop: repeat || (d as any).repeat || false,
                 volume: volume,
                 mute: mute,
                 fadeInTime: transitiontime || d.fadeInTime || 0.5,
-                crossoverTime: d.crossoverTime || 1.0
+                crossoverTime: d.crossoverTime || 1.0,
+                brightness: brightness
             });
         }).catch(err => {
             console.error('Sync failed, attempting play anyway:', err);
-            videoWallAgentService.sendCommand(d, 'play', {
-                filename: filename,
+            videoWallAgentService.playFile(d, filename, {
                 loop: repeat || (d as any).repeat || false,
                 volume: volume,
                 mute: mute,
                 fadeInTime: transitiontime || d.fadeInTime || 0.5,
-                crossoverTime: d.crossoverTime || 1.0
+                crossoverTime: d.crossoverTime || 1.0,
+                brightness: brightness
             });
         });
     }
@@ -136,6 +141,42 @@ export const StartMediaPlayer = async (
         previewplayer.play().catch(err => console.warn('MediaPlayer: Preview play failed', err));
     }
 };
+
+/**
+ * Plays a media file directly on a VideoWall Agent, bypassing sync/checksum.
+ * Use this during show sequence playback — the pre-flight check ensures the file exists.
+ * Falls back to StartMediaPlayer for non-agent device types.
+ */
+export const PlayDirectOnAgent = async (
+    target: Device,
+    sourcefile: string,
+    repeat: boolean,
+    volume: number,
+    transitiontime: number = 0,
+    mute: boolean = false,
+    brightness: number = 100
+) => {
+    if (target.type === 'videowall_agent') {
+        const d = target as VideoWallAgentDevice;
+        let rawFilename = sourcefile.split(/[\\\/]/).pop() || '';
+        try { rawFilename = decodeURIComponent(rawFilename); } catch (_) { }
+        const filename = rawFilename;
+        console.log(`[PlayDirect] Sending play '${filename}' directly to agent ${d.name}`);
+        videoWallAgentService.playFile(d, filename, {
+            loop: repeat || (d as any).repeat || false,
+            volume: volume,
+            mute: mute,
+            fadeInTime: transitiontime || d.fadeInTime || 0.5,
+            crossoverTime: d.crossoverTime || 1.0,
+            brightness: brightness
+        });
+    } else {
+        // For all other device types, fall back to the normal StartMediaPlayer path
+        await StartMediaPlayer(target, sourcefile, repeat, volume, 0, undefined, transitiontime, mute);
+    }
+};
+
+
 
 /**
  * Switches the current media on a target device, typically used for seamless transitions.
@@ -152,9 +193,11 @@ export const ChangeMediaPlayer = (
     transitiontime: number,
     repeat: boolean,
     volume: number,
-    mute: boolean = false
+    mute: boolean = false,
+    projectionMaskIds?: string[],
+    brightness: number = 100
 ) => {
-    console.log('ChangeMediaPlayer', { target, newSourcefile, transitiontime, repeat, volume, mute });
+    console.log('ChangeMediaPlayer', { target, newSourcefile, transitiontime, repeat, volume, mute, projectionMaskIds });
     const ipc = getIpc();
     const mediaUrl = getMediaUrl(newSourcefile);
 
@@ -170,7 +213,9 @@ export const ChangeMediaPlayer = (
                 loop: repeat,
                 volume: volume,
                 mute: mute,
-                transitionTime: transitiontime
+                transitionTime: transitiontime,
+                projectionMaskIds: projectionMaskIds,
+                brightness: brightness
             }
         });
     }
@@ -184,7 +229,8 @@ export const ChangeMediaPlayer = (
                 loop: repeat,
                 volume: volume,
                 mute: mute,
-                deviceId: target.id
+                deviceId: target.id,
+                brightness: brightness
             }
         });
     }
@@ -195,25 +241,25 @@ export const ChangeMediaPlayer = (
         try { rawFilename = decodeURIComponent(rawFilename); } catch (_) { }
         const filename = rawFilename;
 
-        // Sync file with checksum validation first, then play
+        // Sync file with checksum validation first, then play via HTTP POST (more reliable after long uploads)
         videoWallAgentService.syncFileWithProgress(d, newSourcefile, filename).then(() => {
-            videoWallAgentService.sendCommand(d, 'play', {
-                filename: filename,
+            videoWallAgentService.playFile(d, filename, {
                 loop: repeat || (d as any).repeat || false,
                 volume: volume,
                 mute: mute,
                 fadeInTime: transitiontime || d.fadeInTime || 0.5,
-                crossoverTime: d.crossoverTime || 1.0
+                crossoverTime: d.crossoverTime || 1.0,
+                brightness: brightness
             });
         }).catch(err => {
             console.error('Sync failed, attempting play anyway:', err);
-            videoWallAgentService.sendCommand(d, 'play', {
-                filename: filename,
+            videoWallAgentService.playFile(d, filename, {
                 loop: repeat || (d as any).repeat || false,
                 volume: volume,
                 mute: mute,
                 fadeInTime: transitiontime || d.fadeInTime || 0.5,
-                crossoverTime: d.crossoverTime || 1.0
+                crossoverTime: d.crossoverTime || 1.0,
+                brightness: brightness
             });
         });
     }
@@ -312,7 +358,48 @@ export const SetVolumeMediaPlayer = (
  * @param target The device to update.
  * @param repeat Whether to set playback to loop.
  */
-export const SetRepeatMediaPlayer = (
+    /**
+     * Adjusts the brightness of the current playback on a target device in real-time.
+     * @param target The device to update.
+     * @param newBrightness New brightness level (0-100+).
+     */
+    export const SetBrightnessMediaPlayer = (
+        target: Device,
+        newBrightness: number
+    ) => {
+        console.log('SetBrightnessMediaPlayer', { target, newBrightness });
+        const ipc = getIpc();
+    
+        // Test if target is local monitor
+        if (target.type === 'local_monitor') {
+            if (!ipc) return;
+            ipc.send('media-command', {
+                deviceId: target.id,
+                command: 'update',
+                payload: {
+                    brightness: newBrightness
+                }
+            });
+        }
+        // Test if target is remote web client
+        else if (target.type === 'remote_VideoWall') {
+            networkService.sendCommand({
+                type: 'MEDIA_CONTROL',
+                action: 'brightness',
+                payload: {
+                    deviceId: target.id,
+                    level: newBrightness
+                }
+            });
+        }
+        // Test if target is videowall agent node
+        else if (target.type === 'videowall_agent') {
+            const d = target as VideoWallAgentDevice;
+            videoWallAgentService.sendBrightness(d, newBrightness);
+        }
+    };
+    
+    export const SetRepeatMediaPlayer = (
     target: Device,
     repeat: boolean
 ) => {

@@ -1,0 +1,24 @@
+/*!
+ * 
+ *     MCAFEE RESTRICTED CONFIDENTIAL
+ *     Copyright (c) 2026 McAfee, LLC
+ *
+ *     The source code contained or described herein and all documents related
+ *     to the source code ("Material") are owned by McAfee or its
+ *     suppliers or licensors. Title to the Material remains with McAfee
+ *     or its suppliers and licensors. The Material contains trade
+ *     secrets and proprietary and confidential information of McAfee or its
+ *     suppliers and licensors. The Material is protected by worldwide copyright
+ *     and trade secret laws and treaty provisions. No part of the Material may
+ *     be used, copied, reproduced, modified, published, uploaded, posted,
+ *     transmitted, distributed, or disclosed in any way without McAfee's prior
+ *     express written permission.
+ *
+ *     No license under any patent, copyright, trade secret or other intellectual
+ *     property right is granted to or conferred upon you by disclosure or
+ *     delivery of the Materials, either expressly, by implication, inducement,
+ *     estoppel or otherwise. Any license under such intellectual property rights
+ *     must be expressed and approved by McAfee in writing.
+ *
+ */(()=>{"use strict";const e=0,s="PRINT_IN_BACKGROUND",t={NONE:0,INFO:1,ERROR:2,WARN:3,DEBUG:4,ALL_IN_BACKGROUND:99},o=1,r=2,c=3,n=4,a={BACKGROUND:"BACKGROUND",CONTENT:"CONTENT",TELEMETRY:"TELEMETRY"},i={DEFAULT:"color: #000000; font-weight: normal; font-style:normal; background: #FFFFFF;",BACKGROUND:"color: #8D0DBA; font-weight: bold; background: #FFFFFF;",CONTENT:"color: #F54A26; font-weight: bold; background: #FFFFFF;",TELEMETRY:"color: #147831; font-weight: bold; background: #FFFFFF;"};const l=new class{constructor(){this.storageChecked=!1,this.logLevel=null,this.queue=[];const s="MCLOGLEVEL";chrome?.storage?.local.get([s]).then(o=>{const r=Object.values(t).includes(o[s]);this.logLevel=r?o[s]:e,this.logLevel!==t.NONE&&this.queue.forEach(({callback:e,message:s,processType:t})=>{e(s,t)}),this.queue=[],this.storageChecked=!0})}log(e,s=null){this.storageChecked?this.processLog(e,o,s,this.logLevel):this.queue.push({callback:this.log.bind(this),message:e,processType:s})}error(e,s=null){this.storageChecked?this.processLog(e,r,s,this.logLevel):this.queue.push({callback:this.error.bind(this),message:e,processType:s})}warn(e,s=null){this.storageChecked?this.processLog(e,c,s,this.logLevel):this.queue.push({callback:this.warn.bind(this),message:e,processType:s})}debug(e,s=null){this.storageChecked?this.processLog(e,n,s,this.logLevel):this.queue.push({callback:this.debug.bind(this),message:e,processType:s})}processLog(e,o,c,n){if(n===t.NONE)return;let i="chrome-extension:"===location.protocol?a.BACKGROUND:a.CONTENT;c&&a[c]&&(i=c);const l=this.formatDateWithMilliseconds(new Date),h=o===r?e:`%c[${i} ${l} ]: %c${e}`;i===a.CONTENT&&this.logLevel===t.ALL_IN_BACKGROUND&&chrome.runtime.sendMessage({command:s,logMessage:h,processType:i,logType:o,logLevel:n}),this.printLog(h,i,o,n)}formatDateWithMilliseconds(e){return`${new Intl.DateTimeFormat("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:!0}).format(e)}.${e.getMilliseconds().toString().padStart(3,"0")}`}printLog(e,s,a,l){const h=i.DEFAULT,g=i[s]||h;if(l>=t.ERROR&&a===r&&console.error(e),l>=t.INFO&&a===o&&console.log(e,g,h),l>=t.WARN&&a===c){const s="color: #FFA500; font-family: sans-serif; font-weight: bolder; text-shadow: #000 1px 1px;";console.log(`%cWARN - ${e}`,s,g,h)}if(l>=t.DEBUG&&a===n){const s="color: #FF33D7; font-family: sans-serif; font-weight: bolder; text-shadow: #000 1px 1px;";console.log(`%cDEBUG - ${e}`,s,g,h)}}},h=async(e,s,t,o)=>{try{chrome.tabs.sendMessage(o,{ipcId:e,command:s,...t},{},()=>{chrome.runtime.lastError})}catch(e){l.warn(`[broadcast] Unexpected error when calling command: "${s}", err: ${e.message}`)}},g=(e,s,t,o,r=null)=>{if(!chrome.tabs)throw new Error('"tabs" permission not set in manifest.');const c={};return"number"==typeof r&&(c.frameId=r),chrome.tabs.sendMessage(o,{ipcId:e,command:s,...t},c)},d=(e,s={},t)=>(async(e,s,t={},o={})=>{try{if(o?.tabId){const{tabId:r,frameId:c}=o;return await g(e,s,t,r,c)}if(o?.broadcast){const r=await chrome.tabs.query({}),{broadcastIgnoreId:c=[]}=o;return r.filter(({id:e})=>!c.includes(e)).forEach(({id:o})=>{h(e,s,t,o)}),!0}return await chrome.runtime.sendMessage({ipcId:e,command:s,...t})}catch(e){return l.warn(`Unexpected error when calling command: "${s}", err: ${e.message}`),null}})("WA",e,s,t),u="NAVIGATE_COMPLETE";(class{static start(){try{d(u)}catch(e){}}}).start()})();
+//# sourceMappingURL=../sourceMap/chrome/scripts/content_navigate_complete.js.map

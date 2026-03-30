@@ -33,8 +33,9 @@ export class XmlService {
     private mapEvent(raw: any): ShowEvent {
         return {
             act: raw.colAct || '',
-            sceneId: parseInt(raw.colSceneId) || 0,
-            eventId: parseInt(raw.colEventId) || 0,
+            sceneId: raw.colSceneId ? parseInt(raw.colSceneId) : undefined,
+            eventId: raw.colEventId ? parseInt(raw.colEventId) : undefined,
+            actionId: raw.colActionId ? parseInt(raw.colActionId) : undefined,
             fixture: raw.colFixture || '',
             effect: raw.colEffect || '',
             palette: raw.colPalette || '',

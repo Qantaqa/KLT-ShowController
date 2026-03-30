@@ -2,8 +2,9 @@ import type { Device } from './devices';
 
 export interface ShowEvent {
     act: string
-    sceneId: number
-    eventId: number
+    sceneId?: number
+    eventId?: number
+    actionId?: number
     fixture: string
     effect: string
     palette: string
@@ -27,6 +28,7 @@ export interface ShowEvent {
     stopSceneId?: number
     stopEventId?: number
     mediaTriggerId?: string
+    projectionMaskIds?: string[]
 }
 
 export interface ClipboardItem {
@@ -64,7 +66,8 @@ export interface AppSettingsProfile {
     serverPort: number          // Port for the Socket.io hub
     serverIp: string            // IP address of the host machine
     controllerMonitorIndex?: number // Which monitor the main dashboard should open on
-    testVideoPath?: string      // Default video for testing projections
+    testMappingImage?: string;   // Default image for alignment/mapping calibration
+    testMappingVideo?: string;   // Default video for testing projections
     geminiApiKey?: string       // API key for AI-enhanced script parsing
     devices: Device[]           // Global device list (available to all shows)
     pincodes?: {

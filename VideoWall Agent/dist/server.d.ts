@@ -13,6 +13,13 @@ export declare class ServerService {
     private computeFileChecksum;
     private log;
     private getVersion;
+    /** Get the primary non-loopback IPv4 address of this machine */
+    private getLocalIp;
+    /**
+     * Recursively copies files from src to dest, skipping any files whose names
+     * are in the protected list. Used during self-update to preserve start scripts.
+     */
+    private copyExcluding;
     /** Broadcast a message to all output display clients */
     private broadcastToOutputClients;
     private setupRoutes;
