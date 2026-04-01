@@ -1,4 +1,4 @@
-import type { Device } from './devices';
+import type { Device, ProjectionMask } from './devices';
 
 export interface ShowEvent {
     act: string
@@ -21,6 +21,8 @@ export interface ShowEvent {
     type?: string
     filename?: string
     duration?: number
+    /** Seconds recorded per show run when "timing bijhouden" is on; stored on the transition trigger row */
+    timingSamples?: number[]
     segmentId?: number
     effectId?: number
     paletteId?: number
@@ -28,7 +30,8 @@ export interface ShowEvent {
     stopSceneId?: number
     stopEventId?: number
     mediaTriggerId?: string
-    projectionMaskIds?: string[]
+    /** Per-cue projection polygons for local_monitor (percent coords); empty/omit = full frame */
+    projectionMasks?: ProjectionMask[]
 }
 
 export interface ClipboardItem {
@@ -66,9 +69,8 @@ export interface AppSettingsProfile {
     serverPort: number          // Port for the Socket.io hub
     serverIp: string            // IP address of the host machine
     controllerMonitorIndex?: number // Which monitor the main dashboard should open on
-    testMappingImage?: string;   // Default image for alignment/mapping calibration
-    testMappingVideo?: string;   // Default video for testing projections
-    geminiApiKey?: string       // API key for AI-enhanced script parsing
+    /** Legacy DB column / dev test video path (App Settings UI) */
+    testVideoPath?: string
     devices: Device[]           // Global device list (available to all shows)
     pincodes?: {
         showDetails?: string

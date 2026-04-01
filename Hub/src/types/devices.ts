@@ -72,7 +72,6 @@ export interface LocalMonitorDevice extends BaseDevice {
     crossoverTime?: number;
     /** Backward-compatible alias (legacy). Prefer fadeInTime. */
     transitionTime?: number;
-    projectionMasks?: ProjectionMask[];
 }
 
 /**

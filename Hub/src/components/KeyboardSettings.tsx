@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Keyboard, Command, Play, Square, ChevronUp, ChevronDown, Save, RefreshCw, ExternalLink } from 'lucide-react';
+import { Keyboard, Command, Play, Square, ChevronUp, ChevronDown, RefreshCw, ExternalLink } from 'lucide-react';
 import { useSequencerStore } from '../store/useSequencerStore';
 import type { KeyboardBinding } from '../types/show';
 import { cn } from '../lib/utils';
@@ -37,7 +37,7 @@ const KeyboardSettings: React.FC = () => {
         return () => window.removeEventListener('keydown', handleKeyDown, true);
     }, [recordingId, addToast]);
 
-    const handleSave = async () => {
+    const handleSaveBindings = async () => {
         try {
             await updateKeyboardBindings(localBindings);
             addToast('Toetsenbord instellingen opgeslagen', 'info');
@@ -142,16 +142,25 @@ const KeyboardSettings: React.FC = () => {
                 ))}
             </div>
 
-            <div className="mt-8 p-4 bg-white/5 border border-white/5 rounded-xl space-y-2">
-                <p className="text-xs font-bold opacity-60 flex items-center gap-2">
-                    <Command className="w-3.5 h-3.5" /> Hoe werkt het?
-                </p>
-                <ul className="text-[11px] opacity-40 space-y-1 list-disc ml-4">
-                    <li>Klik op een knop hierboven om een toetscombinatie te "leren".</li>
-                    <li>Druk op de fysieke knop op je Sayodevice om de combinatie vast te leggen.</li>
-                    <li>Vergeet niet op 'Opslaan' te klikken om de wijzigingen te bewaren in de database.</li>
-                    <li>Sneltoetsen (behalve script navigatie) werken alleen in Show Mode.</li>
-                </ul>
+            <div className="mt-8 p-4 bg-white/5 border border-white/5 rounded-xl space-y-4">
+                <button
+                    type="button"
+                    onClick={handleSaveBindings}
+                    className="px-4 py-2 rounded-lg bg-primary/80 hover:bg-primary text-black text-xs font-bold uppercase tracking-widest transition-colors"
+                >
+                    Toetsen naar database opslaan
+                </button>
+                <div className="space-y-2">
+                    <p className="text-xs font-bold opacity-60 flex items-center gap-2">
+                        <Command className="w-3.5 h-3.5" /> Hoe werkt het?
+                    </p>
+                    <ul className="text-[11px] opacity-40 space-y-1 list-disc ml-4">
+                        <li>Klik op een knop hierboven om een toetscombinatie te "leren".</li>
+                        <li>Druk op de fysieke knop op je Sayodevice om de combinatie vast te leggen.</li>
+                        <li>Klik op &quot;Toetsen naar database opslaan&quot; om je wijzigingen te bewaren.</li>
+                        <li>Sneltoetsen (behalve script navigatie) werken alleen in Show Mode.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     );

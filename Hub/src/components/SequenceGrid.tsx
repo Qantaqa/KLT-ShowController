@@ -1,10 +1,11 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown, ChevronRight, Play, Square, Volume2, VolumeX, Repeat, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, ArrowUp, ArrowDown, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, Type, User, MousePointer2, Lightbulb, Pipette, MessageSquare, FolderOpen, Layers, ListOrdered, ClipboardCheck } from 'lucide-react'
+import { ChevronDown, ChevronRight, Play, Square, Volume2, VolumeX, Repeat, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, ArrowUp, ArrowDown, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, Type, User, MousePointer2, Lightbulb, Pipette, MessageSquare, FolderOpen, Layers, ListOrdered, ClipboardCheck, Radar } from 'lucide-react'
 import { useSequencerStore } from '../store/useSequencerStore'
-import type { Device } from '../types/devices'
+import type { Device, LocalMonitorDevice } from '../types/devices'
 import type { ShowEvent, ClipboardItem } from '../types/show'
 import { cn } from '../lib/utils'
+import { getMediaUrl } from '../services/media-player-service'
 import { ShowCheckPanel } from './ShowCheckPanel'
 import { runShowChecks, type ShowCheckIssue } from '../utils/showChecks'
 
@@ -429,18 +430,101 @@ const VideoWallPreviewOverlay: React.FC<{ layout: string, bezelSize?: number }> 
 
 // Transition strip rendered BETWEEN event cards (replaces trigger rows in the card body)
 // Note: trigger rows are excluded from the card body, so editing must be handled from here.
+const showModePastClass = 'opacity-[0.38] saturate-[0.65] contrast-[0.92]'
+
+/**
+ * Timing op de actieve overgangsbalk (show mode): `XX:xx / YY:yy`
+ * — XX:xx: resterende tijd (aftellend naar 0) t.o.v. ingestelde of gemiddelde duur; zonder referentie: gelopen tijd.
+ * — YY:yy: gemiddelde uit eerdere opnames (alleen als er samples zijn).
+ */
+const EventTransitionTimingFooter: React.FC<{
+    triggerEvent: ShowEvent | null
+    triggerType: string
+    precedingGroupActive: boolean
+    isPast?: boolean
+    accent: 'yellow' | 'blue'
+}> = ({ triggerEvent, triggerType, precedingGroupActive, isPast, accent }) => {
+    const isTimeTracking = useSequencerStore(s => s.isTimeTracking)
+    const lastTransitionTime = useSequencerStore(s => s.lastTransitionTime)
+    const isPaused = useSequencerStore(s => s.isPaused)
+    const pauseStartTime = useSequencerStore(s => s.pauseStartTime)
+    const [, setTick] = useState(0)
+    useEffect(() => {
+        const i = window.setInterval(() => setTick(t => t + 1), 500)
+        return () => window.clearInterval(i)
+    }, [])
+
+    if (!triggerEvent || isPast || !precedingGroupActive || !isTimeTracking) return null
+
+    const samples = triggerEvent.timingSamples || []
+    const n = samples.length
+    const gemAvg = n ? Math.round(samples.reduce((a, b) => a + b, 0) / n) : null
+
+    const elapsedSec = (() => {
+        if (!lastTransitionTime || !precedingGroupActive) return 0
+        if (isPaused) {
+            return Math.round(((pauseStartTime || Date.now()) - lastTransitionTime) / 1000)
+        }
+        return Math.round((Date.now() - lastTransitionTime) / 1000)
+    })()
+
+    let referenceSec = 0
+    if (triggerType === 'timed') referenceSec = triggerEvent.duration || 0
+    else if ((triggerType === 'manual' || triggerType === 'media') && gemAvg) referenceSec = gemAvg
+
+    const hasRef = referenceSec > 0 && !!lastTransitionTime
+    const toGo =
+        hasRef && precedingGroupActive && isTimeTracking
+            ? Math.max(0, referenceSec - elapsedSec)
+            : null
+
+    /** Links: afteller naar 0 als er een referentie is; anders gelopen seconden in dit blok. */
+    const leftSec = toGo !== null ? toGo : elapsedSec
+    const showRight = n > 0 && gemAvg !== null
+
+    if (leftSec === 0 && !showRight && !lastTransitionTime) return null
+
+    const borderC = accent === 'blue' ? 'border-blue-400/35' : 'border-yellow-400/35'
+    const leftClass =
+        accent === 'blue'
+            ? 'text-sky-50 font-black'
+            : toGo !== null
+              ? 'text-amber-50 font-black'
+              : 'text-yellow-100/90 font-bold'
+
+    return (
+        <div className={cn('flex items-baseline justify-center gap-x-1 w-full border-t pt-2 mt-1 text-[10px] font-mono tabular-nums leading-none', borderC)}>
+            <span className={leftClass}>{formatTime(leftSec)}</span>
+            {showRight && (
+                <>
+                    <span className={accent === 'blue' ? 'text-sky-300/50' : 'text-yellow-200/45'}>/</span>
+                    <span className={accent === 'blue' ? 'text-sky-100/80' : 'text-yellow-100/85'}>{formatTime(gemAvg!)}</span>
+                </>
+            )}
+        </div>
+    )
+}
+
 const EventTransition: React.FC<{
     triggerEvent: ShowEvent | null
     isLastEvent: boolean
     isLocked: boolean
+    /** Show mode: transition fully taken (we're past this block) */
+    isPast?: boolean
+    /** Show mode: the event card above this strip is the active group */
+    precedingGroupActive?: boolean
     onEditTrigger?: (index?: number) => void
     triggerIndex?: number
-}> = ({ triggerEvent, isLastEvent, isLocked, onEditTrigger, triggerIndex }) => {
+}> = ({ triggerEvent, isLastEvent, isLocked, isPast, precedingGroupActive = false, onEditTrigger, triggerIndex }) => {
     if (!triggerEvent && isLastEvent) return null
 
     const triggerType = (triggerEvent?.effect || 'manual').toLowerCase()
     const cueText = triggerEvent?.cue || ''
     const isManualNoCue = !triggerEvent || (triggerType === 'manual' && !cueText)
+
+    /** Alleen de overgang onder de actieve kaart is “live”; verderop: compacter, zonder tijdregel. */
+    const stripMuted = !!(isLocked && !isPast && !precedingGroupActive)
+    const showTimingFooter = !!(isLocked && precedingGroupActive && triggerEvent && !isPast)
 
     const canEdit = !isLocked && !!onEditTrigger
 
@@ -454,22 +538,62 @@ const EventTransition: React.FC<{
         </button>
     ) : null
 
+    const rowOuter = cn(
+        'flex items-center group/trans',
+        stripMuted ? 'gap-1.5 px-3 py-0.5 opacity-[0.78]' : 'gap-2 px-4 py-1',
+        stripMuted && 'saturate-[0.92]',
+        canEdit && 'cursor-pointer',
+        isLocked && isPast && showModePastClass
+    )
+    const lineYellowSolid = stripMuted ? 'border-yellow-500/20' : 'border-yellow-500/40'
+    const lineYellowDash = stripMuted ? 'border-yellow-500/16' : 'border-yellow-500/30'
+    const lineBlueDash = stripMuted ? 'border-blue-500/18' : 'border-blue-500/30'
+
+    const yellowPanel = cn(
+        'flex flex-col rounded-lg border transition-colors',
+        stripMuted
+            ? 'min-w-0 max-w-[min(320px,85vw)] px-2.5 py-1 gap-0 bg-yellow-500/[0.06] border-yellow-500/28 text-[9px] text-yellow-200/75'
+            : 'min-w-[min(420px,92vw)] max-w-[min(520px,calc(100vw-5rem))] px-4 py-2 gap-1 bg-yellow-500/15 border-yellow-500/50 text-[10px] text-yellow-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] group-hover/trans:bg-yellow-500/22'
+    )
+    const yellowPanelDashed = cn(
+        yellowPanel,
+        !stripMuted && 'bg-yellow-500/12 border-yellow-500/35 group-hover/trans:bg-yellow-500/18 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]'
+    )
+    const bluePanel = cn(
+        'flex flex-col rounded-lg border transition-colors',
+        stripMuted
+            ? 'min-w-0 max-w-[min(320px,85vw)] px-2.5 py-1 gap-0 bg-blue-500/[0.06] border-blue-500/28 text-[9px] text-sky-200/75'
+            : 'min-w-[min(420px,92vw)] max-w-[min(520px,calc(100vw-5rem))] px-4 py-2 gap-1 bg-blue-500/12 border-blue-500/35 text-[10px] text-sky-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] group-hover/trans:bg-blue-500/18'
+    )
+
+    const iconSm = stripMuted ? 'w-3 h-3' : 'w-3.5 h-3.5'
+    const labelWeight = stripMuted ? 'font-semibold' : 'font-bold'
+
     if (isManualNoCue) {
-        // If there is no explicit trigger row, still show a normal "manual transition" strip.
-        // This keeps the UI consistent and still allows editing/creating the transition.
         const label = cueText || 'Handmatige overgang'
         return (
             <div
-                className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
+                className={rowOuter}
                 onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger?.(triggerIndex) } : undefined}
             >
-                <div className="flex-1 border-t border-yellow-500/40" />
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-yellow-500/15 border border-yellow-500/50 rounded text-[10px] text-yellow-200 font-bold max-w-[400px] group-hover/trans:bg-yellow-500/25 transition-colors">
-                    <Zap className="w-3 h-3 text-yellow-400 shrink-0" />
-                    <span className="truncate">{label}</span>
-                    {editHint}
+                <div className={cn('flex-1 border-t', lineYellowSolid)} />
+                <div className={yellowPanel}>
+                    <div className={cn('flex items-center gap-2 min-w-0', labelWeight)}>
+                        <Zap className={cn(iconSm, 'text-yellow-400/90 shrink-0')} />
+                        <span className="truncate">{label}</span>
+                        {editHint}
+                    </div>
+                    {showTimingFooter && (
+                        <EventTransitionTimingFooter
+                            triggerEvent={triggerEvent}
+                            triggerType="manual"
+                            precedingGroupActive={precedingGroupActive}
+                            isPast={isPast}
+                            accent="yellow"
+                        />
+                    )}
                 </div>
-                <div className="flex-1 border-t border-yellow-500/40" />
+                <div className={cn('flex-1 border-t', lineYellowSolid)} />
             </div>
         )
     }
@@ -480,16 +604,29 @@ const EventTransition: React.FC<{
         const secs = (duration % 60).toString().padStart(2, '0')
         return (
             <div
-                className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
+                className={rowOuter}
                 onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger?.(triggerIndex) } : undefined}
             >
-                <div className="flex-1 border-t border-dashed border-yellow-500/30" />
-                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/30 rounded text-[9px] text-yellow-300 font-bold group-hover/trans:bg-yellow-500/20 transition-colors">
-                    <Clock className="w-3 h-3" />
-                    <span>Automatisch na {mins}:{secs}</span>
-                    {editHint}
+                <div className={cn('flex-1 border-t border-dashed', lineYellowDash)} />
+                <div className={yellowPanelDashed}>
+                    <div className={cn('flex items-center gap-2 min-w-0 text-yellow-200', labelWeight)}>
+                        <Clock className={cn(iconSm, 'text-yellow-400 shrink-0')} />
+                        <span>
+                            Automatisch na {mins}:{secs}
+                        </span>
+                        {editHint}
+                    </div>
+                    {showTimingFooter && (
+                        <EventTransitionTimingFooter
+                            triggerEvent={triggerEvent}
+                            triggerType="timed"
+                            precedingGroupActive={precedingGroupActive}
+                            isPast={isPast}
+                            accent="yellow"
+                        />
+                    )}
                 </div>
-                <div className="flex-1 border-t border-dashed border-yellow-500/30" />
+                <div className={cn('flex-1 border-t border-dashed', lineYellowDash)} />
             </div>
         )
     }
@@ -500,33 +637,54 @@ const EventTransition: React.FC<{
             : 'media afgerond'
         return (
             <div
-                className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
+                className={rowOuter}
                 onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger?.(triggerIndex) } : undefined}
             >
-                <div className="flex-1 border-t border-dashed border-blue-500/30" />
-                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-[9px] text-blue-300 font-bold group-hover/trans:bg-blue-500/20 transition-colors">
-                    <SkipForward className="w-3 h-3" />
-                    <span>Na: {mediaName}</span>
-                    {editHint}
+                <div className={cn('flex-1 border-t border-dashed', lineBlueDash)} />
+                <div className={bluePanel}>
+                    <div className={cn('flex items-center gap-2 min-w-0 text-sky-200', labelWeight)}>
+                        <SkipForward className={cn(iconSm, 'text-sky-400 shrink-0')} />
+                        <span className="truncate">Na: {mediaName}</span>
+                        {editHint}
+                    </div>
+                    {showTimingFooter && (
+                        <EventTransitionTimingFooter
+                            triggerEvent={triggerEvent}
+                            triggerType="media"
+                            precedingGroupActive={precedingGroupActive}
+                            isPast={isPast}
+                            accent="blue"
+                        />
+                    )}
                 </div>
-                <div className="flex-1 border-t border-dashed border-blue-500/30" />
+                <div className={cn('flex-1 border-t border-dashed', lineBlueDash)} />
             </div>
         )
     }
 
-    // Manual WITH cue text — prominent yellow cue block
     return (
         <div
-            className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
+            className={rowOuter}
             onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger?.(triggerIndex) } : undefined}
         >
-            <div className="flex-1 border-t border-yellow-500/40" />
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-yellow-500/15 border border-yellow-500/50 rounded text-[10px] text-yellow-200 font-bold max-w-[400px] group-hover/trans:bg-yellow-500/25 transition-colors">
-                <Zap className="w-3 h-3 text-yellow-400 shrink-0" />
-                <span className="truncate">{cueText}</span>
-                {editHint}
+            <div className={cn('flex-1 border-t', lineYellowSolid)} />
+            <div className={yellowPanel}>
+                <div className={cn('flex items-center gap-2 min-w-0', labelWeight)}>
+                    <Zap className={cn(iconSm, 'text-yellow-400 shrink-0')} />
+                    <span className="truncate">{cueText}</span>
+                    {editHint}
+                </div>
+                {showTimingFooter && (
+                    <EventTransitionTimingFooter
+                        triggerEvent={triggerEvent}
+                        triggerType="manual"
+                        precedingGroupActive={precedingGroupActive}
+                        isPast={isPast}
+                        accent="yellow"
+                    />
+                )}
             </div>
-            <div className="flex-1 border-t border-yellow-500/40" />
+            <div className={cn('flex-1 border-t', lineYellowSolid)} />
         </div>
     )
 }
@@ -698,7 +856,7 @@ const RowItem: React.FC<{
 }> = ({
     event, originalIndex, id, isShadow, isActiveGroup, isNextGroup, handleRowClick, handleRowDoubleClick,
     editingIndex, setEditingIndex, menuOpenIndex, setMenuOpenIndex, isLocked,
-    activeEventIndex, eventStatuses, ongoingEffects, zebraIndex
+    activeEventIndex, eventStatuses, ongoingEffects, zebraIndex, activeShow
 }) => {
         const [currentTime, setCurrentTime] = useState(new Date())
         const menuButtonRef = useRef<HTMLButtonElement>(null)
@@ -997,10 +1155,6 @@ const RowItem: React.FC<{
                                         {type === 'title' && (
                                             <div className="flex gap-2">
                                                 <div className="flex flex-col gap-0.5">
-                                                    <span className="text-[7px] font-black uppercase tracking-tight opacity-40 ml-1">Duur</span>
-                                                    <RenamableInput className="w-16 bg-white/10 border border-primary/40 rounded px-2 py-1 text-xs text-white outline-none text-center font-mono" placeholder="MM:SS" value={(event.duration ? Math.floor(event.duration / 60) + ':' + (event.duration % 60).toString().padStart(2, '0') : '0:00')} onRename={(val) => { const parts = val.split(':'); const m = parseInt(parts[0]) || 0; const s = parseInt(parts[1]) || 0; updateEvent(originalIndex, { duration: (m * 60) + s }); }} />
-                                                </div>
-                                                <div className="flex flex-col gap-0.5">
                                                     <span className="text-[7px] font-black uppercase tracking-tight opacity-40 ml-1">Pg</span>
                                                     <RenamableInput className="w-12 bg-white/10 border border-primary/40 rounded px-2 py-1 text-xs text-white outline-none text-center" placeholder="Pg" value={(event.scriptPg || 0).toString()} onRename={(val) => updateEvent(originalIndex, { scriptPg: parseInt(val) || 0 })} />
                                                 </div>
@@ -1042,34 +1196,50 @@ const RowItem: React.FC<{
 
                                     {type === 'media' && event.fixture && (() => {
                                         const device = getDevices().find(d => d.name === event.fixture)
-                                        if (device?.type === 'local_monitor' && device.projectionMasks && device.projectionMasks.length > 0) {
+                                        if (device?.type === 'local_monitor') {
                                             return (
-                                                <div className="flex flex-col gap-1.5 p-2 bg-primary/5 border border-primary/10 rounded mt-1">
-                                                    <span className="text-[9px] opacity-40 uppercase font-black tracking-widest">Projection Masks:</span>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {device.projectionMasks.map(mask => (
-                                                            <label key={mask.id} className="flex items-center gap-1.5 cursor-pointer group/mask">
-                                                                <input
-                                                                    type="checkbox"
-                                                                    className="w-3 h-3 rounded border border-white/20 bg-black/40 checked:bg-primary checked:border-primary transition-all cursor-pointer"
-                                                                    checked={event.projectionMaskIds?.includes(mask.id)}
-                                                                    onChange={(e) => {
-                                                                        const current = event.projectionMaskIds || []
-                                                                        const next = e.target.checked
-                                                                            ? [...current, mask.id]
-                                                                            : current.filter(id => id !== mask.id)
-                                                                        updateEvent(originalIndex, { projectionMaskIds: next })
-                                                                    }}
-                                                                />
-                                                                <span className="text-[10px] text-white/60 group-hover/mask:text-white transition-colors">
-                                                                    {mask.name || (mask.id.length > 8 ? `${mask.id.slice(0, 8)}...` : mask.id)}
-                                                                </span>
-                                                            </label>
-                                                        ))}
-                                                        {(!event.projectionMaskIds || event.projectionMaskIds.length === 0) && (
-                                                            <span className="text-[10px] italic text-white/30">Alle maskers actief</span>
+                                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                                                    <button
+                                                        type="button"
+                                                        disabled={!event.filename || isLocked}
+                                                        title={!event.filename ? 'Kies eerst een videobron' : 'Projectiemaskers op de projector bewerken (video, loop, geen audio)'}
+                                                        onClick={async () => {
+                                                            if (!event.filename) {
+                                                                addToast('Kies eerst een videobron.', 'warning')
+                                                                return
+                                                            }
+                                                            if (!activeShow?.id || !(window as any).require) return
+                                                            const { ipcRenderer } = (window as any).require('electron')
+                                                            const d = device as LocalMonitorDevice
+                                                            try {
+                                                                await ipcRenderer.invoke('projection-start-mask-edit', {
+                                                                    showId: activeShow.id,
+                                                                    eventIndex: originalIndex,
+                                                                    deviceId: d.id,
+                                                                    monitorIndex: d.monitorId !== undefined ? d.monitorId : 1,
+                                                                    videoUrl: getMediaUrl(event.filename),
+                                                                    initialMasks: event.projectionMasks || []
+                                                                })
+                                                            } catch (e) {
+                                                                console.error(e)
+                                                                addToast('Kon masker-editor niet openen.', 'error')
+                                                            }
+                                                        }}
+                                                        className={cn(
+                                                            'px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border transition-colors flex items-center gap-1.5',
+                                                            event.filename && !isLocked
+                                                                ? 'bg-primary/20 border-primary/40 hover:bg-primary/30 text-white'
+                                                                : 'opacity-40 cursor-not-allowed border-white/10 text-white/50'
                                                         )}
-                                                    </div>
+                                                    >
+                                                        <Radar className="w-3 h-3 shrink-0" />
+                                                        Masker bewerken
+                                                    </button>
+                                                    {(event.projectionMasks?.length ?? 0) > 0 && (
+                                                        <span className="text-[9px] text-primary/80">
+                                                            {event.projectionMasks!.length} vlak{(event.projectionMasks!.length === 1) ? '' : 'ken'}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             )
                                         }
@@ -1189,7 +1359,7 @@ const RowItem: React.FC<{
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-1.5 text-primary">
-                                                    <Zap className="w-3.5 h-3.5" />
+                                                    <Zap className="w-3.5 h-3.5 shrink-0" />
                                                     <span>Handmatige overgang ({event.cue || 'Geen cue'})</span>
                                                 </div>
                                             )}
@@ -1217,9 +1387,55 @@ const RowItem: React.FC<{
                                     )}
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    {(!isLocked || type !== 'title') && (isTimeTracking || (event.duration && event.duration > 0)) && (
-                                        <div className={cn("font-mono text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 min-w-[45px] justify-center tabular-nums", isRowActive ? "text-yellow-400 font-bold bg-yellow-500/10 border border-yellow-500/20" : "opacity-40 text-muted-foreground bg-white/5")}>
-                                            {(event.duration || 0) > 0 ? (isRowActive && isTimeTracking ? Math.floor(Math.max(0, (event.duration || 0) - Math.round(((currentTime?.getTime() || 0) - (lastTransitionTime || (currentTime?.getTime() || 0))) / 1000)) / 60) + ':' + (Math.max(0, (event.duration || 0) - Math.round(((currentTime?.getTime() || 0) - (lastTransitionTime || (currentTime?.getTime() || 0))) / 1000)) % 60).toString().padStart(2, '0') : Math.floor((event.duration || 0) / 60) + ':' + ((event.duration || 0) % 60).toString().padStart(2, '0')) : (isRowActive && isTimeTracking ? Math.floor(Math.round(((currentTime?.getTime() || 0) - (lastTransitionTime || (currentTime?.getTime() || 0))) / 1000) / 60) + ':' + (Math.round(((currentTime?.getTime() || 0) - (lastTransitionTime || (currentTime?.getTime() || 0))) / 1000) % 60).toString().padStart(2, '0') : '0:00')}
+                                    {!isLocked && (
+                                        type === 'trigger'
+                                            ? (isTimeTracking || (event.timingSamples?.length ?? 0) > 0 || (event.effect?.toLowerCase() === 'timed' && (event.duration || 0) > 0))
+                                            : (isTimeTracking || (event.duration && event.duration > 0))
+                                    ) && (
+                                        <div className={cn(
+                                            "font-mono text-[10px] px-1.5 py-0.5 rounded flex flex-col items-center justify-center gap-0 min-w-[52px] tabular-nums leading-tight",
+                                            isRowActive ? "text-yellow-400 font-bold bg-yellow-500/10 border border-yellow-500/20" : "opacity-40 text-muted-foreground bg-white/5"
+                                        )}>
+                                            {type === 'trigger' ? (() => {
+                                                const samples = event.timingSamples || []
+                                                const avg = samples.length ? Math.round(samples.reduce((a, b) => a + b, 0) / samples.length) : 0
+                                                const elapsed = Math.round(((currentTime?.getTime() || 0) - (lastTransitionTime || (currentTime?.getTime() || 0))) / 1000)
+                                                const eff = event.effect?.toLowerCase() || ''
+                                                if (eff === 'timed' && (event.duration || 0) > 0) {
+                                                    const rem = Math.max(0, (event.duration || 0) - (isRowActive && isTimeTracking ? elapsed : 0))
+                                                    return (
+                                                        <>
+                                                            <span>{isRowActive && isTimeTracking ? formatTime(rem) : formatTime(event.duration || 0)}</span>
+                                                            {samples.length > 0 && (
+                                                                <span className="text-[8px] opacity-70">gem. {formatTime(avg)} · {samples.length}×</span>
+                                                            )}
+                                                        </>
+                                                    )
+                                                }
+                                                if (isRowActive && isTimeTracking) {
+                                                    return (
+                                                        <>
+                                                            <span>{formatTime(elapsed)}</span>
+                                                            {samples.length > 0 && (
+                                                                <span className="text-[8px] opacity-70">gem. {formatTime(avg)} · {samples.length}×</span>
+                                                            )}
+                                                        </>
+                                                    )
+                                                }
+                                                if (samples.length > 0) {
+                                                    return (
+                                                        <>
+                                                            <span>gem. {formatTime(avg)}</span>
+                                                            <span className="text-[8px] opacity-70">{samples.length} metingen</span>
+                                                        </>
+                                                    )
+                                                }
+                                                return <span>0:00</span>
+                                            })() : (
+                                                <>
+                                                    {(event.duration || 0) > 0 ? (isRowActive && isTimeTracking ? Math.floor(Math.max(0, (event.duration || 0) - Math.round(((currentTime?.getTime() || 0) - (lastTransitionTime || (currentTime?.getTime() || 0))) / 1000)) / 60) + ':' + (Math.max(0, (event.duration || 0) - Math.round(((currentTime?.getTime() || 0) - (lastTransitionTime || (currentTime?.getTime() || 0))) / 1000)) % 60).toString().padStart(2, '0') : Math.floor((event.duration || 0) / 60) + ':' + ((event.duration || 0) % 60).toString().padStart(2, '0')) : (isRowActive && isTimeTracking ? Math.floor(Math.round(((currentTime?.getTime() || 0) - (lastTransitionTime || (currentTime?.getTime() || 0))) / 1000) / 60) + ':' + (Math.round(((currentTime?.getTime() || 0) - (lastTransitionTime || (currentTime?.getTime() || 0))) / 1000) % 60).toString().padStart(2, '0') : '0:00')}
+                                                </>
+                                            )}
                                         </div>
                                     )}
                                     {type === 'title' && event.scriptPg !== undefined && event.scriptPg > 0 && <div className="text-[10px] font-mono opacity-40 bg-white/5 px-1.5 rounded flex items-center justify-center min-w-[32px]">Pg {event.scriptPg}</div>}
@@ -1837,6 +2053,8 @@ const SequenceGrid: React.FC = () => {
         rows: EventRow[]
         isActive: boolean
         isNext: boolean
+        flatIndex?: number
+        isPast?: boolean
         duration: number
         activeDuration: number
         isMinimal: boolean
@@ -1847,12 +2065,14 @@ const SequenceGrid: React.FC = () => {
         id: number | undefined // sceneId
         events: EventNode[]
         isActive: boolean
+        isPast?: boolean
     }
 
     interface ActNode {
         id: string // "Act 1"
         scenes: SceneNode[]
         isActive: boolean
+        isPast?: boolean
     }
 
     // Build Hierarchy
@@ -1948,14 +2168,32 @@ const SequenceGrid: React.FC = () => {
             allEventNodes[0].eventNode.isNext = true
         }
 
+        // 2b. Show mode: mark event cards / acts / scenes that are fully before the active card
+        allEventNodes.forEach((item, idx) => {
+            item.eventNode.flatIndex = idx
+            item.eventNode.isPast = activeNodeIdx >= 0 && idx < activeNodeIdx
+        })
+        acts.forEach(act => {
+            let actMax = -1
+            act.scenes.forEach(scene => {
+                let sceneMax = -1
+                scene.events.forEach(en => {
+                    const fi = en.flatIndex ?? -1
+                    if (fi > actMax) actMax = fi
+                    if (fi > sceneMax) sceneMax = fi
+                })
+                scene.isPast = activeNodeIdx >= 0 && sceneMax >= 0 && sceneMax < activeNodeIdx
+            })
+            act.isPast = activeNodeIdx >= 0 && actMax >= 0 && actMax < activeNodeIdx
+        })
+
         // 3. Calculate durations and minimal flag for each event node
         const getEffectiveDuration = (node: EventNode) => {
             const triggerRow = node.rows.find(r => r.event.type?.toLowerCase() === 'trigger')
-            if (triggerRow?.event.effect?.toLowerCase() === 'timed') return triggerRow.event.duration || 0
-
-            const titleRow = node.rows.find(r => r.event.type?.toLowerCase() === 'title')
-            if (titleRow?.event.duration) return titleRow.event.duration
-
+            const tr = triggerRow?.event
+            if (tr?.effect?.toLowerCase() === 'timed') return tr.duration || 0
+            const samples = tr?.timingSamples
+            if (samples?.length) return Math.round(samples.reduce((a, b) => a + b, 0) / samples.length)
             return 0
         }
 
@@ -2262,23 +2500,27 @@ const SequenceGrid: React.FC = () => {
                                 <ChevronRight className="w-3.5 h-3.5 text-primary" />
                                 Dicht
                             </button>
-                            <button
-                                onClick={() => {
-                                    useSequencerStore.getState().reindexEvents()
-                                    useSequencerStore.getState().addToast('Sequence succesvol hernummerd', 'info')
-                                }}
-                                className="h-7 w-8 rounded-lg bg-black/40 border border-white/15 flex items-center justify-center hover:bg-white/5 transition-all text-white"
-                                title="Acts, Scenes en Events hernummeren"
-                            >
-                                <ListOrdered className="w-3.5 h-3.5 text-primary" />
-                            </button>
-                            <button
-                                onClick={runCheck}
-                                className="h-7 w-8 rounded-lg bg-black/40 border border-white/15 flex items-center justify-center hover:bg-white/5 transition-all text-white"
-                                title="Show check uitvoeren"
-                            >
-                                <ClipboardCheck className="w-3.5 h-3.5 text-primary" />
-                            </button>
+                            {!isLocked && (
+                                <>
+                                    <button
+                                        onClick={() => {
+                                            useSequencerStore.getState().reindexEvents()
+                                            useSequencerStore.getState().addToast('Sequence succesvol hernummerd', 'info')
+                                        }}
+                                        className="h-7 w-8 rounded-lg bg-black/40 border border-white/15 flex items-center justify-center hover:bg-white/5 transition-all text-white"
+                                        title="Acts, Scenes en Events hernummeren"
+                                    >
+                                        <ListOrdered className="w-3.5 h-3.5 text-primary" />
+                                    </button>
+                                    <button
+                                        onClick={runCheck}
+                                        className="h-7 w-8 rounded-lg bg-black/40 border border-white/15 flex items-center justify-center hover:bg-white/5 transition-all text-white"
+                                        title="Show check uitvoeren"
+                                    >
+                                        <ClipboardCheck className="w-3.5 h-3.5 text-primary" />
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -2294,7 +2536,10 @@ const SequenceGrid: React.FC = () => {
                 return (
                     <div key={act.id} className="relative group/act text-sm mb-6">
                         {/* ACT Header */}
-                        <div className="sticky top-0 z-20 flex items-center justify-between bg-[#111] border-l-4 border-primary px-4 py-2 mb-2 shadow-lg group-hover/act:bg-[#1a1a1a] transition-colors">
+                        <div className={cn(
+                            "sticky top-0 z-20 flex items-center justify-between bg-[#111] border-l-4 border-primary px-4 py-2 mb-2 shadow-lg group-hover/act:bg-[#1a1a1a] transition-colors",
+                            isLocked && act.isPast && showModePastClass
+                        )}>
                             <div className="flex items-center gap-3 flex-1">
                                 <button
                                     onClick={(e) => { e.stopPropagation(); toggleCollapse(`act-${act.id}`) }}
@@ -2312,7 +2557,11 @@ const SequenceGrid: React.FC = () => {
                                 ) : (
                                     <span className="font-black text-primary uppercase tracking-widest">{act.id}</span>
                                 )}
-                                {act.isActive && <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
+                                {isLocked && act.isActive && (
+                                    <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded text-primary animate-bright-pulse shrink-0">
+                                        Huidig
+                                    </span>
+                                )}
                             </div>
 
                             {/* Act Controls (Unlocked) */}
@@ -2375,7 +2624,8 @@ const SequenceGrid: React.FC = () => {
                                             {/* SCENE Header */}
                                             <div className={cn(
                                                 "flex items-center justify-between mb-2 border-l-4 pl-3 py-0.5",
-                                                scene.isActive ? "border-green-500/60" : "border-white/10"
+                                                scene.isActive ? "border-green-500/60" : "border-white/10",
+                                                isLocked && scene.isPast && showModePastClass
                                             )}>
                                                 <div className="flex items-center gap-2 flex-1 min-w-0">
                                                     <button
@@ -2402,7 +2652,11 @@ const SequenceGrid: React.FC = () => {
                                                             {sceneDesc || <span className="opacity-30 italic text-xs">Scene {scene.id}</span>}
                                                         </span>
                                                     )}
-                                                    {scene.isActive && <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse ml-1 shrink-0" />}
+                                                    {isLocked && scene.isActive && (
+                                                        <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded text-green-400 animate-bright-pulse ml-1 shrink-0">
+                                                            Huidig
+                                                        </span>
+                                                    )}
                                                 </div>
 
                                                 {!isLocked && (
@@ -2461,6 +2715,29 @@ const SequenceGrid: React.FC = () => {
                                                 return (
                                                     <div className="space-y-0">
                                                         {eventNodesWithTriggers.map(({ eventNode, triggerRow }, eventIdx) => {
+                                                            const getNextEventNodeCrossScene = () => {
+                                                                if (eventIdx + 1 < eventNodesWithTriggers.length) {
+                                                                    return eventNodesWithTriggers[eventIdx + 1].eventNode
+                                                                }
+                                                                for (let si = sceneIndex + 1; si < act.scenes.length; si++) {
+                                                                    const evs = act.scenes[si].events
+                                                                    if (evs?.length) return evs[0]
+                                                                }
+                                                                for (let ai = actIndex + 1; ai < hierarchy.length; ai++) {
+                                                                    const ha = hierarchy[ai]
+                                                                    for (const sc of ha.scenes) {
+                                                                        if (sc.events?.length) return sc.events[0]
+                                                                    }
+                                                                }
+                                                                return null
+                                                            }
+                                                            const nextEventNodeAfterThis = getNextEventNodeCrossScene()
+                                                            const isFirstEventGroupInShow = actIndex === 0 && sceneIndex === 0 && eventIdx === 0
+                                                            const scrollTransitionRef =
+                                                                isLocked && nextEventNodeAfterThis?.isActive ? activeGroupRef : null
+                                                            const scrollCardRef =
+                                                                isLocked && eventNode.isActive && isFirstEventGroupInShow ? activeGroupRef : null
+
                                                             // Dynamic Collapse
                                                             const eventCollapsed = collapsedGroups[eventNode.uniqueId] ?? isLocked
 
@@ -2511,16 +2788,6 @@ const SequenceGrid: React.FC = () => {
                                                                 activeTimeElapsed = elapsed >= eventNode.activeDuration
                                                             }
 
-                                                            // Calculate remaining time for the active event countdown
-                                                            let remainingTime = 0
-                                                            let showCountdown = false
-                                                            if (eventNode.isActive && eventDuration > 0 && lastTransitionTime) {
-                                                                const effectiveTime = isPaused ? (pauseStartTime || currentTime.getTime()) : currentTime.getTime()
-                                                                const elapsed = Math.round((effectiveTime - lastTransitionTime) / 1000)
-                                                                remainingTime = Math.max(0, eventDuration - elapsed)
-                                                                showCountdown = true
-                                                            }
-
                                                             // Card-level selection: is any row in this event selected?
                                                             const isCardSelected = !isLocked && selectedEvent &&
                                                                 selectedEvent.act === eventNode.rows[0]?.event.act &&
@@ -2539,7 +2806,7 @@ const SequenceGrid: React.FC = () => {
                                                                 <div key={eventNode.uniqueId} className="ml-6 pl-2 border-l border-white/5 relative">
                                                                     {/* EVENT CARD */}
                                                                     <div
-                                                                        ref={eventNode.isActive ? activeGroupRef : null}
+                                                                        ref={scrollCardRef}
                                                                         className={cn(
                                                                             "relative rounded-lg transition-all duration-300 overflow-hidden group/event mb-1",
                                                                             // Base border & background
@@ -2550,6 +2817,7 @@ const SequenceGrid: React.FC = () => {
                                                                                     : isCardSelected
                                                                                         ? "border-2 border-blue-400/70 bg-blue-500/5 shadow-[0_0_12px_rgba(59,130,246,0.2)]"
                                                                                         : "border border-white/8 bg-black/20 hover:border-white/15 hover:bg-white/3",
+                                                                            isLocked && eventNode.isPast && showModePastClass
                                                                         )}
                                                                     >
                                                                         {/* ═══ EVENT CARD HEADER (hidden for 1-event scenes where name = scene name) ═══ */}
@@ -2646,12 +2914,6 @@ const SequenceGrid: React.FC = () => {
                                                                                                 Pg {titleRow.event.scriptPg}
                                                                                             </div>
                                                                                         )}
-                                                                                        {/* Duration */}
-                                                                                        {!isLocked && titleRow?.event.duration !== undefined && titleRow.event.duration > 0 && (
-                                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] font-mono opacity-60">
-                                                                                                {formatTime(titleRow.event.duration)}
-                                                                                            </div>
-                                                                                        )}
                                                                                         {/* Content summary tags */}
                                                                                         {summaryCounts['action'] > 0 && (
                                                                                             <div className="flex items-center gap-1 px-1.5 py-0.5 bg-yellow-500/10 border border-yellow-500/30 rounded text-[9px] text-yellow-300">
@@ -2674,26 +2936,16 @@ const SequenceGrid: React.FC = () => {
                                                                                             </div>
                                                                                         )}
 
-                                                                                        {/* Status indicators */}
-                                                                                        {eventNode.isActive && (
-                                                                                            <div className="flex items-center gap-1.5">
-                                                                                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                                                                                                {showCountdown ? (
-                                                                                                    <span className={cn(
-                                                                                                        "text-[9px] font-mono font-bold px-1.5 py-0.5 rounded tabular-nums",
-                                                                                                        remainingTime === 0 ? "text-red-400 bg-red-500/10 border border-red-500/20 animate-bright-pulse" : "text-yellow-400 bg-yellow-500/10 border border-yellow-500/20"
-                                                                                                    )}>
-                                                                                                        <span className="opacity-50 mr-1 italic">ToGo:</span>{formatTime(remainingTime)}
-                                                                                                    </span>
-                                                                                                ) : (
-                                                                                                    <span className="text-[9px] font-black uppercase text-green-400 animate-bright-pulse">Active</span>
-                                                                                                )}
-                                                                                            </div>
+                                                                                        {/* Status indicators (show mode: labels only; timing op overgangsbalk) */}
+                                                                                        {isLocked && eventNode.isActive && (
+                                                                                            <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded text-green-400 animate-bright-pulse">
+                                                                                                Huidig
+                                                                                            </span>
                                                                                         )}
 
                                                                                         {eventNode.isNext && (
                                                                                             <div className="flex items-center gap-1.5">
-                                                                                                {eventDuration > 0 && (
+                                                                                                {!isLocked && eventDuration > 0 && (
                                                                                                     <span className="text-[9px] font-mono opacity-40 tabular-nums">
                                                                                                         <span className="opacity-50 mr-1 italic">Duur:</span>{formatTime(eventDuration)}
                                                                                                     </span>
@@ -2815,20 +3067,24 @@ const SequenceGrid: React.FC = () => {
                                                                     </div>
 
                                                                     {/* ═══ TRANSITION STRIP between events ═══ */}
-                                                                    <EventTransition
-                                                                        triggerEvent={triggerRow?.event || null}
-                                                                        isLastEvent={isLastEvent}
-                                                                        isLocked={isLocked}
-                                                                        triggerIndex={triggerRow?.originalIndex}
-                                                                        onEditTrigger={(idx) => {
-                                                                            if (typeof idx === 'number') {
-                                                                                openTransitionEditor(idx)
-                                                                            } else {
-                                                                                // No trigger row yet → create one and open editor
-                                                                                ensureTriggerAndEdit(eventNode, titleRow?.originalIndex)
-                                                                            }
-                                                                        }}
-                                                                    />
+                                                                    <div ref={scrollTransitionRef} className="min-h-0">
+                                                                        <EventTransition
+                                                                            triggerEvent={triggerRow?.event || null}
+                                                                            isLastEvent={isLastEvent}
+                                                                            isLocked={isLocked}
+                                                                            isPast={isLocked && !!eventNode.isPast}
+                                                                            precedingGroupActive={!!eventNode.isActive}
+                                                                            triggerIndex={triggerRow?.originalIndex}
+                                                                            onEditTrigger={(idx) => {
+                                                                                if (typeof idx === 'number') {
+                                                                                    openTransitionEditor(idx)
+                                                                                } else {
+                                                                                    // No trigger row yet → create one and open editor
+                                                                                    ensureTriggerAndEdit(eventNode, titleRow?.originalIndex)
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                    </div>
                                                                 </div>
                                                             )
                                                         })}

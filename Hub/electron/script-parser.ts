@@ -15,17 +15,12 @@ export interface ParsedScript {
     acts: ParsedAct[];
 }
 
-const AI_PARSE_TIMEOUT_MS = 5000;
-
 /**
- * Orchestrates the parsing of a PDF script file.
- * Automatically chooses between AI-enhanced parsing (if API key provided) and rule-based regex parsing.
+ * Parses a PDF script file with rule-based text extraction (pdf-parse + regex).
  * @param filePath Path to the PDF file.
- * @param apiKey Optional Google Gemini API key for AI parsing.
- * @returns A promise resolving to a structured ParsedScript object.
  */
-export async function parsePdfScript(filePath: string, apiKey?: string): Promise<ParsedScript> {
-    console.log(`[Backend] Attempting to parse PDF: ${filePath} (AI Mode: ${!!apiKey})`);
+export async function parsePdfScript(filePath: string): Promise<ParsedScript> {
+    console.log(`[Backend] Attempting to parse PDF: ${filePath}`);
 
     // Read the PDF file into a buffer
     const dataBuffer = fs.readFileSync(filePath);
@@ -55,83 +50,11 @@ export async function parsePdfScript(filePath: string, apiKey?: string): Promise
         const text = data.text;
         console.log(`[Backend] PDF text extracted, length: ${text?.length || 0}`);
 
-        // Test if an AI API key is provided and valid; if true, use AI for parsing
-        if (apiKey && apiKey.trim().length > 10) {
-            try {
-                // Offline-safe: if there's no internet, we want a fast fallback to regex parsing.
-                const aiPromise = parseScriptWithAi(text, apiKey);
-                const timeoutPromise = new Promise<ParsedScript>((_, reject) => {
-                    const t = setTimeout(() => {
-                        clearTimeout(t);
-                        reject(new Error(`AI parse timeout after ${AI_PARSE_TIMEOUT_MS}ms`));
-                    }, AI_PARSE_TIMEOUT_MS);
-                });
-                return await Promise.race([aiPromise, timeoutPromise]);
-            } catch (aiErr) {
-                // If AI parsing fails (e.g. rate limit, content block), fall back to regex
-                console.error('[Backend] AI parsing failed, falling back to regex:', aiErr);
-                return parseTextScript(text);
-            }
-        }
-
-        // Default to regex-based text parsing if no AI key is available
         return parseTextScript(text);
     } catch (err: any) {
         console.error('[Backend] Error in parsePdfScript:', err);
         throw err;
     }
-}
-
-/**
- * Uses Google Gemini AI to analyze script text and extract acts and scenes.
- * @param text The raw text content of the script.
- * @param apiKey Google Gemini API key.
- * @returns Structured script data.
- */
-async function parseScriptWithAi(text: string, apiKey: string): Promise<ParsedScript> {
-    const { GoogleGenerativeAI } = await import('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI(apiKey);
-    // Use the Flash model for speed and efficiency
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    // Construct a specific prompt to guide the AI in extracting theater/musical structure
-    const prompt = `
-    Je bent een expert in het analyseren van theater-scripts voor een show-control systeem.
-    Analyseer het volgende script en extraheer de structuur in JSON formaat.
-    
-    RICHTLIJNEN:
-    1. Identificeer Akten (bijv. "AKTE 1", "AKTE 2").
-    2. Identificeer Scenes binnen elke akte. Let op: er is vaak een hiërarchie tussen locaties (SCENE 1: ...) en muzieknummers/acties (1: Opening, 4a: Reprise).
-    3. Extraheer voor elke regel:
-       - title: De titel van de scene of het nummer (bijv. "SCENE 1: Park" of "4a: In mijn droom").
-       - description: Een korte sfeeromschrijving of regie-aanwijzing indien direct beschikbaar onder de titel.
-    4. Sla de inhoudsopgave (Table of Contents) over.
-    5. Geef ALLEEN de JSON terug, geen extra tekst.
-    
-    JSON SCHEMA:
-    {
-      "acts": [
-        {
-          "name": "AKTE EEN",
-          "scenes": [
-            { "id": 1, "title": "SCENE 1: PALEIS", "description": "1906. Een kleine slaapkamer." },
-            { "id": 2, "title": "2: Ooit In Winterse Dagen", "description": "Lied Keizerin-moeder" }
-          ]
-        }
-      ]
-    }
-
-    SCRIPT TEKST:
-    ${text.substring(0, 50000)} 
-    `;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const responseText = response.text();
-
-    // Clean JSON response (strip markdown blocks if the AI included them)
-    const jsonStr = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(jsonStr) as ParsedScript;
 }
 
 /**

@@ -1,4 +1,4 @@
-import type { Device, LocalMonitorDevice, VideoWallAgentDevice } from '../types/devices';
+import type { Device, LocalMonitorDevice, ProjectionMask, VideoWallAgentDevice } from '../types/devices';
 import { networkService } from './network-service';
 import { videoWallAgentService } from './videowall-agent-service';
 
@@ -54,10 +54,10 @@ export const StartMediaPlayer = async (
     previewplayer?: any,
     transitiontime: number = 0,
     mute: boolean = false,
-    projectionMaskIds?: string[],
+    projectionMasks?: ProjectionMask[],
     brightness: number = 100
 ) => {
-    console.log('StartMediaPlayer', { target, sourcefile, repeat, volume, fadeouttime, previewplayer, transitiontime, mute, projectionMaskIds });
+    console.log('StartMediaPlayer', { target, sourcefile, repeat, volume, fadeouttime, previewplayer, transitiontime, mute, projectionMasks });
     const ipc = getIpc();
     const mediaUrl = getMediaUrl(sourcefile);
 
@@ -84,7 +84,7 @@ export const StartMediaPlayer = async (
                 mute: mute,
                 transitionTime: transitiontime,
                 crossoverTime: (d.crossoverTime ?? 0) * 1000,
-                projectionMaskIds: projectionMaskIds,
+                projectionMasks: projectionMasks,
                 brightness: brightness
             }
         });
@@ -195,10 +195,10 @@ export const ChangeMediaPlayer = (
     repeat: boolean,
     volume: number,
     mute: boolean = false,
-    projectionMaskIds?: string[],
+    projectionMasks?: ProjectionMask[],
     brightness: number = 100
 ) => {
-    console.log('ChangeMediaPlayer', { target, newSourcefile, transitiontime, repeat, volume, mute, projectionMaskIds });
+    console.log('ChangeMediaPlayer', { target, newSourcefile, transitiontime, repeat, volume, mute, projectionMasks });
     const ipc = getIpc();
     const mediaUrl = getMediaUrl(newSourcefile);
 
@@ -215,7 +215,7 @@ export const ChangeMediaPlayer = (
                 volume: volume,
                 mute: mute,
                 transitionTime: transitiontime,
-                projectionMaskIds: projectionMaskIds,
+                projectionMasks: projectionMasks,
                 brightness: brightness
             }
         });

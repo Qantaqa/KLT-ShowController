@@ -3,6 +3,7 @@ import { type ShowState } from '../types';
 import * as MediaPlayer from '../../services/media-player-service';
 import { PlayDirectOnAgent } from '../../services/media-player-service';
 import type { LocalMonitorDevice, VideoWallAgentDevice } from '../../types/devices';
+import { networkService } from '../../services/network-service';
 
 export interface MediaSlice {
     playingMedia: Record<string, {
@@ -59,6 +60,26 @@ export const createMediaSlice: StateCreator<
     persistentLights: {},
 
     restartMedia: (index: number) => {
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            const { events } = get()
+            const e = events[index]
+            networkService.sendCommand({
+                type: 'HOST_MEDIA_CONTROL',
+                action: 'restartMedia',
+                index,
+                eventRef: e ? {
+                    act: e.act,
+                    sceneId: e.sceneId,
+                    eventId: e.eventId,
+                    type: e.type,
+                    cue: e.cue,
+                    filename: (e as any).filename,
+                    fixture: e.fixture,
+                } : undefined
+            })
+            return
+        }
         const { events, appSettings, playingMedia } = get()
         const event = events[index]
         if (!event) return
@@ -86,7 +107,7 @@ export const createMediaSlice: StateCreator<
             const repeat = event.type === 'media' && event.effect === 'repeat'
             const volume = event.intensity !== undefined ? event.intensity : 100
             const mute = !event.sound
-            const projectionMaskIds = event.projectionMaskIds
+            const projectionMasks = event.projectionMasks
 
             const brightness = event.brightness !== undefined ? event.brightness : 100
             // Stop marker:
@@ -114,7 +135,7 @@ export const createMediaSlice: StateCreator<
                 PlayDirectOnAgent(d as VideoWallAgentDevice, mediaUrl, repeat, volume, toNumberOrUndef(event.transition) ?? 0, mute, brightness)
             } else {
                 const transitionArg = d.type === 'local_monitor' ? localTransitionMs : (toNumberOrUndef(event.transition) ?? 0)
-                MediaPlayer.StartMediaPlayer(d, mediaUrl, repeat, volume, 0, undefined, transitionArg, mute, projectionMaskIds, brightness)
+                MediaPlayer.StartMediaPlayer(d, mediaUrl, repeat, volume, 0, undefined, transitionArg, mute, projectionMasks, brightness)
             }
             newPlaying[String(d.id)] = {
                 filename: event.filename || '',
@@ -128,6 +149,26 @@ export const createMediaSlice: StateCreator<
     },
 
     stopMedia: (index: number) => {
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            const { events } = get()
+            const e = events[index]
+            networkService.sendCommand({
+                type: 'HOST_MEDIA_CONTROL',
+                action: 'stopMedia',
+                index,
+                eventRef: e ? {
+                    act: e.act,
+                    sceneId: e.sceneId,
+                    eventId: e.eventId,
+                    type: e.type,
+                    cue: e.cue,
+                    filename: (e as any).filename,
+                    fixture: e.fixture,
+                } : undefined
+            })
+            return
+        }
         const { events, appSettings, playingMedia } = get()
         const event = events[index]
         if (!event) return
@@ -207,6 +248,27 @@ export const createMediaSlice: StateCreator<
     },
 
     setMediaVolume: (index: number, volume: number) => {
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            const { events } = get()
+            const e = events[index]
+            networkService.sendCommand({
+                type: 'HOST_MEDIA_CONTROL',
+                action: 'setMediaVolume',
+                index,
+                volume,
+                eventRef: e ? {
+                    act: e.act,
+                    sceneId: e.sceneId,
+                    eventId: e.eventId,
+                    type: e.type,
+                    cue: e.cue,
+                    filename: (e as any).filename,
+                    fixture: e.fixture,
+                } : undefined
+            })
+            return
+        }
         const { events, appSettings, updateEvent } = get()
         const event = events[index]
         if (!event) return
@@ -228,6 +290,26 @@ export const createMediaSlice: StateCreator<
     },
 
     toggleAudio: (index: number) => {
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            const { events } = get()
+            const e = events[index]
+            networkService.sendCommand({
+                type: 'HOST_MEDIA_CONTROL',
+                action: 'toggleAudio',
+                index,
+                eventRef: e ? {
+                    act: e.act,
+                    sceneId: e.sceneId,
+                    eventId: e.eventId,
+                    type: e.type,
+                    cue: e.cue,
+                    filename: (e as any).filename,
+                    fixture: e.fixture,
+                } : undefined
+            })
+            return
+        }
         const { events, appSettings, updateEvent } = get()
         const event = events[index]
         if (event) {
@@ -251,6 +333,26 @@ export const createMediaSlice: StateCreator<
     },
 
     toggleRepeat: (index: number) => {
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            const { events } = get()
+            const e = events[index]
+            networkService.sendCommand({
+                type: 'HOST_MEDIA_CONTROL',
+                action: 'toggleRepeat',
+                index,
+                eventRef: e ? {
+                    act: e.act,
+                    sceneId: e.sceneId,
+                    eventId: e.eventId,
+                    type: e.type,
+                    cue: e.cue,
+                    filename: (e as any).filename,
+                    fixture: e.fixture,
+                } : undefined
+            })
+            return
+        }
         const { events, appSettings, updateEvent } = get()
         const event = events[index]
         if (event) {
@@ -273,6 +375,27 @@ export const createMediaSlice: StateCreator<
     },
 
     setMediaBrightness: (index: number, brightness: number) => {
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            const { events } = get()
+            const e = events[index]
+            networkService.sendCommand({
+                type: 'HOST_MEDIA_CONTROL',
+                action: 'setMediaBrightness',
+                index,
+                brightness,
+                eventRef: e ? {
+                    act: e.act,
+                    sceneId: e.sceneId,
+                    eventId: e.eventId,
+                    type: e.type,
+                    cue: e.cue,
+                    filename: (e as any).filename,
+                    fixture: e.fixture,
+                } : undefined
+            })
+            return
+        }
         const { events, appSettings, updateEvent } = get()
         const event = events[index]
         if (!event) return

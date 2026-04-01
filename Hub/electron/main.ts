@@ -9,7 +9,7 @@ import { parsePdfScript } from './script-parser';
 import { DeviceStatusManager } from './device-status-manager';
 
 const require = createRequire(import.meta.url);
-const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net, globalShortcut } = require('electron');
 const http = require('http');
 const { Server } = require('socket.io');
 const fs = require('node:fs');
@@ -34,12 +34,13 @@ const server = http.createServer((req: any, res: any) => {
 
     // Serve script PDFs — used by browser remote clients
     if (url.pathname === '/script') {
-        const filePath = url.searchParams.get('path');
+        const raw = url.searchParams.get('path');
+        const filePath = raw ? path.normalize(raw) : null;
         if (filePath && fs.existsSync(filePath)) {
             res.writeHead(200, { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': '*' });
             fs.createReadStream(filePath).pipe(res);
         } else {
-            console.warn('[Main] /script not found:', filePath);
+            console.warn('[Main] /script not found:', filePath, 'raw:', raw);
             res.writeHead(404); res.end('Not found');
         }
         return;
@@ -82,7 +83,8 @@ const fileServer = http.createServer((req: any, res: any) => {
 
     // Serve script PDFs
     if (url.pathname === '/script') {
-        const filePath = url.searchParams.get('path');
+        const raw = url.searchParams.get('path');
+        const filePath = raw ? path.normalize(raw) : null;
         if (filePath && fs.existsSync(filePath)) {
             res.writeHead(200, { 'Content-Type': 'application/pdf', 'Access-Control-Allow-Origin': '*' });
             fs.createReadStream(filePath).pipe(res);
@@ -477,9 +479,46 @@ ipcMain.handle('db:save-logo', async (_e: any, { arrayBuffer }: { arrayBuffer: A
     return `http://localhost:${FILE_PORT}/logo`;
 });
 
+/** Main Hub window — reposition across monitors (Ctrl+Alt+1..3) */
+let mainWindow: any = null;
+
+function moveHostWindowToDisplay(monitorIndex: number) {
+    const win = mainWindow;
+    if (!win || win.isDestroyed()) return;
+    const displays = screen.getAllDisplays();
+    if (!displays.length) return;
+    const idx = Math.max(0, Math.min(Math.floor(monitorIndex), displays.length - 1));
+    const d = displays[idx];
+    win.setBounds({
+        x: d.bounds.x,
+        y: d.bounds.y,
+        width: Math.max(400, d.bounds.width),
+        height: Math.max(300, d.bounds.height)
+    });
+    win.setFullScreen(true);
+    win.focus();
+}
+
+function applyControllerMonitorIndex(index: number) {
+    const idx = Math.max(0, Math.floor(index));
+    dbManager.updateAppSettings({ controllerMonitorIndex: idx });
+    moveHostWindowToDisplay(idx);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('controller-monitor-changed', idx);
+    }
+}
+
 // Database IPC Handlers
 ipcMain.handle('db:get-app-settings', () => dbManager.getAppSettings());
-ipcMain.handle('db:update-app-settings', (_e: any, settings: any) => dbManager.updateAppSettings(settings));
+ipcMain.handle('db:update-app-settings', (_e: any, settings: any) => {
+    dbManager.updateAppSettings(settings);
+    if (typeof settings?.controllerMonitorIndex === 'number') {
+        moveHostWindowToDisplay(settings.controllerMonitorIndex);
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('controller-monitor-changed', settings.controllerMonitorIndex);
+        }
+    }
+});
 
 ipcMain.handle('db:get-shows', () => dbManager.getShows());
 ipcMain.handle('db:create-show', (_e: any, show: any) => dbManager.createShow(show));
@@ -491,10 +530,7 @@ ipcMain.handle('db:get-tables', () => dbManager.getTables());
 ipcMain.handle('db:get-table-data', (_e: any, tableName: string) => dbManager.getTableData(tableName));
 ipcMain.handle('db:update-row', (_e: any, { tableName, id, data }: { tableName: string, id: any, data: any }) => dbManager.updateRow(tableName, id, data));
 ipcMain.handle('db:delete-row', (_e: any, { tableName, id }: { tableName: string, id: any }) => dbManager.deleteRow(tableName, id));
-ipcMain.handle('db:parse-script', async (_e: any, filePath: string) => {
-    const settings = dbManager.getAppSettings();
-    return parsePdfScript(filePath, settings?.geminiApiKey);
-});
+ipcMain.handle('db:parse-script', async (_e: any, filePath: string) => parsePdfScript(filePath));
 
 ipcMain.handle('db:get-devices', (_e: any, showId: string) => {
     const devices = dbManager.getDevices(showId);
@@ -505,6 +541,10 @@ ipcMain.handle('db:save-devices', (_e: any, { showId, devices }: any) => dbManag
 
 ipcMain.handle('db:get-sequences', (_e: any, showId: any) => dbManager.getSequences(showId));
 ipcMain.handle('db:save-sequences', (_e: any, { showId, events }: any) => dbManager.saveSequences(showId, events));
+ipcMain.handle('db:insert-show-timing', (_e: any, payload: { showId: string; runAt: string; transitionKey: string; durationSec: number }) =>
+    dbManager.insertShowTiming(payload.showId, payload.runAt, payload.transitionKey, payload.durationSec));
+ipcMain.handle('db:get-show-timings', (_e: any, { showId, runAt }: { showId: string; runAt?: string }) =>
+    dbManager.getShowTimings(showId, runAt));
 
 ipcMain.handle('db:get-remote-clients', () => dbManager.getRemoteClients());
 ipcMain.handle('db:get-remote-client', (_e: any, id: string) => dbManager.getRemoteClient(id));
@@ -645,11 +685,9 @@ ipcMain.on('app-quit', () => {
 });
 
 ipcMain.on('projection-error', (event: any, error: any) => {
-    // Forward to main window (Host) if available
-    const wins = BrowserWindow.getAllWindows();
-    const hostWin = wins.find((w: any) => w.title === 'KLT LedShow Host');
-    if (hostWin) {
-        hostWin.webContents.send('flash-message', { type: 'error', message: `Projection Error: ${error}` });
+    // Forward to main window (Host) if available (do not rely on title — dev uses package name e.g. "ledshow-app")
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('flash-message', { type: 'error', message: `Projection Error: ${error}` });
     }
 });
 
@@ -674,6 +712,9 @@ ipcMain.handle('get-displays', () => {
 
 const projectionWindows = new Map<string, any>();
 const lastMediaStates = new Map<string, { command: string, payload: any }>();
+
+/** When set, mask edits from the projection window apply to this show event (not device storage). */
+let maskEditSession: { showId: string; eventIndex: number; deviceId: string } | null = null;
 
 function ensureProjectionWindow(deviceId: string, monitorIndex: number) {
     if (projectionWindows.has(deviceId)) {
@@ -763,17 +804,53 @@ ipcMain.on('projection-ready', (event: any, rendererDeviceId?: string) => {
             event.sender.send(`media-${lastState.command}`, lastState.payload);
         }
 
-        // Send device config (includes masks)
-        const shows = dbManager.getShows();
-        for (const show of shows) {
-            const devices = dbManager.getDevices(show.id);
-            const device = devices.find((d: any) => d.id === deviceId);
-            if (device) {
-                event.sender.send('projection-config', device);
-                break;
-            }
+        const pm = lastState?.payload?.projectionMasks;
+        event.sender.send('projection-config', {
+            projectionMasks: Array.isArray(pm) ? pm : []
+        });
+
+        if (maskEditSession && maskEditSession.deviceId === deviceId) {
+            event.sender.send('projection-calibration-mode', { enabled: true });
         }
     }
+});
+
+ipcMain.handle('projection-start-mask-edit', (_e: any, payload: {
+    showId: string;
+    eventIndex: number;
+    deviceId: string;
+    monitorIndex: number;
+    videoUrl: string;
+    initialMasks?: any[];
+}) => {
+    const { showId, eventIndex, deviceId, monitorIndex, videoUrl, initialMasks } = payload;
+    maskEditSession = { showId, eventIndex, deviceId };
+    ensureProjectionWindow(deviceId, monitorIndex !== undefined ? monitorIndex : 1);
+    const win = projectionWindows.get(deviceId);
+    if (!win || win.isDestroyed()) return false;
+
+    const playPayload = {
+        url: videoUrl,
+        loop: true,
+        volume: 0,
+        mute: true,
+        transitionTime: 0,
+        crossoverTime: 0,
+        projectionMasks: Array.isArray(initialMasks) ? initialMasks : [],
+        brightness: 100
+    };
+    lastMediaStates.set(deviceId, { command: 'play', payload: { ...playPayload, startTime: Date.now() } });
+    try {
+        dbManager.updateDeviceMediaState(deviceId, lastMediaStates.get(deviceId)!);
+    } catch (err) {
+        console.error('Failed to persist media state:', err);
+    }
+    // If the window is still loading, IPC listeners are not registered yet — projection-ready will replay lastMediaStates + masks.
+    if (!win.webContents.isLoading()) {
+        win.webContents.send('media-play', playPayload);
+        win.webContents.send('projection-calibration-mode', { enabled: true });
+    }
+    return true;
 });
 
 // Media ended notification from a projection window
@@ -810,21 +887,13 @@ ipcMain.on('media-status-update', (_e: any, { deviceId, status }: any) => {
 // Projection Configuration & Calibration
 ipcMain.on('projection-update-masks', (_e: any, { deviceId, masks }: { deviceId: string, masks: any[] }) => {
     console.log(`[Main] Updating projection masks for device ${deviceId}`, masks);
-    const shows = dbManager.getShows();
-    for (const show of shows) {
-        const devices = dbManager.getDevices(show.id);
-        const device = devices.find((d: any) => d.id === deviceId);
-        if (device && (device.type === 'local_monitor' || device.type === 'remote_VideoWall')) {
-            device.projectionMasks = masks;
-            dbManager.saveDevices(show.id, devices);
-
-            // Notify Hub UI if it's listening
-            const hostWin = BrowserWindow.getAllWindows().find((w: any) => w.title === 'KLT LedShow Host');
-            if (hostWin) {
-                hostWin.webContents.send('projection-masks-updated', { deviceId, masks });
-            }
-            break;
-        }
+    const hostWin = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
+    if (maskEditSession && maskEditSession.deviceId === deviceId && hostWin) {
+        hostWin.webContents.send('projection-masks-saved-for-event', {
+            showId: maskEditSession.showId,
+            eventIndex: maskEditSession.eventIndex,
+            masks
+        });
     }
 });
 
@@ -836,27 +905,12 @@ ipcMain.on('projection-set-calibration', (_e: any, { deviceId, enabled }: { devi
     }
 });
 
-ipcMain.on('projection-test-image', (_e: any, { enabled, url }: { enabled: boolean, url?: string }) => {
-    console.log(`[Main] Toggling projection test image: ${enabled} (${url})`);
-    for (const win of projectionWindows.values()) {
-        if (win && !win.isDestroyed()) {
-            win.webContents.send('projection-test-image', { enabled, url });
-        }
-    }
-});
-
-ipcMain.on('projection-test-video', (_e: any, { enabled, url, playing }: { enabled: boolean, url?: string, playing?: boolean }) => {
-    console.log(`[Main] Toggling projection test video: ${enabled} (${url})`);
-    for (const win of projectionWindows.values()) {
-        if (win && !win.isDestroyed()) {
-            win.webContents.send('projection-test-video', { enabled, url, playing });
-        }
-    }
-});
-
 ipcMain.on('projection-finish-calibration', (_e: any, { deviceId }: { deviceId: string }) => {
     console.log(`[Main] Finishing calibration for device ${deviceId}`);
-    const hostWin = BrowserWindow.getAllWindows().find((w: any) => w.title === 'KLT LedShow Host');
+    if (maskEditSession && maskEditSession.deviceId === deviceId) {
+        maskEditSession = null;
+    }
+    const hostWin = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
     if (hostWin) {
         hostWin.webContents.send('projection-calibration-finished', { deviceId });
     }
@@ -1097,6 +1151,11 @@ function createWindow() {
         title: 'KLT LedShow Host'
     });
 
+    mainWindow = win;
+    win.on('closed', () => {
+        if (mainWindow === win) mainWindow = null;
+    });
+
     win.webContents.on('did-fail-load', (event: any, errorCode: number, errorDescription: string) => {
         console.error('Failed to load window:', errorCode, errorDescription);
         dialog.showErrorBox('Failed to load application', `Error: ${errorCode} - ${errorDescription}\nPath: ${path.join(DIST, 'index.html')}`);
@@ -1152,8 +1211,28 @@ if (app) {
 
         createWindow();
 
+        // Ctrl+Alt+1 / 2 / 3 — verplaats Hub naar scherm 0, 1 of 2 (zoals in scherminstellingen)
+        try {
+            const tryReg = (accelerator: string, index: number) => {
+                const ok = globalShortcut.register(accelerator, () => applyControllerMonitorIndex(index));
+                if (!ok) console.warn('[Main] Kon sneltoets niet registreren:', accelerator);
+            };
+            // Top-row nummers (Windows: Ctrl+Alt+1 …)
+            tryReg('CommandOrControl+Alt+1', 0);
+            tryReg('CommandOrControl+Alt+2', 1);
+            tryReg('CommandOrControl+Alt+3', 2);
+        } catch (e) {
+            console.error('[Main] globalShortcut registratie mislukt:', e);
+        }
+
         // Initialize projection windows slightly after main window to avoid resource contention
         setTimeout(initializeProjectionWindows, 2000);
+    });
+
+    app.on('will-quit', () => {
+        try {
+            globalShortcut.unregisterAll();
+        } catch (_) { /* noop */ }
     });
 
     app.on('window-all-closed', () => {

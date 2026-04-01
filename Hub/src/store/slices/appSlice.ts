@@ -83,6 +83,7 @@ export const createAppSlice: StateCreator<
         accessPin: '',
         serverPort: 3001,
         serverIp: 'localhost',
+        controllerMonitorIndex: 0,
         devices: []
     },
     isAuthorized: !!(window as any).require,
@@ -167,7 +168,7 @@ export const createAppSlice: StateCreator<
                 }
             }
 
-            set({ events, activeShow: show, isLocked: true })
+            set({ events, activeShow: show, isLocked: true, timingRunStartedAt: null, stopButtonFlashRequest: false })
             get().broadcastState()
             localStorage.setItem('ledshow_last_show_id', show.id)
         }
@@ -220,6 +221,8 @@ export const createAppSlice: StateCreator<
                 activeShow: newShow,
                 events: initialEvents,
                 activeEventIndex: -1,
+                timingRunStartedAt: null,
+                stopButtonFlashRequest: false,
                 isLocked: false
             }))
             localStorage.setItem('ledshow_last_show_id', newId)
@@ -244,7 +247,7 @@ export const createAppSlice: StateCreator<
                 set({ availableShows: newAvailable, activeShow: nextShow })
                 if (nextShow) await setActiveShow(nextShow)
                 else {
-                    set({ events: [] })
+                    set({ events: [], timingRunStartedAt: null, stopButtonFlashRequest: false })
                     localStorage.removeItem('ledshow_last_show_id')
                 }
             } else {
@@ -266,7 +269,7 @@ export const createAppSlice: StateCreator<
             }
             const newAvailable = availableShows.filter(s => s.id !== id)
             if (activeShow?.id === id) {
-                set({ availableShows: newAvailable, activeShow: null, events: [] })
+                set({ availableShows: newAvailable, activeShow: null, events: [], timingRunStartedAt: null, stopButtonFlashRequest: false })
                 localStorage.removeItem('ledshow_last_show_id')
             } else {
                 set({ availableShows: newAvailable })
@@ -363,6 +366,8 @@ export const createAppSlice: StateCreator<
                             activeShow: null,
                             events: [],
                             activeEventIndex: -1,
+                            timingRunStartedAt: null,
+                            stopButtonFlashRequest: false,
                             appSettings: { ...appSettings, devices: globalDevices || [] },
                             showsLoading: false,
                             showsLoadError: null
@@ -451,7 +456,9 @@ export const createAppSlice: StateCreator<
                 availableShows: [...state.availableShows, newShow],
                 activeShow: newShow,
                 events: importedEvents,
-                activeEventIndex: -1
+                activeEventIndex: -1,
+                timingRunStartedAt: null,
+                stopButtonFlashRequest: false
             }))
             localStorage.setItem('ledshow_last_show_id', newId)
         } catch (error: any) {

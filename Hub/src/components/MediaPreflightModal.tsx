@@ -62,7 +62,7 @@ const MediaPreflightModal: React.FC<MediaPreflightModalProps> = ({ agents, event
 
         await Promise.all(agents.map(async agent => {
             try {
-                const result = await videoWallAgentService.checkFile(agent, '__ping__')
+                await videoWallAgentService.checkFile(agent, '__ping__')
                 // checkFile returns { exists: false } on a working agent (file not found is fine)
                 // It throws/returns false only on network failure
                 onlineAgents.push(agent)

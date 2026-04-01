@@ -7,15 +7,25 @@ import { useSequencerStore } from '../store/useSequencerStore'
  */
 class NetworkService {
     private socket: Socket | null = null // Current Socket.io connection instance
+    private currentUrl: string | null = null
 
     /**
      * Establishes a connection to the Central Hub server.
      * @param url The URL of the Hub server (default: http://localhost:3001).
      */
     connect(url: string = 'http://localhost:3001') {
-        // Test if a socket connection already exists; if true, do not reconnect
-        if (this.socket) return
+        // If we already have a socket:
+        // - keep it if it's connected to the same URL
+        // - otherwise reconnect (URL changed or we got stuck disconnected)
+        if (this.socket) {
+            const sameUrl = this.currentUrl === url
+            const isConnected = !!this.socket.connected
+            if (sameUrl && isConnected) return
+            try { this.socket.disconnect() } catch (_) { }
+            this.socket = null
+        }
 
+        this.currentUrl = url
         this.socket = io(url)
 
         // Event: Successful initial connection or reconnection
@@ -148,9 +158,49 @@ class NetworkService {
                     if (data.action === 'nextEvent') store.nextEvent(data.force)
                     else if (data.action === 'nextScene') store.nextScene(data.force)
                     else if (data.action === 'nextAct') store.nextAct(data.force)
+                    else if (data.action === 'startShow') store.startShow()
                     else if (data.action === 'stop' || data.action === 'setActiveEvent') {
                         store.setActiveEvent(data.index !== undefined ? data.index : -1)
                     }
+                }
+            }
+            // --- Logic Branch: Remote workstation requests host media controls ---
+            else if (data.type === 'HOST_MEDIA_CONTROL') {
+                const isHost = !!(window as any).require
+                if (isHost) {
+                    const store = useSequencerStore.getState() as any
+                    const action = data.action
+                    const idxFromSender = data.index
+                    const ref = data.eventRef
+
+                    const resolveIndex = () => {
+                        const events = (store.events || []) as any[]
+                        if (ref) {
+                            const match = events.findIndex((e: any) =>
+                                e &&
+                                e.act === ref.act &&
+                                (e.sceneId ?? 0) === (ref.sceneId ?? 0) &&
+                                (e.eventId ?? 0) === (ref.eventId ?? 0) &&
+                                (e.type || '') === (ref.type || '') &&
+                                ((e.filename || '') === (ref.filename || '')) &&
+                                ((e.fixture || '') === (ref.fixture || ''))
+                            )
+                            if (match !== -1) return match
+                        }
+                        return typeof idxFromSender === 'number' ? idxFromSender : -1
+                    }
+
+                    const index = resolveIndex()
+                    if (index < 0) return
+
+                    console.log('HOST: Executing host media control:', action, { index })
+
+                    if (action === 'restartMedia') store.restartMedia(index)
+                    else if (action === 'stopMedia') store.stopMedia(index)
+                    else if (action === 'setMediaVolume') store.setMediaVolume(index, data.volume)
+                    else if (action === 'toggleAudio') store.toggleAudio(index)
+                    else if (action === 'toggleRepeat') store.toggleRepeat(index)
+                    else if (action === 'setMediaBrightness') store.setMediaBrightness(index, data.brightness)
                 }
             }
             // --- Logic Branch: Media Finished ---

@@ -17,7 +17,7 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
     const { appSettings, updateAppSettings, addToast, openModal } = useSequencerStore()
     const [localSettings, setLocalSettings] = useState(appSettings)
     const [isSaving, setIsSaving] = useState(false)
-    const [, setDisplays] = useState<any[]>([])
+    const [displayList, setDisplayList] = useState<{ id: number; index: number; isPrimary: boolean; label: string }[]>([])
     const [activeTab, setActiveTab] = useState<'general' | 'devices' | 'workstations' | 'keyboard'>('general')
     const logoInputRef = useRef<HTMLInputElement>(null)
 
@@ -26,7 +26,7 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
             setLocalSettings(appSettings)
             if ((window as any).require) {
                 const { ipcRenderer } = (window as any).require('electron')
-                ipcRenderer.invoke('get-displays').then(setDisplays)
+                ipcRenderer.invoke('get-displays').then(setDisplayList)
             }
         }
     }, [isOpen, appSettings])
@@ -41,10 +41,12 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                 const arrayBuffer = await file.arrayBuffer();
                 const persistentUrl = await ipcRenderer.invoke('db:save-logo', { arrayBuffer });
                 setLocalSettings(prev => ({ ...prev, defaultLogo: persistentUrl }));
+                await updateAppSettings({ defaultLogo: persistentUrl });
             } catch (err) {
                 console.error('Failed to save logo', err);
             }
         }
+        e.target.value = ''
     }
 
     const handleSelectTestVideo = async () => {
@@ -138,7 +140,11 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                     <label className="text-sm font-bold uppercase tracking-widest opacity-60">Standaard Logo</label>
                                     {localSettings.defaultLogo && (
                                         <button
-                                            onClick={() => setLocalSettings(prev => ({ ...prev, defaultLogo: '' }))}
+                                            type="button"
+                                            onClick={async () => {
+                                                setLocalSettings(prev => ({ ...prev, defaultLogo: '' }))
+                                                await updateAppSettings({ defaultLogo: '' })
+                                            }}
                                             className="text-[10px] text-red-500 hover:underline"
                                         >
                                             Verwijderen
@@ -163,7 +169,7 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                     </div>
                                     <div className="flex-1 space-y-2">
                                         <p className="text-xs opacity-40 leading-relaxed">
-                                            Dit logo wordt gebruikt wanneer een project geen specifiek logo heeft ingesteld.
+                                            Wordt linksboven in de Hub getoond en gebruikt wanneer een project geen eigen logo heeft.
                                         </p>
                                         <button
                                             onClick={() => logoInputRef.current?.click()}
@@ -225,32 +231,56 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                 </div>
                             </div>
 
-                            <div className="h-px bg-white/5" />
+                            {(window as any).require && (
+                                <>
+                                    <div className="h-px bg-white/5" />
 
-                            {/* AI / Gemini Settings */}
-                            <div className="space-y-4">
-                                <label className="text-sm font-bold uppercase tracking-widest opacity-60 flex items-center gap-2">
-                                    <Code className="w-3.5 h-3.5" /> AI & Automatisering
-                                </label>
-
-                                <div className="space-y-2">
-                                    <label htmlFor="geminiApiKey" className="text-xs opacity-60 font-bold uppercase tracking-widest">Google Gemini API Key</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            id="geminiApiKey"
-                                            type="password"
-                                            value={localSettings.geminiApiKey || ''}
-                                            onChange={(e) => {
-                                                setLocalSettings(prev => ({ ...prev, geminiApiKey: e.target.value }))
-                                            }}
-                                            placeholder="AI Sleutel..."
-                                            title="Google Gemini API Sleutel"
-                                            className="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm font-mono focus:border-primary/50 outline-none"
-                                        />
+                                    <div className="space-y-4">
+                                        <label className="text-sm font-bold uppercase tracking-widest opacity-60 flex items-center gap-2">
+                                            <Monitor className="w-3.5 h-3.5" /> Hub-venster
+                                        </label>
+                                        <p className="text-[10px] opacity-40 leading-relaxed">
+                                            Op welk scherm de Show Controller op deze computer wordt getoond. Wordt opgeslagen en toegepast bij de volgende start.
+                                            Sneltoetsen: <span className="font-mono text-white/50">Ctrl+Alt+1</span> eerste scherm,{' '}
+                                            <span className="font-mono text-white/50">Ctrl+Alt+2</span> tweede,{' '}
+                                            <span className="font-mono text-white/50">Ctrl+Alt+3</span> derde (volgorde zoals Windows de schermen aanbiedt).
+                                        </p>
+                                        <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
+                                            <div className="flex-1 space-y-2">
+                                                <label htmlFor="controllerMonitor" className="text-xs opacity-60 font-bold uppercase tracking-widest">Scherm</label>
+                                                <select
+                                                    id="controllerMonitor"
+                                                    title="Scherm voor Hub-venster"
+                                                    value={localSettings.controllerMonitorIndex ?? 0}
+                                                    onChange={(e) => setLocalSettings(prev => ({
+                                                        ...prev,
+                                                        controllerMonitorIndex: Math.max(0, parseInt(e.target.value, 10) || 0)
+                                                    }))}
+                                                    className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-sm focus:border-primary/50 outline-none"
+                                                >
+                                                    {displayList.length === 0 ? (
+                                                        <option value={0}>Scherm 1 (laden…)</option>
+                                                    ) : (
+                                                        displayList.map((d) => (
+                                                            <option key={d.id} value={d.index}>{d.label}</option>
+                                                        ))
+                                                    )}
+                                                </select>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const { ipcRenderer } = (window as any).require('electron')
+                                                    ipcRenderer.invoke('get-displays').then(setDisplayList)
+                                                }}
+                                                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[10px] font-bold uppercase tracking-widest shrink-0 h-[42px] sm:h-auto"
+                                            >
+                                                Vernieuwen
+                                            </button>
+                                        </div>
                                     </div>
-                                    <p className="text-[10px] opacity-30 italic">Nodig voor het automatisch genereren van cue-lists uit PDF scripts.</p>
-                                </div>
-                            </div>
+                                </>
+                            )}
 
                             <div className="h-px bg-white/5" />
 

@@ -8,12 +8,30 @@ import { networkService } from '../services/network-service'
 // Worker is bundled locally in public/ — works offline, no CDN dependency
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
 
+/** Scale PDF page to fit container: width-only, or full page (width + height) when webcam strip is visible. */
+function computePdfScale(
+    pageWidth: number,
+    pageHeight: number,
+    containerWidth: number,
+    containerHeight: number,
+    fitFullPage: boolean
+): number {
+    const sw = containerWidth / pageWidth
+    if (!fitFullPage || containerHeight <= 0) return sw
+    const sh = containerHeight / pageHeight
+    return Math.min(sw, sh)
+}
+
 // ---------------------------------------------------------------------------
 // RemotePdfViewer — for browser clients (non-Electron)
 // Loads PDF via HTTP from the host file server. Free navigation.
 // Jumps to page when EVENT_PAGE arrives (event-triggered, not manual host nav).
 // ---------------------------------------------------------------------------
-const RemotePdfViewer: React.FC<{ pdfPath: string; currentScriptPage: number }> = ({ pdfPath, currentScriptPage }) => {
+const RemotePdfViewer: React.FC<{
+    pdfPath: string
+    currentScriptPage: number
+    webcamStripVisible: boolean
+}> = ({ pdfPath, currentScriptPage, webcamStripVisible }) => {
     const appSettings = useSequencerStore((s) => s.appSettings)
 
     const [localPage, setLocalPage] = useState(currentScriptPage || 1)
@@ -23,12 +41,15 @@ const RemotePdfViewer: React.FC<{ pdfPath: string; currentScriptPage: number }> 
     const [shouldInvert, setShouldInvert] = useState(true)
     const [isJumping, setIsJumping] = useState(false)
     const [jumpInput, setJumpInput] = useState('')
+    const [scrubPage, setScrubPage] = useState<number | null>(null)
 
     const canvasRef = useRef<HTMLCanvasElement>(null)
+    const pdfAreaRef = useRef<HTMLDivElement>(null)
     const pdfDocRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null)
     const renderTaskRef = useRef<pdfjsLib.RenderTask | null>(null)
     const lastWheelTime = useRef(0)
     const lastLoadedPath = useRef('')
+    const [pdfAreaSize, setPdfAreaSize] = useState({ w: 0, h: 0 })
 
     // Load PDF when path or settings change (appSettings may arrive after initial mount)
     useEffect(() => {
@@ -69,9 +90,24 @@ const RemotePdfViewer: React.FC<{ pdfPath: string; currentScriptPage: number }> 
                 setIsLoading(false)
             })
 
-        return () => { cancelled = true }
+        return () => {
+            cancelled = true
+            // StrictMode remount: allow second run to load; otherwise lastLoadedPath matches and we return early with isLoading stuck true
+            lastLoadedPath.current = ''
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pdfPath, appSettings?.serverPort])
+
+    useEffect(() => {
+        const el = pdfAreaRef.current
+        if (!el) return
+        const ro = new ResizeObserver(() => {
+            setPdfAreaSize({ w: el.clientWidth, h: el.clientHeight })
+        })
+        ro.observe(el)
+        setPdfAreaSize({ w: el.clientWidth, h: el.clientHeight })
+        return () => ro.disconnect()
+    }, [pdfPath, loadError])
 
     // Follow EVENT_PAGE — jump when host triggers an event-driven page change
     useEffect(() => {
@@ -89,6 +125,12 @@ const RemotePdfViewer: React.FC<{ pdfPath: string; currentScriptPage: number }> 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [localPage])
 
+    // Re-render when script panel size or webcam strip changes (whole-page fit)
+    useEffect(() => {
+        if (pdfDocRef.current) renderPage(pdfDocRef.current, localPage)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pdfAreaSize, webcamStripVisible])
+
     const renderPage = useCallback(async (doc: pdfjsLib.PDFDocumentProxy, num: number) => {
         if (!canvasRef.current) return
         if (renderTaskRef.current) { try { renderTaskRef.current.cancel() } catch { /* noop */ } }
@@ -97,8 +139,10 @@ const RemotePdfViewer: React.FC<{ pdfPath: string; currentScriptPage: number }> 
             const page = await doc.getPage(Math.max(1, Math.min(num, doc.numPages)))
             const canvas = canvasRef.current
             if (!canvas) return
-            const containerWidth = canvas.parentElement?.clientWidth || 800
-            const scale = containerWidth / page.getViewport({ scale: 1 }).width
+            const pw = pdfAreaSize.w || canvas.parentElement?.clientWidth || 800
+            const ph = pdfAreaSize.h || canvas.parentElement?.clientHeight || 0
+            const unscaled = page.getViewport({ scale: 1 })
+            const scale = computePdfScale(unscaled.width, unscaled.height, pw, ph, webcamStripVisible)
             const viewport = page.getViewport({ scale })
             canvas.width = viewport.width
             canvas.height = viewport.height
@@ -110,7 +154,7 @@ const RemotePdfViewer: React.FC<{ pdfPath: string; currentScriptPage: number }> 
         } catch (err: any) {
             if (err?.name === 'RenderingCancelledException') return
         }
-    }, [])
+    }, [pdfAreaSize, webcamStripVisible])
 
     const navigateTo = useCallback((page: number) => {
         setLocalPage(Math.max(1, totalPages > 0 ? Math.min(page, totalPages) : page))
@@ -150,7 +194,11 @@ const RemotePdfViewer: React.FC<{ pdfPath: string; currentScriptPage: number }> 
 
     return (
         <div className="w-full h-full flex flex-col overflow-hidden bg-black select-none">
-            <div className="flex-1 min-h-0 overflow-hidden bg-black relative" onWheel={handleWheel}>
+            <div
+                ref={pdfAreaRef}
+                className="flex-1 min-h-0 overflow-hidden bg-black relative flex items-center justify-center"
+                onWheel={handleWheel}
+            >
                 {isLoading && (
                     <div className="absolute inset-0 flex items-center justify-center z-10">
                         <div className="text-white/40 text-xs font-mono animate-pulse">PDF laden...</div>
@@ -158,55 +206,106 @@ const RemotePdfViewer: React.FC<{ pdfPath: string; currentScriptPage: number }> 
                 )}
                 <canvas
                     ref={canvasRef}
-                    className={cn('w-full block transition-[filter] duration-200', shouldInvert && 'pdf-inverted')}
+                    className={cn(
+                        'block transition-[filter] duration-200 max-w-full max-h-full',
+                        !webcamStripVisible && 'w-full',
+                        shouldInvert && 'pdf-inverted'
+                    )}
                 />
             </div>
 
-            {/* Simple toolbar — navigation only (no host controls) */}
-            <div className="h-12 bg-background border-t border-white/10 px-4 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-1 bg-black/20 rounded-xl border border-white/10 p-0.5">
+            {/* Bottom bar: paginanav | scrubber | licht/donker */}
+            <div className="shrink-0 bg-background border-t border-white/10 px-2 py-1 flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-0.5 bg-black/20 rounded-lg border border-white/10 p-px shrink-0">
                     <button onClick={() => navigateTo(localPage - 1)} disabled={localPage <= 1}
-                        title="Vorige Pagina"
-                        className="p-1.5 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-20 text-primary">
-                        <ChevronLeft className="w-4 h-4" />
+                        title="Vorige pagina"
+                        className="p-1 hover:bg-white/10 rounded-md transition-colors disabled:opacity-20 text-primary">
+                        <ChevronLeft className="w-3.5 h-3.5" />
                     </button>
-                    <div className="px-2 min-w-[80px] text-center border-x border-white/5">
+                    <div className="px-1.5 min-w-[64px] text-center border-x border-white/5">
                         {isJumping ? (
-                            <form onSubmit={handleJumpSubmit} className="flex items-center">
+                            <form onSubmit={handleJumpSubmit} className="flex items-center justify-center">
                                 <input autoFocus type="number" min={1} value={jumpInput}
                                     onChange={(e) => setJumpInput(e.target.value)}
                                     onBlur={() => { setIsJumping(false); setJumpInput('') }}
-                                    className="w-14 bg-transparent text-center text-xs font-mono font-bold text-white outline-none border-b border-primary"
+                                    className="w-12 bg-transparent text-center text-[11px] font-mono font-bold text-white outline-none border-b border-primary leading-tight"
                                     placeholder={String(localPage)} />
                             </form>
                         ) : (
-                            <button onClick={() => { setIsJumping(true); setJumpInput(String(localPage)) }}
-                                className="flex items-center gap-1 text-white/90 hover:text-white transition-colors">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-white/40 mr-1">Pg</span>
-                                <span className="text-xs font-mono font-bold">{localPage}</span>
-                                {totalPages > 0 && <span className="text-[10px] font-bold text-white/20 ml-1">/ {totalPages}</span>}
+                            <button type="button" onClick={() => { setIsJumping(true); setJumpInput(String(localPage)) }}
+                                title="Spring naar pagina"
+                                className="flex items-center justify-center gap-0.5 text-white/90 hover:text-white transition-colors leading-tight">
+                                <span className="text-[8px] font-black uppercase tracking-tighter text-white/35">Pg</span>
+                                <span className="text-[11px] font-mono font-bold">{localPage}</span>
+                                {totalPages > 0 && <span className="text-[9px] font-bold text-white/25">/{totalPages}</span>}
                             </button>
                         )}
                     </div>
                     <button onClick={() => navigateTo(localPage + 1)} disabled={totalPages > 0 && localPage >= totalPages}
-                        title="Volgende Pagina"
-                        className="p-1.5 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-20 text-primary">
-                        <ChevronRight className="w-4 h-4" />
+                        title="Volgende pagina"
+                        className="p-1 hover:bg-white/10 rounded-md transition-colors disabled:opacity-20 text-primary">
+                        <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                 </div>
 
-                <button onClick={() => setShouldInvert(!shouldInvert)}
-                    className={cn('flex items-center gap-2 h-9 px-4 rounded-xl border transition-all text-[10px] font-black uppercase tracking-widest bg-black/20 border-white/10 text-white/40',
-                        shouldInvert && 'border-primary/20')}>
-                    {shouldInvert ? <Moon className="w-3.5 h-3.5 text-primary" /> : <Sun className="w-3.5 h-3.5 text-primary" />}
-                    {shouldInvert ? 'Donker' : 'Licht'}
+                {totalPages > 1 && (
+                    <div className="relative flex-1 min-w-[40px] flex items-center gap-1.5">
+                        <span className="text-[8px] font-black text-white/25 shrink-0 tabular-nums">1</span>
+                        <div className="relative flex-1 min-w-0 h-3 flex items-center">
+                            <input
+                                type="range"
+                                min={1}
+                                max={totalPages}
+                                value={scrubPage ?? localPage}
+                                onChange={(e) => setScrubPage(Number(e.target.value))}
+                                onMouseUp={(e) => {
+                                    const p = Number((e.target as HTMLInputElement).value)
+                                    navigateTo(p)
+                                    setScrubPage(null)
+                                }}
+                                onTouchEnd={(e) => {
+                                    const p = Number((e.target as HTMLInputElement).value)
+                                    navigateTo(p)
+                                    setScrubPage(null)
+                                }}
+                                className="pdf-scrubber w-full"
+                                title={`Pagina ${scrubPage ?? localPage} van ${totalPages}`}
+                            />
+                            {scrubPage !== null && (
+                                <div
+                                    className="pdf-scrubber-tooltip"
+                                    {...{ style: { '--offset': `calc(${((scrubPage - 1) / Math.max(totalPages - 1, 1)) * 100}% - 10px)` } } as any}
+                                >
+                                    {scrubPage}
+                                </div>
+                            )}
+                        </div>
+                        <span className="text-[8px] font-black text-white/25 shrink-0 tabular-nums">{totalPages}</span>
+                    </div>
+                )}
+
+                <button
+                    type="button"
+                    onClick={() => setShouldInvert(!shouldInvert)}
+                    title={shouldInvert ? 'Donker script (invert)' : 'Licht script'}
+                    className={cn(
+                        'shrink-0 p-1 rounded-md border border-white/10 bg-black/20 text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors',
+                        shouldInvert && 'border-primary/25 text-primary'
+                    )}
+                >
+                    {shouldInvert ? <Moon className="w-3.5 h-3.5" strokeWidth={2} /> : <Sun className="w-3.5 h-3.5" strokeWidth={2} />}
                 </button>
             </div>
         </div>
     )
 }
 
-const PdfViewer: React.FC = () => {
+export type PdfViewerProps = {
+    /** Zijn webcam-previewstrook én uitklap-inhoud zichtbaar (dan past PDF volledige pagina in het paneel) */
+    webcamStripVisible?: boolean
+}
+
+const PdfViewer: React.FC<PdfViewerProps> = ({ webcamStripVisible = false }) => {
     const activeShow = useSequencerStore((state) => state.activeShow)
     const pageNumber = useSequencerStore((state) => state.activeShow?.viewState?.currentScriptPage || 1)
     const setCurrentScriptPage = useSequencerStore((state) => state.setCurrentScriptPage)
@@ -228,10 +327,12 @@ const PdfViewer: React.FC = () => {
     const [scrubPage, setScrubPage] = useState<number | null>(null)  // preview page while dragging
 
     const canvasRef = useRef<HTMLCanvasElement>(null)
+    const pdfAreaRef = useRef<HTMLDivElement>(null)
     const pdfDocRef = useRef<pdfjsLib.PDFDocumentProxy | null>(null)
     const renderTaskRef = useRef<pdfjsLib.RenderTask | null>(null)
     const lastLoadedPath = useRef<string>('')
     const lastWheelTime = useRef(0)
+    const [pdfAreaSize, setPdfAreaSize] = useState({ w: 0, h: 0 })
 
     const pdfPath = activeShow?.pdfPath || ''
 
@@ -287,8 +388,22 @@ const PdfViewer: React.FC = () => {
             }
         }
 
-        return () => { cancelled = true }
+        return () => {
+            cancelled = true
+            lastLoadedPath.current = ''
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isElectron, pdfPath])
+
+    useEffect(() => {
+        const el = pdfAreaRef.current
+        if (!isElectron || !el) return
+        const ro = new ResizeObserver(() => {
+            setPdfAreaSize({ w: el.clientWidth, h: el.clientHeight })
+        })
+        ro.observe(el)
+        setPdfAreaSize({ w: el.clientWidth, h: el.clientHeight })
+        return () => ro.disconnect()
     }, [isElectron, pdfPath])
 
     // ----- Re-render when page number changes -----
@@ -299,6 +414,12 @@ const PdfViewer: React.FC = () => {
         setJumpInput('')
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pageNumber])
+
+    // ----- Re-render when script panel resizes or webcam strip toggles -----
+    useEffect(() => {
+        if (pdfDocRef.current) renderPage(pdfDocRef.current, pageNumber)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pdfAreaSize, webcamStripVisible])
 
     // ----- Canvas rendering -----
     const renderPage = useCallback(async (doc: pdfjsLib.PDFDocumentProxy, num: number) => {
@@ -315,9 +436,10 @@ const PdfViewer: React.FC = () => {
             const canvas = canvasRef.current
             if (!canvas) return
 
-            const containerWidth = canvas.parentElement?.clientWidth || 800
+            const pw = pdfAreaSize.w || canvas.parentElement?.clientWidth || 800
+            const ph = pdfAreaSize.h || canvas.parentElement?.clientHeight || 0
             const unscaled = page.getViewport({ scale: 1 })
-            const scale = containerWidth / unscaled.width
+            const scale = computePdfScale(unscaled.width, unscaled.height, pw, ph, webcamStripVisible)
             const viewport = page.getViewport({ scale })
 
             canvas.width = viewport.width
@@ -333,7 +455,7 @@ const PdfViewer: React.FC = () => {
             if (err?.name === 'RenderingCancelledException') return
             console.error('[PdfViewer] Render error:', err)
         }
-    }, [])
+    }, [pdfAreaSize, webcamStripVisible])
 
     // ----- Navigation (only manual navigation triggers SYNC_PAGE to remotes) -----
     const navigateTo = useCallback((page: number) => {
@@ -409,7 +531,13 @@ const PdfViewer: React.FC = () => {
 
     // ----- Remote client: full pdfjs canvas viewer via HTTP -----
     if (!isElectron) {
-        return <RemotePdfViewer pdfPath={pdfPath} currentScriptPage={pageNumber} />
+        return (
+            <RemotePdfViewer
+                pdfPath={pdfPath}
+                currentScriptPage={pageNumber}
+                webcamStripVisible={webcamStripVisible}
+            />
+        )
     }
 
     // ----- No PDF loaded -----
@@ -443,7 +571,8 @@ const PdfViewer: React.FC = () => {
             {/* Canvas area — min-h-0 is critical: without it, flex-1 uses min-height:auto
                 and grows to canvas height, pushing toolbar off-screen */}
             <div
-                className="flex-1 min-h-0 overflow-hidden bg-black relative"
+                ref={pdfAreaRef}
+                className="flex-1 min-h-0 overflow-hidden bg-black relative flex items-center justify-center"
                 onWheel={handleWheel}
             >
                 {isLoading && (
@@ -455,149 +584,138 @@ const PdfViewer: React.FC = () => {
                 <canvas
                     ref={canvasRef}
                     className={cn(
-                        'w-full block transition-[filter] duration-200',
+                        'block transition-[filter] duration-200 max-w-full max-h-full',
+                        !webcamStripVisible && 'w-full',
                         shouldInvert && 'pdf-inverted'
                     )}
                 />
             </div>
 
-            {/* Page scrubber—only show when PDF is loaded with known total pages */}
-            {totalPages > 1 && (
-                <div className="shrink-0 px-3 py-1.5 bg-black border-t border-white/5 flex items-center gap-3">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-white/20 shrink-0">1</span>
-                    <div className="relative flex-1 h-4 flex items-center">
-                        <input
-                            type="range"
-                            min={1}
-                            max={totalPages}
-                            value={scrubPage ?? pageNumber}
-                            onChange={(e) => {
-                                setScrubPage(Number(e.target.value))
-                            }}
-                            onMouseUp={(e) => {
-                                const p = Number((e.target as HTMLInputElement).value)
-                                navigateTo(p)
-                                setScrubPage(null)
-                            }}
-                            onTouchEnd={(e) => {
-                                const p = Number((e.target as HTMLInputElement).value)
-                                navigateTo(p)
-                                setScrubPage(null)
-                            }}
-                            className="pdf-scrubber w-full"
-                            title={`Pagina ${scrubPage ?? pageNumber} van ${totalPages}`}
-                        />
-                        {/* Tooltip showing preview page while dragging */}
-                        {scrubPage !== null && (
-                            <div
-                                className="pdf-scrubber-tooltip"
-                                // --offset drives the left position via CSS custom property
-                                // CSS: left: var(--offset, 0%)
-                                {...{ style: { '--offset': `calc(${((scrubPage - 1) / Math.max(totalPages - 1, 1)) * 100}% - 12px)` } } as any}
-                            >
-                                {scrubPage}
-                            </div>
-                        )}
-                    </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-white/20 shrink-0">{totalPages}</span>
-                </div>
-            )}
-
-            {/* Toolbar */}
-            <div className="h-12 bg-background border-t border-white/10 px-4 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 bg-black/20 rounded-xl border border-white/10 p-0.5 shadow-inner">
-                        <button
-                            onClick={handlePrevPage}
-                            disabled={pageNumber <= 1}
-                            title="Vorige Pagina"
-                            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-20 text-primary"
-                        >
-                            <ChevronLeft className="w-4 h-4" />
-                        </button>
-
-                        <div className="px-2 min-w-[90px] text-center border-x border-white/5">
-                            {isJumping ? (
-                                <form onSubmit={handleJumpSubmit} className="flex items-center">
-                                    <input
-                                        autoFocus
-                                        type="number"
-                                        min={1}
-                                        max={totalPages || undefined}
-                                        value={jumpInput}
-                                        onChange={(e) => setJumpInput(e.target.value)}
-                                        onBlur={() => { setIsJumping(false); setJumpInput('') }}
-                                        className="w-16 bg-transparent text-center text-xs font-mono font-bold text-white outline-none border-b border-primary"
-                                        placeholder={String(pageNumber)}
-                                    />
-                                </form>
-                            ) : (
-                                <button
-                                    onClick={() => { setIsJumping(true); setJumpInput(String(pageNumber)) }}
-                                    title="Klik om naar pagina te springen"
-                                    className="flex items-center gap-1 text-white/90 hover:text-white transition-colors"
-                                >
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-white/40 mr-1">Pg</span>
-                                    <span className="text-xs font-mono font-bold">{pageNumber}</span>
-                                    {totalPages > 0 && (
-                                        <span className="text-[10px] font-bold text-white/20 ml-1">/ {totalPages}</span>
-                                    )}
-                                </button>
-                            )}
-                        </div>
-
-                        <button
-                            onClick={handleNextPage}
-                            disabled={totalPages > 0 && pageNumber >= totalPages}
-                            title="Volgende Pagina"
-                            className="p-1.5 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-20 text-primary"
-                        >
-                            <ChevronRight className="w-4 h-4" />
-                        </button>
-                    </div>
-
+            {/* Onderbalk: paginanav | scrubber | invert | koppelknoppen */}
+            <div className="shrink-0 bg-background border-t border-white/10 px-2 py-1 flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-0.5 bg-black/20 rounded-lg border border-white/10 p-px shrink-0">
                     <button
-                        onClick={() => { setIsJumping(true); setJumpInput('') }}
-                        title="Spring naar pagina (of klik op paginanummer)"
-                        className={cn('p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white/30 hover:text-white hidden')} // hidden: klik op pg-teller doet hetzelfde
-                    />
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => setShouldInvert(!shouldInvert)}
-                        className={cn(
-                            'flex items-center gap-2 h-9 px-4 rounded-xl border transition-all text-[10px] font-black uppercase tracking-widest bg-black/20 border-white/10 text-white/40 hover:bg-white/5',
-                            shouldInvert && 'border-primary/20'
-                        )}
+                        onClick={handlePrevPage}
+                        disabled={pageNumber <= 1}
+                        title="Vorige pagina"
+                        className="p-1 hover:bg-white/10 rounded-md transition-colors disabled:opacity-20 text-primary"
                     >
-                        {shouldInvert ? <Moon className="w-3.5 h-3.5 text-primary" /> : <Sun className="w-3.5 h-3.5 text-primary" />}
-                        {shouldInvert ? 'Donker' : 'Licht'}
+                        <ChevronLeft className="w-3.5 h-3.5" />
                     </button>
 
-                    {!isLocked && (
+                    <div className="px-1.5 min-w-[64px] text-center border-x border-white/5">
+                        {isJumping ? (
+                            <form onSubmit={handleJumpSubmit} className="flex items-center justify-center">
+                                <input
+                                    autoFocus
+                                    type="number"
+                                    min={1}
+                                    max={totalPages || undefined}
+                                    value={jumpInput}
+                                    onChange={(e) => setJumpInput(e.target.value)}
+                                    onBlur={() => { setIsJumping(false); setJumpInput('') }}
+                                    className="w-12 bg-transparent text-center text-[11px] font-mono font-bold text-white outline-none border-b border-primary leading-tight"
+                                    placeholder={String(pageNumber)}
+                                />
+                            </form>
+                        ) : (
+                            <button
+                                type="button"
+                                onClick={() => { setIsJumping(true); setJumpInput(String(pageNumber)) }}
+                                title="Spring naar pagina"
+                                className="flex items-center justify-center gap-0.5 text-white/90 hover:text-white transition-colors leading-tight"
+                            >
+                                <span className="text-[8px] font-black uppercase tracking-tighter text-white/35">Pg</span>
+                                <span className="text-[11px] font-mono font-bold">{pageNumber}</span>
+                                {totalPages > 0 && (
+                                    <span className="text-[9px] font-bold text-white/25">/{totalPages}</span>
+                                )}
+                            </button>
+                        )}
+                    </div>
+
+                    <button
+                        onClick={handleNextPage}
+                        disabled={totalPages > 0 && pageNumber >= totalPages}
+                        title="Volgende pagina"
+                        className="p-1 hover:bg-white/10 rounded-md transition-colors disabled:opacity-20 text-primary"
+                    >
+                        <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                </div>
+
+                {totalPages > 1 && (
+                    <div className="relative flex-1 min-w-[40px] flex items-center gap-1.5">
+                        <span className="text-[8px] font-black text-white/25 shrink-0 tabular-nums">1</span>
+                        <div className="relative flex-1 min-w-0 h-3 flex items-center">
+                            <input
+                                type="range"
+                                min={1}
+                                max={totalPages}
+                                value={scrubPage ?? pageNumber}
+                                onChange={(e) => setScrubPage(Number(e.target.value))}
+                                onMouseUp={(e) => {
+                                    const p = Number((e.target as HTMLInputElement).value)
+                                    navigateTo(p)
+                                    setScrubPage(null)
+                                }}
+                                onTouchEnd={(e) => {
+                                    const p = Number((e.target as HTMLInputElement).value)
+                                    navigateTo(p)
+                                    setScrubPage(null)
+                                }}
+                                className="pdf-scrubber w-full"
+                                title={`Pagina ${scrubPage ?? pageNumber} van ${totalPages}`}
+                            />
+                            {scrubPage !== null && (
+                                <div
+                                    className="pdf-scrubber-tooltip"
+                                    {...{ style: { '--offset': `calc(${((scrubPage - 1) / Math.max(totalPages - 1, 1)) * 100}% - 10px)` } } as any}
+                                >
+                                    {scrubPage}
+                                </div>
+                            )}
+                        </div>
+                        <span className="text-[8px] font-black text-white/25 shrink-0 tabular-nums">{totalPages}</span>
+                    </div>
+                )}
+
+                <button
+                    type="button"
+                    onClick={() => setShouldInvert(!shouldInvert)}
+                    title={shouldInvert ? 'Donker script (invert)' : 'Licht script'}
+                    className={cn(
+                        'shrink-0 p-1 rounded-md border border-white/10 bg-black/20 text-white/50 hover:text-white/80 hover:bg-white/5 transition-colors',
+                        shouldInvert && 'border-primary/25 text-primary'
+                    )}
+                >
+                    {shouldInvert ? <Moon className="w-3.5 h-3.5" strokeWidth={2} /> : <Sun className="w-3.5 h-3.5" strokeWidth={2} />}
+                </button>
+
+                {!isLocked && (
+                    <>
                         <button
+                            type="button"
                             onClick={handleBindToCue}
                             disabled={selectedEventIndex === -1}
-                            className="flex items-center gap-2 h-9 px-4 bg-black/20 hover:bg-white/5 border border-white/10 rounded-xl transition-all group disabled:opacity-20 disabled:grayscale text-white/40"
+                            title="Koppel aan geselecteerde cue"
+                            className="flex items-center gap-1 h-7 px-2 bg-black/20 hover:bg-white/5 border border-white/10 rounded-md transition-all group disabled:opacity-20 disabled:grayscale text-white/40 shrink-0"
                         >
-                            <LinkIcon className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Koppel aan cue</span>
+                            <LinkIcon className="w-3 h-3 text-primary group-hover:scale-110 transition-transform shrink-0" />
+                            <span className="text-[9px] font-black uppercase tracking-tight leading-none">Cue</span>
                         </button>
-                    )}
-
-                    {!isLocked && (
                         <button
+                            type="button"
                             onClick={handleBindToActiveEvent}
                             disabled={activeEventIndex === -1}
-                            className="flex items-center gap-2 h-9 px-4 bg-black/20 hover:bg-white/5 border border-white/10 rounded-xl transition-all group disabled:opacity-20 disabled:grayscale text-white/40"
-                            title="Koppel huidige pagina aan het actieve event"
+                            title="Koppel aan actief event"
+                            className="flex items-center gap-1 h-7 px-2 bg-black/20 hover:bg-white/5 border border-white/10 rounded-md transition-all group disabled:opacity-20 disabled:grayscale text-white/40 shrink-0"
                         >
-                            <LinkIcon className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Koppel aan actief event</span>
+                            <LinkIcon className="w-3 h-3 text-primary group-hover:scale-110 transition-transform shrink-0" />
+                            <span className="text-[9px] font-black uppercase tracking-tight leading-none">Actief</span>
                         </button>
-                    )}
-                </div>
+                    </>
+                )}
             </div>
         </div>
     )

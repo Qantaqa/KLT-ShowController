@@ -15,7 +15,9 @@ export const useRemoteKeyboard = () => {
         blinkingNextEvent,
         blinkingNextScene,
         blinkingNextAct,
-        setActiveEvent
+        setActiveEvent,
+        activeEventIndex,
+        setStopButtonFlashRequest
     } = useSequencerStore();
 
     useEffect(() => {
@@ -72,12 +74,15 @@ export const useRemoteKeyboard = () => {
                 return;
             }
 
-            // 3. Escape key for stop/reset
+            // 3. Escape: vraag expliciet Stop (geen directe stop; tweede Escape ook niet)
             if (key === 'Escape') {
+                if (activeEventIndex < 0) return;
                 e.preventDefault();
-                console.log('[RemoteKeyboard] Escape -> Stop/Reset Show');
-                setActiveEvent(-1);
-                addToast('Show gestopt (Escape)', 'info');
+                const already = useSequencerStore.getState().stopButtonFlashRequest;
+                setStopButtonFlashRequest(true);
+                if (!already) {
+                    addToast('Druk op Stop om de show te beëindigen', 'info');
+                }
                 return;
             }
 
@@ -141,5 +146,5 @@ export const useRemoteKeyboard = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isLocked, keyboardBindings, nextEvent, nextScene, nextAct, addToast, activeShow, setCurrentScriptPage, blinkingNextEvent, blinkingNextScene, blinkingNextAct, setActiveEvent]);
+    }, [isLocked, keyboardBindings, nextEvent, nextScene, nextAct, addToast, activeShow, setCurrentScriptPage, blinkingNextEvent, blinkingNextScene, blinkingNextAct, setActiveEvent, activeEventIndex, setStopButtonFlashRequest]);
 };

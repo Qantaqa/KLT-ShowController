@@ -29,6 +29,7 @@ class DbManager {
     const dbPath = path.join(app$1.getPath("userData"), "ledshow.db");
     console.log("--- Initializing Database at:", dbPath);
     this.db = new Database(dbPath);
+    this.db.pragma("foreign_keys = ON");
     this.init();
   }
   /**
@@ -52,6 +53,10 @@ class DbManager {
     }
     try {
       this.db.exec("ALTER TABLE app_settings ADD COLUMN geminiApiKey TEXT");
+    } catch (e) {
+    }
+    try {
+      this.db.exec("ALTER TABLE app_settings ADD COLUMN controllerMonitorIndex INTEGER DEFAULT 0");
     } catch (e) {
     }
     try {
@@ -170,6 +175,12 @@ class DbManager {
     if (!columns.includes("stopEventId")) {
       this.db.exec("ALTER TABLE sequences ADD COLUMN stopEventId INTEGER");
     }
+    if (!columns.includes("projectionMasks")) {
+      this.db.exec("ALTER TABLE sequences ADD COLUMN projectionMasks TEXT");
+    }
+    if (!columns.includes("actionId")) {
+      this.db.exec("ALTER TABLE sequences ADD COLUMN actionId INTEGER DEFAULT 0");
+    }
     this.db.exec(`
             CREATE TABLE IF NOT EXISTS clipboard (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -219,6 +230,125 @@ class DbManager {
         insert.run(b.id, b.key, b.ctrl, b.shift, b.alt, b.action, b.label);
       }
     }
+    this.db.exec(`
+            CREATE TABLE IF NOT EXISTS show_timing (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                showId TEXT NOT NULL,
+                runAt TEXT NOT NULL,
+                transitionKey TEXT NOT NULL,
+                durationSec INTEGER NOT NULL,
+                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (showId) REFERENCES shows (id) ON DELETE CASCADE,
+                UNIQUE (showId, runAt, transitionKey)
+            )
+        `);
+    this.db.exec(`
+            CREATE TABLE IF NOT EXISTS show_videomaskers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                showId TEXT NOT NULL,
+                act TEXT NOT NULL DEFAULT '',
+                sceneId INTEGER NOT NULL DEFAULT 0,
+                eventId INTEGER NOT NULL DEFAULT 0,
+                actionId INTEGER NOT NULL DEFAULT 0,
+                eventType TEXT NOT NULL DEFAULT 'media',
+                masksJson TEXT NOT NULL,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (showId) REFERENCES shows (id) ON DELETE CASCADE,
+                UNIQUE (showId, act, sceneId, eventId, actionId, eventType)
+            )
+        `);
+    this.migrateLegacySequenceProjectionMasksToVideoMaskers();
+  }
+  /**
+   * One-time migration: copy masks from sequences.projectionMasks into show_videomaskers.
+   */
+  migrateLegacySequenceProjectionMasksToVideoMaskers() {
+    try {
+      const cols = this.db.pragma("table_info(sequences)").map((c) => c.name);
+      if (!cols.includes("projectionMasks")) return;
+      const rows = this.db.prepare(
+        "SELECT showId, act, sceneId, eventId, actionId, type, projectionMasks FROM sequences WHERE projectionMasks IS NOT NULL AND projectionMasks != ''"
+      ).all();
+      const insert = this.db.prepare(`
+                INSERT OR IGNORE INTO show_videomaskers (showId, act, sceneId, eventId, actionId, eventType, masksJson, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            `);
+      for (const r of rows) {
+        let parsed;
+        try {
+          parsed = JSON.parse(r.projectionMasks);
+        } catch {
+          continue;
+        }
+        if (!Array.isArray(parsed) || parsed.length === 0) continue;
+        const t = String(r.type || "media").toLowerCase();
+        insert.run(
+          r.showId,
+          r.act ?? "",
+          r.sceneId ?? 0,
+          r.eventId ?? 0,
+          r.actionId ?? 0,
+          t,
+          JSON.stringify(parsed)
+        );
+      }
+    } catch (e) {
+      console.error("[DB] migrateLegacySequenceProjectionMasksToVideoMaskers:", e);
+    }
+  }
+  /** Stable key for a sequence row's video mask (media cues). */
+  static videoMaskKey(e) {
+    return `${e.act ?? ""}|${e.sceneId ?? ""}|${e.eventId ?? ""}|${e.actionId ?? 0}|${String(e.type || "").toLowerCase()}`;
+  }
+  /**
+   * Returns a map of videoMaskKey -> parsed ProjectionMask[] for one show.
+   */
+  getVideoMasksMap(showId) {
+    const map = /* @__PURE__ */ new Map();
+    const rows = this.db.prepare(
+      "SELECT act, sceneId, eventId, actionId, eventType, masksJson FROM show_videomaskers WHERE showId = ?"
+    ).all(showId);
+    for (const r of rows) {
+      const key = DbManager.videoMaskKey({
+        act: r.act,
+        sceneId: r.sceneId,
+        eventId: r.eventId,
+        actionId: r.actionId,
+        type: r.eventType
+      });
+      try {
+        const parsed = JSON.parse(r.masksJson);
+        if (Array.isArray(parsed)) map.set(key, parsed);
+      } catch {
+      }
+    }
+    return map;
+  }
+  /**
+   * Replaces all videomask rows for a show from the in-memory events array.
+   */
+  replaceShowVideoMasks(showId, events) {
+    const del = this.db.prepare("DELETE FROM show_videomaskers WHERE showId = ?");
+    const ins = this.db.prepare(`
+            INSERT INTO show_videomaskers (showId, act, sceneId, eventId, actionId, eventType, masksJson, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        `);
+    del.run(showId);
+    for (const e of events) {
+      const t = String(e.type || "").toLowerCase();
+      if (t !== "media") continue;
+      const masks = e.projectionMasks;
+      if (!Array.isArray(masks) || masks.length === 0) continue;
+      ins.run(
+        showId,
+        e.act ?? "",
+        e.sceneId ?? 0,
+        e.eventId ?? 0,
+        e.actionId ?? 0,
+        t,
+        JSON.stringify(masks)
+      );
+    }
   }
   /**
    * Retrieves the global application settings from the database.
@@ -240,11 +370,12 @@ class DbManager {
       accessPin: next.accessPin ? "SET (length:" + next.accessPin.length + ")" : "EMPTY",
       serverPort: next.serverPort
     });
+    const monitorIdx = typeof next.controllerMonitorIndex === "number" && Number.isFinite(next.controllerMonitorIndex) ? Math.max(0, Math.floor(next.controllerMonitorIndex)) : current?.controllerMonitorIndex ?? 0;
     return this.db.prepare(`
             UPDATE app_settings 
-            SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?, geminiApiKey = ?
+            SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?, geminiApiKey = ?, controllerMonitorIndex = ?
             WHERE id = 1
-        `).run(next.defaultLogo, next.accessPin, next.serverPort, next.testVideoPath || "", next.geminiApiKey || "");
+        `).run(next.defaultLogo, next.accessPin, next.serverPort, next.testVideoPath || "", next.geminiApiKey || "", monitorIdx);
   }
   /**
    * Retrieves all shows, excluding the system 'GLOBAL' entry.
@@ -459,11 +590,27 @@ class DbManager {
    * @returns Array of sequence event objects.
    */
   getSequences(showId) {
-    return this.db.prepare("SELECT * FROM sequences WHERE showId = ? ORDER BY id ASC").all(showId).map((s) => ({
-      ...s,
-      // Convert integer (0/1) from SQLite to boolean for frontend consistency
-      sound: !!s.sound
-    }));
+    const maskMap = this.getVideoMasksMap(showId);
+    return this.db.prepare("SELECT * FROM sequences WHERE showId = ? ORDER BY id ASC").all(showId).map((s) => {
+      let legacyMasks;
+      if (s.projectionMasks && typeof s.projectionMasks === "string") {
+        try {
+          const parsed = JSON.parse(s.projectionMasks);
+          legacyMasks = Array.isArray(parsed) ? parsed : void 0;
+        } catch {
+          legacyMasks = void 0;
+        }
+      }
+      const { projectionMasks: _pm, ...rest } = s;
+      const key = DbManager.videoMaskKey(s);
+      const fromTable = maskMap.get(key);
+      const projectionMasks = fromTable !== void 0 ? fromTable : legacyMasks;
+      return {
+        ...rest,
+        sound: !!s.sound,
+        projectionMasks
+      };
+    });
   }
   /**
    * Saves a list of sequence events (acts/scenes/events) for a show.
@@ -475,8 +622,8 @@ class DbManager {
     const deleteStmt = this.db.prepare("DELETE FROM sequences WHERE showId = ?");
     const insertStmt = this.db.prepare(`
             INSERT INTO sequences 
-            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId, stopAct, stopSceneId, stopEventId)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId, stopAct, stopSceneId, stopEventId, actionId)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
     const transaction = this.db.transaction((showId2, events2) => {
       deleteStmt.run(showId2);
@@ -509,9 +656,11 @@ class DbManager {
           // Stop marker (optional)
           e.stopAct || null,
           e.stopSceneId !== void 0 ? e.stopSceneId : null,
-          e.stopEventId !== void 0 ? e.stopEventId : null
+          e.stopEventId !== void 0 ? e.stopEventId : null,
+          e.actionId !== void 0 && e.actionId !== null ? e.actionId : 0
         );
       }
+      this.replaceShowVideoMasks(showId2, events2);
     });
     try {
       return transaction(showId, events);
@@ -519,6 +668,32 @@ class DbManager {
       console.error("Failed to save sequences:", err);
       throw err;
     }
+  }
+  /**
+   * Records a single transition duration for a show run (execution id = runAt ISO string from show start).
+   * Upserts on (showId, runAt, transitionKey).
+   */
+  insertShowTiming(showId, runAt, transitionKey, durationSec) {
+    return this.db.prepare(`
+            INSERT INTO show_timing (showId, runAt, transitionKey, durationSec)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(showId, runAt, transitionKey) DO UPDATE SET
+                durationSec = excluded.durationSec,
+                createdAt = CURRENT_TIMESTAMP
+        `).run(showId, runAt, transitionKey, durationSec);
+  }
+  /**
+   * Lists stored transition timings for a show, optionally filtered by execution (runAt).
+   */
+  getShowTimings(showId, runAt) {
+    if (runAt !== void 0 && runAt !== "") {
+      return this.db.prepare(
+        "SELECT * FROM show_timing WHERE showId = ? AND runAt = ? ORDER BY transitionKey ASC"
+      ).all(showId, runAt);
+    }
+    return this.db.prepare(
+      "SELECT * FROM show_timing WHERE showId = ? ORDER BY runAt DESC, transitionKey ASC"
+    ).all(showId);
   }
   /**
    * Retrieves all registered remote clients (e.g. tablet controllers).
@@ -643,6 +818,7 @@ class DbManager {
       const placeholders = showIds.map(() => "?").join(",");
       this.db.prepare(`DELETE FROM sequences WHERE showId IN (${placeholders})`).run(...showIds);
       this.db.prepare(`DELETE FROM devices WHERE showId IN (${placeholders})`).run(...showIds);
+      this.db.prepare(`DELETE FROM show_timing WHERE showId IN (${placeholders})`).run(...showIds);
       this.db.prepare("DELETE FROM wled_segments WHERE id NOT IN (SELECT id FROM devices)").run();
       const result = this.db.prepare("DELETE FROM shows WHERE archived = 1 AND id != 'GLOBAL'").run();
       return { deletedCount: result.changes };
@@ -10005,9 +10181,8 @@ class DeviceScanner {
   }
 }
 const deviceScanner = new DeviceScanner();
-const AI_PARSE_TIMEOUT_MS = 5e3;
-async function parsePdfScript(filePath, apiKey) {
-  console.log(`[Backend] Attempting to parse PDF: ${filePath} (AI Mode: ${!!apiKey})`);
+async function parsePdfScript(filePath) {
+  console.log(`[Backend] Attempting to parse PDF: ${filePath}`);
   const dataBuffer = fs$1.readFileSync(filePath);
   try {
     const { createRequire: createRequire2 } = await import("node:module");
@@ -10026,65 +10201,11 @@ async function parsePdfScript(filePath, apiKey) {
     const data = await pdfParser(dataBuffer);
     const text = data.text;
     console.log(`[Backend] PDF text extracted, length: ${text?.length || 0}`);
-    if (apiKey && apiKey.trim().length > 10) {
-      try {
-        const aiPromise = parseScriptWithAi(text, apiKey);
-        const timeoutPromise = new Promise((_, reject) => {
-          const t = setTimeout(() => {
-            clearTimeout(t);
-            reject(new Error(`AI parse timeout after ${AI_PARSE_TIMEOUT_MS}ms`));
-          }, AI_PARSE_TIMEOUT_MS);
-        });
-        return await Promise.race([aiPromise, timeoutPromise]);
-      } catch (aiErr) {
-        console.error("[Backend] AI parsing failed, falling back to regex:", aiErr);
-        return parseTextScript(text);
-      }
-    }
     return parseTextScript(text);
   } catch (err) {
     console.error("[Backend] Error in parsePdfScript:", err);
     throw err;
   }
-}
-async function parseScriptWithAi(text, apiKey) {
-  const { GoogleGenerativeAI } = await import("./index-B6HwN2S4.js");
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const prompt = `
-    Je bent een expert in het analyseren van theater-scripts voor een show-control systeem.
-    Analyseer het volgende script en extraheer de structuur in JSON formaat.
-    
-    RICHTLIJNEN:
-    1. Identificeer Akten (bijv. "AKTE 1", "AKTE 2").
-    2. Identificeer Scenes binnen elke akte. Let op: er is vaak een hiërarchie tussen locaties (SCENE 1: ...) en muzieknummers/acties (1: Opening, 4a: Reprise).
-    3. Extraheer voor elke regel:
-       - title: De titel van de scene of het nummer (bijv. "SCENE 1: Park" of "4a: In mijn droom").
-       - description: Een korte sfeeromschrijving of regie-aanwijzing indien direct beschikbaar onder de titel.
-    4. Sla de inhoudsopgave (Table of Contents) over.
-    5. Geef ALLEEN de JSON terug, geen extra tekst.
-    
-    JSON SCHEMA:
-    {
-      "acts": [
-        {
-          "name": "AKTE EEN",
-          "scenes": [
-            { "id": 1, "title": "SCENE 1: PALEIS", "description": "1906. Een kleine slaapkamer." },
-            { "id": 2, "title": "2: Ooit In Winterse Dagen", "description": "Lied Keizerin-moeder" }
-          ]
-        }
-      ]
-    }
-
-    SCRIPT TEKST:
-    ${text.substring(0, 5e4)} 
-    `;
-  const result = await model.generateContent(prompt);
-  const response = await result.response;
-  const responseText = response.text();
-  const jsonStr = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
-  return JSON.parse(jsonStr);
 }
 function parseTextScript(text) {
   const lines = text.split("\n").map((l) => l.trim()).filter((l) => l.length > 0);
@@ -10328,7 +10449,7 @@ class DeviceStatusManager {
   }
 }
 const require$1 = createRequire(import.meta.url);
-const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net } = require$1("electron");
+const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net, globalShortcut } = require$1("electron");
 const http = require$1("http");
 const { Server } = require$1("socket.io");
 const fs = require$1("node:fs");
@@ -10353,12 +10474,13 @@ const server = http.createServer((req, res) => {
     return;
   }
   if (url.pathname === "/script") {
-    const filePath = url.searchParams.get("path");
+    const raw = url.searchParams.get("path");
+    const filePath = raw ? path.normalize(raw) : null;
     if (filePath && fs.existsSync(filePath)) {
       res.writeHead(200, { "Content-Type": "application/pdf", "Access-Control-Allow-Origin": "*" });
       fs.createReadStream(filePath).pipe(res);
     } else {
-      console.warn("[Main] /script not found:", filePath);
+      console.warn("[Main] /script not found:", filePath, "raw:", raw);
       res.writeHead(404);
       res.end("Not found");
     }
@@ -10401,7 +10523,8 @@ const fileServer = http.createServer((req, res) => {
     return;
   }
   if (url.pathname === "/script") {
-    const filePath = url.searchParams.get("path");
+    const raw = url.searchParams.get("path");
+    const filePath = raw ? path.normalize(raw) : null;
     if (filePath && fs.existsSync(filePath)) {
       res.writeHead(200, { "Content-Type": "application/pdf", "Access-Control-Allow-Origin": "*" });
       fs.createReadStream(filePath).pipe(res);
@@ -10718,8 +10841,41 @@ ipcMain.handle("db:save-logo", async (_e, { arrayBuffer }) => {
   fs.writeFileSync(logoPath, buffer);
   return `http://localhost:${FILE_PORT}/logo`;
 });
+let mainWindow = null;
+function moveHostWindowToDisplay(monitorIndex) {
+  const win = mainWindow;
+  if (!win || win.isDestroyed()) return;
+  const displays = screen.getAllDisplays();
+  if (!displays.length) return;
+  const idx = Math.max(0, Math.min(Math.floor(monitorIndex), displays.length - 1));
+  const d = displays[idx];
+  win.setBounds({
+    x: d.bounds.x,
+    y: d.bounds.y,
+    width: Math.max(400, d.bounds.width),
+    height: Math.max(300, d.bounds.height)
+  });
+  win.setFullScreen(true);
+  win.focus();
+}
+function applyControllerMonitorIndex(index) {
+  const idx = Math.max(0, Math.floor(index));
+  dbManager.updateAppSettings({ controllerMonitorIndex: idx });
+  moveHostWindowToDisplay(idx);
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("controller-monitor-changed", idx);
+  }
+}
 ipcMain.handle("db:get-app-settings", () => dbManager.getAppSettings());
-ipcMain.handle("db:update-app-settings", (_e, settings) => dbManager.updateAppSettings(settings));
+ipcMain.handle("db:update-app-settings", (_e, settings) => {
+  dbManager.updateAppSettings(settings);
+  if (typeof settings?.controllerMonitorIndex === "number") {
+    moveHostWindowToDisplay(settings.controllerMonitorIndex);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("controller-monitor-changed", settings.controllerMonitorIndex);
+    }
+  }
+});
 ipcMain.handle("db:get-shows", () => dbManager.getShows());
 ipcMain.handle("db:create-show", (_e, show) => dbManager.createShow(show));
 ipcMain.handle("db:update-show", (_e, { id, partial }) => dbManager.updateShow(id, partial));
@@ -10730,10 +10886,7 @@ ipcMain.handle("db:get-tables", () => dbManager.getTables());
 ipcMain.handle("db:get-table-data", (_e, tableName) => dbManager.getTableData(tableName));
 ipcMain.handle("db:update-row", (_e, { tableName, id, data }) => dbManager.updateRow(tableName, id, data));
 ipcMain.handle("db:delete-row", (_e, { tableName, id }) => dbManager.deleteRow(tableName, id));
-ipcMain.handle("db:parse-script", async (_e, filePath) => {
-  const settings = dbManager.getAppSettings();
-  return parsePdfScript(filePath, settings?.geminiApiKey);
-});
+ipcMain.handle("db:parse-script", async (_e, filePath) => parsePdfScript(filePath));
 ipcMain.handle("db:get-devices", (_e, showId) => {
   const devices = dbManager.getDevices(showId);
   console.log(`--- DB: get-devices for ${showId}, found ${devices.length} devices. IDs: ${devices.map((d) => d.id).join(", ")}`);
@@ -10742,6 +10895,8 @@ ipcMain.handle("db:get-devices", (_e, showId) => {
 ipcMain.handle("db:save-devices", (_e, { showId, devices }) => dbManager.saveDevices(showId, devices));
 ipcMain.handle("db:get-sequences", (_e, showId) => dbManager.getSequences(showId));
 ipcMain.handle("db:save-sequences", (_e, { showId, events }) => dbManager.saveSequences(showId, events));
+ipcMain.handle("db:insert-show-timing", (_e, payload) => dbManager.insertShowTiming(payload.showId, payload.runAt, payload.transitionKey, payload.durationSec));
+ipcMain.handle("db:get-show-timings", (_e, { showId, runAt }) => dbManager.getShowTimings(showId, runAt));
 ipcMain.handle("db:get-remote-clients", () => dbManager.getRemoteClients());
 ipcMain.handle("db:get-remote-client", (_e, id) => dbManager.getRemoteClient(id));
 ipcMain.handle("db:upsert-remote-client", (_e, client) => dbManager.upsertRemoteClient(client));
@@ -10848,10 +11003,8 @@ ipcMain.on("app-quit", () => {
   app.quit();
 });
 ipcMain.on("projection-error", (event, error) => {
-  const wins = BrowserWindow.getAllWindows();
-  const hostWin = wins.find((w) => w.title === "KLT LedShow Host");
-  if (hostWin) {
-    hostWin.webContents.send("flash-message", { type: "error", message: `Projection Error: ${error}` });
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("flash-message", { type: "error", message: `Projection Error: ${error}` });
   }
 });
 ipcMain.on("test-flash", (event) => {
@@ -10872,6 +11025,7 @@ ipcMain.handle("get-displays", () => {
 });
 const projectionWindows = /* @__PURE__ */ new Map();
 const lastMediaStates = /* @__PURE__ */ new Map();
+let maskEditSession = null;
 function ensureProjectionWindow(deviceId, monitorIndex) {
   if (projectionWindows.has(deviceId)) {
     const existing = projectionWindows.get(deviceId);
@@ -10942,16 +11096,42 @@ ipcMain.on("projection-ready", (event, rendererDeviceId) => {
     if (lastState) {
       event.sender.send(`media-${lastState.command}`, lastState.payload);
     }
-    const shows = dbManager.getShows();
-    for (const show of shows) {
-      const devices = dbManager.getDevices(show.id);
-      const device = devices.find((d) => d.id === deviceId);
-      if (device) {
-        event.sender.send("projection-config", device);
-        break;
-      }
+    const pm = lastState?.payload?.projectionMasks;
+    event.sender.send("projection-config", {
+      projectionMasks: Array.isArray(pm) ? pm : []
+    });
+    if (maskEditSession && maskEditSession.deviceId === deviceId) {
+      event.sender.send("projection-calibration-mode", { enabled: true });
     }
   }
+});
+ipcMain.handle("projection-start-mask-edit", (_e, payload) => {
+  const { showId, eventIndex, deviceId, monitorIndex, videoUrl, initialMasks } = payload;
+  maskEditSession = { showId, eventIndex, deviceId };
+  ensureProjectionWindow(deviceId, monitorIndex !== void 0 ? monitorIndex : 1);
+  const win = projectionWindows.get(deviceId);
+  if (!win || win.isDestroyed()) return false;
+  const playPayload = {
+    url: videoUrl,
+    loop: true,
+    volume: 0,
+    mute: true,
+    transitionTime: 0,
+    crossoverTime: 0,
+    projectionMasks: Array.isArray(initialMasks) ? initialMasks : [],
+    brightness: 100
+  };
+  lastMediaStates.set(deviceId, { command: "play", payload: { ...playPayload, startTime: Date.now() } });
+  try {
+    dbManager.updateDeviceMediaState(deviceId, lastMediaStates.get(deviceId));
+  } catch (err) {
+    console.error("Failed to persist media state:", err);
+  }
+  if (!win.webContents.isLoading()) {
+    win.webContents.send("media-play", playPayload);
+    win.webContents.send("projection-calibration-mode", { enabled: true });
+  }
+  return true;
 });
 ipcMain.on("media-ended", (_e, { deviceId, src: src2 }) => {
   console.log(`[Main] Media ended on device ${deviceId}: ${src2}`);
@@ -10979,19 +11159,13 @@ ipcMain.on("media-status-update", (_e, { deviceId, status }) => {
 });
 ipcMain.on("projection-update-masks", (_e, { deviceId, masks }) => {
   console.log(`[Main] Updating projection masks for device ${deviceId}`, masks);
-  const shows = dbManager.getShows();
-  for (const show of shows) {
-    const devices = dbManager.getDevices(show.id);
-    const device = devices.find((d) => d.id === deviceId);
-    if (device && (device.type === "local_monitor" || device.type === "remote_VideoWall")) {
-      device.projectionMasks = masks;
-      dbManager.saveDevices(show.id, devices);
-      const hostWin = BrowserWindow.getAllWindows().find((w) => w.title === "KLT LedShow Host");
-      if (hostWin) {
-        hostWin.webContents.send("projection-masks-updated", { deviceId, masks });
-      }
-      break;
-    }
+  const hostWin = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
+  if (maskEditSession && maskEditSession.deviceId === deviceId && hostWin) {
+    hostWin.webContents.send("projection-masks-saved-for-event", {
+      showId: maskEditSession.showId,
+      eventIndex: maskEditSession.eventIndex,
+      masks
+    });
   }
 });
 ipcMain.on("projection-set-calibration", (_e, { deviceId, enabled }) => {
@@ -11001,25 +11175,12 @@ ipcMain.on("projection-set-calibration", (_e, { deviceId, enabled }) => {
     win.webContents.send("projection-calibration-mode", { enabled });
   }
 });
-ipcMain.on("projection-test-image", (_e, { enabled, url }) => {
-  console.log(`[Main] Toggling projection test image: ${enabled} (${url})`);
-  for (const win of projectionWindows.values()) {
-    if (win && !win.isDestroyed()) {
-      win.webContents.send("projection-test-image", { enabled, url });
-    }
-  }
-});
-ipcMain.on("projection-test-video", (_e, { enabled, url, playing }) => {
-  console.log(`[Main] Toggling projection test video: ${enabled} (${url})`);
-  for (const win of projectionWindows.values()) {
-    if (win && !win.isDestroyed()) {
-      win.webContents.send("projection-test-video", { enabled, url, playing });
-    }
-  }
-});
 ipcMain.on("projection-finish-calibration", (_e, { deviceId }) => {
   console.log(`[Main] Finishing calibration for device ${deviceId}`);
-  const hostWin = BrowserWindow.getAllWindows().find((w) => w.title === "KLT LedShow Host");
+  if (maskEditSession && maskEditSession.deviceId === deviceId) {
+    maskEditSession = null;
+  }
+  const hostWin = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
   if (hostWin) {
     hostWin.webContents.send("projection-calibration-finished", { deviceId });
   }
@@ -11209,6 +11370,10 @@ function createWindow() {
     },
     title: "KLT LedShow Host"
   });
+  mainWindow = win;
+  win.on("closed", () => {
+    if (mainWindow === win) mainWindow = null;
+  });
   win.webContents.on("did-fail-load", (event, errorCode, errorDescription) => {
     console.error("Failed to load window:", errorCode, errorDescription);
     dialog.showErrorBox("Failed to load application", `Error: ${errorCode} - ${errorDescription}
@@ -11248,7 +11413,24 @@ if (app) {
       console.error("Failed to restore media states from DB:", err);
     }
     createWindow();
+    try {
+      const tryReg = (accelerator, index) => {
+        const ok = globalShortcut.register(accelerator, () => applyControllerMonitorIndex(index));
+        if (!ok) console.warn("[Main] Kon sneltoets niet registreren:", accelerator);
+      };
+      tryReg("CommandOrControl+Alt+1", 0);
+      tryReg("CommandOrControl+Alt+2", 1);
+      tryReg("CommandOrControl+Alt+3", 2);
+    } catch (e) {
+      console.error("[Main] globalShortcut registratie mislukt:", e);
+    }
     setTimeout(initializeProjectionWindows, 2e3);
+  });
+  app.on("will-quit", () => {
+    try {
+      globalShortcut.unregisterAll();
+    } catch (_) {
+    }
   });
   app.on("window-all-closed", () => {
     if (process.platform !== "darwin") app.quit();

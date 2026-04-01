@@ -41,8 +41,8 @@ import { DatabaseManager } from './components/DatabaseManager'
 import SimpleModal from './components/SimpleModal'
 import CameraStreamer from './components/CameraStreamer'
 import MediaPreflightModal from './components/MediaPreflightModal'
-import { StickyHub } from './components/StickyHub'
 import { networkService } from './services/network-service'
+import type { ShowEvent } from './types/show'
 
 import { cn } from './lib/utils'
 
@@ -68,7 +68,9 @@ export default function App() {
     setLocked,
     events,
     activeEventIndex,
+    stopButtonFlashRequest,
     setActiveEvent,
+    startShow,
     blinkingNextEvent,
     blinkingNextScene,
     blinkingNextAct,
@@ -398,9 +400,15 @@ export default function App() {
     if (!activeEvent) return { eventDuration: 0, eventRemaining: 0, isEventOverdue: false }
 
     const groupRows = events.filter(e => e.act === activeEvent.act && e.sceneId === activeEvent.sceneId && e.eventId === activeEvent.eventId)
-    const titleRowElement = groupRows.find(e => e.type?.toLowerCase() === 'title')
     const triggerRowElement = groupRows.find(e => e.type?.toLowerCase() === 'trigger')
-    const dur = (triggerRowElement?.effect?.toLowerCase() === 'timed' ? triggerRowElement.duration : 0) || titleRowElement?.duration || 0
+    const samples = triggerRowElement?.timingSamples
+    const avgFromSamples = samples?.length
+      ? Math.round(samples.reduce((a, b) => a + b, 0) / samples.length)
+      : 0
+    const dur =
+      (triggerRowElement?.effect?.toLowerCase() === 'timed' ? triggerRowElement.duration : 0) ||
+      avgFromSamples ||
+      0
 
     const elapsed = isPaused
       ? Math.round(((pauseStartTime || Date.now()) - (lastTransitionTime || Date.now())) / 1000)
@@ -417,6 +425,13 @@ export default function App() {
   // "Quiet" pulse when running, "Fast/Bright" pulse when overdue OR in last 5s
   const isFastBlinking = (isEventOverdue || (eventDuration > 0 && eventRemaining > 0 && eventRemaining <= 5)) && !isPaused
   const pulseClass = isFastBlinking ? "animate-fast-bright-pulse shadow-[0_0_15px_rgba(249,115,22,0.4)]" : "animate-pulse"
+
+  const nextNav = useMemo(() => {
+    if (navigationWarning === 'event' || blinkingNextEvent) return 'event' as const
+    if (navigationWarning === 'scene' || blinkingNextScene) return 'scene' as const
+    if (navigationWarning === 'act' || blinkingNextAct) return 'act' as const
+    return null
+  }, [navigationWarning, blinkingNextEvent, blinkingNextScene, blinkingNextAct])
 
   useEffect(() => {
     initializeShows()
@@ -463,12 +478,52 @@ export default function App() {
 
   useEffect(() => {
     const port = appSettings.serverPort || 3001
-    networkService.connect(`http://${window.location.hostname}:${port}`)
+    const host =
+      (appSettings.serverIp && appSettings.serverIp !== 'localhost')
+        ? appSettings.serverIp
+        : window.location.hostname
+
+    networkService.connect(`http://${host}:${port}`)
+
+    let prevConnected = false
     const checkConn = setInterval(() => {
-      setSocketConnected(true) // For now assume true if service lives
-    }, 2000)
+      const connected = !!networkService.getSocketId()
+      setSocketConnected(connected)
+      // If a remote workstation comes online (or reconnects), ask the hub for the latest state.
+      if (connected && !prevConnected && !isHost) {
+        networkService.sendCommand({ type: 'REQUEST_STATE' })
+      }
+      prevConnected = connected
+    }, 1000)
     return () => clearInterval(checkConn)
-  }, [appSettings.serverPort])
+  }, [appSettings.serverPort, appSettings.serverIp, isHost])
+
+  // Zet lokale webcam aan zodra de hub bereikbaar is (host) of na autorisatie (remote werkstation)
+  useEffect(() => {
+    if (!navigator.mediaDevices?.getUserMedia) return
+    if (isHost) {
+      if (!socketConnected) return
+      setCameraActive(true)
+      return
+    }
+    if (!isAuthorized) return
+    setCameraActive(true)
+  }, [isHost, socketConnected, isAuthorized, setCameraActive])
+
+  // Sync store wanneer main process het Hub-venster naar een ander scherm verplaatst (Ctrl+Alt+1..3)
+  useEffect(() => {
+    if (!isHost || !(window as any).require) return
+    const { ipcRenderer } = (window as any).require('electron')
+    const onMonitor = (_: unknown, idx: number) => {
+      useSequencerStore.setState(s => ({
+        appSettings: { ...s.appSettings, controllerMonitorIndex: idx }
+      }))
+    }
+    ipcRenderer.on('controller-monitor-changed', onMonitor)
+    return () => {
+      ipcRenderer.removeListener('controller-monitor-changed', onMonitor)
+    }
+  }, [isHost])
 
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -588,8 +643,19 @@ export default function App() {
         addToast(message, type)
       }
       ipcRenderer.on('flash-message', handleFlash)
+
+      const onMasksForEvent = (_: unknown, payload: { showId: string; eventIndex: number; masks: unknown[] }) => {
+        const { activeShow, events, updateEvent } = useSequencerStore.getState()
+        if (!activeShow || activeShow.id !== payload.showId) return
+        const ev = events[payload.eventIndex]
+        if (!ev) return
+        updateEvent(payload.eventIndex, { projectionMasks: payload.masks as ShowEvent['projectionMasks'] })
+      }
+      ipcRenderer.on('projection-masks-saved-for-event', onMasksForEvent)
+
       return () => {
         ipcRenderer.removeListener('flash-message', handleFlash)
+        ipcRenderer.removeListener('projection-masks-saved-for-event', onMasksForEvent)
       }
     }
   }, [addToast])
@@ -798,11 +864,11 @@ export default function App() {
         <div className="flex items-center gap-6 flex-1">
           <div className="flex items-center gap-4 group">
             {appSettings.defaultLogo ? (
-              <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-300">
+              <div className="w-11 h-11 rounded-xl overflow-hidden border border-white/10 shadow-lg group-hover:scale-105 transition-transform duration-300 bg-black/40 flex items-center justify-center shrink-0">
                 <img
                   src={appSettings.defaultLogo}
                   alt="App Logo"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain p-1"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                 />
               </div>
@@ -1207,8 +1273,6 @@ export default function App() {
               </div>
             </div>
 
-            {isLocked && <StickyHub />}
-
             <div className="flex-1 overflow-auto p-2 custom-scrollbar">
               <SequenceGrid />
             </div>
@@ -1225,7 +1289,10 @@ export default function App() {
             <div className="absolute inset-y-0 -left-2 -right-2" />
           </div>
 
-          <section className="sidebar-resizable flex flex-col bg-black/40 shrink-0">
+          <section
+            className="sidebar-resizable flex flex-col bg-black/40 shrink-0 min-w-[300px] max-w-[min(100%,96vw)]"
+            style={{ width: activeShow?.sidebarWidth ?? 500 }}
+          >
             <div className="flex flex-col flex-1">
               {/* Camera Viewing Boxes */}
               {selectedCameraClients.length > 0 && (
@@ -1285,12 +1352,10 @@ export default function App() {
                 </>
               )}
 
-              <div className="p-3 border-b border-white/5 flex items-center justify-between bg-black/20">
-                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-2">Script</span>
-              </div>
-
               <div className="flex-1 p-0 overflow-hidden relative">
-                <PdfViewer />
+                <PdfViewer
+                  webcamStripVisible={selectedCameraClients.length > 0 && isWebcamExpanded}
+                />
               </div>
             </div>
           </section>
@@ -1679,15 +1744,15 @@ export default function App() {
                   cancelLabel: 'Nee, alleen starten',
                   onConfirm: () => {
                     toggleTimeTracking();
-                    setActiveEvent(0);
+                    startShow();
                   },
                   onCancel: () => {
                     // Start show WITHOUT tracking timings
-                    setActiveEvent(0);
+                    startShow();
                   }
                 });
               } else {
-                setActiveEvent(0);
+                startShow();
               }
             }}
             disabled={!isLocked || !activeShow}
@@ -1728,53 +1793,48 @@ export default function App() {
             </button>
           )}
 
-          {activeShow && isLocked && activeEventIndex >= 0 && (
-            <div className="flex gap-3">
+          {activeShow && isLocked && activeEventIndex >= 0 && nextNav && (
+            <div className="flex">
               <button
-                onClick={() => nextAct()}
+                onClick={() => {
+                  if (nextNav === 'event') return nextEvent()
+                  if (nextNav === 'scene') return nextScene()
+                  return nextAct()
+                }}
                 disabled={!isLocked || !activeShow}
                 className={cn(
-                  "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
-                  blinkingNextAct && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
-                  navigationWarning === 'act' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
-                  !isLocked && "opacity-20"
+                  "h-14 min-w-[260px] w-[260px] px-4 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all whitespace-nowrap",
+                  // Always show as the active blinking button (green) or override warning (orange)
+                  (nextNav === 'event' && blinkingNextEvent) && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
+                  (nextNav === 'scene' && blinkingNextScene) && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
+                  (nextNav === 'act' && blinkingNextAct) && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
+                  (nextNav === 'event' && navigationWarning === 'event') && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
+                  (nextNav === 'scene' && navigationWarning === 'scene') && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
+                  (nextNav === 'act' && navigationWarning === 'act') && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
                 )}
               >
-                <FastForward className={cn("w-5 h-5", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-orange-400")} />
-                <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-muted-foreground")}>
-                  {navigationWarning === 'act' ? 'Override?' : 'Next Act'}
-                </span>
-              </button>
-
-              <button
-                onClick={() => nextScene()}
-                disabled={!isLocked || !activeShow}
-                className={cn(
-                  "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
-                  blinkingNextScene && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
-                  navigationWarning === 'scene' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
-                  !isLocked && "opacity-20"
+                {nextNav === 'act' ? (
+                  <>
+                    <FastForward className={cn("w-5 h-5", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-orange-400")} />
+                    <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-muted-foreground")}>
+                      {navigationWarning === 'act' ? 'Override?' : 'Next Act'}
+                    </span>
+                  </>
+                ) : nextNav === 'scene' ? (
+                  <>
+                    <SkipForward className={cn("w-5 h-5", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-blue-400")} />
+                    <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-muted-foreground")}>
+                      {navigationWarning === 'scene' ? 'Override?' : 'Next Scene'}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <FileText className={cn("w-5 h-5", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-primary")} />
+                    <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-muted-foreground")}>
+                      {navigationWarning === 'event' ? 'Override?' : 'Next Event'}
+                    </span>
+                  </>
                 )}
-              >
-                <SkipForward className={cn("w-5 h-5", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-blue-400")} />
-                <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-muted-foreground")}>
-                  {navigationWarning === 'scene' ? 'Override?' : 'Next Scene'}
-                </span>
-              </button>
-              <button
-                onClick={() => nextEvent()}
-                disabled={!isLocked || !activeShow}
-                className={cn(
-                  "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
-                  blinkingNextEvent && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
-                  navigationWarning === 'event' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
-                  !isLocked && "opacity-20"
-                )}
-              >
-                <FileText className={cn("w-5 h-5", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-primary")} />
-                <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-muted-foreground")}>
-                  {navigationWarning === 'event' ? 'Override?' : 'Next Event'}
-                </span>
               </button>
             </div>
           )}
@@ -1785,14 +1845,15 @@ export default function App() {
             </div>
           )}
 
-          {activeShow && isLocked && activeEventIndex >= 0 && (
+          {activeShow && isLocked && activeEventIndex >= 0 && isHost && (
             <button
               onClick={() => { setActiveEvent(-1) }}
               disabled={!activeShow || !isLocked}
               title="Stop/Reset Show"
               className={cn(
                 "w-16 h-16 rounded-full glass border-red-500/20 flex items-center justify-center hover:bg-red-500/20 transition-all text-red-500 disabled:opacity-20",
-                !activeShow && "cursor-not-allowed"
+                !activeShow && "cursor-not-allowed",
+                stopButtonFlashRequest && "animate-bright-pulse shadow-[0_0_28px_rgba(239,68,68,0.75)] border-red-400/80 ring-2 ring-red-500/50 scale-105"
               )}
             >
               <StopCircle className="w-6 h-6" />
@@ -2038,6 +2099,22 @@ export default function App() {
       {
         appLocked && (
           <div className="fixed inset-0 z-[20000] bg-black flex flex-col items-center justify-center p-8 animate-in backdrop-blur-3xl duration-700">
+            {isHost && (
+              <button
+                type="button"
+                title="Noodstop: lock geforceerd verwijderen"
+                className="fixed bottom-5 right-5 z-[20001] p-2 bg-black text-zinc-800 hover:text-zinc-700 transition-colors opacity-50 hover:opacity-80"
+                onClick={() => {
+                  console.log('--- EMERGENCY UNLOCK TRIGGERED ---');
+                  console.log('Current Stored PIN:', appSettings.accessPin);
+                  if (confirm(`Noodstop: Lock geforceerd verwijderen?\n(Huidige PIN is: '${appSettings.accessPin}')`)) {
+                    setAppLocked(false);
+                  }
+                }}
+              >
+                <Lock className="w-2.5 h-2.5" strokeWidth={1.5} aria-hidden />
+              </button>
+            )}
             <div className="flex flex-col items-center gap-12 max-w-sm w-full">
               <div className="relative">
                 <div className="w-32 h-32 rounded-[2.5rem] bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500">
@@ -2097,23 +2174,6 @@ export default function App() {
                 />
                 <div className="flex justify-between px-2 items-center">
                   <span className="text-[10px] font-black uppercase tracking-widest text-white/20">Station: {clientFriendlyName || (isHost ? 'Host Controller' : 'Unknown')}</span>
-                  {isHost && (
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-orange-500/40">Host Authentication</span>
-                      <button
-                        className="text-[9px] text-red-500/50 hover:text-red-500 underline decoration-red-500/30 font-bold uppercase tracking-widest cursor-pointer"
-                        onClick={() => {
-                          console.log('--- EMERGENCY UNLOCK TRIGGERED ---');
-                          console.log('Current Stored PIN:', appSettings.accessPin);
-                          if (confirm(`Noodstop: Lock geforceerd verwijderen?\n(Huidige PIN is: '${appSettings.accessPin}')`)) {
-                            setAppLocked(false);
-                          }
-                        }}
-                      >
-                        NOOD-UNLOCK
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

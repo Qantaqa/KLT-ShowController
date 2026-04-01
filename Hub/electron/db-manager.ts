@@ -22,6 +22,7 @@ class DbManager {
 
         // Create a new database connection
         this.db = new Database(dbPath);
+        this.db.pragma('foreign_keys = ON');
 
         // Initialize tables and run migrations
         this.init();
@@ -57,6 +58,13 @@ class DbManager {
             this.db.exec('ALTER TABLE app_settings ADD COLUMN geminiApiKey TEXT');
         } catch (e) {
             // Safely ignore if the column is already present
+        }
+
+        // Migration: Which display the Hub main window uses (0 = first in screen.getAllDisplays())
+        try {
+            this.db.exec('ALTER TABLE app_settings ADD COLUMN controllerMonitorIndex INTEGER DEFAULT 0');
+        } catch (e) {
+            /* ignore if exists */
         }
 
         // Migration: Ensure 'shows' table has the 'archived' column
@@ -204,6 +212,14 @@ class DbManager {
             this.db.exec('ALTER TABLE sequences ADD COLUMN stopEventId INTEGER');
         }
 
+        if (!columns.includes('projectionMasks')) {
+            this.db.exec('ALTER TABLE sequences ADD COLUMN projectionMasks TEXT');
+        }
+
+        if (!columns.includes('actionId')) {
+            this.db.exec('ALTER TABLE sequences ADD COLUMN actionId INTEGER DEFAULT 0');
+        }
+
         // Create the clipboard table for copy/paste functionality between shows/events
         this.db.exec(`
             CREATE TABLE IF NOT EXISTS clipboard (
@@ -267,6 +283,132 @@ class DbManager {
                 insert.run(b.id, b.key, b.ctrl, b.shift, b.alt, b.action, b.label);
             }
         }
+
+        // Per-run transition durations (one row per show, execution start time, and logical transition key)
+        this.db.exec(`
+            CREATE TABLE IF NOT EXISTS show_timing (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                showId TEXT NOT NULL,
+                runAt TEXT NOT NULL,
+                transitionKey TEXT NOT NULL,
+                durationSec INTEGER NOT NULL,
+                createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (showId) REFERENCES shows (id) ON DELETE CASCADE,
+                UNIQUE (showId, runAt, transitionKey)
+            )
+        `);
+
+        this.db.exec(`
+            CREATE TABLE IF NOT EXISTS show_videomaskers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                showId TEXT NOT NULL,
+                act TEXT NOT NULL DEFAULT '',
+                sceneId INTEGER NOT NULL DEFAULT 0,
+                eventId INTEGER NOT NULL DEFAULT 0,
+                actionId INTEGER NOT NULL DEFAULT 0,
+                eventType TEXT NOT NULL DEFAULT 'media',
+                masksJson TEXT NOT NULL,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (showId) REFERENCES shows (id) ON DELETE CASCADE,
+                UNIQUE (showId, act, sceneId, eventId, actionId, eventType)
+            )
+        `);
+
+        this.migrateLegacySequenceProjectionMasksToVideoMaskers();
+    }
+
+    /**
+     * One-time migration: copy masks from sequences.projectionMasks into show_videomaskers.
+     */
+    private migrateLegacySequenceProjectionMasksToVideoMaskers() {
+        try {
+            const cols = this.db.pragma('table_info(sequences)').map((c: any) => c.name);
+            if (!cols.includes('projectionMasks')) return;
+            const rows = this.db.prepare(
+                'SELECT showId, act, sceneId, eventId, actionId, type, projectionMasks FROM sequences WHERE projectionMasks IS NOT NULL AND projectionMasks != \'\''
+            ).all() as any[];
+            const insert = this.db.prepare(`
+                INSERT OR IGNORE INTO show_videomaskers (showId, act, sceneId, eventId, actionId, eventType, masksJson, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            `);
+            for (const r of rows) {
+                let parsed: any;
+                try {
+                    parsed = JSON.parse(r.projectionMasks);
+                } catch {
+                    continue;
+                }
+                if (!Array.isArray(parsed) || parsed.length === 0) continue;
+                const t = String(r.type || 'media').toLowerCase();
+                insert.run(
+                    r.showId,
+                    r.act ?? '',
+                    r.sceneId ?? 0,
+                    r.eventId ?? 0,
+                    r.actionId ?? 0,
+                    t,
+                    JSON.stringify(parsed)
+                );
+            }
+        } catch (e) {
+            console.error('[DB] migrateLegacySequenceProjectionMasksToVideoMaskers:', e);
+        }
+    }
+
+    /** Stable key for a sequence row's video mask (media cues). */
+    static videoMaskKey(e: { act?: string; sceneId?: number; eventId?: number; actionId?: number; type?: string }) {
+        return `${e.act ?? ''}|${e.sceneId ?? ''}|${e.eventId ?? ''}|${e.actionId ?? 0}|${String(e.type || '').toLowerCase()}`;
+    }
+
+    /**
+     * Returns a map of videoMaskKey -> parsed ProjectionMask[] for one show.
+     */
+    getVideoMasksMap(showId: string): Map<string, any[]> {
+        const map = new Map<string, any[]>();
+        const rows = this.db.prepare(
+            'SELECT act, sceneId, eventId, actionId, eventType, masksJson FROM show_videomaskers WHERE showId = ?'
+        ).all(showId) as any[];
+        for (const r of rows) {
+            const key = DbManager.videoMaskKey({
+                act: r.act,
+                sceneId: r.sceneId,
+                eventId: r.eventId,
+                actionId: r.actionId,
+                type: r.eventType
+            });
+            try {
+                const parsed = JSON.parse(r.masksJson);
+                if (Array.isArray(parsed)) map.set(key, parsed);
+            } catch { /* skip */ }
+        }
+        return map;
+    }
+
+    /**
+     * Replaces all videomask rows for a show from the in-memory events array.
+     */
+    replaceShowVideoMasks(showId: string, events: any[]) {
+        const del = this.db.prepare('DELETE FROM show_videomaskers WHERE showId = ?');
+        const ins = this.db.prepare(`
+            INSERT INTO show_videomaskers (showId, act, sceneId, eventId, actionId, eventType, masksJson, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        `);
+        del.run(showId);
+        for (const e of events) {
+            const t = String(e.type || '').toLowerCase();
+            if (t !== 'media') continue;
+            const masks = e.projectionMasks;
+            if (!Array.isArray(masks) || masks.length === 0) continue;
+            ins.run(
+                showId,
+                e.act ?? '',
+                e.sceneId ?? 0,
+                e.eventId ?? 0,
+                e.actionId ?? 0,
+                t,
+                JSON.stringify(masks)
+            );
+        }
     }
 
     /**
@@ -296,11 +438,15 @@ class DbManager {
         });
 
         // Persist the merged settings back to the database
+        const monitorIdx = typeof next.controllerMonitorIndex === 'number' && Number.isFinite(next.controllerMonitorIndex)
+            ? Math.max(0, Math.floor(next.controllerMonitorIndex))
+            : (current?.controllerMonitorIndex ?? 0)
+
         return this.db.prepare(`
             UPDATE app_settings 
-            SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?, geminiApiKey = ?
+            SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?, geminiApiKey = ?, controllerMonitorIndex = ?
             WHERE id = 1
-        `).run(next.defaultLogo, next.accessPin, next.serverPort, next.testVideoPath || '', next.geminiApiKey || '');
+        `).run(next.defaultLogo, next.accessPin, next.serverPort, next.testVideoPath || '', next.geminiApiKey || '', monitorIdx);
     }
 
     /**
@@ -576,11 +722,27 @@ class DbManager {
      * @returns Array of sequence event objects.
      */
     getSequences(showId: string) {
-        return this.db.prepare('SELECT * FROM sequences WHERE showId = ? ORDER BY id ASC').all(showId).map((s: any) => ({
-            ...s,
-            // Convert integer (0/1) from SQLite to boolean for frontend consistency
-            sound: !!s.sound
-        }));
+        const maskMap = this.getVideoMasksMap(showId);
+        return this.db.prepare('SELECT * FROM sequences WHERE showId = ? ORDER BY id ASC').all(showId).map((s: any) => {
+            let legacyMasks: any[] | undefined;
+            if (s.projectionMasks && typeof s.projectionMasks === 'string') {
+                try {
+                    const parsed = JSON.parse(s.projectionMasks);
+                    legacyMasks = Array.isArray(parsed) ? parsed : undefined;
+                } catch {
+                    legacyMasks = undefined;
+                }
+            }
+            const { projectionMasks: _pm, ...rest } = s;
+            const key = DbManager.videoMaskKey(s);
+            const fromTable = maskMap.get(key);
+            const projectionMasks = fromTable !== undefined ? fromTable : legacyMasks;
+            return {
+                ...rest,
+                sound: !!s.sound,
+                projectionMasks
+            };
+        });
     }
 
     /**
@@ -593,8 +755,8 @@ class DbManager {
         const deleteStmt = this.db.prepare('DELETE FROM sequences WHERE showId = ?');
         const insertStmt = this.db.prepare(`
             INSERT INTO sequences 
-            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId, stopAct, stopSceneId, stopEventId)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId, stopAct, stopSceneId, stopEventId, actionId)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
 
         // Perform the save as an atomic transaction to prevent partial show data
@@ -618,9 +780,12 @@ class DbManager {
                     // Stop marker (optional)
                     e.stopAct || null,
                     e.stopSceneId !== undefined ? e.stopSceneId : null,
-                    e.stopEventId !== undefined ? e.stopEventId : null
+                    e.stopEventId !== undefined ? e.stopEventId : null,
+                    e.actionId !== undefined && e.actionId !== null ? e.actionId : 0
                 );
             }
+
+            this.replaceShowVideoMasks(showId, events);
         });
 
         try {
@@ -630,6 +795,34 @@ class DbManager {
             console.error('Failed to save sequences:', err);
             throw err;
         }
+    }
+
+    /**
+     * Records a single transition duration for a show run (execution id = runAt ISO string from show start).
+     * Upserts on (showId, runAt, transitionKey).
+     */
+    insertShowTiming(showId: string, runAt: string, transitionKey: string, durationSec: number) {
+        return this.db.prepare(`
+            INSERT INTO show_timing (showId, runAt, transitionKey, durationSec)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(showId, runAt, transitionKey) DO UPDATE SET
+                durationSec = excluded.durationSec,
+                createdAt = CURRENT_TIMESTAMP
+        `).run(showId, runAt, transitionKey, durationSec);
+    }
+
+    /**
+     * Lists stored transition timings for a show, optionally filtered by execution (runAt).
+     */
+    getShowTimings(showId: string, runAt?: string) {
+        if (runAt !== undefined && runAt !== '') {
+            return this.db.prepare(
+                'SELECT * FROM show_timing WHERE showId = ? AND runAt = ? ORDER BY transitionKey ASC'
+            ).all(showId, runAt);
+        }
+        return this.db.prepare(
+            'SELECT * FROM show_timing WHERE showId = ? ORDER BY runAt DESC, transitionKey ASC'
+        ).all(showId);
     }
 
     /**
@@ -778,6 +971,7 @@ class DbManager {
             // Explicitly delete associated data (Sequences use ON DELETE CASCADE, but Devices might not)
             this.db.prepare(`DELETE FROM sequences WHERE showId IN (${placeholders})`).run(...showIds);
             this.db.prepare(`DELETE FROM devices WHERE showId IN (${placeholders})`).run(...showIds);
+            this.db.prepare(`DELETE FROM show_timing WHERE showId IN (${placeholders})`).run(...showIds);
 
             // Cleanup orphaned WLED segments (segments whose device is no longer in the devices table)
             this.db.prepare("DELETE FROM wled_segments WHERE id NOT IN (SELECT id FROM devices)").run();
