@@ -104,7 +104,7 @@ export const createSequenceSlice: StateCreator<
             networkService.sendCommand({ type: 'REMOTE_CONTROL', action: 'setActiveEvent', index })
             return
         }
-        const { events, activeEventIndex, actualStartTime, isPaused, isTimeTracking, lastTransitionTime, isLocked, freezeRuntimeCollapsedGroups, saveCurrentShow, autoFollowScript, setCurrentScriptPage, updateBlinkRecommendations, broadcastState } = get()
+        const { events, activeEventIndex, actualStartTime, isPaused, isTimeTracking, lastTransitionTime, isLocked, freezeRuntimeCollapsedGroups, stopMediaAt, saveCurrentShow, autoFollowScript, setCurrentScriptPage, updateBlinkRecommendations, broadcastState } = get()
         if (index === -1) {
             set({
                 activeEventIndex: -1,
@@ -150,9 +150,17 @@ export const createSequenceSlice: StateCreator<
             lastTransitionTime: newLastTransitionTime
         }
 
-        // --- Auto-trigger Logic ---
-        // When a new event is started (group change), automatically trigger all media and light blocks in that event.
+        // --- Auto-stop / Auto-trigger Logic (Show mode only) ---
+        // Important: this only runs on the host (Electron) while locked (Show mode),
+        // and only when we ENTER a *new* event group (act/sceneId/eventId changes).
+        //
+        // Stop logic:
+        // - A media/light row can declare a stop marker via stopAct/stopSceneId/stopEventId (set in the grid UI).
+        // - When we enter that stop event group, `stopMediaAt(...)` fades out and stops playback on the target device(s).
         if (isHost && isLocked && isNewEventGroup) {
+            // Stop media whose stop marker matches this group
+            stopMediaAt(currentEvent.act, currentEvent.sceneId ?? 0, currentEvent.eventId ?? 0)
+
             newEvents.forEach((e, i) => {
                 if (e.act === currentEvent.act && e.sceneId === currentEvent.sceneId && e.eventId === currentEvent.eventId) {
                     const type = e.type?.toLowerCase()
@@ -652,21 +660,108 @@ export const createSequenceSlice: StateCreator<
     },
 
     moveEvent: (index, direction) => {
-        const { events, setEvents, reindexEvents, saveCurrentShow } = get()
-        if (direction === 'up' && index > 0) {
-            const newEvents = [...events]
-            const [moved] = newEvents.splice(index, 1)
-            newEvents.splice(index - 1, 0, moved)
+        const { events, setEvents, reindexEvents, saveCurrentShow, activeEventIndex, selectedEventIndex } = get()
+        if (index < 0 || index >= events.length) return
+
+        const key = events[index]
+        const act = key.act
+        const sceneId = key.sceneId
+        const eventId = key.eventId
+        if (!act || sceneId === undefined || eventId === undefined) return
+
+        const isSameEventGroup = (e: ShowEvent | undefined) =>
+            !!e && e.act === act && e.sceneId === sceneId && e.eventId === eventId
+
+        // Find contiguous block for the event group at index
+        let start = index
+        while (start > 0 && isSameEventGroup(events[start - 1])) start--
+        let end = index
+        while (end < events.length - 1 && isSameEventGroup(events[end + 1])) end++
+
+        const currentBlock = events.slice(start, end + 1)
+
+        if (direction === 'up') {
+            const prevIdx = start - 1
+            if (prevIdx < 0) return
+            const prev = events[prevIdx]
+            // Only allow moving within the same scene
+            if (prev.act !== act || prev.sceneId !== sceneId) return
+
+            const prevEventId = prev.eventId
+            if (prevEventId === undefined) return
+            const isSamePrevGroup = (e: ShowEvent | undefined) =>
+                !!e && e.act === act && e.sceneId === sceneId && e.eventId === prevEventId
+
+            let prevStart = prevIdx
+            while (prevStart > 0 && isSamePrevGroup(events[prevStart - 1])) prevStart--
+            const prevBlock = events.slice(prevStart, start)
+
+            const newEvents = [
+                ...events.slice(0, prevStart),
+                ...currentBlock,
+                ...prevBlock,
+                ...events.slice(end + 1)
+            ]
+
+            const currentNewStart = prevStart
+            const prevNewStart = prevStart + currentBlock.length
+
+            const remap = (i: number) => {
+                if (i >= start && i <= end) return currentNewStart + (i - start)
+                if (i >= prevStart && i <= start - 1) return prevNewStart + (i - prevStart)
+                return i
+            }
+
             setEvents(newEvents)
+            set({
+                activeEventIndex: activeEventIndex >= 0 ? remap(activeEventIndex) : activeEventIndex,
+                selectedEventIndex: selectedEventIndex >= 0 ? remap(selectedEventIndex) : selectedEventIndex,
+            })
             reindexEvents()
             saveCurrentShow()
-        } else if (direction === 'down' && index < events.length - 1) {
-            const newEvents = [...events]
-            const [moved] = newEvents.splice(index, 1)
-            newEvents.splice(index + 1, 0, moved)
+            return
+        }
+
+        if (direction === 'down') {
+            const nextIdx = end + 1
+            if (nextIdx >= events.length) return
+            const next = events[nextIdx]
+            // Only allow moving within the same scene
+            if (next.act !== act || next.sceneId !== sceneId) return
+
+            const nextEventId = next.eventId
+            if (nextEventId === undefined) return
+            const isSameNextGroup = (e: ShowEvent | undefined) =>
+                !!e && e.act === act && e.sceneId === sceneId && e.eventId === nextEventId
+
+            let nextEnd = nextIdx
+            while (nextEnd < events.length - 1 && isSameNextGroup(events[nextEnd + 1])) nextEnd++
+            const nextBlock = events.slice(nextIdx, nextEnd + 1)
+
+            const newEvents = [
+                ...events.slice(0, start),
+                ...nextBlock,
+                ...currentBlock,
+                ...events.slice(nextEnd + 1)
+            ]
+
+            const nextNewStart = start
+            const currentNewStart = start + nextBlock.length
+
+            const remap = (i: number) => {
+                if (i >= start && i <= end) return currentNewStart + (i - start)
+                if (i >= nextIdx && i <= nextEnd) return nextNewStart + (i - nextIdx)
+                return i
+            }
+
             setEvents(newEvents)
+            set({
+                activeEventIndex: activeEventIndex >= 0 ? remap(activeEventIndex) : activeEventIndex,
+                selectedEventIndex: selectedEventIndex >= 0 ? remap(selectedEventIndex) : selectedEventIndex,
+            })
             reindexEvents()
             saveCurrentShow()
+            return
         }
     },
 

@@ -24,12 +24,12 @@ import {
   Clock,
   FileText,
   Cloud,
+  FastForward,
   Maximize,
   Minimize,
   Layers,
   Download,
-  Radar,
-  Hash
+  Radar
 } from 'lucide-react'
 import { useSequencerStore } from './store/useSequencerStore'
 import SequenceGrid from './components/SequenceGrid'
@@ -41,6 +41,7 @@ import { DatabaseManager } from './components/DatabaseManager'
 import SimpleModal from './components/SimpleModal'
 import CameraStreamer from './components/CameraStreamer'
 import MediaPreflightModal from './components/MediaPreflightModal'
+import { StickyHub } from './components/StickyHub'
 import { networkService } from './services/network-service'
 
 import { cn } from './lib/utils'
@@ -77,6 +78,8 @@ export default function App() {
     nextAct,
     activeShow,
     availableShows,
+    showsLoading,
+    showsLoadError,
     appSettings,
     updateActiveShowSidebarWidth,
     archiveShow,
@@ -217,6 +220,7 @@ export default function App() {
   const [foundAgent, setFoundAgent] = useState<any>(null)
   const [isWizardScanning, setIsWizardScanning] = useState(false)
   const [showPreflight, setShowPreflight] = useState(false)
+  const [showStartupShowSelect, setShowStartupShowSelect] = useState(false)
 
   // Clear PIN input when switching between auth screens
   useEffect(() => {
@@ -418,6 +422,45 @@ export default function App() {
     initializeShows()
   }, [])
 
+  // Host-only startup prompt: if no active show after loading, open the selector.
+  useEffect(() => {
+    if (!isHost) return
+    if (showsLoading) return
+    if (activeShow) {
+      setShowStartupShowSelect(false)
+      return
+    }
+    // Only prompt when we have finished a load attempt (success or error).
+    setShowStartupShowSelect(true)
+  }, [isHost, showsLoading, activeShow?.id])
+
+  // Host-only hotkey: Ctrl+F5 reloads show list (and gives feedback)
+  useEffect(() => {
+    if (!isHost) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'F5') {
+        e.preventDefault()
+        initializeShows().then(() => {
+          addToast('Showlijst herladen', 'info')
+        }).catch(() => {
+          // initializeShows handles toast/error state itself; keep this silent
+        })
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isHost, initializeShows, addToast])
+
+  // Open Project Settings from child components (edit-mode only)
+  useEffect(() => {
+    const handler = () => {
+      if (isLocked) return
+      setIsSettingsOpen(true)
+    }
+    window.addEventListener('hub:open-project-settings' as any, handler as any)
+    return () => window.removeEventListener('hub:open-project-settings' as any, handler as any)
+  }, [isLocked])
+
   useEffect(() => {
     const port = appSettings.serverPort || 3001
     networkService.connect(`http://${window.location.hostname}:${port}`)
@@ -617,6 +660,119 @@ export default function App() {
         />
       )}
 
+      {/* Host-only startup show selector (when no active show is loaded) */}
+      {isHost && showStartupShowSelect && (
+        <div className="fixed inset-0 z-[9998] bg-black/70 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="w-full max-w-2xl rounded-2xl border border-white/15 bg-[#0a0a0a] shadow-[0_30px_80px_rgba(0,0,0,0.6)] overflow-hidden">
+            <div className="px-6 py-4 flex items-center justify-between border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-400/20 flex items-center justify-center">
+                  <Layers className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-white">Kies een show</div>
+                  <div className="text-[11px] text-white/50">
+                    {showsLoading ? 'Shows laden…' : showsLoadError ? 'Kon shows niet laden' : 'Selecteer een show om te starten'}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                className="p-2 rounded-lg hover:bg-white/10 transition-colors text-white/70 hover:text-white"
+                title="Sluiten"
+                onClick={() => setShowStartupShowSelect(false)}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {showsLoadError && (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-white">
+                  <div className="text-xs font-bold mb-1">Fout</div>
+                  <div className="text-[11px] text-white/70 font-mono break-words">{showsLoadError}</div>
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className={cn(
+                    "px-3 py-2 rounded-xl text-[11px] font-bold border transition-colors",
+                    showsLoading
+                      ? "bg-white/5 border-white/10 text-white/40 cursor-not-allowed"
+                      : "bg-white/5 hover:bg-white/10 border-white/10 text-white"
+                  )}
+                  disabled={showsLoading}
+                  onClick={async () => { await initializeShows() }}
+                  title="Herlaad de showlijst"
+                >
+                  Herlaad shows
+                </button>
+
+                <button
+                  className={cn(
+                    "px-3 py-2 rounded-xl text-[11px] font-bold border transition-colors",
+                    showsLoading
+                      ? "bg-blue-500/10 border-blue-400/10 text-blue-200/40 cursor-not-allowed"
+                      : "bg-blue-500/10 hover:bg-blue-500/15 border-blue-400/20 text-blue-200"
+                  )}
+                  disabled={showsLoading}
+                  onClick={() => {
+                    openModal({
+                      title: 'Nieuwe show',
+                      message: 'Voer een naam in voor de nieuwe show.',
+                      type: 'prompt',
+                      defaultValue: 'Mijn LedShow',
+                      onConfirm: (name: string) => {
+                        if (name) createNewShow(name)
+                      }
+                    })
+                  }}
+                  title="Maak een nieuwe show"
+                >
+                  Nieuwe show
+                </button>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-black/30 overflow-hidden">
+                <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                  <div className="text-[11px] font-bold text-white/80">Beschikbare shows</div>
+                  <div className="text-[10px] text-white/40">{availableShows.length}</div>
+                </div>
+
+                <div className="max-h-[340px] overflow-auto">
+                  {showsLoading ? (
+                    <div className="px-4 py-6 text-[11px] text-white/50 italic">Shows laden…</div>
+                  ) : availableShows.length === 0 ? (
+                    <div className="px-4 py-6 text-[11px] text-white/50 italic">Geen shows gevonden</div>
+                  ) : (
+                    <div className="p-2">
+                      {availableShows.map(show => (
+                        <button
+                          key={show.id}
+                          className="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 transition-colors flex items-center gap-2 text-white"
+                          onClick={async () => {
+                            await setActiveShow(show)
+                            setShowStartupShowSelect(false)
+                          }}
+                          title={`Laad show: ${show.name}`}
+                        >
+                          <Activity className="w-3.5 h-3.5 text-blue-400/80" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-[11px] font-bold truncate">{show.name || 'Naamloze Show'}</div>
+                            <div className="text-[10px] text-white/40 font-mono truncate">{show.id}</div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="fixed bottom-6 right-6 z-[9999] flex flex-col gap-2 items-end pointer-events-none">
         {toasts.map(toast => (
           <div key={toast.id} className={cn(
@@ -710,7 +866,6 @@ export default function App() {
             </button>
           )}
 
-
           {isHost && (
             <div className="relative group/menu">
               <button
@@ -744,75 +899,105 @@ export default function App() {
                         </div>
                       ) : (
                         <>
-                          <button onClick={() => {
-                            openModal({
-                              title: 'Nieuwe Show',
-                              message: 'Voer de naam in voor de nieuwe show:',
-                              type: 'prompt',
-                              defaultValue: 'Mijn LedShow',
-                              onConfirm: (name: string) => {
-                                if (name) createNewShow(name);
-                              }
-                            });
-                            setIsMenuOpen(false);
-                          }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Maak een nieuwe show aan">
-                            <Plus className="w-3.5 h-3.5 text-purple-500" /> Nieuwe show maken
-                          </button>
+                          {isHost ? (
+                            <>
+                              <button onClick={() => {
+                                openModal({
+                                  title: 'Nieuwe Show',
+                                  message: 'Voer de naam in voor de nieuwe show:',
+                                  type: 'prompt',
+                                  defaultValue: 'Mijn LedShow',
+                                  onConfirm: (name: string) => {
+                                    if (name) createNewShow(name);
+                                  }
+                                });
+                                setIsMenuOpen(false);
+                              }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Maak een nieuwe show aan">
+                                <Plus className="w-3.5 h-3.5 text-purple-500" /> Nieuwe show maken
+                              </button>
 
-                          <button onClick={() => { handleCreateShowWithScript(); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Maak een nieuwe show aan op basis van een script">
-                            <FileText className="w-3.5 h-3.5 text-purple-500" /> Nieuwe show met script
-                          </button>
+                              <button onClick={() => { handleCreateShowWithScript(); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Maak een nieuwe show aan op basis van een script">
+                                <FileText className="w-3.5 h-3.5 text-purple-500" /> Nieuwe show met script
+                              </button>
 
-                          <div className="relative group/submenu">
-                            <button className="w-full px-4 py-2 text-left text-xs flex items-center justify-between hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Laad een bestaande show uit de database">
-                              <div className="flex items-center gap-3"><Layers className="w-3.5 h-3.5 text-blue-400" /> Show laden</div>
-                              <ChevronRight className="w-3 h-3 opacity-40 group-hover/submenu:translate-x-1 transition-transform" />
-                            </button>
-                            <div className="absolute right-full top-0 mr-1 w-64 bg-[#0a0a0a] border border-white/20 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] py-2 hidden group-hover/submenu:block animate-in fade-in slide-in-from-right-2 duration-200">
-                              {availableShows.length === 0 ? (
-                                <div className="px-4 py-2 text-[10px] text-white/40 italic text-left">Geen shows gevonden</div>
-                              ) : availableShows.map((show) => (
-                                <button
-                                  key={show.id}
-                                  onClick={async () => { await setActiveShow(show); setIsMenuOpen(false); }}
-                                  className={cn(
-                                    "w-full px-4 py-2 text-left text-[10px] hover:bg-white/10 transition-colors truncate text-white flex items-center gap-2",
-                                    activeShow?.id === show.id && "text-blue-400 font-bold bg-blue-400/5"
-                                  )}
-                                  title={`Laad show: ${show.name}`}
-                                >
-                                  <Activity className="w-2.5 h-2.5 text-blue-400/60" />
-                                  {show.name || 'Naamloze Show'}
+                              <div className="relative group/submenu">
+                                <button className="w-full px-4 py-2 text-left text-xs flex items-center justify-between hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Laad een bestaande show uit de database">
+                                  <div className="flex items-center gap-3"><Layers className="w-3.5 h-3.5 text-blue-400" /> Show laden</div>
+                                  <ChevronRight className="w-3 h-3 opacity-40 group-hover/submenu:translate-x-1 transition-transform" />
                                 </button>
-                              ))}
+                                <div className="absolute right-full top-0 mr-1 w-64 bg-[#0a0a0a] border border-white/20 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] py-2 hidden group-hover/submenu:block animate-in fade-in slide-in-from-right-2 duration-200">
+                                  <button
+                                    onClick={async () => { await initializeShows(); }}
+                                    className={cn(
+                                      "w-full px-4 py-2 text-left text-[10px] hover:bg-white/10 transition-colors truncate text-white flex items-center gap-2",
+                                      showsLoading && "opacity-40 pointer-events-none"
+                                    )}
+                                    title="Herlaad de showlijst"
+                                  >
+                                    <Radar className="w-2.5 h-2.5 text-blue-400/60" />
+                                    {showsLoading ? 'Shows laden…' : 'Herlaad shows'}
+                                  </button>
+
+                                  {showsLoadError && (
+                                    <div className="px-4 py-2 text-[10px] text-red-300/80 italic text-left break-words">
+                                      Kon shows niet laden
+                                    </div>
+                                  )}
+
+                                  <div className="h-px bg-white/10 my-1" />
+
+                                  {showsLoading ? (
+                                    <div className="px-4 py-2 text-[10px] text-white/40 italic text-left">Shows laden…</div>
+                                  ) : availableShows.length === 0 ? (
+                                    <div className="px-4 py-2 text-[10px] text-white/40 italic text-left">Geen shows gevonden</div>
+                                  ) : availableShows.map((show) => (
+                                    <button
+                                      key={show.id}
+                                      onClick={async () => { await setActiveShow(show); setIsMenuOpen(false); }}
+                                      className={cn(
+                                        "w-full px-4 py-2 text-left text-[10px] hover:bg-white/10 transition-colors truncate text-white flex items-center gap-2",
+                                        activeShow?.id === show.id && "text-blue-400 font-bold bg-blue-400/5"
+                                      )}
+                                      title={`Laad show: ${show.name}`}
+                                    >
+                                      <Activity className="w-2.5 h-2.5 text-blue-400/60" />
+                                      {show.name || 'Naamloze Show'}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <button onClick={() => { handleImportShow(); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Importeer een show vanuit een XML of JSON bestand">
+                                <FileText className="w-3.5 h-3.5 text-purple-500" /> Show importeren
+                              </button>
+
+                              {activeShow && (
+                                <button onClick={() => { handleExportShow(); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Exporteer de huidige show naar een JSON bestand">
+                                  <Download className="w-3.5 h-3.5 text-purple-500" /> Show exporteren
+                                </button>
+                              )}
+
+                              {activeShow && (
+                                <button onClick={() => {
+                                  if (!activeShow) return;
+                                  openModal({
+                                    title: 'Show Verwijderen',
+                                    message: `Weet je zeker dat je show "${activeShow.name}" wilt verwijderen (archiveren)?`,
+                                    type: 'confirm',
+                                    onConfirm: () => {
+                                      archiveShow(activeShow.id);
+                                      setIsMenuOpen(false);
+                                    }
+                                  });
+                                }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Verwijder de huidige show definitief">
+                                  <Trash2 className="w-3.5 h-3.5 text-red-500" /> Show verwijderen
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <div className="px-4 py-2 text-[10px] text-white/40 italic text-left">
+                              Alleen de Hub kan shows beheren.
                             </div>
-                          </div>
-
-                          <button onClick={() => { handleImportShow(); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Importeer een show vanuit een XML of JSON bestand">
-                            <FileText className="w-3.5 h-3.5 text-purple-500" /> Show importeren
-                          </button>
-
-                          {activeShow && (
-                            <button onClick={() => { handleExportShow(); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Exporteer de huidige show naar een JSON bestand">
-                              <Download className="w-3.5 h-3.5 text-purple-500" /> Show exporteren
-                            </button>
-                          )}
-
-                          {activeShow && (
-                            <button onClick={() => {
-                              if (!activeShow) return;
-                              openModal({
-                                title: 'Show Verwijderen',
-                                message: `Weet je zeker dat je show "${activeShow.name}" wilt verwijderen (archiveren)?`,
-                                type: 'confirm',
-                                onConfirm: () => {
-                                  archiveShow(activeShow.id);
-                                  setIsMenuOpen(false);
-                                }
-                              });
-                            }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-white" title="Verwijder de huidige show definitief">
-                              <Trash2 className="w-3.5 h-3.5 text-red-500" /> Show verwijderen
-                            </button>
                           )}
 
                           <div className="h-px bg-white/10 my-1" />
@@ -939,11 +1124,15 @@ export default function App() {
             </div>
             <div className="text-center space-y-2">
               <h2 className="text-xl font-bold tracking-tight">Geen show geladen</h2>
-              <p className="text-sm text-muted-foreground max-w-xs">Er is momenteel geen active show ingeladen.</p>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                {isHost
+                  ? 'Er is momenteel geen actieve show ingeladen.'
+                  : 'Wacht op de Hub om een show te laden…'}
+              </p>
             </div>
             <div className="flex flex-col gap-3 w-full max-w-sm">
               {/* Recent shows list */}
-              {availableShows.length > 0 && (
+              {isHost && availableShows.length > 0 && (
                 <div className="flex flex-col gap-1.5">
                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-1">Recente Shows</span>
                   <div className="flex flex-col gap-1 max-h-48 overflow-y-auto custom-scrollbar rounded-xl border border-white/10 bg-black/40 p-1.5">
@@ -967,7 +1156,7 @@ export default function App() {
               )}
 
               {/* Divider */}
-              {availableShows.length > 0 && (
+              {isHost && availableShows.length > 0 && (
                 <div className="flex items-center gap-3 px-2">
                   <div className="flex-1 h-px bg-white/10" />
                   <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/40">of</span>
@@ -1017,6 +1206,9 @@ export default function App() {
                 {activeEventIndex + 1} / {events.length}
               </div>
             </div>
+
+            {isLocked && <StickyHub />}
+
             <div className="flex-1 overflow-auto p-2 custom-scrollbar">
               <SequenceGrid />
             </div>
@@ -1539,18 +1731,18 @@ export default function App() {
           {activeShow && isLocked && activeEventIndex >= 0 && (
             <div className="flex gap-3">
               <button
-                onClick={() => nextEvent()}
+                onClick={() => nextAct()}
                 disabled={!isLocked || !activeShow}
                 className={cn(
                   "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
-                  blinkingNextEvent && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
-                  navigationWarning === 'event' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
+                  blinkingNextAct && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
+                  navigationWarning === 'act' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
                   !isLocked && "opacity-20"
                 )}
               >
-                <SkipForward className={cn("w-5 h-5", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-primary")} />
-                <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-muted-foreground")}>
-                  {navigationWarning === 'event' ? 'Override?' : 'Next Event'}
+                <FastForward className={cn("w-5 h-5", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-orange-400")} />
+                <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-muted-foreground")}>
+                  {navigationWarning === 'act' ? 'Override?' : 'Next Act'}
                 </span>
               </button>
 
@@ -1564,24 +1756,24 @@ export default function App() {
                   !isLocked && "opacity-20"
                 )}
               >
-                <Layers className={cn("w-5 h-5", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-blue-400")} />
+                <SkipForward className={cn("w-5 h-5", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-blue-400")} />
                 <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextScene || navigationWarning === 'scene') ? "text-white" : "text-muted-foreground")}>
                   {navigationWarning === 'scene' ? 'Override?' : 'Next Scene'}
                 </span>
               </button>
               <button
-                onClick={() => nextAct()}
+                onClick={() => nextEvent()}
                 disabled={!isLocked || !activeShow}
                 className={cn(
                   "h-14 min-w-[160px] px-6 rounded-xl glass border-white/10 flex items-center justify-center gap-3 transition-all",
-                  blinkingNextAct && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
-                  navigationWarning === 'act' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
+                  blinkingNextEvent && `bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] ${pulseClass} border-white/60`,
+                  navigationWarning === 'event' && `bg-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)] ${pulseClass} border-white/80`,
                   !isLocked && "opacity-20"
                 )}
               >
-                <SkipForward className={cn("w-5 h-5 rotate-2700", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-orange-400")} />
-                <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextAct || navigationWarning === 'act') ? "text-white" : "text-muted-foreground")}>
-                  {navigationWarning === 'act' ? 'Override?' : 'Next Act'}
+                <FileText className={cn("w-5 h-5", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-primary")} />
+                <span className={cn("text-xs font-black uppercase tracking-widest", (blinkingNextEvent || navigationWarning === 'event') ? "text-white" : "text-muted-foreground")}>
+                  {navigationWarning === 'event' ? 'Override?' : 'Next Event'}
                 </span>
               </button>
             </div>

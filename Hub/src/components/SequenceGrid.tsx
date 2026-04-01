@@ -1,10 +1,12 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown, ChevronRight, Play, Square, Volume2, VolumeX, Repeat, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, ArrowUp, ArrowDown, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, Type, User, MousePointer2, Lightbulb, Pipette, MessageSquare, FolderOpen, Layers, Hash } from 'lucide-react'
+import { ChevronDown, ChevronRight, Play, Square, Volume2, VolumeX, Repeat, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, ArrowUp, ArrowDown, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, Type, User, MousePointer2, Lightbulb, Pipette, MessageSquare, FolderOpen, Layers, ListOrdered, ClipboardCheck } from 'lucide-react'
 import { useSequencerStore } from '../store/useSequencerStore'
 import type { Device } from '../types/devices'
 import type { ShowEvent, ClipboardItem } from '../types/show'
 import { cn } from '../lib/utils'
+import { ShowCheckPanel } from './ShowCheckPanel'
+import { runShowChecks, type ShowCheckIssue } from '../utils/showChecks'
 
 interface RenamableInputProps {
     value: string
@@ -426,11 +428,12 @@ const VideoWallPreviewOverlay: React.FC<{ layout: string, bezelSize?: number }> 
 };
 
 // Transition strip rendered BETWEEN event cards (replaces trigger rows in the card body)
+// Note: trigger rows are excluded from the card body, so editing must be handled from here.
 const EventTransition: React.FC<{
     triggerEvent: ShowEvent | null
     isLastEvent: boolean
     isLocked: boolean
-    onEditTrigger?: (index: number) => void
+    onEditTrigger?: (index?: number) => void
     triggerIndex?: number
 }> = ({ triggerEvent, isLastEvent, isLocked, onEditTrigger, triggerIndex }) => {
     if (!triggerEvent && isLastEvent) return null
@@ -439,11 +442,11 @@ const EventTransition: React.FC<{
     const cueText = triggerEvent?.cue || ''
     const isManualNoCue = !triggerEvent || (triggerType === 'manual' && !cueText)
 
-    const canEdit = !isLocked && onEditTrigger && triggerIndex !== undefined
+    const canEdit = !isLocked && !!onEditTrigger
 
     const editHint = canEdit ? (
         <button
-            onClick={(e) => { e.stopPropagation(); if (canEdit) onEditTrigger(triggerIndex!) }}
+            onClick={(e) => { e.stopPropagation(); if (canEdit) onEditTrigger?.(triggerIndex) }}
             className="opacity-0 group-hover/trans:opacity-60 hover:!opacity-100 transition-opacity p-0.5 hover:bg-white/10 rounded"
             title="Overgang bewerken"
         >
@@ -452,17 +455,21 @@ const EventTransition: React.FC<{
     ) : null
 
     if (isManualNoCue) {
+        // If there is no explicit trigger row, still show a normal "manual transition" strip.
+        // This keeps the UI consistent and still allows editing/creating the transition.
+        const label = cueText || 'Handmatige overgang'
         return (
             <div
-                className={cn("flex items-center gap-2 px-4 py-0.5 group/trans", canEdit && "cursor-pointer")}
-                onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger!(triggerIndex!) } : undefined}
+                className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
+                onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger?.(triggerIndex) } : undefined}
             >
-                <div className="flex-1 border-t border-dashed border-white/10 group-hover/trans:border-white/20 transition-colors" />
-                <div className="flex items-center gap-1">
-                    <span className="text-[8px] opacity-20 uppercase tracking-widest font-bold group-hover/trans:opacity-40 transition-opacity select-none">handmatig</span>
+                <div className="flex-1 border-t border-yellow-500/40" />
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-yellow-500/15 border border-yellow-500/50 rounded text-[10px] text-yellow-200 font-bold max-w-[400px] group-hover/trans:bg-yellow-500/25 transition-colors">
+                    <Zap className="w-3 h-3 text-yellow-400 shrink-0" />
+                    <span className="truncate">{label}</span>
                     {editHint}
                 </div>
-                <div className="flex-1 border-t border-dashed border-white/10 group-hover/trans:border-white/20 transition-colors" />
+                <div className="flex-1 border-t border-yellow-500/40" />
             </div>
         )
     }
@@ -474,7 +481,7 @@ const EventTransition: React.FC<{
         return (
             <div
                 className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
-                onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger!(triggerIndex!) } : undefined}
+                onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger?.(triggerIndex) } : undefined}
             >
                 <div className="flex-1 border-t border-dashed border-yellow-500/30" />
                 <div className="flex items-center gap-1.5 px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/30 rounded text-[9px] text-yellow-300 font-bold group-hover/trans:bg-yellow-500/20 transition-colors">
@@ -494,7 +501,7 @@ const EventTransition: React.FC<{
         return (
             <div
                 className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
-                onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger!(triggerIndex!) } : undefined}
+                onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger?.(triggerIndex) } : undefined}
             >
                 <div className="flex-1 border-t border-dashed border-blue-500/30" />
                 <div className="flex items-center gap-1.5 px-2 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-[9px] text-blue-300 font-bold group-hover/trans:bg-blue-500/20 transition-colors">
@@ -511,7 +518,7 @@ const EventTransition: React.FC<{
     return (
         <div
             className={cn("flex items-center gap-2 px-4 py-1 group/trans", canEdit && "cursor-pointer")}
-            onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger!(triggerIndex!) } : undefined}
+            onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger?.(triggerIndex) } : undefined}
         >
             <div className="flex-1 border-t border-yellow-500/40" />
             <div className="flex items-center gap-1.5 px-3 py-1 bg-yellow-500/15 border border-yellow-500/50 rounded text-[10px] text-yellow-200 font-bold max-w-[400px] group-hover/trans:bg-yellow-500/25 transition-colors">
@@ -524,12 +531,155 @@ const EventTransition: React.FC<{
     )
 }
 
+const TransitionEditModal: React.FC<{
+    triggerIndex: number
+    onClose: () => void
+}> = ({ triggerIndex, onClose }) => {
+    const updateEvent = useSequencerStore(s => s.updateEvent)
+    const events = useSequencerStore(s => s.events)
+
+    const trigger = events[triggerIndex]
+    const siblingMedia = useMemo(() => {
+        if (!trigger) return []
+        return events.filter(e =>
+            e.act === trigger.act &&
+            e.sceneId === trigger.sceneId &&
+            e.eventId === trigger.eventId &&
+            e.type?.toLowerCase() === 'media'
+        )
+    }, [events, trigger])
+
+    useEffect(() => {
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose()
+        }
+        window.addEventListener('keydown', onKeyDown)
+        return () => window.removeEventListener('keydown', onKeyDown)
+    }, [onClose])
+
+    if (!trigger) return null
+
+    return createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+            <button
+                className="absolute inset-0 bg-black/70"
+                onClick={onClose}
+                aria-label="Sluiten"
+            />
+            <div className="relative w-[min(720px,calc(100vw-32px))] rounded-2xl border border-white/10 bg-[#0a0a0a] shadow-[0_30px_80px_rgba(0,0,0,0.6)] p-4">
+                <div className="flex items-center justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-2">
+                        <MousePointer2 className="w-4 h-4 text-primary" />
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-white/70">Overgang bewerken</span>
+                            <span className="text-[9px] font-mono text-white/40">{trigger.act} • {trigger.sceneId}.{trigger.eventId}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] opacity-50 w-24 shrink-0">Type</span>
+                        <select
+                            title="Trigger type"
+                            className="flex-1 bg-zinc-900 border border-white/10 rounded px-2 py-1 text-[10px] text-white outline-none"
+                            value={trigger.effect || 'manual'}
+                            onChange={(e) => updateEvent(triggerIndex, { effect: e.target.value })}
+                        >
+                            <option value="manual">Handmatige overgang</option>
+                            <option value="timed">Timed (Auto-trigger)</option>
+                            <option value="media">Media afgerond trigger</option>
+                        </select>
+                    </div>
+
+                    {(trigger.effect || 'manual').toLowerCase() === 'manual' && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] opacity-50 w-24 shrink-0">Cue</span>
+                            <RenamableInput
+                                autoFocus
+                                className="flex-1 bg-white/10 border border-primary/40 rounded px-2 py-1 text-xs text-white outline-none focus:bg-white/20"
+                                value={trigger.cue || ''}
+                                placeholder="Trigger zin / actie..."
+                                onRename={(val) => updateEvent(triggerIndex, { cue: val })}
+                            />
+                        </div>
+                    )}
+
+                    {(trigger.effect || '').toLowerCase() === 'timed' && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] opacity-50 w-24 shrink-0">Vertraging</span>
+                            <RenamableInput
+                                autoFocus
+                                className="w-24 bg-white/10 border border-primary/40 rounded px-2 py-1 text-xs text-white outline-none text-center font-mono"
+                                placeholder="MM:SS"
+                                value={(trigger.duration ? Math.floor(trigger.duration / 60) + ':' + (trigger.duration % 60).toString().padStart(2, '0') : '0:00')}
+                                onRename={(val) => {
+                                    const parts = val.split(':')
+                                    const m = parseInt(parts[0]) || 0
+                                    const s = parseInt(parts[1]) || 0
+                                    updateEvent(triggerIndex, { duration: (m * 60) + s })
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    {(trigger.effect || '').toLowerCase() === 'media' && (
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] opacity-50 w-24 shrink-0">Media</span>
+                            {siblingMedia.length > 0 ? (
+                                <select
+                                    title="Selecteer Media Trigger"
+                                    className="flex-1 bg-zinc-900 border border-white/10 rounded px-2 py-1 text-[10px] text-blue-300 outline-none"
+                                    value={trigger.mediaTriggerId || ''}
+                                    onChange={(e) => updateEvent(triggerIndex, { mediaTriggerId: e.target.value })}
+                                >
+                                    <option value="">Wacht op een media in dit event...</option>
+                                    {siblingMedia.map((m, idx) => {
+                                        const mediaId = `${m.filename}|${m.fixture}`
+                                        const name = m.filename?.split(/[\\/]/).pop() || 'Onbekende media'
+                                        return (
+                                            <option key={idx} value={mediaId}>
+                                                {name} {m.fixture ? `(${m.fixture})` : ''}
+                                            </option>
+                                        )
+                                    })}
+                                </select>
+                            ) : (
+                                <div className="flex-1 text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-1 flex items-center gap-2">
+                                    <AlertCircle className="w-3 h-3" /> Geen media gevonden in dit event
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-end gap-2">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors"
+                    >
+                        Annuleren
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 rounded-xl bg-primary hover:bg-white border border-primary/30 text-black text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/20 transition-all"
+                    >
+                        Opslaan &amp; sluiten
+                    </button>
+                </div>
+            </div>
+        </div>,
+        document.body
+    )
+}
+
 
 const RowItem: React.FC<{
     event: ShowEvent
     originalIndex: number
     id: number | string
     isShadow?: boolean
+    zebraIndex?: number
     isActiveGroup?: boolean
     isNextGroup?: boolean
     handleRowClick: (index: number) => void
@@ -548,7 +698,7 @@ const RowItem: React.FC<{
 }> = ({
     event, originalIndex, id, isShadow, isActiveGroup, isNextGroup, handleRowClick, handleRowDoubleClick,
     editingIndex, setEditingIndex, menuOpenIndex, setMenuOpenIndex, isLocked,
-    activeEventIndex, eventStatuses, ongoingEffects
+    activeEventIndex, eventStatuses, ongoingEffects, zebraIndex
 }) => {
         const [currentTime, setCurrentTime] = useState(new Date())
         const menuButtonRef = useRef<HTMLButtonElement>(null)
@@ -719,8 +869,18 @@ const RowItem: React.FC<{
 
         if (!event) return null
 
-        const isDefaultComment = type === 'comment' && (!event.cue || event.cue === 'Opmerkingen' || event.cue === 'Opmerking');
-        if (type === 'comment' && isDefaultComment && isLocked) return null;
+        const isDefaultComment = type === 'comment' && (
+            !event.cue ||
+            event.cue === 'Nieuw commentaar' ||
+            event.cue === 'Opmerkingen' ||
+            event.cue === 'Opmerking'
+        );
+        // Hide placeholder/empty comment rows unless the user is actively editing that row.
+        if (type === 'comment' && isDefaultComment && editingIndex !== originalIndex) return null;
+
+        const zebraClass = !isShadow && zebraIndex !== undefined
+            ? (zebraIndex % 2 === 0 ? "bg-white/[0.04]" : "bg-white/[0.08]")
+            : null
 
         return (
             <div
@@ -730,6 +890,7 @@ const RowItem: React.FC<{
                 className={cn(
                     "group/row relative flex items-center px-4 py-2 transition-all border-l-2",
                     isShadow ? "cursor-default opacity-50 grayscale bg-white/5 border-l-dashed border-l-primary/30" : "cursor-pointer",
+                    !isShadow && zebraClass,
                     isRowActive ? "bg-green-500/20 border-green-500 shadow-[inset_0_0_10px_rgba(34,197,94,0.1)]" : "border-transparent hover:bg-white/5",
                     isActiveGroup && !isRowActive && "border-l-green-500/30",
                     isNextGroup && !isRowActive && "border-l-orange-500/30",
@@ -931,7 +1092,22 @@ const RowItem: React.FC<{
                                                     <select
                                                         title="Selecteer Stop Event"
                                                         className="flex-1 bg-zinc-900 border border-white/10 rounded px-2 py-0.5 text-[10px] text-primary outline-none font-bold"
-                                                        value={event.stopAct ? `${event.stopAct}|${event.stopSceneId}|${event.stopEventId}` : ''}
+                                                        // Stop marker is stored on the *media/light row* as:
+                                                        //   stopAct + stopSceneId + stopEventId
+                                                        // At runtime (Show/locked mode) the host calls `stopMediaAt(act, sceneId, eventId)`
+                                                        // when ENTERING a new event group; that function matches those stop markers and
+                                                        // triggers a fade-out stop on the actual device (local monitor / remote / agent).
+                                                        value={(() => {
+                                                            const stopAct = (event.stopAct || '').trim()
+                                                            const stopScene = Number.parseInt(String(event.stopSceneId ?? ''), 10)
+                                                            const stopEvent = Number.parseInt(String(event.stopEventId ?? ''), 10)
+                                                            const computed =
+                                                                stopAct && Number.isFinite(stopScene) && stopScene > 0 && Number.isFinite(stopEvent) && stopEvent > 0
+                                                                    ? `${stopAct}|${stopScene}|${stopEvent}`
+                                                                    : ''
+
+                                                            return computed
+                                                        })()}
                                                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                                                             const val = e.target.value
                                                             if (!val) {
@@ -942,14 +1118,17 @@ const RowItem: React.FC<{
                                                                 } as any)
                                                             } else {
                                                                 const [act, sId, eId] = val.split('|')
+                                                                const parsedSceneId = Number.parseInt(sId, 10)
+                                                                const parsedEventId = Number.parseInt(eId, 10)
                                                                 updateEvent(originalIndex, {
-                                                                    stopAct: act,
-                                                                    stopSceneId: parseInt(sId),
-                                                                    stopEventId: parseInt(eId)
+                                                                    stopAct: act?.trim() || undefined,
+                                                                    stopSceneId: Number.isFinite(parsedSceneId) ? parsedSceneId : undefined,
+                                                                    stopEventId: Number.isFinite(parsedEventId) ? parsedEventId : undefined
                                                                 })
                                                             }
                                                         }}
                                                     >
+                                                        <option value="">— Geen stop moment —</option>
                                                         {events
                                                             .filter((e: ShowEvent, idx: number) => e.type?.toLowerCase() === 'title' && idx > originalIndex)
                                                             .map((titleEvt: ShowEvent, idx: number) => (
@@ -1070,9 +1249,9 @@ const RowItem: React.FC<{
                                 {(() => {
                                     const targetDev = event.fixture ? getDevices().find(d => d.name === event.fixture) : null;
                                     const isVideoWall = targetDev?.type === 'videowall_agent' || targetDev?.type === 'remote_VideoWall' || targetDev?.type === 'local_monitor';
-                                    
+
                                     if (!isVideoWall) return null;
-                                    
+
                                     return (
                                         <>
                                             <div className="flex items-center gap-1.5 bg-white/5 rounded p-0.5" title="Brightness">
@@ -1213,7 +1392,8 @@ const RowItem: React.FC<{
 
 
 
-// Context menu for Acts and Scenes
+// Context menu for Acts and Scenes (currently unused; kept for future use)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const HeaderContextMenu: React.FC<{
     type: 'act' | 'scene'
     id: string
@@ -1328,6 +1508,9 @@ const HeaderContextMenu: React.FC<{
         document.getElementById('portal-root')!
     )
 }
+
+// Keep symbol referenced to avoid TS unused warning (menu is currently not wired).
+void HeaderContextMenu
 
 // Sub-component for the context menu to handle complex logic and sub-menus
 const ContextMenu: React.FC<{
@@ -1456,7 +1639,7 @@ const ContextMenu: React.FC<{
             )}
 
             {(type === 'light' || type === 'media' || type === 'action') && (
-                <button onClick={() => { handlers.resendEvent(index); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2 text-blue-400">
+                <button onClick={(e) => { e.stopPropagation(); handlers.resendEvent(index); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2 text-blue-400">
                     <Send className="w-3 h-3" /> Herzenden
                 </button>
             )}
@@ -1469,7 +1652,7 @@ const ContextMenu: React.FC<{
                     {/* Event Level Actions */}
                     {type === 'title' && (
                         <>
-                            <button onClick={() => { handlers.addCommentToEvent(index); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2">
+                            <button onClick={(e) => { e.stopPropagation(); handlers.addCommentToEvent(index); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2">
                                 <Info className="w-3 h-3 text-blue-400" /> Commentaarregel toevoegen
                             </button>
                             <div className="h-px bg-white/5 my-1" />
@@ -1491,11 +1674,31 @@ const ContextMenu: React.FC<{
                                 "absolute right-full w-40 glass border border-white/10 rounded-lg shadow-2xl py-1 mr-1",
                                 isFlipped ? "bottom-0" : "top-0"
                             )}>
-                                <button onClick={() => { handlers.addEventBelow(index, 'Action', 'Aktie'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><User className="w-3 h-3 text-blue-400" /> Aktie </button>
-                                <button onClick={() => { handlers.addEventBelow(index, 'Light', 'Licht'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><Lightbulb className="w-3 h-3 text-yellow-400" /> Licht </button>
-                                <button onClick={() => { handlers.addEventBelow(index, 'Media', 'Media'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><Layers className="w-3 h-3 text-purple-400" /> Media </button>
+                                <button onClick={(e) => { e.stopPropagation(); handlers.addEventBelow(index, 'Action', 'Aktie'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><User className="w-3 h-3 text-blue-400" /> Aktie </button>
+                                <button onClick={(e) => {
+                                    e.stopPropagation();
+                                    const s = useSequencerStore.getState();
+                                    const sceneId = event.sceneId ?? 0;
+                                    const eventId = event.eventId ?? 0;
+                                    const groupId = `${event.act}-${sceneId}-${eventId}`;
+                                    const collapsed = s.isLocked ? (s.runtimeCollapsedGroups || {}) : (s.activeShow?.viewState?.collapsedGroups || {});
+                                    if (collapsed[groupId]) s.toggleCollapse(groupId);
+                                    handlers.addEventBelow(index, 'Light', 'Licht');
+                                    onClose();
+                                }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><Lightbulb className="w-3 h-3 text-yellow-400" /> Licht </button>
+                                <button onClick={(e) => {
+                                    e.stopPropagation();
+                                    const s = useSequencerStore.getState();
+                                    const sceneId = event.sceneId ?? 0;
+                                    const eventId = event.eventId ?? 0;
+                                    const groupId = `${event.act}-${sceneId}-${eventId}`;
+                                    const collapsed = s.isLocked ? (s.runtimeCollapsedGroups || {}) : (s.activeShow?.viewState?.collapsedGroups || {});
+                                    if (collapsed[groupId]) s.toggleCollapse(groupId);
+                                    handlers.addEventBelow(index, 'Media', 'Media');
+                                    onClose();
+                                }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><Layers className="w-3 h-3 text-purple-400" /> Media </button>
                                 {!useSequencerStore.getState().events.some(e => e.act === event.act && e.sceneId === event.sceneId && e.eventId === event.eventId && e.type?.toLowerCase() === 'trigger') && (
-                                    <button onClick={() => { handlers.addEventBelow(index, 'Trigger', 'Handmatige overgang'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><MousePointer2 className="w-3 h-3 text-primary" /> Trigger </button>
+                                    <button onClick={(e) => { e.stopPropagation(); handlers.addEventBelow(index, 'Trigger', 'Handmatige overgang'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><MousePointer2 className="w-3 h-3 text-primary" /> Trigger </button>
                                 )}
                             </div>
                         )}
@@ -1503,7 +1706,7 @@ const ContextMenu: React.FC<{
 
                     <div className="h-px bg-white/5 my-1" />
 
-                    <button onClick={() => { handlers.handleDelete(index, event); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2 text-red-500">
+                    <button onClick={(e) => { e.stopPropagation(); handlers.handleDelete(index, event); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2 text-red-500">
                         <Trash2 className="w-3 h-3" /> {type === 'comment' ? 'Commentaar verwijderen' : type === 'title' ? 'Event verwijderen' : 'Actie verwijderen'}
                     </button>
                 </>
@@ -1524,17 +1727,13 @@ const SequenceGrid: React.FC = () => {
     const {
         events,
         activeEventIndex,
-        setActiveEvent,
         activeShow,
         isLocked,
-        expandAll,
-        collapseAll,
-        reindexEvents,
-        addToast,
+        setActiveEvent,
+        toggleCollapse,
+        openModal,
         deleteAct,
         deleteScene,
-        openModal,
-        toggleCollapse,
         runtimeCollapsedGroups,
         eventStatuses,
     } = useSequencerStore() as any
@@ -1563,7 +1762,6 @@ const SequenceGrid: React.FC = () => {
 
     const [editingIndex, setEditingIndex] = useState<number | null>(null)
     const [menuOpenIndex, setMenuOpenIndex] = useState<number | string | null>(null)
-    const [headerMenuAnchor, setHeaderMenuAnchor] = useState<DOMRect | undefined>(undefined)
 
     // Clear editing/menu when locked (Show Mode)
     useEffect(() => {
@@ -1577,6 +1775,13 @@ const SequenceGrid: React.FC = () => {
     const collapsedGroups = isLocked
         ? (runtimeCollapsedGroups || {})
         : (activeShow?.viewState?.collapsedGroups || {})
+
+    const [currentTime, setCurrentTime] = useState(new Date())
+
+    useEffect(() => {
+        const interval = setInterval(() => setCurrentTime(new Date()), 1000)
+        return () => clearInterval(interval)
+    }, [])
 
     // Ensure currentTime is available or use new Date if store doesn't provide it live (it does usually if subbed)
     // Actually useSequencerStore has `currentTime`? NO. App.tsx has `currentTime`.
@@ -1594,85 +1799,6 @@ const SequenceGrid: React.FC = () => {
 
 
 
-    const [currentTime, setCurrentTime] = useState(new Date())
-
-    useEffect(() => {
-        const t = setInterval(() => setCurrentTime(new Date()), 1000)
-        return () => clearInterval(t)
-    }, [])
-
-    const showHud = useMemo(() => {
-        if (!isLocked || events.length === 0) return null
-
-        const safeIdx = activeEventIndex >= 0 ? activeEventIndex : 0
-        const current = events[safeIdx] as ShowEvent | undefined
-        if (!current) return null
-
-        const groupRows = events.filter((e: ShowEvent) =>
-            e.act === current.act &&
-            e.sceneId === current.sceneId &&
-            e.eventId === current.eventId
-        )
-        const titleRow = groupRows.find((e: ShowEvent) => e.type?.toLowerCase() === 'title')
-        const triggerRow = groupRows.find((e: ShowEvent) => e.type?.toLowerCase() === 'trigger')
-
-        const sceneLabelKey = `${current.act}-${current.sceneId}`
-        const sceneLabel = activeShow?.viewState?.sceneNames?.[sceneLabelKey] || ''
-
-        // Find first row of the next group (event/scene/act boundary)
-        let nextGroupIdx = -1
-        if (activeEventIndex >= 0) {
-            for (let i = activeEventIndex + 1; i < events.length; i++) {
-                const e = events[i]
-                if (e.act !== current.act || e.sceneId !== current.sceneId || e.eventId !== current.eventId) {
-                    nextGroupIdx = i
-                    break
-                }
-            }
-        } else {
-            nextGroupIdx = 0
-        }
-
-        const next = nextGroupIdx >= 0 ? (events[nextGroupIdx] as ShowEvent) : null
-        const nextKind = !next
-            ? null
-            : next.act !== current.act
-                ? 'act'
-                : next.sceneId !== current.sceneId
-                    ? 'scene'
-                    : 'event'
-
-        const nextGroupRows = next
-            ? events.filter((e: ShowEvent) => e.act === next.act && e.sceneId === next.sceneId && e.eventId === next.eventId)
-            : []
-        const nextTitle = nextGroupRows.find((e: ShowEvent) => e.type?.toLowerCase() === 'title')?.cue || ''
-        const nextSceneKey = next ? `${next.act}-${next.sceneId}` : ''
-        const nextSceneLabel = next ? (activeShow?.viewState?.sceneNames?.[nextSceneKey] || '') : ''
-
-        const triggerType = (triggerRow?.effect || 'manual').toLowerCase()
-        const isTimed = triggerType === 'timed' && (triggerRow?.duration || 0) > 0
-        const isManual = !isTimed
-        const plannedDur = isTimed ? (triggerRow?.duration || 0) : (titleRow?.duration || 0)
-
-        const elapsedSec = lastTransitionTime
-            ? Math.round(((isPaused ? (pauseStartTime || currentTime.getTime()) : currentTime.getTime()) - lastTransitionTime) / 1000)
-            : 0
-        const remainingSec = plannedDur > 0 ? Math.max(0, plannedDur - elapsedSec) : 0
-
-        return {
-            current,
-            currentTitle: titleRow?.cue || '',
-            currentSceneLabel: sceneLabel,
-            next,
-            nextKind,
-            nextTitle,
-            nextSceneLabel,
-            isTimed,
-            isManual,
-            plannedDur,
-            remainingSec,
-        }
-    }, [isLocked, events, activeEventIndex, activeShow?.viewState?.sceneNames, lastTransitionTime, isPaused, pauseStartTime, currentTime])
 
 
 
@@ -1743,14 +1869,32 @@ const SequenceGrid: React.FC = () => {
                 acts.push(act)
             }
 
+            // Act/Scene header rows are structural; they should not create "Event 0" groups.
+            // They are rendered by the Act/Scene headers in the grid, not as event cards.
+            const typeLower = (event.type || '').toLowerCase()
+            if (typeLower === 'act') return
+
             // Als dit een puur Act-level item is (zoals Type 'Act' of een commentaar zonder sceneId),
             // kunnen we het niet opslaan in het *huidige* weergavemodel omdat dat model verwacht 
             // dat alles in een event zit. We pushen het als een speciale 'dummy' scene/event.
             let targetSceneId = event.sceneId
             let targetEventId = event.eventId
 
-            if (targetSceneId === undefined) targetSceneId = 0 // Dummy ID voor weergave
-            if (targetEventId === undefined) targetEventId = 0 // Dummy ID voor weergave
+            // Scene header row: ensure scene exists but do not attach to an event node
+            if (typeLower === 'scene') {
+                const sceneId = targetSceneId ?? 0
+                let scene = act.scenes.find(s => s.id === sceneId)
+                if (!scene) {
+                    scene = { id: sceneId, events: [], isActive: false }
+                    act.scenes.push(scene)
+                }
+                return
+            }
+
+            if (targetSceneId === undefined) targetSceneId = 0 // Dummy ID for Act-level items (no scene)
+            // Only use eventId=0 as dummy when there is no real eventId (Act-level items).
+            // For real scenes, rows without an eventId are structural and are skipped above.
+            if (targetEventId === undefined) targetEventId = 0 // Dummy ID for Act-level items
 
             let scene = act.scenes.find(s => s.id === targetSceneId)
             if (!scene) {
@@ -1907,6 +2051,145 @@ const SequenceGrid: React.FC = () => {
         setActiveEvent(originalIndex)
     }
 
+    const addEventBelow = useSequencerStore(s => s.addEventBelow)
+    const deleteEvent = useSequencerStore(s => s.deleteEvent)
+    const [transitionEditIndex, setTransitionEditIndex] = useState<number | null>(null)
+    const [isCheckOpen, setIsCheckOpen] = useState(false)
+    const [checkIssues, setCheckIssues] = useState<ShowCheckIssue[]>([])
+
+    const openTransitionEditor = useCallback((idx: number) => {
+        if (isLocked) return
+        setSelectedEvent(idx)
+        setTransitionEditIndex(idx)
+    }, [isLocked, setSelectedEvent])
+
+    const selectAndScrollToIndex = useCallback((idx: number) => {
+        if (idx < 0) return
+        useSequencerStore.getState().setSelectedEvent(idx)
+        // Scroll to the specific row (data-row-id is the original index for real rows)
+        const el = containerRef.current?.querySelector?.(`[data-row-id="${idx}"]`) as HTMLElement | null
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        } else {
+            // Fallback: scroll to the container top
+            containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+    }, [])
+
+    const runCheck = useCallback(() => {
+        const s = useSequencerStore.getState()
+        const isHost = !!(window as any).require
+        const issues = runShowChecks({
+            events: s.events,
+            devices: (s.appSettings?.devices || []) as any,
+            activeShow: s.activeShow as any,
+            isHost
+        })
+        setCheckIssues(issues)
+        setIsCheckOpen(true)
+    }, [])
+
+    const fixCheckIssue = useCallback((issue: ShowCheckIssue) => {
+        if (isLocked) return
+        if (issue.originalIndex === undefined) return
+
+        const s = useSequencerStore.getState()
+
+        if (issue.type === 'missing_trigger') {
+            const { act, sceneId, eventId } = issue
+            if (!act || sceneId === undefined || eventId === undefined) return
+
+            const existingTriggerIdx = s.events.findIndex(e =>
+                e.act === act &&
+                e.sceneId === sceneId &&
+                e.eventId === eventId &&
+                e.type?.toLowerCase() === 'trigger'
+            )
+            if (existingTriggerIdx !== -1) {
+                s.addToast('Trigger bestaat al voor dit event', 'info')
+                selectAndScrollToIndex(existingTriggerIdx)
+                return
+            }
+
+            const titleIdx = s.events.findIndex(e =>
+                e.act === act &&
+                e.sceneId === sceneId &&
+                e.eventId === eventId &&
+                e.type?.toLowerCase() === 'title'
+            )
+            if (titleIdx === -1) return
+
+            addEventBelow(titleIdx, 'Trigger', 'Handmatige overgang')
+            s.addToast('Handmatige trigger toegevoegd', 'info')
+            queueMicrotask(() => runCheck())
+            return
+        }
+
+        if (issue.type === 'empty_default_comments') {
+            const act = issue.act
+            const sceneId = issue.sceneId
+            const eventId = issue.eventId
+            const idx = (() => {
+                if (act && sceneId !== undefined && eventId !== undefined) {
+                    const found = s.events.findIndex(e =>
+                        e.act === act &&
+                        (e.sceneId ?? 0) === (sceneId ?? 0) &&
+                        (e.eventId ?? 0) === (eventId ?? 0) &&
+                        (e.type || '').toLowerCase() === 'comment' &&
+                        (((e.cue || '').trim() === '') || ['Nieuw commentaar', 'Opmerkingen', 'Opmerking'].includes((e.cue || '').trim()))
+                    )
+                    if (found !== -1) return found
+                }
+                return issue.originalIndex
+            })()
+
+            deleteEvent(idx)
+            s.addToast('Lege commentaarregel verwijderd', 'info', 1000)
+            setTimeout(() => runCheck(), 0)
+        }
+    }, [addEventBelow, deleteEvent, isLocked, runCheck, selectAndScrollToIndex])
+
+    const ensureTriggerAndEdit = useCallback((eventNode: any, fallbackIndex?: number) => {
+        if (isLocked) return
+
+        const act = eventNode?.rows?.[0]?.event?.act
+        const sceneId = eventNode?.rows?.[0]?.event?.sceneId
+        const eventId = eventNode?.rows?.[0]?.event?.eventId
+
+        const { events } = useSequencerStore.getState()
+        const existing = events.findIndex(e =>
+            e.act === act &&
+            e.sceneId === sceneId &&
+            e.eventId === eventId &&
+            e.type?.toLowerCase() === 'trigger'
+        )
+        if (existing !== -1) {
+            openTransitionEditor(existing)
+            return
+        }
+
+        const baseIndex =
+            typeof fallbackIndex === 'number'
+                ? fallbackIndex
+                : (eventNode?.rows?.find((r: any) => r?.event?.type?.toLowerCase() === 'title')?.originalIndex ?? eventNode?.rows?.[0]?.originalIndex)
+
+        if (typeof baseIndex !== 'number') return
+
+        addEventBelow(baseIndex, 'Trigger', 'Handmatige overgang')
+
+        // After insertion + reindex, locate the newly created trigger row and open editor.
+        queueMicrotask(() => {
+            const { events: nextEvents } = useSequencerStore.getState()
+            const idx = nextEvents.findIndex(e =>
+                e.act === act &&
+                e.sceneId === sceneId &&
+                e.eventId === eventId &&
+                e.type?.toLowerCase() === 'trigger'
+            )
+            if (idx !== -1) openTransitionEditor(idx)
+        })
+    }, [addEventBelow, isLocked, openTransitionEditor])
+
 
 
 
@@ -1915,6 +2198,23 @@ const SequenceGrid: React.FC = () => {
 
     return (
         <div ref={containerRef} className="flex-1 overflow-auto p-4 space-y-6 custom-scrollbar bg-black/20 scroll-smooth relative">
+            {transitionEditIndex !== null && !isLocked && (
+                <TransitionEditModal
+                    triggerIndex={transitionEditIndex}
+                    onClose={() => setTransitionEditIndex(null)}
+                />
+            )}
+            <ShowCheckPanel
+                open={isCheckOpen}
+                issues={checkIssues}
+                onClose={() => setIsCheckOpen(false)}
+                onRescan={runCheck}
+                onSelectIssue={(issue) => {
+                    if (issue.originalIndex === undefined) return
+                    selectAndScrollToIndex(issue.originalIndex)
+                }}
+                onFixIssue={fixCheckIssue}
+            />
             {/* Time Tracking Toolbar removed (moved to App Header) */}
             {hierarchy.length === 0 && (
                 <div className="flex flex-col items-center justify-center h-full text-muted-foreground opacity-40 italic text-sm">
@@ -1922,111 +2222,72 @@ const SequenceGrid: React.FC = () => {
                 </div>
             )}
 
-            {/* Fixed Sequence Controls HUD (blijft zichtbaar tijdens scrollen) */}
-            {events.length > 0 && (
-                <div className="fixed top-28 left-0 right-0 z-30 px-4">
-                    <div className="rounded-xl border border-white/10 bg-[#0b0b0bcc] backdrop-blur-md shadow-2xl pointer-events-auto">
-                        <div className="px-4 py-3 flex items-start justify-between gap-4">
-                            <div className="min-w-0">
-                                {showHud ? (
-                                    <>
-                                        <div className="text-[9px] font-black uppercase tracking-widest opacity-50">Nu</div>
-                                        <div className="mt-1 flex flex-wrap items-center gap-2">
-                                            <div className="px-2 py-1 rounded bg-primary/15 border border-primary/25 text-[10px] font-black uppercase tracking-widest text-primary">
-                                                {showHud.current.act}
-                                            </div>
-                                            {showHud.current.sceneId !== undefined && showHud.current.sceneId > 0 && (
-                                                <div className="px-2 py-1 rounded bg-green-500/10 border border-green-500/20 text-[10px] font-bold text-green-200">
-                                                    Scene {showHud.current.sceneId}{showHud.currentSceneLabel ? ` — ${showHud.currentSceneLabel}` : ''}
-                                                </div>
-                                            )}
-                                            <div className="px-2 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-bold text-white/90 truncate max-w-[520px]">
-                                                {showHud.currentTitle || showHud.current.cue || '—'}
-                                            </div>
-                                        </div>
-                                        <div className="mt-2 flex flex-wrap items-center gap-2">
-                                            <div className="text-[10px] font-mono opacity-60">
-                                                Overgang: {showHud.isTimed ? 'Timed' : 'Handmatig'}
-                                                {showHud.plannedDur > 0 ? ` • Duur ${formatTime(showHud.plannedDur)}` : ''}
-                                                {showHud.isTimed && showHud.plannedDur > 0 ? ` • ToGo ${formatTime(showHud.remainingSec)}` : ''}
-                                                {isPaused ? ' • PAUZE' : ''}
-                                            </div>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div>
-                                        <div className="text-[9px] font-black uppercase tracking-widest opacity-50">Edit</div>
-                                        <div className="mt-1 text-[10px] font-bold text-white/80">
-                                            Open/Dicht + Hernummeren
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+            {/* SHOW + EDIT: top-level "Show" header (single place for Open/Dicht/Hernummeren) */}
+            {hierarchy.length > 0 && (
+                <div className="relative group/show text-sm">
+                    <div className="flex items-center justify-between bg-[#111] border-l-4 border-primary/70 px-4 py-2 shadow-lg hover:bg-[#1a1a1a] transition-colors rounded-lg">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <span className="font-black text-primary uppercase tracking-widest shrink-0">Show</span>
+                            <span className="text-white/80 font-bold truncate">
+                                {activeShow?.name || <span className="opacity-30 italic">Naamloze show</span>}
+                            </span>
+                            <span className="text-[10px] font-mono opacity-30 shrink-0">
+                                {activeEventIndex + 1} / {events.length}
+                            </span>
+                        </div>
 
-                            <div className="flex items-start justify-end gap-4 min-w-0">
-                                {showHud && (
-                                    <div className="min-w-0 text-right">
-                                        <div className="text-[9px] font-black uppercase tracking-widest opacity-50">Volgende</div>
-                                        <div className="mt-1 flex flex-col items-end gap-1">
-                                            {showHud.next ? (
-                                                <>
-                                                    <div className={cn(
-                                                        "px-2 py-1 rounded border text-[10px] font-black uppercase tracking-widest",
-                                                        showHud.nextKind === 'act' ? "bg-primary/15 border-primary/25 text-primary" :
-                                                            showHud.nextKind === 'scene' ? "bg-green-500/10 border-green-500/20 text-green-200" :
-                                                                "bg-orange-500/10 border-orange-500/20 text-orange-200"
-                                                    )}>
-                                                        {showHud.nextKind === 'act' ? 'Act overgang' : showHud.nextKind === 'scene' ? 'Scene overgang' : 'Event overgang'}
-                                                    </div>
-                                                    <div className="text-[10px] font-bold text-white/80 truncate max-w-[420px]">
-                                                        {showHud.nextKind !== 'event' && showHud.nextSceneLabel
-                                                            ? showHud.nextSceneLabel
-                                                            : showHud.nextTitle || showHud.next.cue || '—'}
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <div className="text-[10px] font-bold text-white/40 italic">Einde show</div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="flex items-center gap-2 flex-wrap justify-end pointer-events-auto">
-                                    <button
-                                        onClick={() => expandAll()}
-                                        className="h-8 px-3 rounded-xl bg-black border border-white/20 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white"
-                                        title="Open de boom (in beide modes)"
-                                    >
-                                        <ChevronDown className="w-3.5 h-3.5 text-primary" />
-                                        Open
-                                    </button>
-                                    <button
-                                        onClick={() => collapseAll()}
-                                        className="h-8 px-3 rounded-xl bg-black border border-white/20 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white"
-                                        title="Klap de boom dicht (in beide modes)"
-                                    >
-                                        <ChevronRight className="w-3.5 h-3.5 text-primary" />
-                                        Dicht
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            reindexEvents()
-                                            addToast('Sequence succesvol hernummerd', 'info')
-                                        }}
-                                        className="h-8 px-3 rounded-xl bg-primary text-black font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] flex items-center gap-2"
-                                        title="Acts, Scenes en Events hernummeren"
-                                    >
-                                        <Hash className="w-3.5 h-3.5" />
-                                        Hernummeren
-                                    </button>
-                                </div>
-                            </div>
+                        <div className="flex items-center gap-2 opacity-50 group-hover/show:opacity-100 transition-opacity">
+                            {!isLocked && (
+                                <button
+                                    onClick={() => window.dispatchEvent(new Event('hub:open-project-settings'))}
+                                    className="h-7 w-8 rounded-lg bg-black/40 border border-white/15 flex items-center justify-center hover:bg-white/5 transition-all text-white"
+                                    title="Show instellingen"
+                                >
+                                    <Edit2 className="w-3.5 h-3.5 text-primary" />
+                                </button>
+                            )}
+                            <button
+                                onClick={() => useSequencerStore.getState().expandAll()}
+                                className="h-7 px-2.5 rounded-lg bg-black/40 border border-white/15 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white"
+                                title="Alles uitklappen"
+                            >
+                                <ChevronDown className="w-3.5 h-3.5 text-primary" />
+                                Open
+                            </button>
+                            <button
+                                onClick={() => useSequencerStore.getState().collapseAll()}
+                                className="h-7 px-2.5 rounded-lg bg-black/40 border border-white/15 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white"
+                                title="Alles inklappen"
+                            >
+                                <ChevronRight className="w-3.5 h-3.5 text-primary" />
+                                Dicht
+                            </button>
+                            <button
+                                onClick={() => {
+                                    useSequencerStore.getState().reindexEvents()
+                                    useSequencerStore.getState().addToast('Sequence succesvol hernummerd', 'info')
+                                }}
+                                className="h-7 w-8 rounded-lg bg-black/40 border border-white/15 flex items-center justify-center hover:bg-white/5 transition-all text-white"
+                                title="Acts, Scenes en Events hernummeren"
+                            >
+                                <ListOrdered className="w-3.5 h-3.5 text-primary" />
+                            </button>
+                            <button
+                                onClick={runCheck}
+                                className="h-7 w-8 rounded-lg bg-black/40 border border-white/15 flex items-center justify-center hover:bg-white/5 transition-all text-white"
+                                title="Show check uitvoeren"
+                            >
+                                <ClipboardCheck className="w-3.5 h-3.5 text-primary" />
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {hierarchy.map((act) => {
+            {/* Edit-mode: no extra HUD/tools row needed */}
+
+
+            {hierarchy.map((act, actIndex) => {
                 // Dynamic Collapse: everything collapsed except active and next group during playback
                 const actCollapsed = collapsedGroups[`act-${act.id}`]
 
@@ -2102,7 +2363,7 @@ const SequenceGrid: React.FC = () => {
 
                         {!actCollapsed && (
                             <div className="pl-4 space-y-4 border-l border-white/5 ml-2">
-                                {act.scenes.map((scene) => {
+                                {act.scenes.map((scene, sceneIndex) => {
                                     const firstEvent = scene.events[0]?.rows[0]?.event
                                     const sceneDesc = activeShow?.viewState?.sceneNames?.[`${act.id}-${scene.id}`] || (firstEvent?.type?.toLowerCase() === 'title' ? firstEvent.cue : '') || ''
 
@@ -2213,7 +2474,10 @@ const SequenceGrid: React.FC = () => {
                                                             // Actions and Comments are functional and should always be visible (even when collapsed)
                                                             const alwaysVisibleRows = allContentRows.filter(r => {
                                                                 const type = r.event.type?.toLowerCase()
-                                                                return type === 'action' || type === 'comment'
+                                                                if (type === 'action') return true
+                                                                if (type !== 'comment') return false
+                                                                const cue = (r.event.cue || '').trim()
+                                                                return cue !== '' && cue !== 'Nieuw commentaar' && cue !== 'Opmerkingen' && cue !== 'Opmerking'
                                                             })
 
                                                             // Light and Media are technical details and can be collapsed
@@ -2222,10 +2486,18 @@ const SequenceGrid: React.FC = () => {
                                                                 return type === 'light' || type === 'media'
                                                             })
 
+                                                            // If an event has no underlying rows, don't show the collapse toggle.
+                                                            const hasUnderlyingRows = (alwaysVisibleRows.length + collapsibleRows.length) > 0
+
                                                             // Calculate summary for header tags
                                                             const summaryCounts = eventNode.rows.reduce((acc, r) => {
                                                                 const t = r.event.type?.toLowerCase() || 'unknown'
-                                                                if (t !== 'title' && t !== 'trigger') acc[t] = (acc[t] || 0) + 1
+                                                                if (t === 'title' || t === 'trigger') return acc
+                                                                if (t === 'comment') {
+                                                                    const cue = (r.event.cue || '').trim()
+                                                                    if (!cue || cue === 'Nieuw commentaar' || cue === 'Opmerkingen' || cue === 'Opmerking') return acc
+                                                                }
+                                                                acc[t] = (acc[t] || 0) + 1
                                                                 return acc
                                                             }, {} as Record<string, number>)
 
@@ -2234,7 +2506,8 @@ const SequenceGrid: React.FC = () => {
                                                             // Check if the active event's timing has elapsed (for blinking "Next")
                                                             let activeTimeElapsed = false
                                                             if (eventNode.isNext && eventNode.activeDuration > 0 && lastTransitionTime) {
-                                                                const elapsed = Math.round((currentTime.getTime() - lastTransitionTime) / 1000)
+                                                                const effectiveTime = isPaused ? (pauseStartTime || currentTime.getTime()) : currentTime.getTime()
+                                                                const elapsed = Math.round((effectiveTime - lastTransitionTime) / 1000)
                                                                 activeTimeElapsed = elapsed >= eventNode.activeDuration
                                                             }
 
@@ -2242,7 +2515,8 @@ const SequenceGrid: React.FC = () => {
                                                             let remainingTime = 0
                                                             let showCountdown = false
                                                             if (eventNode.isActive && eventDuration > 0 && lastTransitionTime) {
-                                                                const elapsed = Math.round((currentTime.getTime() - lastTransitionTime) / 1000)
+                                                                const effectiveTime = isPaused ? (pauseStartTime || currentTime.getTime()) : currentTime.getTime()
+                                                                const elapsed = Math.round((effectiveTime - lastTransitionTime) / 1000)
                                                                 remainingTime = Math.max(0, eventDuration - elapsed)
                                                                 showCountdown = true
                                                             }
@@ -2253,7 +2527,13 @@ const SequenceGrid: React.FC = () => {
                                                                 selectedEvent.sceneId === eventNode.rows[0]?.event.sceneId &&
                                                                 selectedEvent.eventId === eventNode.rows[0]?.event.eventId
 
-                                                            const isLastEvent = eventIdx === eventNodesWithTriggers.length - 1
+                                                            // Only hide the transition strip if this is truly the last event in the whole show.
+                                                            // If there's a next scene/act, we still want a transition line between the last event
+                                                            // of the current scene/act and the next event.
+                                                            const hasNextInScene = eventIdx < eventNodesWithTriggers.length - 1
+                                                            const hasNextSceneInAct = !hasNextInScene && act.scenes.slice(sceneIndex + 1).some(sc => (sc.events?.length || 0) > 0)
+                                                            const hasNextAct = !hasNextInScene && !hasNextSceneInAct && hierarchy.slice(actIndex + 1).some(a => (a.scenes || []).some(sc => (sc.events?.length || 0) > 0))
+                                                            const isLastEvent = !(hasNextInScene || hasNextSceneInAct || hasNextAct)
 
                                                             return (
                                                                 <div key={eventNode.uniqueId} className="ml-6 pl-2 border-l border-white/5 relative">
@@ -2293,19 +2573,23 @@ const SequenceGrid: React.FC = () => {
                                                                                 )}>
                                                                                     {/* Left: collapse toggle + event name */}
                                                                                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                                                        <button
-                                                                                            onClick={(e) => { e.stopPropagation(); toggleCollapse(eventNode.uniqueId) }}
-                                                                                            className="p-1 hover:bg-white/10 rounded -ml-1 shrink-0"
-                                                                                        >
-                                                                                            {eventCollapsed ? <ChevronRight className="w-3.5 h-3.5 opacity-60" /> : <ChevronDown className="w-3.5 h-3.5 opacity-60" />}
-                                                                                        </button>
+                                                                                        {hasUnderlyingRows && (
+                                                                                            <button
+                                                                                                onClick={(e) => { e.stopPropagation(); toggleCollapse(eventNode.uniqueId) }}
+                                                                                                className="p-1 hover:bg-white/10 rounded -ml-1 shrink-0"
+                                                                                                title={eventCollapsed ? "Uitklappen" : "Inklappen"}
+                                                                                            >
+                                                                                                {eventCollapsed ? <ChevronRight className="w-3.5 h-3.5 opacity-60" /> : <ChevronDown className="w-3.5 h-3.5 opacity-60" />}
+                                                                                            </button>
+                                                                                        )}
 
                                                                                         {/* Event name (from title row cue) */}
                                                                                         {titleRow ? (
                                                                                             !isLocked ? (
                                                                                                 <RenamableInput
                                                                                                     className={cn(
-                                                                                                        "bg-transparent font-bold text-xs outline-none border-b border-transparent focus:border-white/30 flex-1 min-w-0 uppercase tracking-wider ml-4",
+                                                                                                        "bg-transparent font-bold text-xs outline-none border-b border-transparent focus:border-white/30 flex-1 min-w-0 uppercase tracking-wider",
+                                                                                                        hasUnderlyingRows && "ml-4",
                                                                                                         eventNode.isActive ? "text-green-400" :
                                                                                                             eventNode.isNext ? "text-orange-400" :
                                                                                                                 "text-orange-500/90"
@@ -2319,7 +2603,8 @@ const SequenceGrid: React.FC = () => {
                                                                                                 />
                                                                                             ) : (
                                                                                                 <span className={cn(
-                                                                                                    "font-bold text-xs truncate flex-1 uppercase tracking-wider ml-4",
+                                                                                                    "font-bold text-xs truncate flex-1 uppercase tracking-wider",
+                                                                                                    hasUnderlyingRows && "ml-4",
                                                                                                     eventNode.isActive ? "text-green-400" :
                                                                                                         eventNode.isNext ? "text-orange-400" :
                                                                                                             "text-orange-500/90"
@@ -2334,8 +2619,29 @@ const SequenceGrid: React.FC = () => {
 
                                                                                     {/* Right: meta tags + status + controls */}
                                                                                     <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                                                                                        {/* Event number (edit mode): scene-event */}
+                                                                                        {!isLocked && (
+                                                                                            <span className="text-[9px] font-mono opacity-25 shrink-0">
+                                                                                                Event {(eventNode.rows?.[0]?.event?.sceneId ?? 0)}-{(eventNode.rows?.[0]?.event?.eventId ?? 0)}
+                                                                                            </span>
+                                                                                        )}
                                                                                         {/* Script page */}
-                                                                                        {titleRow?.event.scriptPg !== undefined && titleRow.event.scriptPg > 0 && (
+                                                                                        {!isLocked && titleRow && (
+                                                                                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-[9px] font-bold text-blue-200">
+                                                                                                <span className="opacity-70">Pg</span>
+                                                                                                <RenamableInput
+                                                                                                    className="w-10 bg-transparent outline-none text-[9px] font-mono font-bold text-blue-100 text-center border-b border-transparent focus:border-blue-300/60"
+                                                                                                    value={(titleRow.event.scriptPg || 0).toString()}
+                                                                                                    placeholder="0"
+                                                                                                    onRename={(val) => {
+                                                                                                        const n = parseInt((val || '').trim()) || 0
+                                                                                                        const updateEvent = useSequencerStore.getState().updateEvent
+                                                                                                        updateEvent(titleRow.originalIndex, { scriptPg: n })
+                                                                                                    }}
+                                                                                                />
+                                                                                            </div>
+                                                                                        )}
+                                                                                        {isLocked && titleRow?.event.scriptPg !== undefined && titleRow.event.scriptPg > 0 && (
                                                                                             <div className="flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/30 rounded text-[9px] font-bold text-blue-300">
                                                                                                 Pg {titleRow.event.scriptPg}
                                                                                             </div>
@@ -2444,13 +2750,14 @@ const SequenceGrid: React.FC = () => {
                                                                         {/* ═══ ALWAYS VISIBLE ROWS (Comments, Actions) ═══ */}
                                                                         {alwaysVisibleRows.length > 0 && (
                                                                             <div className="flex flex-col divide-y divide-white/5 border-t border-white/5">
-                                                                                {alwaysVisibleRows.map(item => (
+                                                                                {alwaysVisibleRows.map((item, idx) => (
                                                                                     <RowItem
                                                                                         key={`always-${item.id}`}
                                                                                         event={item.event}
                                                                                         originalIndex={item.originalIndex}
                                                                                         id={item.id}
                                                                                         isShadow={item.isShadow}
+                                                                                        zebraIndex={idx}
                                                                                         isActiveGroup={eventNode.isActive}
                                                                                         isNextGroup={eventNode.isNext}
                                                                                         handleRowClick={handleRowClick}
@@ -2476,13 +2783,15 @@ const SequenceGrid: React.FC = () => {
                                                                             <div className="flex flex-col divide-y divide-white/5 border-t border-white/5">
                                                                                 {(() => {
                                                                                     const usedFixtures = eventNode.rows.map(r => r.event.fixture).filter(Boolean)
-                                                                                    return collapsibleRows.map(item => (
+                                                                                    const base = alwaysVisibleRows.length
+                                                                                    return collapsibleRows.map((item, idx) => (
                                                                                         <RowItem
                                                                                             key={`row-${item.id}`}
                                                                                             event={{ ...item.event, usedFixtures } as any}
                                                                                             originalIndex={item.originalIndex}
                                                                                             id={item.id}
                                                                                             isShadow={item.isShadow}
+                                                                                            zebraIndex={base + idx}
                                                                                             isNextGroup={eventNode.isNext}
                                                                                             isActiveGroup={eventNode.isActive}
                                                                                             handleRowClick={handleRowClick}
@@ -2512,8 +2821,12 @@ const SequenceGrid: React.FC = () => {
                                                                         isLocked={isLocked}
                                                                         triggerIndex={triggerRow?.originalIndex}
                                                                         onEditTrigger={(idx) => {
-                                                                            handleRowClick(idx)
-                                                                            handleRowDoubleClick(idx)
+                                                                            if (typeof idx === 'number') {
+                                                                                openTransitionEditor(idx)
+                                                                            } else {
+                                                                                // No trigger row yet → create one and open editor
+                                                                                ensureTriggerAndEdit(eventNode, titleRow?.originalIndex)
+                                                                            }
                                                                         }}
                                                                     />
                                                                 </div>

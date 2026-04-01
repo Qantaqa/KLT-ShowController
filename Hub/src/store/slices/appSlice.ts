@@ -8,6 +8,8 @@ import { showInitService } from '../../services/show-init-service';
 export interface AppSlice {
     activeShow: ShowProfile | null;
     availableShows: ShowProfile[];
+    showsLoading: boolean;
+    showsLoadError: string | null;
     appSettings: AppSettingsProfile;
     isAuthorized: boolean;
     registrationStatus: 'NOT_FOUND' | 'WAITING_PIN' | 'WAITING_HOST_PIN' | 'WAITING_REGISTRATION' | 'AUTHORIZED' | 'STARTING' | null;
@@ -33,7 +35,7 @@ export interface AppSlice {
     clientUUID: string;
     clientFriendlyName: string;
 
-    addToast: (message: string, type?: 'info' | 'warning' | 'error') => void;
+    addToast: (message: string, type?: 'info' | 'warning' | 'error', durationMs?: number) => void;
     removeToast: (id: string) => void;
     openModal: (config: any) => void;
     closeModal: () => void;
@@ -74,6 +76,8 @@ export const createAppSlice: StateCreator<
 > = (set, get) => ({
     activeShow: null,
     availableShows: [],
+    showsLoading: false,
+    showsLoadError: null,
     appSettings: {
         defaultLogo: '',
         accessPin: '',
@@ -107,10 +111,10 @@ export const createAppSlice: StateCreator<
     clientFriendlyName: '',
     eventPage: null,
 
-    addToast: (message, type = 'info') => {
+    addToast: (message, type = 'info', durationMs = 5000) => {
         const id = Math.random().toString(36).substring(7)
         set(state => ({ toasts: [...state.toasts, { id, type, message }] }))
-        setTimeout(() => get().removeToast(id), 5000)
+        setTimeout(() => get().removeToast(id), durationMs)
     },
 
     removeToast: (id) => set(state => ({ toasts: state.toasts.filter(t => t.id !== id) })),
@@ -302,60 +306,109 @@ export const createAppSlice: StateCreator<
 
     initializeShows: async () => {
         if (!(window as any).require) return
-        const { ipcRenderer } = (window as any).require('electron')
-        try {
-            const dbShows: any[] = await ipcRenderer.invoke('db:get-shows')
-            const safeJsonParse = (val: any, fallback: any = {}) => {
-                if (val === null || val === undefined) return fallback
-                if (typeof val === 'object') return val
-                if (typeof val === 'string') {
-                    try { return JSON.parse(val) } catch { return fallback }
-                }
-                return fallback
-            }
-            const available: ShowProfile[] = dbShows.map(s => ({
-                ...s,
-                invertScriptColors: !!s.invertScriptColors,
-                schedule: safeJsonParse(s.schedule, {}),
-                viewState: safeJsonParse(s.viewState, {})
-            }))
-            const lastShowId = localStorage.getItem('ledshow_last_show_id')
-            let active = lastShowId ? available.find(s => s.id === lastShowId) || null : null
-            const appSettings = await ipcRenderer.invoke('db:get-app-settings')
-            if (appSettings?.defaultLogo && appSettings.defaultLogo.startsWith('ledshow-file://')) {
-                const port = (appSettings.serverPort || 3001) + 1
-                appSettings.defaultLogo = `http://localhost:${port}/logo`
-                await ipcRenderer.invoke('db:update-app-settings', appSettings)
-            }
-            const globalDevices = await ipcRenderer.invoke('db:get-devices', 'GLOBAL')
-            set({
-                availableShows: available,
-                activeShow: null,
-                events: [],
-                activeEventIndex: -1,
-                appSettings: { ...appSettings, devices: globalDevices || [] }
-            })
-            networkService.registerClient()
-            if (active) await get().setActiveShow(active)
-            let uuid = localStorage.getItem('ledshow_client_uuid')
-            if (!uuid) {
-                uuid = 'client_' + Math.random().toString(36).substring(2, 15)
-                localStorage.setItem('ledshow_client_uuid', uuid)
-            }
-            const clientConfig = appSettings?.clientConfigs?.[uuid]
-            if (clientConfig) {
-                set({
-                    clientUUID: uuid,
-                    isCameraActive: clientConfig.isCameraActive ?? false,
-                    isSelfPreviewVisible: clientConfig.isSelfPreviewVisible ?? true,
-                    selectedCameraClients: clientConfig.selectedCameraClients ?? []
-                })
-            } else {
-                set({ clientUUID: uuid })
-            }
-        } catch (err) {
-            console.error('Project initialization failure:', err)
+
+        // Ensure initializeShows is single-flight (avoid overlapping calls)
+        const anyGlobal = globalThis as any
+        if (anyGlobal.__hubInitializeShowsPromise) {
+            return anyGlobal.__hubInitializeShowsPromise
         }
+
+        const { addToast } = get()
+        const { ipcRenderer } = (window as any).require('electron')
+
+        const safeJsonParse = (val: any, fallback: any = {}) => {
+            if (val === null || val === undefined) return fallback
+            if (typeof val === 'object') return val
+            if (typeof val === 'string') {
+                try { return JSON.parse(val) } catch { return fallback }
+            }
+            return fallback
+        }
+
+        const wait = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms))
+
+        const run = (async () => {
+            set({ showsLoading: true, showsLoadError: null })
+            try {
+                // Retry a few times; on cold start the DB / IPC can be transiently unavailable.
+                const delaysMs = [0, 200, 500, 1000, 1500]
+                let lastErr: any = null
+
+                for (let attempt = 0; attempt < delaysMs.length; attempt++) {
+                    if (delaysMs[attempt] > 0) await wait(delaysMs[attempt])
+                    try {
+                        const dbShows: any[] = await ipcRenderer.invoke('db:get-shows')
+
+                        const available: ShowProfile[] = (dbShows || []).map(s => ({
+                            ...s,
+                            invertScriptColors: !!s.invertScriptColors,
+                            schedule: safeJsonParse(s.schedule, {}),
+                            viewState: safeJsonParse(s.viewState, {})
+                        }))
+
+                        const lastShowId = localStorage.getItem('ledshow_last_show_id')
+                        const active = lastShowId ? available.find(s => s.id === lastShowId) || null : null
+
+                        const appSettings = await ipcRenderer.invoke('db:get-app-settings')
+                        if (appSettings?.defaultLogo && appSettings.defaultLogo.startsWith('ledshow-file://')) {
+                            const port = (appSettings.serverPort || 3001) + 1
+                            appSettings.defaultLogo = `http://localhost:${port}/logo`
+                            await ipcRenderer.invoke('db:update-app-settings', appSettings)
+                        }
+
+                        const globalDevices = await ipcRenderer.invoke('db:get-devices', 'GLOBAL')
+
+                        set({
+                            availableShows: available,
+                            activeShow: null,
+                            events: [],
+                            activeEventIndex: -1,
+                            appSettings: { ...appSettings, devices: globalDevices || [] },
+                            showsLoading: false,
+                            showsLoadError: null
+                        })
+
+                        networkService.registerClient()
+
+                        if (active) await get().setActiveShow(active)
+
+                        let uuid = localStorage.getItem('ledshow_client_uuid')
+                        if (!uuid) {
+                            uuid = 'client_' + Math.random().toString(36).substring(2, 15)
+                            localStorage.setItem('ledshow_client_uuid', uuid)
+                        }
+                        const clientConfig = appSettings?.clientConfigs?.[uuid]
+                        if (clientConfig) {
+                            set({
+                                clientUUID: uuid,
+                                isCameraActive: clientConfig.isCameraActive ?? false,
+                                isSelfPreviewVisible: clientConfig.isSelfPreviewVisible ?? true,
+                                selectedCameraClients: clientConfig.selectedCameraClients ?? []
+                            })
+                        } else {
+                            set({ clientUUID: uuid })
+                        }
+
+                        return
+                    } catch (e) {
+                        lastErr = e
+                        // Continue retrying
+                    }
+                }
+
+                const msg = (lastErr && (lastErr.message || String(lastErr))) || 'Onbekende fout'
+                console.error('Project initialization failure:', lastErr)
+                set({ showsLoading: false, showsLoadError: msg })
+                addToast(`Kon shows niet laden: ${msg}`, 'error')
+            } finally {
+                // Always clear the single-flight promise
+                anyGlobal.__hubInitializeShowsPromise = null
+                set(state => state.showsLoading ? { showsLoading: false } as any : ({} as any))
+            }
+        })()
+
+        anyGlobal.__hubInitializeShowsPromise = run
+        return run
     },
 
     updateAppSettings: async (partial) => {

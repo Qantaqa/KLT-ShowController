@@ -26,6 +26,7 @@ export interface MediaSlice {
 
     restartMedia: (index: number) => void;
     stopMedia: (index: number) => void;
+    stopMediaAt: (act: string, sceneId: number, eventId: number) => void;
     stopAllMedia: () => void;
     setMediaVolume: (index: number, volume: number) => void;
     toggleAudio: (index: number) => void;
@@ -62,6 +63,11 @@ export const createMediaSlice: StateCreator<
         const event = events[index]
         if (!event) return
 
+        const toNumberOrUndef = (v: any) => {
+            const n = typeof v === 'string' && v.trim() === '' ? NaN : Number(v)
+            return Number.isFinite(n) ? n : undefined
+        }
+
         const targetName = (event.fixture || '').trim().toLowerCase()
         const devices = appSettings.devices || []
         const targets = devices.filter((d: any) => {
@@ -71,6 +77,9 @@ export const createMediaSlice: StateCreator<
             return isTypeMatch && isEnabled && isNameMatch
         })
 
+        // `playingMedia` keeps track of what's currently playing per device.
+        // Keys are device ids (stringified) so we can reliably match Object.entries(...) keys.
+        // Values include the stop marker (stopAct/stopSceneId/stopEventId) used by stopMediaAt().
         const newPlaying = { ...playingMedia }
         targets.forEach((d: any) => {
             const mediaUrl = event.filename || ''
@@ -80,14 +89,40 @@ export const createMediaSlice: StateCreator<
             const projectionMaskIds = event.projectionMaskIds
 
             const brightness = event.brightness !== undefined ? event.brightness : 100
+            // Stop marker:
+            // - Set in the SequenceGrid UI ("Stop At") on the media/light row.
+            // - When show navigation enters that target event group, stopMediaAt(...) will match and fade out the device.
+            const stopSceneId = toNumberOrUndef(event.stopSceneId)
+            const stopEventId = toNumberOrUndef(event.stopEventId)
+            const stopAct =
+                (event.stopAct || '').trim() ||
+                // If only scene/event is set, default stopAct to the current event's act.
+                ((stopSceneId !== undefined || stopEventId !== undefined)
+                    ? (event.act || '').trim() || undefined
+                    : undefined)
+
+            // ShowEvent.transition is stored in seconds (used by lights and agent fadeInTime).
+            // Local monitor projection window expects milliseconds.
+            const localTransitionMs = (toNumberOrUndef(event.transition) ?? 0) > 0
+                ? (event.transition * 1000)
+                : ((d.type === 'local_monitor'
+                    ? ((d as LocalMonitorDevice).fadeInTime ?? (d as LocalMonitorDevice).transitionTime ?? 0.5)
+                    : 0) * 1000)
 
             if (d.type === 'videowall_agent') {
                 // Direct play — no sync — pre-flight check ensures media is present
-                PlayDirectOnAgent(d as VideoWallAgentDevice, mediaUrl, repeat, volume, event.transition, mute, brightness)
+                PlayDirectOnAgent(d as VideoWallAgentDevice, mediaUrl, repeat, volume, toNumberOrUndef(event.transition) ?? 0, mute, brightness)
             } else {
-                MediaPlayer.StartMediaPlayer(d, mediaUrl, repeat, volume, 0, undefined, event.transition, mute, projectionMaskIds, brightness)
+                const transitionArg = d.type === 'local_monitor' ? localTransitionMs : (toNumberOrUndef(event.transition) ?? 0)
+                MediaPlayer.StartMediaPlayer(d, mediaUrl, repeat, volume, 0, undefined, transitionArg, mute, projectionMaskIds, brightness)
             }
-            newPlaying[d.id] = { filename: event.filename || '', timestamp: Date.now() }
+            newPlaying[String(d.id)] = {
+                filename: event.filename || '',
+                timestamp: Date.now(),
+                stopAct,
+                stopSceneId,
+                stopEventId
+            }
         })
         set({ playingMedia: newPlaying })
     },
@@ -111,8 +146,52 @@ export const createMediaSlice: StateCreator<
             const dLocal = d.type === 'local_monitor' ? d as LocalMonitorDevice : null
             const fadeOutTime = (dLocal?.fadeOutTime || 0.5) * 1000
             MediaPlayer.StopMediaPlayer(d, fadeOutTime)
-            delete newPlaying[d.id]
+            delete newPlaying[String(d.id)]
         })
+        set({ playingMedia: newPlaying })
+    },
+
+    /**
+     * Auto-stop any currently playing media that declares a stop marker
+     * matching the given Act/Scene/Event group.
+     *
+     * Used during show navigation: when we ENTER the stop event, we fade out and go to black.
+     */
+    stopMediaAt: (act: string, sceneId: number, eventId: number) => {
+        const { appSettings, playingMedia } = get()
+        const devices = appSettings.devices || []
+
+        const newPlaying = { ...playingMedia }
+        const targetAct = (act || '').trim()
+        const targetScene = Number.isFinite(sceneId as number) ? sceneId : 0
+        const targetEvent = Number.isFinite(eventId as number) ? eventId : 0
+
+        const toNumberOrZero = (v: any) => {
+            const n = typeof v === 'string' && v.trim() === '' ? NaN : Number(v)
+            return Number.isFinite(n) ? n : 0
+        }
+        // Called by the host when a new event group becomes active (SequenceSlice.setActiveEvent).
+        // It checks all currently playing devices for a matching stop marker and then
+        // calls MediaPlayer.StopMediaPlayer(...) with the device's configured fadeOutTime.
+        for (const [deviceId, info] of Object.entries(playingMedia)) {
+            const stopScene = toNumberOrZero(info?.stopSceneId)
+            const stopEvent = toNumberOrZero(info?.stopEventId)
+            const stopAct = (info?.stopAct || '').trim() || ((stopScene !== 0 || stopEvent !== 0) ? targetAct : '')
+            if (!stopAct) continue
+
+            if (stopAct === targetAct && stopScene === targetScene && stopEvent === targetEvent) {
+                // Device ids coming from Object.entries(...) are strings; normalize to avoid mismatches.
+                const d = devices.find((x: any) => String(x.id) === String(deviceId))
+                if (!d || (d as any).enabled === false) {
+                    delete newPlaying[deviceId]
+                    continue
+                }
+                const dLocal = d.type === 'local_monitor' ? d as LocalMonitorDevice : null
+                const fadeOutTime = (dLocal?.fadeOutTime || 0.5) * 1000
+                MediaPlayer.StopMediaPlayer(d as any, fadeOutTime)
+                delete newPlaying[deviceId]
+            }
+        }
         set({ playingMedia: newPlaying })
     },
 
