@@ -83,6 +83,7 @@ export const StartMediaPlayer = async (
                 volume: volume,
                 mute: mute,
                 transitionTime: transitiontime,
+                crossoverTime: (d.crossoverTime ?? 0) * 1000,
                 projectionMaskIds: projectionMaskIds,
                 brightness: brightness
             }

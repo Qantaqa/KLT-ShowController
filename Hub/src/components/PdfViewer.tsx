@@ -212,6 +212,8 @@ const PdfViewer: React.FC = () => {
     const setCurrentScriptPage = useSequencerStore((state) => state.setCurrentScriptPage)
     const isLocked = useSequencerStore((state) => state.isLocked)
     const selectedEventIndex = useSequencerStore((state) => state.selectedEventIndex)
+    const activeEventIndex = useSequencerStore((state) => state.activeEventIndex)
+    const events = useSequencerStore((state) => state.events)
     const updateEvent = useSequencerStore((state) => state.updateEvent)
     const addToast = useSequencerStore((state) => state.addToast)
 
@@ -377,6 +379,32 @@ const PdfViewer: React.FC = () => {
         } else {
             addToast('Selecteer eerst een cue in het grid', 'warning')
         }
+    }
+
+    const handleBindToActiveEvent = () => {
+        if (activeEventIndex < 0) {
+            addToast('Geen actief event om te koppelen', 'warning')
+            return
+        }
+
+        const active = events[activeEventIndex]
+        if (!active) {
+            addToast('Geen actief event om te koppelen', 'warning')
+            return
+        }
+
+        // Prefer binding to the Title row of the active event group (so it shows in the event header),
+        // fallback to the active row if no title row exists.
+        const titleIdx = events.findIndex(e =>
+            e.act === active.act &&
+            e.sceneId === active.sceneId &&
+            e.eventId === active.eventId &&
+            e.type?.toLowerCase() === 'title'
+        )
+
+        const idxToUpdate = titleIdx !== -1 ? titleIdx : activeEventIndex
+        updateEvent(idxToUpdate, { scriptPg: pageNumber })
+        addToast(`Pagina ${pageNumber} gekoppeld aan actief event`, 'info')
     }
 
     // ----- Remote client: full pdfjs canvas viewer via HTTP -----
@@ -555,6 +583,18 @@ const PdfViewer: React.FC = () => {
                         >
                             <LinkIcon className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
                             <span className="text-[10px] font-black uppercase tracking-widest">Koppel aan cue</span>
+                        </button>
+                    )}
+
+                    {!isLocked && (
+                        <button
+                            onClick={handleBindToActiveEvent}
+                            disabled={activeEventIndex === -1}
+                            className="flex items-center gap-2 h-9 px-4 bg-black/20 hover:bg-white/5 border border-white/10 rounded-xl transition-all group disabled:opacity-20 disabled:grayscale text-white/40"
+                            title="Koppel huidige pagina aan het actieve event"
+                        >
+                            <LinkIcon className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Koppel aan actief event</span>
                         </button>
                     )}
                 </div>

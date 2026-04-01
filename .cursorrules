@@ -1,0 +1,105 @@
+# KLT ShowController — Cursor Rules (aligned with current codebase)
+
+## 1) Project Context
+- **Doel**: show-control systeem voor musical/theater. Moet betrouwbaar werken tijdens live cues.
+- **Topologie**:
+  - **Hub**: Electron + React UI op Windows (host) en optioneel read-only remote clients (browser).
+  - **VideoWall Agent(s)**: Node/Express + kiosk browser (vaak Raspberry Pi) voor video output.
+- **Offline-first**: geen internet tijdens show; wel LAN.
+
+## 2) Repo Layout (reality, not ideal)
+- **Hub code**: `Hub/`
+  - **Electron main**: `Hub/electron/`
+  - **Renderer (React)**: `Hub/src/`
+  - **Built artifacts**: `Hub/dist-electron/` (niet handmatig aanpassen)
+- **VideoWall Agent**: `VideoWall Agent/` (let op spatie in pad)
+
+## 3) Core UX Principle (“The show must go on”)
+- **No UI freezing**: nooit sync/blocking work in render loops; voorkom grote re-renders.
+- **Graceful degradation**: devices mogen offline zijn; UI blijft bruikbaar en show-progressie gaat door.
+- **Show-mode vs Edit-mode**:
+  - **Show-mode** (`isLocked === true`): focus op overgangen (Act/Scene/Event), crew-instructies, timing; geen CRUD.
+  - **Edit-mode** (`isLocked === false`): snelle CRUD, insert/move, test, bulk acties.
+
+## 4) Domain Model (Sequence)
+- **Sequence → Acts → Scenes → Events → Actions**
+- In code is het model row-based (`ShowEvent`) met `type` + (`act`, `sceneId`, `eventId`, `actionId`).
+- **ID’s**: `reindexEvents()` is de bron van waarheid voor normalisatie/nummering.
+- **Transitions**:
+  - `Trigger` rows bepalen overgangstype (manual/timed) en duration.
+
+## 5) Electron Boundary (current behavior + target direction)
+- **Huidige realiteit**: Hub renderer gebruikt op plekken `(window as any).require('electron')` voor IPC.
+  - Dit is toegestaan **in Host/Electron context**, maar code moet altijd guarden:
+    - `if ((window as any).require) { ... } else { /* remote browser */ }`
+- **Target direction** (geleidelijk): verplaats platform/OS/DB calls naar `preload` + `contextBridge` (`window.api.*`).
+  - Nieuwe features: **voorkeur** voor `contextBridge` API’s i.p.v. nieuwe `window.require` usages.
+  - We migreren **incrementeel**: bestaande `window.require` code blijft werken; nieuwe functionaliteit bouwt bij voorkeur op `window.api.*`.
+
+## 6) TypeScript Rules (pragmatic)
+- **Voorkeur**: strict typing voor domeinmodellen (`ShowEvent`, devices, network messages).
+- **Geen nieuwe implicit-any**: expliciet types op callbacks/filters/maps.
+- **`any`**:
+  - Bestaande `as any` mag blijven waar refactor duur is.
+  - Nieuwe `any` alleen als er een korte comment in PR/commit staat met reden + follow-up (“type later”).
+
+## 7) Networking & Hardware Control
+- **WLED**: HTTP JSON API (`http://<ip>/json/...`) met **korte timeouts** en try/catch.
+- **WiZ**: UDP via main-process; fire-and-forget; UI mag nooit wachten op antwoord.
+- **Agent**:
+  - Control via `http://<agent-ip>:3003/*` en `ws://<agent-ip>:3003`.
+  - Media sync bij voorkeur **preflight** vóór show; tijdens show liefst alleen “play asset name”.
+
+## 8) Offline-First Hard Rules
+- **Geen externe web-assets**: geen Google Fonts/CDN links, geen runtime downloads.
+- **Timeouts everywhere**: elke network call (WLED/Agent/Hub endpoints) met timeout + fallback.
+- **AI features**: optioneel en fail-fast; offline moet altijd binnen seconden terugvallen op non-AI pad.
+
+## 9) UI/UX Design Guidelines (existing system)
+- Dark-first, minimale afleiding. Gebruik Tailwind utilities consistent.
+- Show-mode:
+  - Sticky/fixed HUD mag, maar mag focus niet wegnemen.
+  - “Waar zitten we + wat komt er” boven techniekdetails.
+- Edit-mode:
+  - Snelle knoppen voor boom “Open/Dicht” en “Hernummeren” zijn toegestaan, maar moeten predictably werken.
+
+## 10) State Management (Zustand)
+- Gebruik selectors waar mogelijk om re-renders te beperken.
+- Show-mode UI mag runtime state gebruiken (bv. `runtimeCollapsedGroups`).
+- Edit-mode UI mag viewState in DB opslaan (bv. `activeShow.viewState.collapsedGroups`).
+
+## 11) Contracts / Message Naming (align with code)
+- Gebruik de bestaande `networkService.sendCommand({ type: ... })` contracten consistent.
+- Als er nieuwe types bijkomen: voeg ze toe aan types/enum en documenteer 1 plek (liefst in `Hub/src/services/network-service.ts` of types map).
+
+## 11a) Hub ↔ VideoWall Agent Protocol (small & stable)
+- **Doel**: de agent is primair een “output device”. Houd het protocol klein.
+- **Transport (huidige code)**:
+  - **HTTP** op `http://<agent-ip>:3003` voor betrouwbare commands na uploads.
+  - **WebSocket** op `ws://<agent-ip>:3003` voor realtime tweaks.
+- **Canonieke commando’s (verwacht)**:
+  - **Play**: `filename` + parameters zoals `loop`, `volume`, `mute`, `fadeInTime`, `crossoverTime`, `brightness`.
+  - **Stop**: stop playback (optioneel met fade aan Hub-zijde).
+  - **Realtime**: `volume`, `brightness`, `repeat`, optioneel `pause`/`resume`, `test-pattern` (technisch/debug).
+  - **Media sync**: upload/checksum vóór show; tijdens show alleen “play asset name” waar mogelijk.
+- **Nieuwe agent-commando’s**:
+  - Alleen toevoegen als het echt “output-device” gedrag is (geen showlogica in agent).
+  - Documenteer in 1 plek: `VideoWall Agent/src/server.ts` routes/WS actions + Hub client wrapper in `Hub/src/services/videowall-agent-service.ts`.
+
+## 12) “Plan first” guideline (lightweight)
+- Voor **grote** wijzigingen (nieuw protocol, database schema, agent update flow): eerst kort plan.
+- Voor **kleine** UI fixes/bugfixes: direct uitvoeren is ok, zolang het non-breaking is.
+
+## Appendix: Clarifications (what we mean in these rules)
+- **“Migratie deadline”**: geen datum nodig. Het betekent alleen: *willen we dit ooit verplicht afronden*, of blijft `window.require('electron')` voorlopig ok? In deze repo: **voorlopig ok**, maar nieuwe code heeft voorkeur voor `contextBridge` waar makkelijk.
+- **“Command types”**: dit zijn de waarden van `sendCommand({ type: ... })` en soortgelijke message-dispatch. Een vaste lijst in de rules helpt om per ongeluk nieuwe “one-off” types te introduceren. Voor nu houden we het simpel: **volg de bestaande types** en documenteer nieuwe types op 1 plek.
+
+## UI: Open/Dicht gedrag
+- **Edit-mode (`isLocked=false`)**:
+  - `Open`: alles uitklappen (acts + scenes + event-details).
+  - `Dicht`: alles inklappen (event-details dicht; act/scene structuur blijft bruikbaar).
+  - Knoppen mogen aanwezig zijn maar **niet prominent**.
+- **Show-mode (`isLocked=true`)**:
+  - UI focust op **actieve + volgende** items (auto-collapse mag).
+  - “Open/Dicht” is optioneel; als aanwezig: mag de auto-collapse tijdelijk overrulen, maar blijft secundair.
+

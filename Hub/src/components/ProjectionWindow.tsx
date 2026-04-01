@@ -79,7 +79,7 @@ const ProjectionWindow: React.FC = () => {
             const { ipcRenderer } = (window as any).require('electron')
             setIsConnected(true)
 
-            const handlePlay = (_: any, { url, loop, volume, mute, transitionTime, projectionMaskIds }: { url: string, loop: boolean, volume: number, mute: boolean, transitionTime?: number, projectionMaskIds?: string[] }) => {
+            const handlePlay = (_: any, { url, loop, volume, mute, transitionTime, crossoverTime, projectionMaskIds }: { url: string, loop: boolean, volume: number, mute: boolean, transitionTime?: number, crossoverTime?: number, projectionMaskIds?: string[] }) => {
                 const vol = Math.max(0, Math.min(1, volume / 100))
 
                 // Disable test media when show starting show media
@@ -88,8 +88,10 @@ const ProjectionWindow: React.FC = () => {
                 setActiveMaskIds(projectionMaskIds || null)
                 const nextPlayer = activePlayerRef.current === 'A' ? 'B' : 'A';
                 const fadeMs = transitionTime || 0;
+                const crossoverMs = crossoverTime || 0;
 
                 console.log(`[Proj] Play Request: ${url} (Next: ${nextPlayer}, Fade: ${fadeMs}ms)`);
+                ;(window as any).__projCrossoverMs = crossoverMs;
 
                 const nextState: PlayerState = {
                     src: url,
@@ -278,7 +280,7 @@ const ProjectionWindow: React.FC = () => {
             setTimeout(() => {
                 const cleanup = { src: null, playing: false, opacity: 0, fadeDuration: 0, loop: false, volume: 1, muted: false };
                 if (id === 'A') setPlayerB(cleanup); else setPlayerA(cleanup);
-            }, fadeMs + 100);
+            }, fadeMs + 100 + ((window as any).__projCrossoverMs || 0));
 
             setDebugInfo(`Transitioning (${fadeMs}ms)`)
         } else if (isNextPlayer && pendingFadeMs.current === 0) {

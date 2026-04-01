@@ -65,7 +65,12 @@ export interface ProjectionMask {
 export interface LocalMonitorDevice extends BaseDevice {
     type: 'local_monitor';
     monitorId: number;
+    /** Default fade-in duration in seconds (used when event.transition is 0). */
+    fadeInTime?: number;
     fadeOutTime?: number;
+    /** Cross-over overlap time in seconds (used for cleanup overlap). */
+    crossoverTime?: number;
+    /** Backward-compatible alias (legacy). Prefer fadeInTime. */
     transitionTime?: number;
     projectionMasks?: ProjectionMask[];
 }

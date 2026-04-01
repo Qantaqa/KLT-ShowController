@@ -125,6 +125,10 @@ class DbManager {
                 scriptPg INTEGER,
                 duration INTEGER,
                 filename TEXT,
+                -- Stop marker: if set on a media/light row, playback will auto-stop when entering this target group.
+                stopAct TEXT,
+                stopSceneId INTEGER,
+                stopEventId INTEGER,
                 FOREIGN KEY(showId) REFERENCES shows(id) ON DELETE CASCADE
             )
         `);
@@ -156,6 +160,15 @@ class DbManager {
     }
     if (!columns.includes("paletteId")) {
       this.db.exec("ALTER TABLE sequences ADD COLUMN paletteId INTEGER");
+    }
+    if (!columns.includes("stopAct")) {
+      this.db.exec("ALTER TABLE sequences ADD COLUMN stopAct TEXT");
+    }
+    if (!columns.includes("stopSceneId")) {
+      this.db.exec("ALTER TABLE sequences ADD COLUMN stopSceneId INTEGER");
+    }
+    if (!columns.includes("stopEventId")) {
+      this.db.exec("ALTER TABLE sequences ADD COLUMN stopEventId INTEGER");
     }
     this.db.exec(`
             CREATE TABLE IF NOT EXISTS clipboard (
@@ -462,8 +475,8 @@ class DbManager {
     const deleteStmt = this.db.prepare("DELETE FROM sequences WHERE showId = ?");
     const insertStmt = this.db.prepare(`
             INSERT INTO sequences 
-            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId, stopAct, stopSceneId, stopEventId)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
     const transaction = this.db.transaction((showId2, events2) => {
       deleteStmt.run(showId2);
@@ -492,7 +505,11 @@ class DbManager {
           // Use segment/effect/palette IDs if present, otherwise null
           e.segmentId !== void 0 ? e.segmentId : null,
           e.effectId !== void 0 ? e.effectId : null,
-          e.paletteId !== void 0 ? e.paletteId : null
+          e.paletteId !== void 0 ? e.paletteId : null,
+          // Stop marker (optional)
+          e.stopAct || null,
+          e.stopSceneId !== void 0 ? e.stopSceneId : null,
+          e.stopEventId !== void 0 ? e.stopEventId : null
         );
       }
     });

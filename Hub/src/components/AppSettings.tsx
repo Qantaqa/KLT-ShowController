@@ -14,7 +14,7 @@ interface AppSettingsProps {
 }
 
 const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperMode, setIsDeveloperMode, serverIp }) => {
-    const { appSettings, updateAppSettings, addToast } = useSequencerStore()
+    const { appSettings, updateAppSettings, addToast, openModal } = useSequencerStore()
     const [localSettings, setLocalSettings] = useState(appSettings)
     const [isSaving, setIsSaving] = useState(false)
     const [, setDisplays] = useState<any[]>([])
@@ -330,8 +330,10 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                     </div>
                                 ) : useSequencerStore.getState().connectedClients.map((client) => {
                                     const isHostClient = client.type === 'HOST'
+                                    const clientUuid = client.uuid || null
+                                    const clientKey = clientUuid || client.id
                                     return (
-                                        <div key={client.uuid} className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group">
+                                        <div key={clientKey} className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group">
                                             <div className="flex items-center gap-4">
                                                 <div className={cn(
                                                     "w-10 h-10 rounded-lg flex items-center justify-center border",
@@ -345,7 +347,7 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                                         {isHostClient && <span className="text-[8px] bg-orange-500/20 text-orange-500 px-1.5 py-0.5 rounded uppercase font-black tracking-widest">HOST</span>}
                                                     </div>
                                                     <div className="flex items-center gap-3 text-[10px] opacity-40">
-                                                        <span className="font-mono">{client.uuid.slice(0, 8)}...</span>
+                                                        <span className="font-mono">{clientUuid ? `${clientUuid.slice(0, 8)}...` : `${(client.id || '').slice(0, 8)}...`}</span>
                                                         <span>•</span>
                                                         <span className={client.isAuthorized ? "text-green-500" : "text-yellow-500"}>
                                                             {client.isAuthorized ? 'Geautoriseerd' : 'Wacht op PIN'}
@@ -356,20 +358,66 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
 
                                             <div className="flex items-center gap-2">
                                                 {!isHostClient && (
-                                                    <button
-                                                        onClick={async () => {
-                                                            if ((window as any).require) {
-                                                                const { ipcRenderer } = (window as any).require('electron')
-                                                                if (confirm(`Weet je zeker dat je station '${client.friendlyName}' wilt verwijderen?`)) {
-                                                                    await ipcRenderer.invoke('db:delete-row', { tableName: 'remote_clients', id: client.id })
+                                                    <>
+                                                        <button
+                                                            onClick={() => {
+                                                                if (!clientUuid) {
+                                                                    addToast('Station is nog niet geregistreerd (geen UUID). Probeer opnieuw na een paar seconden.', 'warning')
+                                                                    return
                                                                 }
-                                                            }
-                                                        }}
-                                                        className="p-2 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
-                                                        title="Station verwijderen"
-                                                    >
-                                                        <X className="w-4 h-4" />
-                                                    </button>
+                                                                openModal({
+                                                                    title: 'Pincode wijzigen',
+                                                                    message: `Nieuwe pincode voor "${client.friendlyName}" (4 cijfers):`,
+                                                                    type: 'prompt',
+                                                                    defaultValue: '',
+                                                                    onConfirm: async (val?: string) => {
+                                                                        const pin = (val || '').trim()
+                                                                        if (!/^[0-9]{4}$/.test(pin)) {
+                                                                            addToast('Pincode moet precies 4 cijfers zijn.', 'warning')
+                                                                            return
+                                                                        }
+                                                                        if ((window as any).require) {
+                                                                            const { ipcRenderer } = (window as any).require('electron')
+                                                                            await ipcRenderer.invoke('db:update-row', {
+                                                                                tableName: 'remote_clients',
+                                                                                id: clientUuid,
+                                                                                data: { pinCode: pin }
+                                                                            })
+                                                                            addToast('Pincode bijgewerkt', 'info')
+                                                                        }
+                                                                    }
+                                                                })
+                                                            }}
+                                                            className="p-2 rounded-lg bg-white/5 text-white/70 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10 hover:text-white"
+                                                            title="Pincode wijzigen"
+                                                        >
+                                                            <Shield className="w-4 h-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                if ((window as any).require) {
+                                                                    const { ipcRenderer } = (window as any).require('electron')
+                                                                    if (!clientUuid) {
+                                                                        addToast('Station is nog niet geregistreerd (geen UUID). Probeer opnieuw na een paar seconden.', 'warning')
+                                                                        return
+                                                                    }
+                                                                    openModal({
+                                                                        title: 'Station verwijderen',
+                                                                        message: `Weet je zeker dat je station "${client.friendlyName}" wilt verwijderen?`,
+                                                                        type: 'confirm',
+                                                                        onConfirm: async () => {
+                                                                            await ipcRenderer.invoke('db:delete-row', { tableName: 'remote_clients', id: clientUuid })
+                                                                            addToast('Station verwijderd', 'info')
+                                                                        }
+                                                                    })
+                                                                }
+                                                            }}
+                                                            className="p-2 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white"
+                                                            title="Station verwijderen"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </>
                                                 )}
                                             </div>
                                         </div>

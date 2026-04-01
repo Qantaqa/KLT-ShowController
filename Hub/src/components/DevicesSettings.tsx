@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Plus, Trash2, Settings2, Monitor, Wifi, Tv, ChevronDown, Radar, RefreshCw, Play, X, StopCircle, Save, Upload } from 'lucide-react'
+import { Plus, Trash2, Settings2, Monitor, Wifi, Tv, ChevronDown, Radar, RefreshCw, Play, X, StopCircle, Save, Upload, ExternalLink, CheckCircle2 } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { useSequencerStore } from '../store/useSequencerStore'
 import type { Device, DeviceType, RemoteVideoWallDevice, WiZDevice, VideoWallAgentDevice, WLEDDevice, LocalMonitorDevice } from '../types/devices'
@@ -306,7 +306,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                 newDevice = { id, name: 'Nieuwe WiZ', type, enabled: true, ip: '' }
                 break
             case 'local_monitor':
-                newDevice = { id, name: 'Lokale Monitor', type, enabled: true, monitorId: 1 }
+                newDevice = { id, name: 'Lokale Monitor', type, enabled: true, monitorId: 1, fadeInTime: 0.5, fadeOutTime: 0.5, crossoverTime: 0 }
                 break
             case 'remote_VideoWall':
                 newDevice = { id, name: 'Remote VideoWall', type, enabled: true, ip: '', width: 1920, height: 1080, orientation: 'landscape' }
@@ -333,8 +333,8 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                 const monitor = device as LocalMonitorDevice;
                 const testVideoPath = await ipcRenderer.invoke('get-test-video-path');
                 if (testVideoPath) {
-                    const fadeInTime = (monitor.transitionTime || 0.5) * 1000;
-                    const transitionTime = (monitor.transitionTime || 0.5) * 1000;
+                    const fadeInTime = ((monitor.fadeInTime ?? monitor.transitionTime) || 0.5) * 1000;
+                    const transitionTime = ((monitor.fadeInTime ?? monitor.transitionTime) || 0.5) * 1000;
 
                     await StartMediaPlayer(device, testVideoPath, true, 100, fadeInTime, undefined, transitionTime);
                     setTestVolumes(prev => ({ ...prev, [device.id]: 100 }))
@@ -671,7 +671,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
 
                                 {isExpanded && (
                                     <div className="px-4 pb-4 border-t border-white/5 pt-4 space-y-4">
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className={cn("grid gap-4", device.type === 'videowall_agent' ? "grid-cols-3" : "grid-cols-2")}>
                                             <div className="space-y-1.5">
                                                 <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Naam</label>
                                                 <input
@@ -722,6 +722,21 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                const ip = ((device as any).ip || '').trim()
+                                                                if (!ip) {
+                                                                    addToast('Vul eerst een IP adres in.', 'warning')
+                                                                    return
+                                                                }
+                                                                window.open(`http://${ip}:80`, '_blank', 'noopener,noreferrer')
+                                                            }}
+                                                            className="px-4 py-2 bg-black/30 hover:bg-white/10 border border-white/10 text-white font-black uppercase text-[10px] rounded-lg tracking-widest transition-all flex items-center gap-2"
+                                                            title="Open WLED URL in browser"
+                                                        >
+                                                            <ExternalLink className="w-3.5 h-3.5 text-green-400" />
+                                                            Open URL
+                                                        </button>
                                                         <button
                                                             onClick={() => handleReadWledConfig(device)}
                                                             disabled={isReadingConfig === device.id}
@@ -837,18 +852,25 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
 
                                         {device.type === 'videowall_agent' && (
                                             <div className="space-y-4">
+                                                <div className="flex items-center justify-end">
+                                                    <button
+                                                        onClick={() => {
+                                                            const ip = ((device as VideoWallAgentDevice).ip || '').trim()
+                                                            const port = (device as VideoWallAgentDevice).port || 3003
+                                                            if (!ip) {
+                                                                addToast('Vul eerst een IP adres in.', 'warning')
+                                                                return
+                                                            }
+                                                            window.open(`http://${ip}:${port}`, '_blank', 'noopener,noreferrer')
+                                                        }}
+                                                        className="h-8 px-3 rounded-xl bg-black/40 border border-white/15 flex items-center gap-2 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest text-white"
+                                                        title="Open agent URL in browser"
+                                                    >
+                                                        <ExternalLink className="w-3.5 h-3.5 text-green-400" />
+                                                        Open URL
+                                                    </button>
+                                                </div>
                                                 <div className="grid grid-cols-3 gap-4">
-                                                    <div className="space-y-1.5">
-                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Poort</label>
-                                                        <input
-                                                            type="number"
-                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
-                                                            value={(device as VideoWallAgentDevice).port || 3003}
-                                                            title="Netwerk Poort"
-                                                            placeholder="3003"
-                                                            onChange={e => updateDevice(device.id, { port: parseInt(e.target.value) } as any)}
-                                                        />
-                                                    </div>
                                                     <div className="space-y-1.5">
                                                         <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Model</label>
                                                         <select
@@ -918,18 +940,6 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                                             placeholder="1.0"
                                                             onChange={e => updateDevice(device.id, { crossoverTime: parseFloat(e.target.value) || 0 } as any)}
                                                         />
-                                                    </div>
-                                                    <div className="space-y-1.5">
-                                                        <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Repeat</label>
-                                                        <select
-                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all appearance-none"
-                                                            value={(device as VideoWallAgentDevice).loop ? 'true' : 'false'}
-                                                            title="Herhaal Afspelen"
-                                                            onChange={e => updateDevice(device.id, { loop: e.target.value === 'true' } as any)}
-                                                        >
-                                                            <option value="true" className="bg-background">Aan</option>
-                                                            <option value="false" className="bg-background">Uit</option>
-                                                        </select>
                                                     </div>
                                                 </div>
 
@@ -1068,10 +1078,76 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                             </div>
                                         )}
 
+                                        {device.type === 'local_monitor' && (
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Monitor</label>
+                                                    <select
+                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all appearance-none"
+                                                        value={(device as LocalMonitorDevice).monitorId ?? 1}
+                                                        onChange={e => updateDevice(device.id, { monitorId: parseInt(e.target.value) || 0 } as any)}
+                                                        title="Welke monitor/projectie window"
+                                                    >
+                                                        {displays.map((d: any) => (
+                                                            <option key={d.index} className="bg-[#1a1a1a]" value={d.index}>
+                                                                Scherm {d.index + 1}{d.isPrimary ? ' (Hoofdscherm)' : ''}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Fade-in (s)</label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.1"
+                                                        min="0"
+                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                        value={(device as LocalMonitorDevice).fadeInTime ?? (device as LocalMonitorDevice).transitionTime ?? 0.5}
+                                                        onChange={e => updateDevice(device.id, { fadeInTime: parseFloat(e.target.value) || 0 } as any)}
+                                                        title="Default fade-in tijd (gebruikt als event transition 0 is)"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Fade-out (s)</label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.1"
+                                                        min="0"
+                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                        value={(device as LocalMonitorDevice).fadeOutTime ?? 0.5}
+                                                        onChange={e => updateDevice(device.id, { fadeOutTime: parseFloat(e.target.value) || 0 } as any)}
+                                                        title="Fade-out tijd bij stop"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Cross-over (s)</label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.1"
+                                                        min="0"
+                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/40 focus:bg-white/10 transition-all font-mono"
+                                                        value={(device as LocalMonitorDevice).crossoverTime ?? 0}
+                                                        onChange={e => updateDevice(device.id, { crossoverTime: parseFloat(e.target.value) || 0 } as any)}
+                                                        title="Extra overlap tijd vóór cleanup van de vorige player"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+
                                         <div className="flex items-center justify-between pt-2">
                                             <div className="flex gap-2">
-                                                <button onClick={() => updateDevice(device.id, { enabled: !device.enabled })} className={`px - 4 py - 1.5 rounded - lg text - [10px] font - bold uppercase tracking - widest transition - all ${device.enabled ? 'bg-primary text-white' : 'bg-white/5 text-muted-foreground border border-white/10'} `}>
-                                                    {device.enabled ? 'Actief' : 'Gedeactiveerd'}
+                                                <button
+                                                    onClick={() => updateDevice(device.id, { enabled: !device.enabled })}
+                                                    className={cn(
+                                                        "h-8 px-3 rounded-xl border flex items-center gap-2 transition-all text-[10px] font-black uppercase tracking-widest",
+                                                        device.enabled
+                                                            ? "border-green-500/40 text-green-300 bg-green-500/10 hover:bg-green-500/15"
+                                                            : "border-red-500/40 text-red-300 bg-red-500/10 hover:bg-red-500/15"
+                                                    )}
+                                                    title={device.enabled ? 'Deactiveer' : 'Activeer'}
+                                                >
+                                                    <CheckCircle2 className={cn("w-3.5 h-3.5", device.enabled ? "text-green-400" : "text-red-400")} />
+                                                    {device.enabled ? 'Actief' : 'Uit'}
                                                 </button>
                                                 <div className="flex bg-white/5 border border-white/10 rounded-lg overflow-hidden">
                                                     <button

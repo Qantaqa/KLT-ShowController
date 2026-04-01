@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Keyboard, Command, Play, Square, ChevronUp, ChevronDown, Save, RefreshCw } from 'lucide-react';
+import { Keyboard, Command, Play, Square, ChevronUp, ChevronDown, Save, RefreshCw, ExternalLink } from 'lucide-react';
 import { useSequencerStore } from '../store/useSequencerStore';
 import type { KeyboardBinding } from '../types/show';
 import { cn } from '../lib/utils';
@@ -68,10 +68,11 @@ const KeyboardSettings: React.FC = () => {
                     </p>
                 </div>
                 <button
-                    onClick={handleSave}
-                    className="px-4 py-2 bg-primary hover:bg-primary/80 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-primary/20"
+                    onClick={() => window.open('https://sayodevice.com/', '_blank', 'noopener,noreferrer')}
+                    className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-xs font-bold transition-colors flex items-center gap-2"
+                    title="Open sayodevice.com"
                 >
-                    <Save className="w-3.5 h-3.5" /> Opslaan
+                    <ExternalLink className="w-3.5 h-3.5" /> sayodevice.com
                 </button>
             </div>
 
