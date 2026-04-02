@@ -695,6 +695,12 @@ class DbManager {
       "SELECT * FROM show_timing WHERE showId = ? ORDER BY runAt DESC, transitionKey ASC"
     ).all(showId);
   }
+  /** Remove all stored durations for one logical transition (all runs). */
+  deleteShowTimingForTransition(showId, transitionKey) {
+    return this.db.prepare(
+      "DELETE FROM show_timing WHERE showId = ? AND transitionKey = ?"
+    ).run(showId, transitionKey);
+  }
   /**
    * Retrieves all registered remote clients (e.g. tablet controllers).
    * @returns Array of remote client objects.
@@ -10897,6 +10903,10 @@ ipcMain.handle("db:get-sequences", (_e, showId) => dbManager.getSequences(showId
 ipcMain.handle("db:save-sequences", (_e, { showId, events }) => dbManager.saveSequences(showId, events));
 ipcMain.handle("db:insert-show-timing", (_e, payload) => dbManager.insertShowTiming(payload.showId, payload.runAt, payload.transitionKey, payload.durationSec));
 ipcMain.handle("db:get-show-timings", (_e, { showId, runAt }) => dbManager.getShowTimings(showId, runAt));
+ipcMain.handle(
+  "db:delete-show-timing-for-transition",
+  (_e, { showId, transitionKey }) => dbManager.deleteShowTimingForTransition(showId, transitionKey)
+);
 ipcMain.handle("db:get-remote-clients", () => dbManager.getRemoteClients());
 ipcMain.handle("db:get-remote-client", (_e, id) => dbManager.getRemoteClient(id));
 ipcMain.handle("db:upsert-remote-client", (_e, client) => dbManager.upsertRemoteClient(client));

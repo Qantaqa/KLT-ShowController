@@ -825,6 +825,13 @@ class DbManager {
         ).all(showId);
     }
 
+    /** Remove all stored durations for one logical transition (all runs). */
+    deleteShowTimingForTransition(showId: string, transitionKey: string) {
+        return this.db.prepare(
+            'DELETE FROM show_timing WHERE showId = ? AND transitionKey = ?'
+        ).run(showId, transitionKey);
+    }
+
     /**
      * Retrieves all registered remote clients (e.g. tablet controllers).
      * @returns Array of remote client objects.

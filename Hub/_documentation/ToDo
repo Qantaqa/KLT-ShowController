@@ -1,0 +1,15 @@
+|Als er geen remote workstation online zijn hoeft de camera niet gestart te worden. Deze broadcast het beeld en dat gebruikt onnodig brandbreedte. 
+In Edit Mode bij een Action with local_monitor kunnen we het masker bewerken, voeg een knop toe om het masker ook te verwijderen
+Toon als we in edit mode zitten op de overgangen ook de eerste geregistreerde tijden. 
+Voeg als we in edit-mode zitten op de overgang een optie toe om eerder geregistreerde tijden te verwijderen of het gemiddelde te kunnen corrigeren.
+Ook als we in-show mode aan hebben gegeven dat we tijden willen opnemen, moet ook eventueel eerdere geregistreerde tijden worden getoond bij een overgang. Als we aan het recorden zijn, mag ook een lopende timer getoond worden hoelang de action/event voor  overgang al bezig is.
+Als we in-show mode zitten worden de actieve en volgende events volledig getoond. We hoeven alleen de belangrijke dingen te zien, local_monitor en videowall_agent regels zijn minder belangrijk en hoeven dus niet uitgeklapt te worden. 
+Is het in show-mode bij een local_monitor ook mogelijk om in de preview het masker te tonen?
+Als repeat op een local_monitor niet aan staat, blijft de preview wel herhalen. De preview moet dus gelijk lopen met de grote video/image.
+Voeg een pauze knop toe in show-mode bij een local_monitor en bij een videowall_agent.
+In-show mode hebben we bij een local_monitor onder de puntje popup menu de optie om te herzenden, maar voor een local_monitor kan dit niet. Verwijder deze optie.
+In Edit-Mode heb ik soms alleen een Event en nog geen actions. Ik kan dan via het event geen action toevoegen. Voeg een button toe om een eerste action toe te kunnen voegen (net zoals gedaan is bij een act)
+In edit-mode voeg op een event en een action een button tot om commentaar toe te voegen (net als bij een act), als deze er nog niet is. Er kan maar 1 commentaar per event of action.
+Als in edit-mode een commentaar is toegevoegd, maak dan ook een popup menu met optie om het commentaar te verwijderen.
+Een WLED of WIZ kunnen we kopieren naar een buffer.  Er kunnen meerdere buffers aanwezig zijn, voor het plakken van het butter is een dropdown met meer informatie of voorbeeld wel handig  om  te zien.
+Maak in de database twee tabellen. 1 voor beschikbare wled effecten en 1 voor beschikbare wled palettes. Via App settings kunnen deze tabellen gevuld worden zodra een wled online komt. In principe hoeft dit maar 1 keer gedaan te worden. De grid moet dan de beschikbare effecten en palettes uit de database halen.

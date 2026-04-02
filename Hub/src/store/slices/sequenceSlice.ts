@@ -2,6 +2,7 @@ import type { StateCreator } from 'zustand';
 import { type ShowState } from '../types';
 import type { ShowEvent, ClipboardItem } from '../../types/show';
 import { networkService } from '../../services/network-service';
+import { transitionKeyFromGroupEvent } from '../../utils/transitionTiming';
 
 export interface SequenceSlice {
     events: ShowEvent[];
@@ -27,6 +28,14 @@ export interface SequenceSlice {
     runtimeCollapsedGroups: Record<string, boolean>;
     eventStatuses: Record<number, 'sending' | 'ok' | 'failed' | null>;
     clipboard: ClipboardItem[];
+    /** Per `transitionKey` (act|sceneId|eventId): all `durationSec` from `show_timing`, chronological by run. */
+    showTimingDurationsByKey: Record<string, number[]>;
+    /** Load `show_timing` for the active show into `showTimingDurationsByKey`. */
+    refreshShowTimingFromDb: () => Promise<void>;
+    /** Edit mode: remove all DB + in-sequence samples for this transition trigger. */
+    clearTransitionTimingData: (triggerIndex: number) => Promise<void>;
+    /** Edit mode: replace all samples with one reference duration (seconds); clears DB rows for this key first. */
+    setTransitionTimingReferenceSec: (triggerIndex: number, durationSec: number) => Promise<void>;
 
     setEvents: (events: ShowEvent[]) => void;
     setShowStartTime: (time: string) => void;
@@ -103,6 +112,82 @@ export const createSequenceSlice: StateCreator<
     runtimeCollapsedGroups: {},
     eventStatuses: {},
     clipboard: [],
+    showTimingDurationsByKey: {},
+
+    refreshShowTimingFromDb: async () => {
+        const { activeShow } = get()
+        if (!activeShow?.id || !(window as any).require) {
+            set({ showTimingDurationsByKey: {} })
+            return
+        }
+        try {
+            const { ipcRenderer } = (window as any).require('electron')
+            const rows = (await ipcRenderer.invoke('db:get-show-timings', {
+                showId: activeShow.id
+            })) as { transitionKey: string; durationSec: number; runAt: string }[]
+            const sorted = [...(rows || [])].sort(
+                (a, b) => new Date(a.runAt).getTime() - new Date(b.runAt).getTime()
+            )
+            const map: Record<string, number[]> = {}
+            for (const r of sorted) {
+                if (!map[r.transitionKey]) map[r.transitionKey] = []
+                map[r.transitionKey].push(r.durationSec)
+            }
+            set({ showTimingDurationsByKey: map })
+        } catch (e) {
+            console.warn('refreshShowTimingFromDb failed', e)
+        }
+    },
+
+    clearTransitionTimingData: async (triggerIndex: number) => {
+        const { events, activeShow, setEvents, saveCurrentShow, refreshShowTimingFromDb } = get()
+        const ev = events[triggerIndex]
+        if (!ev || (ev.type || '').toLowerCase() !== 'trigger') return
+        const key = transitionKeyFromGroupEvent(ev)
+        if (activeShow?.id && (window as any).require) {
+            try {
+                const { ipcRenderer } = (window as any).require('electron')
+                await ipcRenderer.invoke('db:delete-show-timing-for-transition', {
+                    showId: activeShow.id,
+                    transitionKey: key
+                })
+            } catch (e) {
+                console.warn('delete show_timing for transition failed', e)
+            }
+        }
+        const newEvents = [...events]
+        newEvents[triggerIndex] = { ...ev, timingSamples: undefined }
+        setEvents(newEvents)
+        await saveCurrentShow()
+        await refreshShowTimingFromDb()
+    },
+
+    setTransitionTimingReferenceSec: async (triggerIndex: number, durationSec: number) => {
+        const sec = Math.max(0, Math.round(durationSec))
+        const { events, activeShow, setEvents, saveCurrentShow, refreshShowTimingFromDb } = get()
+        const ev = events[triggerIndex]
+        if (!ev || (ev.type || '').toLowerCase() !== 'trigger') return
+        const key = transitionKeyFromGroupEvent(ev)
+        if (activeShow?.id && (window as any).require) {
+            try {
+                const { ipcRenderer } = (window as any).require('electron')
+                await ipcRenderer.invoke('db:delete-show-timing-for-transition', {
+                    showId: activeShow.id,
+                    transitionKey: key
+                })
+            } catch (e) {
+                console.warn('delete show_timing for transition failed', e)
+            }
+        }
+        const newEvents = [...events]
+        newEvents[triggerIndex] = {
+            ...ev,
+            timingSamples: sec > 0 ? [sec] : undefined
+        }
+        setEvents(newEvents)
+        await saveCurrentShow()
+        await refreshShowTimingFromDb()
+    },
 
     setEvents: (events) => set({ events }),
     setShowStartTime: (showStartTime) => set({ showStartTime }),
@@ -153,7 +238,7 @@ export const createSequenceSlice: StateCreator<
                             const samples = [...(tr.timingSamples || []), durationSec]
                             newEvents = [...events]
                             newEvents[ti] = { ...tr, timingSamples: samples }
-                            const transitionKey = `${fromEv.act}|${fromEv.sceneId ?? 0}|${fromEv.eventId ?? 0}`
+                            const transitionKey = transitionKeyFromGroupEvent(fromEv)
                             if (activeShow?.id && timingRunStartedAt != null) {
                                 try {
                                     const { ipcRenderer } = (window as any).require('electron')
@@ -164,6 +249,7 @@ export const createSequenceSlice: StateCreator<
                                             transitionKey,
                                             durationSec
                                         })
+                                        .then(() => get().refreshShowTimingFromDb())
                                         .catch((err: unknown) => console.warn('show_timing insert failed', err))
                                 } catch (e) {
                                     console.warn('show_timing insert failed', e)

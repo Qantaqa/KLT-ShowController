@@ -438,6 +438,33 @@ export const SetVolumeMediaPlayer = (
     }
 };
 
+/** Pause current playback on the target (projection window / remote / agent). */
+export const PauseMediaPlayer = (target: Device) => {
+    console.log('PauseMediaPlayer', { target });
+    if (target.type === 'local_monitor') {
+        const ipc = getIpc();
+        if (!ipc) return;
+        ipc.send('media-command', {
+            deviceId: target.id,
+            command: 'pause',
+            payload: {}
+        });
+        return;
+    }
+    if (target.type === 'remote_VideoWall') {
+        networkService.sendCommand({
+            type: 'MEDIA_CONTROL',
+            action: 'pause',
+            payload: { deviceId: target.id }
+        });
+        return;
+    }
+    if (target.type === 'videowall_agent') {
+        const d = target as VideoWallAgentDevice;
+        void videoWallAgentService.sendCommand(d, 'pause', {});
+    }
+};
+
 export const StartProjection = async (device: Device, monitorIndex: number) => {
     const ipc = getIpc();
     if (!ipc) return;

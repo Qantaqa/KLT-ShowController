@@ -196,6 +196,7 @@ class NetworkService {
                     console.log('HOST: Executing host media control:', action, { index })
 
                     if (action === 'restartMedia') store.restartMedia(index)
+                    else if (action === 'pauseMedia') store.pauseMedia(index)
                     else if (action === 'stopMedia') store.stopMedia(index)
                     else if (action === 'setMediaVolume') store.setMediaVolume(index, data.volume)
                     else if (action === 'toggleAudio') store.toggleAudio(index)

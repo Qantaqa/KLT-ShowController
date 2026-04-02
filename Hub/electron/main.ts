@@ -545,6 +545,11 @@ ipcMain.handle('db:insert-show-timing', (_e: any, payload: { showId: string; run
     dbManager.insertShowTiming(payload.showId, payload.runAt, payload.transitionKey, payload.durationSec));
 ipcMain.handle('db:get-show-timings', (_e: any, { showId, runAt }: { showId: string; runAt?: string }) =>
     dbManager.getShowTimings(showId, runAt));
+ipcMain.handle(
+    'db:delete-show-timing-for-transition',
+    (_e: any, { showId, transitionKey }: { showId: string; transitionKey: string }) =>
+        dbManager.deleteShowTimingForTransition(showId, transitionKey)
+);
 
 ipcMain.handle('db:get-remote-clients', () => dbManager.getRemoteClients());
 ipcMain.handle('db:get-remote-client', (_e: any, id: string) => dbManager.getRemoteClient(id));

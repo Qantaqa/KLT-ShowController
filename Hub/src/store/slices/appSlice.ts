@@ -169,6 +169,7 @@ export const createAppSlice: StateCreator<
             }
 
             set({ events, activeShow: show, isLocked: true, timingRunStartedAt: null, stopButtonFlashRequest: false })
+            void get().refreshShowTimingFromDb()
             get().broadcastState()
             localStorage.setItem('ledshow_last_show_id', show.id)
         }
@@ -225,6 +226,7 @@ export const createAppSlice: StateCreator<
                 stopButtonFlashRequest: false,
                 isLocked: false
             }))
+            void get().refreshShowTimingFromDb()
             localStorage.setItem('ledshow_last_show_id', newId)
         } catch (error: any) {
             console.error('Failed to create new show:', error)
@@ -248,6 +250,7 @@ export const createAppSlice: StateCreator<
                 if (nextShow) await setActiveShow(nextShow)
                 else {
                     set({ events: [], timingRunStartedAt: null, stopButtonFlashRequest: false })
+                    void get().refreshShowTimingFromDb()
                     localStorage.removeItem('ledshow_last_show_id')
                 }
             } else {
@@ -270,6 +273,7 @@ export const createAppSlice: StateCreator<
             const newAvailable = availableShows.filter(s => s.id !== id)
             if (activeShow?.id === id) {
                 set({ availableShows: newAvailable, activeShow: null, events: [], timingRunStartedAt: null, stopButtonFlashRequest: false })
+                void get().refreshShowTimingFromDb()
                 localStorage.removeItem('ledshow_last_show_id')
             } else {
                 set({ availableShows: newAvailable })
@@ -372,6 +376,7 @@ export const createAppSlice: StateCreator<
                             showsLoading: false,
                             showsLoadError: null
                         })
+                        void get().refreshShowTimingFromDb()
 
                         networkService.registerClient()
 
@@ -460,6 +465,7 @@ export const createAppSlice: StateCreator<
                 timingRunStartedAt: null,
                 stopButtonFlashRequest: false
             }))
+            void get().refreshShowTimingFromDb()
             localStorage.setItem('ledshow_last_show_id', newId)
         } catch (error: any) {
             console.error('Failed to import show:', error)

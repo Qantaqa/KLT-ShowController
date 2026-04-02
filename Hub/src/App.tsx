@@ -43,6 +43,7 @@ import CameraStreamer from './components/CameraStreamer'
 import MediaPreflightModal from './components/MediaPreflightModal'
 import { networkService } from './services/network-service'
 import type { ShowEvent } from './types/show'
+import { getTransitionTimingSamples } from './utils/transitionTiming'
 
 import { cn } from './lib/utils'
 
@@ -127,7 +128,12 @@ export default function App() {
     setAppLocked
   } = useSequencerStore()
 
+  const showTimingDurationsByKey = useSequencerStore(s => s.showTimingDurationsByKey)
+
   const isHost = !!(window as any).require
+
+  /** Host: vorige aantal geautoriseerde remote werkstations — voorkomt dat elke CLIENTS-update de camera opnieuw forceert. */
+  const prevAuthorizedRemoteCountRef = useRef<number | null>(null)
 
   // Start keyboard shortcut listener (remote keyboard)
   useRemoteKeyboard()
@@ -401,8 +407,10 @@ export default function App() {
 
     const groupRows = events.filter(e => e.act === activeEvent.act && e.sceneId === activeEvent.sceneId && e.eventId === activeEvent.eventId)
     const triggerRowElement = groupRows.find(e => e.type?.toLowerCase() === 'trigger')
-    const samples = triggerRowElement?.timingSamples
-    const avgFromSamples = samples?.length
+    const samples = triggerRowElement
+      ? getTransitionTimingSamples(triggerRowElement, showTimingDurationsByKey)
+      : []
+    const avgFromSamples = samples.length
       ? Math.round(samples.reduce((a, b) => a + b, 0) / samples.length)
       : 0
     const dur =
@@ -420,7 +428,7 @@ export default function App() {
       eventRemaining: remaining,
       isEventOverdue: dur > 0 && remaining === 0
     }
-  }, [activeEventIndex, events, isPaused, pauseStartTime, lastTransitionTime, currentTime])
+  }, [activeEventIndex, events, isPaused, pauseStartTime, lastTransitionTime, currentTime, showTimingDurationsByKey])
 
   // "Quiet" pulse when running, "Fast/Bright" pulse when overdue OR in last 5s
   const isFastBlinking = (isEventOverdue || (eventDuration > 0 && eventRemaining > 0 && eventRemaining <= 5)) && !isPaused
@@ -498,17 +506,39 @@ export default function App() {
     return () => clearInterval(checkConn)
   }, [appSettings.serverPort, appSettings.serverIp, isHost])
 
-  // Zet lokale webcam aan zodra de hub bereikbaar is (host) of na autorisatie (remote werkstation)
+  // Host: camera pas aan als er minstens één geautoriseerd remote werkstation is (bespaart bandbreedte).
+  // Bij 0 remotes altijd uit. Overgang 0→≥1: zelfde auto-aan als voorheen bij “hub online”.
+  // Remote: na autorisatie camera aan (ongewijzigd).
   useEffect(() => {
     if (!navigator.mediaDevices?.getUserMedia) return
     if (isHost) {
-      if (!socketConnected) return
-      setCameraActive(true)
+      if (!socketConnected) {
+        setCameraActive(false)
+        prevAuthorizedRemoteCountRef.current = 0
+        return
+      }
+      const authorizedRemoteCount = connectedClients.filter(
+        (c: { type?: string; isAuthorized?: boolean }) => c.type !== 'HOST' && c.isAuthorized
+      ).length
+      const prev = prevAuthorizedRemoteCountRef.current
+      prevAuthorizedRemoteCountRef.current = authorizedRemoteCount
+
+      if (authorizedRemoteCount === 0) {
+        // Alleen uit bij eerste meting of als er net geen remotes meer zijn — niet bij elke CLIENTS-update,
+        // anders wordt een handmatig ingeschakelde camera (zonder publiek) steeds weer uitgezet.
+        if (prev === null || prev > 0) {
+          setCameraActive(false)
+        }
+        return
+      }
+      if (prev === null || prev === 0) {
+        setCameraActive(true)
+      }
       return
     }
     if (!isAuthorized) return
     setCameraActive(true)
-  }, [isHost, socketConnected, isAuthorized, setCameraActive])
+  }, [isHost, socketConnected, isAuthorized, connectedClients, setCameraActive])
 
   // Sync store wanneer main process het Hub-venster naar een ander scherm verplaatst (Ctrl+Alt+1..3)
   useEffect(() => {

@@ -26,6 +26,7 @@ export interface MediaSlice {
     }>;
 
     restartMedia: (index: number) => void;
+    pauseMedia: (index: number) => void;
     stopMedia: (index: number) => void;
     stopMediaAt: (act: string, sceneId: number, eventId: number) => void;
     stopAllMedia: () => void;
@@ -146,6 +147,45 @@ export const createMediaSlice: StateCreator<
             }
         })
         set({ playingMedia: newPlaying })
+    },
+
+    pauseMedia: (index: number) => {
+        const isHost = !!(window as any).require
+        if (!isHost) {
+            const { events } = get()
+            const e = events[index]
+            networkService.sendCommand({
+                type: 'HOST_MEDIA_CONTROL',
+                action: 'pauseMedia',
+                index,
+                eventRef: e ? {
+                    act: e.act,
+                    sceneId: e.sceneId,
+                    eventId: e.eventId,
+                    type: e.type,
+                    cue: e.cue,
+                    filename: (e as any).filename,
+                    fixture: e.fixture,
+                } : undefined
+            })
+            return
+        }
+        const { events, appSettings } = get()
+        const event = events[index]
+        if (!event) return
+
+        const targetName = (event.fixture || '').trim().toLowerCase()
+        const devices = appSettings.devices || []
+        const targets = devices.filter((d: any) => {
+            const isTypeMatch = d.type === 'local_monitor' || d.type === 'remote_VideoWall' || d.type === 'videowall_agent'
+            const isEnabled = (d as any).enabled !== false
+            const isNameMatch = !targetName || targetName === '*' || d.name.trim().toLowerCase() === targetName
+            return isTypeMatch && isEnabled && isNameMatch
+        })
+
+        targets.forEach((d: any) => {
+            MediaPlayer.PauseMediaPlayer(d)
+        })
     },
 
     stopMedia: (index: number) => {
