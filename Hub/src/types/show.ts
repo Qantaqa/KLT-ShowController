@@ -17,6 +17,14 @@ export interface ShowEvent {
     transition: number
     sound: boolean
     scriptPg?: number
+    /** Stagehand (type action): wanneer iets moet gebeuren (vrije tekst). */
+    actionCueMoment?: string
+    /** Stagehand: wie voert uit (naam/rol). */
+    actionAssignee?: string
+    /** Stagehand: positie op scriptpagina 0–1 t.o.v. gerenderde PDF-viewport. */
+    scriptMarkerNorm?: { x: number; y: number }
+    /** Stagehand: in show afgevinkt; bij show-start gereset. */
+    actionCompleted?: boolean
     cue?: string
     type?: string
     filename?: string

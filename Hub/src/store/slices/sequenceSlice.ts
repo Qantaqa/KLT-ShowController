@@ -110,6 +110,8 @@ export interface SequenceSlice {
     setShowStartTime: (time: string) => void;
     setActiveEvent: (index: number) => void;
     startShow: () => void;
+    /** Geen actief event tot Play; wis timing; reset stagehand-vinkjes. Aanroepen vóór setLocked(true) bij edit→show. */
+    resetPlaybackForShowMode: () => void;
     setSelectedEvent: (index: number) => void;
     setStopButtonFlashRequest: (on: boolean) => void;
     setLocked: (locked: boolean) => Promise<void>;
@@ -153,6 +155,10 @@ export interface SequenceSlice {
     addActComment: (actId: string) => void;
     addSceneComment: (actId: string, sceneId: number) => void;
     updateEvent: (index: number, partial: Partial<ShowEvent>) => void;
+    /** Set by PdfViewer markers; SequenceGrid opens SequenceRowEditModal when unlocked. */
+    rowEditRequestFromPdfMarker: number | null;
+    requestRowEditFromPdfMarker: (rowIndex: number) => void;
+    clearRowEditRequestFromPdfMarker: () => void;
     resendEvent: (index: number) => void;
     reindexEvents: () => void;
 
@@ -192,6 +198,10 @@ export const createSequenceSlice: StateCreator<
     eventStatuses: {},
     clipboard: [],
     showTimingDurationsByKey: {},
+    rowEditRequestFromPdfMarker: null,
+
+    requestRowEditFromPdfMarker: (rowIndex: number) => set({ rowEditRequestFromPdfMarker: rowIndex }),
+    clearRowEditRequestFromPdfMarker: () => set({ rowEditRequestFromPdfMarker: null }),
 
     refreshShowTimingFromDb: async () => {
         const { activeShow } = get()
@@ -340,12 +350,31 @@ export const createSequenceSlice: StateCreator<
             }
         }
         newLastTransitionTime = Date.now()
-        const currentEvent = newEvents[index]
         const prevEvent = activeEventIndex >= 0 ? events[activeEventIndex] : null
+        let stepEvents = newEvents
+        const curTmp = stepEvents[index]
         const isNewEventGroup = !prevEvent ||
-            prevEvent.act !== currentEvent.act ||
-            prevEvent.sceneId !== currentEvent.sceneId ||
-            prevEvent.eventId !== currentEvent.eventId
+            prevEvent.act !== curTmp.act ||
+            prevEvent.sceneId !== curTmp.sceneId ||
+            prevEvent.eventId !== curTmp.eventId
+
+        if (isHost && isLocked && isNewEventGroup && prevEvent) {
+            const pk = groupKey(prevEvent)
+            const needComplete = stepEvents.some(
+                e =>
+                    (e.type || '').toLowerCase() === 'action' &&
+                    groupKey(e) === pk &&
+                    !e.actionCompleted
+            )
+            if (needComplete) {
+                stepEvents = stepEvents.map(e => {
+                    if ((e.type || '').toLowerCase() !== 'action' || groupKey(e) !== pk) return e
+                    return { ...e, actionCompleted: true }
+                })
+            }
+        }
+        newEvents = stepEvents
+        const currentEvent = newEvents[index]
 
         const updates: any = {
             events: newEvents,
@@ -464,19 +493,34 @@ export const createSequenceSlice: StateCreator<
             networkService.sendCommand({ type: 'REMOTE_CONTROL', action: 'startShow' })
             return
         }
-        const { events, setActiveEvent } = get()
-        if (!events || events.length === 0) return
-
+        const { setEvents, saveCurrentShow, setActiveEvent } = get()
         set({ timingRunStartedAt: Date.now(), stopButtonFlashRequest: false })
 
+        const events = get().events
+        if (!events || events.length === 0) return
+
+        const cleared = events.map(e =>
+            (e.type || '').toLowerCase() === 'action'
+                ? { ...e, actionCompleted: undefined }
+                : e
+        )
+        const changed = cleared.some((e, i) => e !== events[i])
+        if (changed) {
+            setEvents(cleared)
+            void saveCurrentShow()
+        }
+
+        const eventsAfter = get().events
+        if (!eventsAfter || eventsAfter.length === 0) return
+
         // Always start at the very first act/scene/event group (often pre-show).
-        const firstActName = events.find(e => e && e.act)?.act
+        const firstActName = eventsAfter.find(e => e && e.act)?.act
         if (!firstActName) return
 
         const sceneIdFor = (e: ShowEvent) => (e.sceneId ?? 0)
         const eventIdFor = (e: ShowEvent) => (e.eventId ?? 0)
 
-        const candidates = events.filter(e => e && e.act === firstActName)
+        const candidates = eventsAfter.filter(e => e && e.act === firstActName)
         if (candidates.length === 0) return
 
         const minPositiveScene = Math.min(...candidates.map(e => sceneIdFor(e)).filter(n => n > 0))
@@ -486,7 +530,7 @@ export const createSequenceSlice: StateCreator<
         const minPositiveEvent = Math.min(...inTargetScene.map(e => eventIdFor(e)).filter(n => n > 0))
         const targetEventId = Number.isFinite(minPositiveEvent) ? minPositiveEvent : Math.min(...inTargetScene.map(e => eventIdFor(e)))
 
-        const titleIdx = events.findIndex(e =>
+        const titleIdx = eventsAfter.findIndex(e =>
             e.act === firstActName &&
             (e.sceneId ?? 0) === targetSceneId &&
             (e.eventId ?? 0) === targetEventId &&
@@ -496,12 +540,41 @@ export const createSequenceSlice: StateCreator<
             setActiveEvent(titleIdx)
             return
         }
-        const firstGroupIdx = events.findIndex(e =>
+        const firstGroupIdx = eventsAfter.findIndex(e =>
             e.act === firstActName &&
             (e.sceneId ?? 0) === targetSceneId &&
             (e.eventId ?? 0) === targetEventId
         )
         if (firstGroupIdx !== -1) setActiveEvent(firstGroupIdx)
+    },
+
+    resetPlaybackForShowMode: () => {
+        const { events, setEvents, saveCurrentShow, broadcastState } = get()
+        const cleared = events.map((e: ShowEvent) =>
+            (e.type || '').toLowerCase() === 'action'
+                ? { ...e, actionCompleted: undefined }
+                : e
+        )
+        const changed = cleared.some((e, i) => e !== events[i])
+        if (changed) {
+            setEvents(cleared)
+            void saveCurrentShow()
+        }
+        set({
+            activeEventIndex: -1,
+            selectedEventIndex: -1,
+            navigationWarning: null,
+            lastTransitionTime: null,
+            isPaused: false,
+            pauseStartTime: null,
+            timingRunStartedAt: null,
+            actualStartTime: null,
+            blinkingNextEvent: false,
+            blinkingNextScene: false,
+            blinkingNextAct: false,
+            stopButtonFlashRequest: false,
+        })
+        broadcastState()
     },
 
     setSelectedEvent: (index) => set({ selectedEventIndex: index }),
@@ -827,7 +900,13 @@ export const createSequenceSlice: StateCreator<
 
     addEventAbove: (index, type = 'Scene', cue = '') => {
         const { events, setEvents, reindexEvents, saveCurrentShow } = get()
-        const newEvent = { ...events[index], type, cue, fixture: '', effect: '', filename: '', duration: undefined, timingSamples: undefined }
+        const tl = (type || '').toLowerCase()
+        let newEvent: ShowEvent = { ...events[index], type, cue, fixture: '', effect: '', filename: '', duration: undefined, timingSamples: undefined }
+        if (tl === 'action') {
+            newEvent = { ...newEvent, actionCompleted: false, actionCueMoment: undefined, actionAssignee: undefined, scriptMarkerNorm: undefined }
+        } else {
+            newEvent = { ...newEvent, actionCueMoment: undefined, actionAssignee: undefined, scriptMarkerNorm: undefined, actionCompleted: undefined }
+        }
         const newEvents = [...events]
         newEvents.splice(index, 0, newEvent)
         setEvents(newEvents)
@@ -837,7 +916,13 @@ export const createSequenceSlice: StateCreator<
 
     addEventBelow: (index, type = 'Scene', cue = '') => {
         const { events, setEvents, reindexEvents, saveCurrentShow } = get()
-        const newEvent = { ...events[index], type, cue, fixture: '', effect: '', filename: '', duration: undefined, timingSamples: undefined }
+        const tl = (type || '').toLowerCase()
+        let newEvent: ShowEvent = { ...events[index], type, cue, fixture: '', effect: '', filename: '', duration: undefined, timingSamples: undefined }
+        if (tl === 'action') {
+            newEvent = { ...newEvent, actionCompleted: false, actionCueMoment: undefined, actionAssignee: undefined, scriptMarkerNorm: undefined }
+        } else {
+            newEvent = { ...newEvent, actionCueMoment: undefined, actionAssignee: undefined, scriptMarkerNorm: undefined, actionCompleted: undefined }
+        }
         const newEvents = [...events]
         newEvents.splice(index + 1, 0, newEvent)
         setEvents(newEvents)
@@ -1436,6 +1521,11 @@ export const createSequenceSlice: StateCreator<
         const event = events[index]
         if (!event) return
         set({ eventStatuses: { ...eventStatuses, [index]: 'sending' } })
+        try {
+            networkService.sendCommand({ type: 'EVENT_TRIGGER', event })
+        } catch {
+            /* ignore */
+        }
         setTimeout(() => set((s) => ({ eventStatuses: { ...s.eventStatuses, [index]: 'ok' } })), 500)
     },
 

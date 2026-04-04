@@ -1,10 +1,10 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown, ChevronRight, Play, Pause, Square, Volume2, VolumeX, Repeat, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, Type, User, MousePointer2, Lightbulb, Layers, ListOrdered, ClipboardCheck, Settings, FileText, Download, Lock, LockOpen, GripVertical } from 'lucide-react'
+import { ChevronDown, ChevronRight, Play, Pause, Square, Volume2, VolumeX, Repeat, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, Type, User, MousePointer2, Lightbulb, Layers, ListOrdered, ClipboardCheck, Settings, FileText, Download, Lock, LockOpen, GripVertical, X, Save } from 'lucide-react'
 import { useSequencerStore } from '../store/useSequencerStore'
 import type { Device } from '../types/devices'
 import type { ShowEvent, ClipboardItem } from '../types/show'
-import { cn } from '../lib/utils'
+import { cn, modalBtnIconClass, modalBtnPrimary, modalBtnSecondary, modalHeaderCloseBtn } from '../lib/utils'
 import { ShowCheckPanel } from './ShowCheckPanel'
 import { runShowChecks, type ShowCheckIssue } from '../utils/showChecks'
 import { getTransitionTimingSamples } from '../utils/transitionTiming'
@@ -14,6 +14,7 @@ import ActEditModal from './ActEditModal'
 import SceneEditModal from './SceneEditModal'
 import EventEditModal from './EventEditModal'
 import LightFixtureStripPreview from './LightFixtureStripPreview'
+import ShowCollapsedTechRow, { isCollapsedShowProjectionMediaRow } from './ShowCollapsedTechRow'
 import { isLightStripPreviewEnabled } from '../lib/light-strip-preview'
 import LightStripPreviewSwitch from './LightStripPreviewSwitch'
 
@@ -23,50 +24,6 @@ function isProjectionStyleMediaRow(event: ShowEvent, devices: Device[]): boolean
     const d = event.fixture ? devices.find(x => x.name === event.fixture) : undefined
     const t = d?.type
     return t === 'videowall_agent'
-}
-
-interface RenamableInputProps {
-    value: string
-    onRename: (newValue: string) => void
-    className?: string
-    placeholder?: string
-    autoFocus?: boolean
-    disabled?: boolean
-    onBlur?: () => void
-}
-
-const RenamableInput: React.FC<RenamableInputProps> = ({ value, onRename, className, placeholder, autoFocus, disabled, onBlur }) => {
-    const [localValue, setLocalValue] = useState(value)
-
-    useEffect(() => {
-        setLocalValue(value)
-    }, [value])
-
-    const handleBlur = () => {
-        if (localValue !== value) {
-            onRename(localValue)
-        }
-        if (onBlur) onBlur()
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            e.currentTarget.blur()
-        }
-    }
-
-    return (
-        <input
-            className={className}
-            value={localValue}
-            onChange={(e) => setLocalValue(e.target.value)}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            placeholder={placeholder}
-            autoFocus={autoFocus}
-            disabled={disabled}
-        />
-    )
 }
 
 const formatTime = (seconds: number) => {
@@ -445,16 +402,6 @@ const EventTransition: React.FC<{
 
     const canEdit = !isLocked && !!onEditTrigger
 
-    const editHint = canEdit ? (
-        <button
-            onClick={(e) => { e.stopPropagation(); if (canEdit) onEditTrigger?.(triggerIndex) }}
-            className="opacity-0 group-hover/trans:opacity-60 hover:!opacity-100 transition-opacity p-0.5 hover:bg-white/10 rounded"
-            title="Overgang bewerken"
-        >
-            <Edit2 className="w-2.5 h-2.5" />
-        </button>
-    ) : null
-
     const rowOuter = cn(
         'flex items-center group/trans',
         stripMuted ? 'gap-1.5 px-3 py-0.5 opacity-[0.78]' : 'gap-2 px-4 py-1',
@@ -498,7 +445,6 @@ const EventTransition: React.FC<{
                     <div className={cn('flex items-center gap-2 min-w-0', labelWeight)}>
                         <Zap className={cn(iconSm, 'text-yellow-400/90 shrink-0')} />
                         <span className="truncate">{label}</span>
-                        {editHint}
                     </div>
                     {showTimingFooter && (
                         <EventTransitionTimingFooter
@@ -531,7 +477,6 @@ const EventTransition: React.FC<{
                         <span>
                             Automatisch na {mins}:{secs}
                         </span>
-                        {editHint}
                     </div>
                     {showTimingFooter && (
                         <EventTransitionTimingFooter
@@ -562,7 +507,6 @@ const EventTransition: React.FC<{
                     <div className={cn('flex items-center gap-2 min-w-0 text-sky-200', labelWeight)}>
                         <SkipForward className={cn(iconSm, 'text-sky-400 shrink-0')} />
                         <span className="truncate">Na: {mediaName}</span>
-                        {editHint}
                     </div>
                     {showTimingFooter && (
                         <EventTransitionTimingFooter
@@ -589,7 +533,6 @@ const EventTransition: React.FC<{
                 <div className={cn('flex items-center gap-2 min-w-0', labelWeight)}>
                     <Zap className={cn(iconSm, 'text-yellow-400 shrink-0')} />
                     <span className="truncate">{cueText}</span>
-                    {editHint}
                 </div>
                 {showTimingFooter && (
                     <EventTransitionTimingFooter
@@ -612,11 +555,16 @@ const TransitionEditModal: React.FC<{
 }> = ({ triggerIndex, onClose }) => {
     const updateEvent = useSequencerStore(s => s.updateEvent)
     const events = useSequencerStore(s => s.events)
+    const activeShow = useSequencerStore(s => s.activeShow)
     const showTimingDurationsByKey = useSequencerStore(s => s.showTimingDurationsByKey)
     const clearTransitionTimingData = useSequencerStore(s => s.clearTransitionTimingData)
     const setTransitionTimingReferenceSec = useSequencerStore(s => s.setTransitionTimingReferenceSec)
     const [correctOpen, setCorrectOpen] = useState(false)
     const [correctInput, setCorrectInput] = useState('')
+    const [editEffect, setEditEffect] = useState('manual')
+    const [editCue, setEditCue] = useState('')
+    const [editDurationStr, setEditDurationStr] = useState('0:00')
+    const [editMediaTriggerId, setEditMediaTriggerId] = useState('')
 
     const trigger = events[triggerIndex]
     const siblingMedia = useMemo(() => {
@@ -630,6 +578,24 @@ const TransitionEditModal: React.FC<{
     }, [events, trigger])
 
     useEffect(() => {
+        const row = events[triggerIndex]
+        if (!row) return
+        const eff = (row.effect || 'manual').toLowerCase()
+        setEditEffect(eff)
+        setEditCue(row.cue || '')
+        const d = row.duration || 0
+        setEditDurationStr(`${Math.floor(d / 60)}:${(d % 60).toString().padStart(2, '0')}`)
+        setEditMediaTriggerId(row.mediaTriggerId || '')
+    }, [
+        triggerIndex,
+        events,
+        events[triggerIndex]?.effect,
+        events[triggerIndex]?.cue,
+        events[triggerIndex]?.duration,
+        events[triggerIndex]?.mediaTriggerId
+    ])
+
+    useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose()
         }
@@ -637,96 +603,123 @@ const TransitionEditModal: React.FC<{
         return () => window.removeEventListener('keydown', onKeyDown)
     }, [onClose])
 
+    const showLabel = activeShow?.name?.trim() || 'Script / show'
+    const labelCls = 'block text-[10px] font-bold uppercase tracking-wider text-white/50 mb-1'
+    const inputCls =
+        'w-full rounded-lg bg-[#13131a] border border-white/18 px-3 py-2 text-sm text-white placeholder:text-white/35 outline-none focus:border-primary/45'
+
+    const handleSave = () => {
+        if (!trigger) return
+        const eff = editEffect.toLowerCase()
+        const parts = editDurationStr.split(':')
+        const m = parseInt(parts[0], 10) || 0
+        const s = parseInt(parts[1], 10) || 0
+        const durationSec = m * 60 + s
+        updateEvent(triggerIndex, {
+            effect: eff,
+            cue: editCue.trim(),
+            duration: eff === 'timed' ? durationSec : 0,
+            mediaTriggerId: eff === 'media' ? (editMediaTriggerId || undefined) : undefined
+        })
+        onClose()
+    }
+
     if (!trigger) return null
 
     return createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-            <button
-                className="absolute inset-0 bg-black/70"
-                onClick={onClose}
-                aria-label="Sluiten"
-            />
-            <div className="relative w-[min(720px,calc(100vw-32px))] rounded-2xl border border-white/10 bg-[#0a0a0a] shadow-[0_30px_80px_rgba(0,0,0,0.6)] p-4">
-                <div className="flex items-center justify-between gap-3 mb-3">
-                    <div className="flex items-center gap-2">
-                        <MousePointer2 className="w-4 h-4 text-primary" />
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-white/70">Overgang bewerken</span>
-                            <span className="text-[9px] font-mono text-white/40">{trigger.act} • {trigger.sceneId}.{trigger.eventId}</span>
-                        </div>
-                    </div>
+        <div
+            className="fixed inset-0 z-[10050] flex items-center justify-center p-4 bg-black/55 backdrop-blur-[2px]"
+            onClick={onClose}
+            role="presentation"
+        >
+            <div
+                className="flex max-h-[90vh] min-h-0 w-full max-w-lg flex-col rounded-xl border border-white/15 bg-[#1e1e24] shadow-2xl p-5 w-[min(560px,calc(100vw-32px))]"
+                onClick={e => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+            >
+                <div className="flex items-center justify-between shrink-0 gap-3 mb-4">
+                    <h2 className="text-sm font-black uppercase tracking-wider text-primary">Overgang bewerken</h2>
+                    <button type="button" onClick={onClose} className={modalHeaderCloseBtn()} title="Sluiten">
+                        <X className="h-4 w-4" />
+                    </button>
                 </div>
 
-                <div className="flex flex-col gap-3">
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] opacity-50 w-24 shrink-0">Type</span>
+                <p className="text-[11px] text-white/50 mb-4 leading-relaxed shrink-0">
+                    Onderdeel van <span className="font-semibold text-white/80">{trigger.act}</span>
+                    {' · '}
+                    Scene <span className="font-mono text-white/75">{trigger.sceneId}</span>, Event{' '}
+                    <span className="font-mono text-white/75">{trigger.eventId}</span>
+                    <br />
+                    <span className="text-white/45">Script / show:</span> <span className="text-white/70">{showLabel}</span>
+                </p>
+
+                <div className="flex flex-col gap-3 min-h-0 flex-1 overflow-y-auto pr-1 max-h-[min(70vh,520px)]">
+                    <div>
+                        <label className={labelCls}>Type overgang</label>
                         <select
                             title="Trigger type"
-                            className="flex-1 bg-zinc-900 border border-white/10 rounded px-2 py-1 text-[10px] text-white outline-none"
-                            value={trigger.effect || 'manual'}
-                            onChange={(e) => updateEvent(triggerIndex, { effect: e.target.value })}
+                            className={inputCls}
+                            value={editEffect}
+                            onChange={(e) => setEditEffect(e.target.value)}
                         >
                             <option value="manual">Handmatige overgang</option>
-                            <option value="timed">Timed (Auto-trigger)</option>
-                            <option value="media">Media afgerond trigger</option>
+                            <option value="timed">Timed (auto-trigger)</option>
+                            <option value="media">Media afgerond</option>
                         </select>
                     </div>
 
-                    {(trigger.effect || 'manual').toLowerCase() === 'manual' && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] opacity-50 w-24 shrink-0">Cue</span>
-                            <RenamableInput
+                    {editEffect === 'manual' && (
+                        <div>
+                            <label className={labelCls}>Cue / omschrijving</label>
+                            <input
                                 autoFocus
-                                className="flex-1 bg-white/10 border border-primary/40 rounded px-2 py-1 text-xs text-white outline-none focus:bg-white/20"
-                                value={trigger.cue || ''}
-                                placeholder="Trigger zin / actie..."
-                                onRename={(val) => updateEvent(triggerIndex, { cue: val })}
+                                value={editCue}
+                                onChange={(e) => setEditCue(e.target.value)}
+                                className={inputCls}
+                                placeholder="Trigger of korte omschriving…"
                             />
                         </div>
                     )}
 
-                    {(trigger.effect || '').toLowerCase() === 'timed' && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] opacity-50 w-24 shrink-0">Vertraging</span>
-                            <RenamableInput
+                    {editEffect === 'timed' && (
+                        <div>
+                            <label className={labelCls}>Vertraging (mm:ss)</label>
+                            <input
                                 autoFocus
-                                className="w-24 bg-white/10 border border-primary/40 rounded px-2 py-1 text-xs text-white outline-none text-center font-mono"
-                                placeholder="MM:SS"
-                                value={(trigger.duration ? Math.floor(trigger.duration / 60) + ':' + (trigger.duration % 60).toString().padStart(2, '0') : '0:00')}
-                                onRename={(val) => {
-                                    const parts = val.split(':')
-                                    const m = parseInt(parts[0]) || 0
-                                    const s = parseInt(parts[1]) || 0
-                                    updateEvent(triggerIndex, { duration: (m * 60) + s })
-                                }}
+                                value={editDurationStr}
+                                onChange={(e) => setEditDurationStr(e.target.value)}
+                                className={cn(inputCls, 'font-mono text-center max-w-[8rem]')}
+                                placeholder="M:SS"
                             />
                         </div>
                     )}
 
-                    {(trigger.effect || '').toLowerCase() === 'media' && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] opacity-50 w-24 shrink-0">Media</span>
+                    {editEffect === 'media' && (
+                        <div>
+                            <label className={labelCls}>Media-trigger</label>
                             {siblingMedia.length > 0 ? (
                                 <select
-                                    title="Selecteer Media Trigger"
-                                    className="flex-1 bg-zinc-900 border border-white/10 rounded px-2 py-1 text-[10px] text-blue-300 outline-none"
-                                    value={trigger.mediaTriggerId || ''}
-                                    onChange={(e) => updateEvent(triggerIndex, { mediaTriggerId: e.target.value })}
+                                    title="Media kiezen"
+                                    className={inputCls}
+                                    value={editMediaTriggerId}
+                                    onChange={(e) => setEditMediaTriggerId(e.target.value)}
                                 >
-                                    <option value="">Wacht op een media in dit event...</option>
-                                    {siblingMedia.map((m, idx) => {
-                                        const mediaId = `${m.filename}|${m.fixture}`
-                                        const name = m.filename?.split(/[\\/]/).pop() || 'Onbekende media'
+                                    <option value="">Kies mediabron in dit event…</option>
+                                    {siblingMedia.map((medi, idx) => {
+                                        const mediaId = `${medi.filename}|${medi.fixture}`
+                                        const name = medi.filename?.split(/[\\/]/).pop() || 'Onbekende media'
                                         return (
                                             <option key={idx} value={mediaId}>
-                                                {name} {m.fixture ? `(${m.fixture})` : ''}
+                                                {name}{medi.fixture ? ` (${medi.fixture})` : ''}
                                             </option>
                                         )
                                     })}
                                 </select>
                             ) : (
-                                <div className="flex-1 text-[10px] text-red-400 bg-red-500/10 border border-red-500/20 rounded px-2 py-1 flex items-center gap-2">
-                                    <AlertCircle className="w-3 h-3" /> Geen media gevonden in dit event
+                                <div className={cn(inputCls, 'flex items-center gap-2 text-red-300 border-red-500/30 bg-red-500/10')}>
+                                    <AlertCircle className="w-4 h-4 shrink-0" />
+                                    <span className="text-xs">Geen mediaregel in dit event</span>
                                 </div>
                             )}
                         </div>
@@ -761,7 +754,7 @@ const TransitionEditModal: React.FC<{
                     }
 
                     return (
-                        <div className="mt-3 pt-3 border-t border-white/10">
+                        <div className="mt-3 border-t border-white/15 pt-3">
                             <div className="flex flex-col gap-2">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">Geregistreerde Tijden</span>
                                 <div className="flex flex-col gap-1">
@@ -841,77 +834,19 @@ const TransitionEditModal: React.FC<{
                     )
                 })()}
 
-                <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-end gap-2">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors"
-                    >
+                <div className="mt-4 flex shrink-0 items-center justify-end gap-2 border-t border-white/15 pt-3">
+                    <button type="button" onClick={onClose} className={modalBtnSecondary('px-3')}>
+                        <X className={modalBtnIconClass} />
                         Annuleren
                     </button>
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 rounded-xl bg-primary hover:bg-white border border-primary/30 text-black text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/20 transition-all"
-                    >
-                        Opslaan &amp; sluiten
+                    <button type="button" onClick={handleSave} className={modalBtnPrimary('px-4')}>
+                        <Save className="h-4 w-4 shrink-0 text-white" />
+                        Opslaan
                     </button>
                 </div>
             </div>
         </div>,
         document.body
-    )
-}
-
-/** Show mode: quick access to light/media controls under the active event card. */
-const ActiveEventTechStrip: React.FC<{ rows: { event: ShowEvent; originalIndex: number }[] }> = ({ rows }) => {
-    const restartMedia = useSequencerStore(s => s.restartMedia)
-    const pauseMedia = useSequencerStore(s => s.pauseMedia)
-    const stopMedia = useSequencerStore(s => s.stopMedia)
-    const toggleAudio = useSequencerStore(s => s.toggleAudio)
-    const resendEvent = useSequencerStore(s => s.resendEvent)
-
-    const items = rows.filter(r => {
-        const t = r.event.type?.toLowerCase()
-        return t === 'light' || t === 'media'
-    })
-    if (items.length === 0) return null
-
-    return (
-        <div
-            className="ml-6 pl-2 mb-1.5 border-l-2 border-emerald-500/40 bg-emerald-500/[0.06] rounded-r-lg py-2 px-2 space-y-2"
-            onClick={e => e.stopPropagation()}
-        >
-            <div className="text-[9px] font-black uppercase tracking-widest text-emerald-300/90">Techniek (actief event)</div>
-            {items.map(({ event, originalIndex }) => {
-                const t = event.type?.toLowerCase()
-                if (t === 'media') {
-                    return (
-                        <div key={originalIndex} className="flex items-center gap-2 py-1.5 px-2 bg-black/35 rounded border border-white/10">
-                            <Monitor className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                            <div className="flex-1 min-w-0">
-                                <div className="text-[10px] font-semibold text-white/90 truncate">{event.fixture || 'Scherm'}</div>
-                                <div className="text-[9px] text-white/45 font-mono truncate">{event.filename ? event.filename.split(/[\\/]/).pop() : '—'}</div>
-                            </div>
-                            <div className="flex items-center gap-1 shrink-0">
-                                <button type="button" onClick={() => restartMedia(originalIndex)} className="p-1.5 bg-green-500 text-black rounded-full hover:bg-green-400 transition-colors" title="Start / Play"><Play className="w-3 h-3 fill-black" /></button>
-                                <button type="button" onClick={() => pauseMedia(originalIndex)} className="p-1.5 bg-white/10 hover:bg-amber-500/80 hover:text-white rounded-full transition-colors" title="Pauze"><Pause className="w-3 h-3 fill-current" /></button>
-                                <button type="button" onClick={() => stopMedia(originalIndex)} className="p-1.5 bg-white/10 hover:bg-red-500 hover:text-white rounded-full transition-colors" title="Stop"><Square className="w-3 h-3 fill-current" /></button>
-                                <button type="button" onClick={() => toggleAudio(originalIndex)} className={cn('p-1 rounded transition-colors', event.sound ? 'bg-white/10 text-white' : 'bg-red-500/15 text-red-400')} title="Mute/Unmute">{!event.sound ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}</button>
-                            </div>
-                        </div>
-                    )
-                }
-                return (
-                    <div key={originalIndex} className="flex items-center justify-between gap-2 py-1.5 px-2 bg-black/35 rounded border border-white/10">
-                        <div className="flex items-center gap-2 min-w-0">
-                            <Lightbulb className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                            <span className="text-[10px] text-white/85 truncate">{event.fixture || 'Licht'}</span>
-                            <span className="text-[9px] text-white/40 truncate">{event.effect || '—'}</span>
-                        </div>
-                        <button type="button" onClick={() => resendEvent(originalIndex)} className="text-[9px] font-bold uppercase px-2 py-1 rounded border border-primary/40 text-primary hover:bg-primary/15 shrink-0" title="Cue opnieuw naar apparaat">Herzenden</button>
-                    </div>
-                )
-            })}
-        </div>
     )
 }
 
@@ -1227,7 +1162,7 @@ const RowItem: React.FC<{
                                 />
                             )}
                             <div className="flex items-center justify-between gap-4">
-                                <div className={cn("text-xs flex items-center gap-2", type === 'action' && "font-black uppercase tracking-wider", type === 'title' && "text-sm font-semibold text-orange-400", type !== 'comment' && "truncate")}>
+                                <div className={cn("text-xs flex items-center gap-2", type === 'action' && !isLocked && "font-black uppercase tracking-wider", type === 'title' && "text-sm font-semibold text-orange-400", type !== 'comment' && type !== 'action' && "truncate")}>
                                     {type === 'comment' ? (
                                         <div className="flex flex-col gap-1 w-full">
                                             <div className={cn(
@@ -1268,6 +1203,57 @@ const RowItem: React.FC<{
                                                     <span>Handmatige overgang ({event.cue || 'Geen cue'})</span>
                                                 </div>
                                             )}
+                                        </div>
+                                    ) : type === 'action' ? (
+                                        <div className="flex flex-col gap-1 w-full min-w-0">
+                                            <div className="flex items-start gap-2 w-full min-w-0">
+                                                {isLocked && !isShadow && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            updateEvent(originalIndex, { actionCompleted: !event.actionCompleted })
+                                                        }}
+                                                        title={event.actionCompleted ? 'Markeren als niet gedaan' : 'Afvinken'}
+                                                        className="mt-0.5 shrink-0 rounded border border-white/20 p-0.5 hover:bg-white/10 text-green-400"
+                                                    >
+                                                        {event.actionCompleted ? (
+                                                            <Check className="w-4 h-4" />
+                                                        ) : (
+                                                            <span className="block w-4 h-4 rounded-sm border border-white/40" />
+                                                        )}
+                                                    </button>
+                                                )}
+                                                <div
+                                                    className={cn(
+                                                        'flex-1 min-w-0',
+                                                        isLocked && event.actionCompleted && 'line-through opacity-55'
+                                                    )}
+                                                >
+                                                    <span className={cn(!isLocked && 'font-black uppercase tracking-wider')}>
+                                                        {event.cue}
+                                                    </span>
+                                                    {(event.actionCueMoment ||
+                                                        event.actionAssignee ||
+                                                        event.duration ||
+                                                        event.scriptPg) && (
+                                                        <div className="mt-1 flex flex-wrap gap-x-2 gap-y-0.5 text-[10px] font-normal normal-case opacity-70">
+                                                            {event.actionCueMoment ? (
+                                                                <span title="Moment">Moment: {event.actionCueMoment}</span>
+                                                            ) : null}
+                                                            {event.actionAssignee ? (
+                                                                <span title="Wie">Wie: {event.actionAssignee}</span>
+                                                            ) : null}
+                                                            {(event.duration || 0) > 0 ? (
+                                                                <span title="Tijdsbudget">Tijd: {formatTime(event.duration || 0)}</span>
+                                                            ) : null}
+                                                            {event.scriptPg ? (
+                                                                <span title="Script">Pg {event.scriptPg}</span>
+                                                            ) : null}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     ) : (
                                         event.cue
@@ -1369,6 +1355,44 @@ const RowItem: React.FC<{
                             className="flex items-center gap-2 mt-1.5 py-1.5 px-2 bg-black/30 rounded border border-white/10"
                             onClick={e => e.stopPropagation()}
                         >
+                            {event.filename && (() => {
+                                const isPortrait = event.fixture && getDevices().find(d => d.name === event.fixture)?.type === 'videowall_agent' && (getDevices().find(d => d.name === event.fixture) as any)?.orientation === 'portrait'
+                                return (
+                                    <div className={cn(
+                                        'w-24 shrink-0 bg-black rounded border border-white/10 overflow-hidden relative group/preview-compact',
+                                        isPortrait ? 'aspect-[9/16]' : 'aspect-video'
+                                    )}>
+                                        <div className={cn(
+                                            'absolute',
+                                            isPortrait ? 'top-1/2 left-1/2' : 'inset-0'
+                                        )} style={isPortrait ? { width: '177.77%', height: '56.25%', transform: 'translate(-50%, -50%) rotate(-90deg)' } : undefined}>
+                                            <video
+                                                ref={videoRef}
+                                                src={getMediaUrlWithContext(event.filename)}
+                                                className="w-full h-full object-cover"
+                                                muted
+                                                loop={previewShouldLoop}
+                                                onTimeUpdate={(e) => {
+                                                    const v = e.currentTarget
+                                                    if (v.duration) {
+                                                        setVideoTimes({ current: Math.floor(v.currentTime), total: Math.floor(v.duration) })
+                                                    }
+                                                }}
+                                                onLoadedMetadata={(e) => {
+                                                    const v = e.currentTarget
+                                                    setVideoTimes({ current: 0, total: Math.floor(v.duration) })
+                                                }}
+                                            />
+                                        </div>
+                                        {event.fixture && getDevices().find((d: Device) => d.name === event.fixture)?.type === 'videowall_agent' && (
+                                            <VideoWallPreviewOverlay
+                                                layout={(getDevices().find((d: Device) => d.name === event.fixture) as any)?.layout || '1x1'}
+                                                bezelSize={(getDevices().find((d: Device) => d.name === event.fixture) as any)?.bezelSize}
+                                            />
+                                        )}
+                                    </div>
+                                )
+                            })()}
                             <Monitor className="w-3.5 h-3.5 text-blue-400/80 shrink-0" />
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-1.5 min-w-0">
@@ -1967,6 +1991,8 @@ const SequenceGrid: React.FC = () => {
     const isElectronHost = typeof window !== 'undefined' && !!(window as any).require
 
     const [editRowIndex, setEditRowIndex] = useState<number | null>(null)
+    const rowEditRequestFromPdfMarker = useSequencerStore(s => s.rowEditRequestFromPdfMarker)
+    const clearRowEditRequestFromPdfMarker = useSequencerStore(s => s.clearRowEditRequestFromPdfMarker)
     const [menuOpenIndex, setMenuOpenIndex] = useState<number | string | null>(null)
     const [treeMenu, setTreeMenu] = useState<{ top: number; left: number; content: React.ReactNode } | null>(null)
     const [actEditActId, setActEditActId] = useState<string | null>(null)
@@ -1995,6 +2021,17 @@ const SequenceGrid: React.FC = () => {
             content,
         })
     }, [])
+
+    useEffect(() => {
+        if (rowEditRequestFromPdfMarker === null) return
+        const idx = rowEditRequestFromPdfMarker
+        clearRowEditRequestFromPdfMarker()
+        if (!isLocked) {
+            setEditRowIndex(idx)
+        } else {
+            useSequencerStore.getState().addToast('Schakel naar bewerkmodus om de actie te bewerken.', 'info')
+        }
+    }, [rowEditRequestFromPdfMarker, isLocked, clearRowEditRequestFromPdfMarker])
 
     // Clear row editor + menu when locked (Show Mode)
     useEffect(() => {
@@ -2631,7 +2668,7 @@ const SequenceGrid: React.FC = () => {
 
 
     return (
-        <div ref={containerRef} className="flex-1 overflow-auto p-4 space-y-6 custom-scrollbar bg-black/20 scroll-smooth relative">
+        <div className="relative flex flex-1 min-h-0 flex-col bg-black/20">
             {treeMenu &&
                 createPortal(
                     <>
@@ -2647,9 +2684,9 @@ const SequenceGrid: React.FC = () => {
                     </>,
                     document.body
                 )}
-            {/* Hoogste regel in de tree (eerste in scroll-container); uit/inklappen via collapsedGroups['show'] */}
+            {/* Show-balk: vast boven de scrollbare tree (geen overlay / geen sticky) */}
             {(hierarchy.length > 0 || events.length === 0) && (
-                <div className="relative group/show text-sm sticky top-0 z-[25] pb-0">
+                <div className="relative shrink-0 group/show px-4 pt-4 pb-2 text-sm">
                     <div
                         className={cn(
                             'relative flex min-w-0 items-center gap-2 border-l-4 px-3 py-2 shadow-lg rounded-lg transition-[filter,background-color] sm:px-4',
@@ -2809,40 +2846,10 @@ const SequenceGrid: React.FC = () => {
                 </div>
             )}
 
-            {transitionEditIndex !== null && !isLocked && (
-                <TransitionEditModal
-                    triggerIndex={transitionEditIndex}
-                    onClose={() => setTransitionEditIndex(null)}
-                />
-            )}
-            {editRowIndex !== null && !isLocked && (
-                <SequenceRowEditModal
-                    rowIndex={editRowIndex}
-                    onClose={() => setEditRowIndex(null)}
-                />
-            )}
-            {actEditActId !== null && !isLocked && (
-                <ActEditModal actId={actEditActId} onClose={() => setActEditActId(null)} />
-            )}
-            {sceneEdit !== null && !isLocked && (
-                <SceneEditModal sceneEdit={sceneEdit} onClose={() => setSceneEdit(null)} />
-            )}
-            {eventEdit !== null && !isLocked && (
-                <EventEditModal eventEdit={eventEdit} onClose={() => setEventEdit(null)} />
-            )}
-            <ShowCheckPanel
-                open={isCheckOpen}
-                issues={checkIssues}
-                onClose={() => setIsCheckOpen(false)}
-                onRescan={runCheck}
-                onSelectIssue={(issue) => {
-                    if (issue.originalIndex === undefined) return
-                    selectAndScrollToIndex(issue.originalIndex)
-                }}
-                onFixIssue={fixCheckIssue}
-            />
-            {/* Time Tracking Toolbar removed (moved to App Header) */}
-
+            <div
+                ref={containerRef}
+                className="flex-1 min-h-0 space-y-6 overflow-y-auto overflow-x-hidden scroll-smooth px-4 pb-4 custom-scrollbar"
+            >
             {hierarchy.length === 0 && events.length > 0 && (
                 <div className="flex flex-col items-center justify-center h-full text-muted-foreground opacity-40 italic text-sm">
                     Geen sequence data gevonden
@@ -3093,6 +3100,18 @@ const SequenceGrid: React.FC = () => {
                                                     seqDndSourceKey === `scene-${act.id}-${scene.id ?? 0}` && 'opacity-45',
                                                     !isLocked && 'cursor-pointer'
                                                 )}
+                                                onDoubleClick={(e) => {
+                                                    if (!isLocked) return
+                                                    const t = e.target as HTMLElement
+                                                    if (t.closest('button') || t.closest('[data-seq-dnd-grip]')) return
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    const firstEv = scene.events[0]
+                                                    const tr = firstEv?.rows?.find(r => (r.event.type || '').toLowerCase() === 'title')
+                                                    const idx = tr?.originalIndex ?? firstEv?.rows[0]?.originalIndex
+                                                    if (idx === undefined) return
+                                                    setActiveEvent(idx)
+                                                }}
                                                 onClick={(e) => {
                                                     if (isLocked) return
                                                     const t = e.target as HTMLElement
@@ -3479,6 +3498,14 @@ const SequenceGrid: React.FC = () => {
                                                                             isLocked && eventNode.isPast && showModePastClass,
                                                                             seqDndSourceKey === eventDndKey && 'opacity-45'
                                                                         )}
+                                                                        onDoubleClick={(e) => {
+                                                                            if (!isLocked) return
+                                                                            if ((e.target as HTMLElement).closest('button, a, input, textarea, select')) return
+                                                                            e.preventDefault()
+                                                                            e.stopPropagation()
+                                                                            const idx = titleRow?.originalIndex ?? eventGroupStartIdx
+                                                                            setActiveEvent(idx)
+                                                                        }}
                                                                     >
                                                                         {hideCompactEventHeader && !isLocked && (
                                                                             <div
@@ -3821,46 +3848,68 @@ const SequenceGrid: React.FC = () => {
                                                                             </div>
                                                                         )}
 
-                                                                        {/* Show + ingeklapt: miniature peek voor WLED/WiZ (mits preview aan) */}
+                                                                        {/* Show + ingeklapt: lamp-peeks + projectie-media strip (bediening op actief event) */}
                                                                         {isLocked &&
                                                                             eventCollapsed &&
-                                                                            lightStripPreviewOn &&
                                                                             (() => {
-                                                                                const lightPeekRows = collapsibleRows.filter(
+                                                                                const techPeekRows = collapsibleRows.filter(
                                                                                     r => {
                                                                                         const t = r.event.type?.toLowerCase()
-                                                                                        if (t !== 'light') return false
-                                                                                        const d = gridDevices.find(
-                                                                                            x =>
-                                                                                                x.name ===
-                                                                                                r.event.fixture
-                                                                                        )
-                                                                                        return (
-                                                                                            d?.type === 'wled' ||
-                                                                                            d?.type === 'wiz'
-                                                                                        )
+                                                                                        if (t === 'light') {
+                                                                                            const d =
+                                                                                                gridDevices.find(
+                                                                                                    x =>
+                                                                                                        x.name ===
+                                                                                                        r.event.fixture
+                                                                                                )
+                                                                                            return (
+                                                                                                d?.type === 'wled' ||
+                                                                                                d?.type === 'wiz'
+                                                                                            )
+                                                                                        }
+                                                                                        if (t === 'media')
+                                                                                            return isCollapsedShowProjectionMediaRow(
+                                                                                                r.event,
+                                                                                                gridDevices
+                                                                                            )
+                                                                                        return false
                                                                                     }
                                                                                 )
-                                                                                if (lightPeekRows.length === 0)
+                                                                                if (techPeekRows.length === 0)
                                                                                     return null
                                                                                 return (
                                                                                     <div className="space-y-0.5 border-t border-white/5 bg-violet-950/15 py-0.5 pl-14 pr-4">
-                                                                                        {lightPeekRows.map(item => (
-                                                                                            <LightFixtureStripPreview
-                                                                                                key={`collapsed-peek-${item.id}`}
-                                                                                                event={item.event}
-                                                                                                compact
-                                                                                                variant="micro"
-                                                                                                className="!mb-0"
-                                                                                                showModeStrip
-                                                                                                wledPeekPlaceholder={wledPeekPlaceholderForRow(
-                                                                                                    isLocked,
-                                                                                                    eventNode,
-                                                                                                    item.event,
-                                                                                                    item.originalIndex,
-                                                                                                    gridDevices
-                                                                                                )}
-                                                                                            />
+                                                                                        {techPeekRows.map(item => (
+                                                                                            <div
+                                                                                                key={`collapsed-tech-${item.id}`}
+                                                                                                className="min-w-0"
+                                                                                                onClick={e =>
+                                                                                                    e.stopPropagation()
+                                                                                                }
+                                                                                            >
+                                                                                                <ShowCollapsedTechRow
+                                                                                                    event={item.event}
+                                                                                                    originalIndex={
+                                                                                                        item.originalIndex
+                                                                                                    }
+                                                                                                    gridDevices={
+                                                                                                        gridDevices
+                                                                                                    }
+                                                                                                    wledPeekPlaceholder={wledPeekPlaceholderForRow(
+                                                                                                        isLocked,
+                                                                                                        eventNode,
+                                                                                                        item.event,
+                                                                                                        item.originalIndex,
+                                                                                                        gridDevices
+                                                                                                    )}
+                                                                                                    lightStripPreviewOn={
+                                                                                                        lightStripPreviewOn
+                                                                                                    }
+                                                                                                    showActions={
+                                                                                                        !!eventNode.isActive
+                                                                                                    }
+                                                                                                />
+                                                                                            </div>
                                                                                         ))}
                                                                                     </div>
                                                                                 )
@@ -3948,10 +3997,6 @@ const SequenceGrid: React.FC = () => {
                                                                         )}
                                                                     </div>
 
-                                                                    {isLocked && eventNode.isActive && (
-                                                                        <ActiveEventTechStrip rows={eventNode.rows} />
-                                                                    )}
-
                                                                     {/* ═══ TRANSITION STRIP between events ═══ */}
                                                                     <div ref={scrollTransitionRef} className="min-h-0">
                                                                         <EventTransition
@@ -3987,7 +4032,41 @@ const SequenceGrid: React.FC = () => {
                     </div >
                 )
             })}
-        </div >
+            </div>
+
+            {transitionEditIndex !== null && !isLocked && (
+                <TransitionEditModal
+                    triggerIndex={transitionEditIndex}
+                    onClose={() => setTransitionEditIndex(null)}
+                />
+            )}
+            {editRowIndex !== null && !isLocked && (
+                <SequenceRowEditModal
+                    rowIndex={editRowIndex}
+                    onClose={() => setEditRowIndex(null)}
+                />
+            )}
+            {actEditActId !== null && !isLocked && (
+                <ActEditModal actId={actEditActId} onClose={() => setActEditActId(null)} />
+            )}
+            {sceneEdit !== null && !isLocked && (
+                <SceneEditModal sceneEdit={sceneEdit} onClose={() => setSceneEdit(null)} />
+            )}
+            {eventEdit !== null && !isLocked && (
+                <EventEditModal eventEdit={eventEdit} onClose={() => setEventEdit(null)} />
+            )}
+            <ShowCheckPanel
+                open={isCheckOpen}
+                issues={checkIssues}
+                onClose={() => setIsCheckOpen(false)}
+                onRescan={runCheck}
+                onSelectIssue={(issue) => {
+                    if (issue.originalIndex === undefined) return
+                    selectAndScrollToIndex(issue.originalIndex)
+                }}
+                onFixIssue={fixCheckIssue}
+            />
+        </div>
     )
 }
 

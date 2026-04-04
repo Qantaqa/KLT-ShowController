@@ -1,11 +1,23 @@
 import { type StateCreator } from 'zustand';
 import { type ShowState } from '../types';
 import * as MediaPlayer from '../../services/media-player-service';
-import { PlayDirectOnAgent } from '../../services/media-player-service';
+import { PlayDirectOnAgent, ResumeMediaPlayer } from '../../services/media-player-service';
 import type { LocalMonitorDevice, VideoWallAgentDevice } from '../../types/devices';
 import { networkService } from '../../services/network-service';
 
+/** Laatste afspeelstatus per device (projection → hub via IPC). */
+export type MediaPlaybackSnapshot = {
+    currentTime?: number
+    duration?: number
+    playing?: boolean
+    paused?: boolean
+    lastUpdated?: number
+}
+
 export interface MediaSlice {
+    mediaPlaybackByDevice: Record<string, MediaPlaybackSnapshot>
+    applyMediaPlaybackStatus: (deviceId: string, status: Partial<MediaPlaybackSnapshot>) => void
+
     playingMedia: Record<string, {
         filename: string;
         timestamp: number;
@@ -52,6 +64,20 @@ export const createMediaSlice: StateCreator<
     [],
     MediaSlice
 > = (set, get) => ({
+    mediaPlaybackByDevice: {},
+    applyMediaPlaybackStatus: (deviceId: string, status: Partial<MediaPlaybackSnapshot>) => {
+        if (!deviceId) return
+        set(s => {
+            const prev = s.mediaPlaybackByDevice[deviceId] || {}
+            return {
+                mediaPlaybackByDevice: {
+                    ...s.mediaPlaybackByDevice,
+                    [deviceId]: { ...prev, ...status, lastUpdated: Date.now() }
+                }
+            }
+        })
+    },
+
     playingMedia: {},
     isCameraActive: false,
     isSelfPreviewVisible: true,

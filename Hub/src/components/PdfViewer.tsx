@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
+import { createPortal } from 'react-dom'
+import type { ShowEvent } from '../types/show'
 import { ChevronLeft, ChevronRight, Link as LinkIcon, Sun, Moon } from 'lucide-react'
 import { useSequencerStore } from '../store/useSequencerStore'
 import { cn } from '../lib/utils'
@@ -22,6 +24,141 @@ function computePdfScale(
     return Math.min(sw, sh)
 }
 
+/** Stagehand (action) markers on the PDF: label + right-pointing triangle; right-click for menu. */
+function PdfActionMarkersOverlay({
+    events,
+    pageNumber
+}: {
+    events: ShowEvent[]
+    pageNumber: number
+}) {
+    const updateEvent = useSequencerStore(s => s.updateEvent)
+    const requestRowEditFromPdfMarker = useSequencerStore(s => s.requestRowEditFromPdfMarker)
+    const setSelectedEvent = useSequencerStore(s => s.setSelectedEvent)
+    const [ctx, setCtx] = useState<null | { x: number; y: number; rowIndex: number }>(null)
+    const menuRef = useRef<HTMLDivElement>(null)
+
+    const items = useMemo(() => {
+        const out: { key: number; event: ShowEvent; x: number; y: number; done: boolean; label: string }[] = []
+        events.forEach((e, idx) => {
+            if ((e.type || '').toLowerCase() !== 'action') return
+            if ((e.scriptPg || 0) !== pageNumber) return
+            const mn = e.scriptMarkerNorm
+            if (!mn || typeof mn.x !== 'number' || typeof mn.y !== 'number') return
+            if (!Number.isFinite(mn.x) || !Number.isFinite(mn.y)) return
+            const label = `${(e.act || '').trim() || '?'} - ${e.sceneId ?? '?'}.${e.eventId ?? '?'}`
+            out.push({ key: idx, event: e, x: mn.x, y: mn.y, done: !!e.actionCompleted, label })
+        })
+        return out
+    }, [events, pageNumber])
+
+    useEffect(() => {
+        if (!ctx) return
+        const onMouseDown = (e: MouseEvent) => {
+            if (menuRef.current?.contains(e.target as Node)) return
+            setCtx(null)
+        }
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setCtx(null)
+        }
+        const t = window.setTimeout(() => document.addEventListener('mousedown', onMouseDown), 0)
+        window.addEventListener('keydown', onKey)
+        return () => {
+            window.clearTimeout(t)
+            document.removeEventListener('mousedown', onMouseDown)
+            window.removeEventListener('keydown', onKey)
+        }
+    }, [ctx])
+
+    if (items.length === 0 && !ctx) return null
+
+    const triFill = (done: boolean) => (done ? '#eab308' : '#ef4444')
+
+    return (
+        <>
+            <div className="absolute inset-0 pointer-events-none overflow-visible">
+                {items.map(({ key, x, y, done, label }) => (
+                    <div
+                        key={key}
+                        className="absolute flex flex-row items-center gap-0 pointer-events-auto cursor-context-menu"
+                        style={{
+                            left: `${x * 100}%`,
+                            top: `${y * 100}%`,
+                            transform: 'translate(-50%, -50%)'
+                        }}
+                        onClick={e => e.stopPropagation()}
+                        onContextMenu={e => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setCtx({ x: e.clientX, y: e.clientY, rowIndex: key })
+                        }}
+                    >
+                        <span
+                            className="select-none text-[8px] font-bold tracking-tight text-white max-h-[52px] overflow-hidden text-ellipsis"
+                            style={{
+                                writingMode: 'vertical-rl',
+                                transform: 'rotate(180deg)',
+                                textShadow: '0 0 2px #000, 0 1px 3px #000'
+                            }}
+                            title={label}
+                        >
+                            {label}
+                        </span>
+                        <svg width="20" height="18" viewBox="0 0 20 18" aria-hidden className="shrink-0">
+                            <polygon
+                                points="2,3 2,15 18,9"
+                                fill={triFill(done)}
+                                stroke="#000"
+                                strokeWidth="1.1"
+                                strokeLinejoin="round"
+                            />
+                        </svg>
+                    </div>
+                ))}
+            </div>
+            {ctx &&
+                createPortal(
+                    <div
+                        ref={menuRef}
+                        className="fixed z-[20050] min-w-[200px] rounded-lg border border-white/15 bg-[#1e1e24] py-1 shadow-xl"
+                        style={{ left: Math.min(ctx.x, window.innerWidth - 220), top: Math.min(ctx.y, window.innerHeight - 120) }}
+                        onMouseDown={e => e.stopPropagation()}
+                        onContextMenu={e => e.preventDefault()}
+                    >
+                        <button
+                            type="button"
+                            className="w-full px-3 py-2 text-left text-xs text-white/90 hover:bg-white/10"
+                            onClick={() => {
+                                setSelectedEvent(ctx.rowIndex)
+                                requestRowEditFromPdfMarker(ctx.rowIndex)
+                                setCtx(null)
+                            }}
+                        >
+                            Actie bewerken…
+                        </button>
+                        <button
+                            type="button"
+                            className="w-full px-3 py-2 text-left text-xs text-white/90 hover:bg-white/10 border-t border-white/10"
+                            onClick={() => {
+                                if (
+                                    window.confirm(
+                                        'PDF-marker van deze actie verwijderen? De actie zelf blijft behouden.'
+                                    )
+                                ) {
+                                    updateEvent(ctx.rowIndex, { scriptMarkerNorm: undefined })
+                                }
+                                setCtx(null)
+                            }}
+                        >
+                            Marker verwijderen…
+                        </button>
+                    </div>,
+                    document.body
+                )}
+        </>
+    )
+}
+
 // ---------------------------------------------------------------------------
 // RemotePdfViewer — for browser clients (non-Electron)
 // Loads PDF via HTTP from the host file server. Free navigation.
@@ -33,6 +170,7 @@ const RemotePdfViewer: React.FC<{
     webcamStripVisible: boolean
 }> = ({ pdfPath, currentScriptPage, webcamStripVisible }) => {
     const appSettings = useSequencerStore((s) => s.appSettings)
+    const events = useSequencerStore((s) => s.events)
 
     const [localPage, setLocalPage] = useState(currentScriptPage || 1)
     const [totalPages, setTotalPages] = useState(0)
@@ -204,14 +342,17 @@ const RemotePdfViewer: React.FC<{
                         <div className="text-white/40 text-xs font-mono animate-pulse">PDF laden...</div>
                     </div>
                 )}
-                <canvas
-                    ref={canvasRef}
-                    className={cn(
-                        'block transition-[filter] duration-200 max-w-full max-h-full',
-                        !webcamStripVisible && 'w-full',
-                        shouldInvert && 'pdf-inverted'
-                    )}
-                />
+                <div className="relative inline-block max-w-full max-h-full">
+                    <canvas
+                        ref={canvasRef}
+                        className={cn(
+                            'block transition-[filter] duration-200 max-w-full max-h-full',
+                            !webcamStripVisible && 'w-full',
+                            shouldInvert && 'pdf-inverted'
+                        )}
+                    />
+                    <PdfActionMarkersOverlay events={events} pageNumber={localPage} />
+                </div>
             </div>
 
             {/* Bottom bar: paginanav | scrubber | licht/donker */}
@@ -529,6 +670,35 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ webcamStripVisible = false }) => 
         addToast(`Pagina ${pageNumber} gekoppeld aan actief event`, 'info')
     }
 
+    const canPlaceActionMarker =
+        !isLocked &&
+        selectedEventIndex >= 0 &&
+        (events[selectedEventIndex]?.type || '').toLowerCase() === 'action'
+
+    const handleCanvasClickActionMarker = useCallback(
+        (e: React.MouseEvent<HTMLCanvasElement>) => {
+            if (isLocked) return
+            if (selectedEventIndex < 0) return
+            const ev = events[selectedEventIndex]
+            if (!ev || (ev.type || '').toLowerCase() !== 'action') return
+            const canvas = canvasRef.current
+            if (!canvas) return
+            const rect = canvas.getBoundingClientRect()
+            if (rect.width <= 0 || rect.height <= 0) return
+            const nx = (e.clientX - rect.left) / rect.width
+            const ny = (e.clientY - rect.top) / rect.height
+            updateEvent(selectedEventIndex, {
+                scriptPg: pageNumber,
+                scriptMarkerNorm: {
+                    x: Math.min(1, Math.max(0, nx)),
+                    y: Math.min(1, Math.max(0, ny))
+                }
+            })
+            addToast('Marker geplaatst op actie', 'info')
+        },
+        [addToast, events, isLocked, pageNumber, selectedEventIndex, updateEvent]
+    )
+
     // ----- Remote client: full pdfjs canvas viewer via HTTP -----
     if (!isElectron) {
         return (
@@ -581,14 +751,19 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ webcamStripVisible = false }) => 
                     </div>
                 )}
 
-                <canvas
-                    ref={canvasRef}
-                    className={cn(
-                        'block transition-[filter] duration-200 max-w-full max-h-full',
-                        !webcamStripVisible && 'w-full',
-                        shouldInvert && 'pdf-inverted'
-                    )}
-                />
+                <div className="relative inline-block max-w-full max-h-full">
+                    <canvas
+                        ref={canvasRef}
+                        onClick={handleCanvasClickActionMarker}
+                        className={cn(
+                            'block transition-[filter] duration-200 max-w-full max-h-full',
+                            !webcamStripVisible && 'w-full',
+                            shouldInvert && 'pdf-inverted',
+                            canPlaceActionMarker && 'cursor-crosshair'
+                        )}
+                    />
+                    <PdfActionMarkersOverlay events={events} pageNumber={pageNumber} />
+                </div>
             </div>
 
             {/* Onderbalk: paginanav | scrubber | invert | koppelknoppen */}

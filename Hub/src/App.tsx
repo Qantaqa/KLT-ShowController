@@ -232,14 +232,32 @@ export default function App() {
   const [showPreflight, setShowPreflight] = useState(false)
   const [showStartupShowSelect, setShowStartupShowSelect] = useState(false)
 
+  const commitShowMode = useCallback(async () => {
+    useSequencerStore.getState().resetPlaybackForShowMode()
+    await useSequencerStore.getState().setLocked(true)
+  }, [])
+
   const requestToggleShowEditMode = useCallback(() => {
     if (!activeShow || !isHost) return
     if (!isLocked) {
-      setShowPreflight(true)
+      openModal({
+        title: 'Pre-checks voor show-modus',
+        message:
+          'Wil je pre-checks uitvoeren? Ontbrekende media wordt gecontroleerd en zo nodig geüpload naar videowall-agents. Kies "Nee" om direct naar show-modus te gaan (zonder upload).',
+        type: 'confirm',
+        confirmLabel: 'Ja, pre-checks',
+        cancelLabel: 'Nee, overslaan',
+        onConfirm: () => {
+          setShowPreflight(true)
+        },
+        onCancel: () => {
+          void commitShowMode()
+        },
+      })
     } else {
       void setLocked(false)
     }
-  }, [activeShow, isHost, isLocked, setLocked])
+  }, [activeShow, isHost, isLocked, openModal, commitShowMode, setLocked])
 
   // Clear PIN input when switching between auth screens
   useEffect(() => {
@@ -718,9 +736,18 @@ export default function App() {
       }
       ipcRenderer.on('projection-masks-saved-for-event', onMasksForEvent)
 
+      const onMediaPlaybackStatus = (_: unknown, payload: { deviceId?: string } & Record<string, unknown>) => {
+        const id = payload?.deviceId
+        if (!id) return
+        const { deviceId: _d, ...status } = payload
+        useSequencerStore.getState().applyMediaPlaybackStatus(String(id), status as any)
+      }
+      ipcRenderer.on('media-playback-status', onMediaPlaybackStatus)
+
       return () => {
         ipcRenderer.removeListener('flash-message', handleFlash)
         ipcRenderer.removeListener('projection-masks-saved-for-event', onMasksForEvent)
+        ipcRenderer.removeListener('media-playback-status', onMediaPlaybackStatus)
       }
     }
   }, [addToast])
@@ -765,29 +792,18 @@ export default function App() {
 
   return (
     <div className="h-screen w-screen bg-background text-foreground flex flex-col overflow-hidden font-sans select-none relative">
-      {/* Pre-flight media check modal */}
+      {/* Pre-flight media check — alleen na "Ja, pre-checks" bij edit → show */}
       {showPreflight && (
         <MediaPreflightModal
           agents={(appSettings.devices || []).filter((d: any) => d.type === 'videowall_agent' && d.enabled !== false) as any[]}
           events={events}
           onComplete={() => {
             setShowPreflight(false)
-            setLocked(true)
+            void commitShowMode()
           }}
-          onCancel={() => setShowPreflight(false)}
-        />
-      )}
-
-      {/* Pre-flight media check modal — runs when transitioning from edit to show mode */}
-      {showPreflight && (
-        <MediaPreflightModal
-          agents={(appSettings.devices || []).filter((d: any) => d.type === 'videowall_agent' && d.enabled !== false) as any[]}
-          events={events}
-          onComplete={() => {
+          onCancel={() => {
             setShowPreflight(false)
-            setLocked(true)
           }}
-          onCancel={() => setShowPreflight(false)}
         />
       )}
 
@@ -1290,7 +1306,7 @@ export default function App() {
 
         <div className="flex-1 flex overflow-hidden">
           {/* Main Content Area */}
-          <section className="flex-1 flex flex-col border-r border-white/5 min-w-[400px] relative">
+          <section className="flex-1 flex flex-col border-r border-white/5 min-w-[400px] relative min-h-0">
             {!isLocked && !isHost && (
               <div className="absolute inset-0 z-[2000] bg-black/40 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500">
                 <div className="w-20 h-20 rounded-full bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center mb-6 animate-pulse">
@@ -1302,7 +1318,8 @@ export default function App() {
                 </p>
               </div>
             )}
-            <div className="flex-1 overflow-auto p-2 custom-scrollbar min-h-0">
+            {/* Scroll alleen hieronder: SequenceGrid gebruikt sticky voor de show-balk. */}
+            <div className="flex flex-1 flex-col min-h-0 overflow-hidden p-2">
               <SequenceGrid />
             </div>
           </section>
@@ -1762,6 +1779,7 @@ export default function App() {
         </div>
 
         <div className="flex-[2] flex items-center justify-center gap-6">
+          {isHost && isLocked && activeEventIndex < 0 && (
           <button
             onClick={() => {
               if (!isTimeTracking && activeEventIndex === -1) {
@@ -1785,19 +1803,16 @@ export default function App() {
                 startShow();
               }
             }}
-            disabled={!isLocked || !activeShow}
+            disabled={!activeShow}
             title="Start Show / Eerste Event"
             className={cn(
               "w-16 h-16 rounded-full glass border-white/10 flex items-center justify-center transition-all group disabled:opacity-20",
-              activeEventIndex === -1 && "bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] animate-bright-pulse border-white/60",
-              !isHost && "hidden"
+              "bg-green-500 shadow-[0_0_30px_rgba(34,197,94,0.6)] animate-bright-pulse border-white/60"
             )}
           >
-            <Play className={cn(
-              "w-6 h-6 transition-all",
-              activeEventIndex === -1 ? "text-white fill-white" : "text-green-400 fill-green-400/20 group-hover:fill-green-400 group-hover:text-black"
-            )} />
+            <Play className="w-6 h-6 transition-all text-white fill-white" />
           </button>
+          )}
 
           {/* Active Event Remaining Time */}
           {isLocked && activeEventIndex >= 0 && (

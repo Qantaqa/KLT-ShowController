@@ -19,6 +19,7 @@ const typeLabels: Partial<Record<ShowCheckType, string>> = {
   missing_trigger: 'Trigger',
   timed_trigger_invalid: 'Timed trigger',
   script_page_invalid: 'ScriptPg',
+  action_marker_inconsistent: 'Actie PDF-marker',
   duplicates_in_event: 'Dubbele fixture',
 }
 

@@ -12780,6 +12780,68 @@ class NetworkManager {
     }
   }
   /**
+   * Alle WLED-segmenten effen zwart (lage helderheid), voor show-modus “stop”.
+   */
+  async stopWledAllSegmentsBlack(ip, deviceId) {
+    const blackSeg = {
+      on: true,
+      bri: 1,
+      fx: 0,
+      pal: 0,
+      col: [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+      ],
+      sx: 128,
+      ix: 128
+    };
+    try {
+      const finalData = await this.getWledInfo(ip);
+      const segs = this.normalizeWledStateSegments(finalData?.state?.seg);
+      let segPayload;
+      if (segs.length > 0) {
+        segPayload = segs.map((s) => ({
+          id: typeof s.id === "number" ? s.id : parseInt(String(s.id), 10) || 0,
+          ...blackSeg
+        }));
+      } else if (deviceId) {
+        const stored = dbManager.getWledSegments(deviceId);
+        if (stored && Array.isArray(stored) && stored.length > 0) {
+          segPayload = stored.map((s) => ({
+            id: typeof s.id === "number" ? s.id : parseInt(String(s.id), 10) || 0,
+            ...blackSeg
+          }));
+        } else {
+          segPayload = [{ id: 0, ...blackSeg }];
+        }
+      } else {
+        segPayload = [{ id: 0, ...blackSeg }];
+      }
+      await this.sendWledCommand({ ip, on: true, bri: 1, seg: segPayload });
+    } catch (e) {
+      console.error(`[NetworkManager] WLED black-out failed for ${ip}:`, e?.message || e);
+      await this.sendWledCommand({ ip, on: true, bri: 1, seg: [{ id: 0, ...blackSeg }] });
+    }
+  }
+  /** WLED of WiZ op zwart; alleen lamp-types. */
+  async stopLightFixtureBlack(fixtureName) {
+    const name = (fixtureName || "").trim();
+    if (!name) return { ok: false, error: "Geen fixture" };
+    const devices = dbManager.getDevices("GLOBAL") || [];
+    const device = devices.find((d) => d.name === name);
+    if (!device?.ip) return { ok: false, error: "Apparaat niet gevonden" };
+    if (device.type === "wiz") {
+      await this.sendWizCommand(device.ip, "setPilot", { r: 0, g: 0, b: 0, dimming: 1 });
+      return { ok: true };
+    }
+    if (device.type === "wled") {
+      await this.stopWledAllSegmentsBlack(device.ip, device.id);
+      return { ok: true };
+    }
+    return { ok: false, error: "Geen lamp" };
+  }
+  /**
    * Executes a visual test sequence on a device (Red -> Green -> Blue).
    * Used for identifying physical fixtures during setup.
    * @param device The device object to test.
@@ -13889,6 +13951,9 @@ ipcMain.handle(
     return networkManager.sendWledLivePreview(ip, event, deviceId);
   }
 );
+ipcMain.handle("light:fixture-black", (_e, { fixture }) => {
+  return networkManager.stopLightFixtureBlack(fixture);
+});
 ipcMain.handle("wiz:get-pilot", (_e, ip) => networkManager.sendWizCommand(ip, "getPilot", {}));
 ipcMain.handle("wiz:live-preview", (_e, { ip, event }) => {
   return networkManager.sendWizLivePreview(ip, event);
@@ -14054,6 +14119,9 @@ ipcMain.on("media-status-update", (_e, { deviceId, status }) => {
     } catch (err) {
     }
   }
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send("media-playback-status", { deviceId, ...status });
+  }
 });
 ipcMain.on("projection-update-masks", (_e, { deviceId, masks }) => {
   console.log(`[Main] Updating projection masks for device ${deviceId}`, masks);
@@ -14110,6 +14178,20 @@ ipcMain.on("media-command", (_e, { deviceId, command, payload }) => {
     const win2 = projectionWindows.get(deviceId);
     if (win2 && !win2.isDestroyed()) {
       win2.webContents.send("projection-config", payload);
+    }
+    return;
+  }
+  if (command === "pause") {
+    const win2 = projectionWindows.get(deviceId);
+    if (win2 && !win2.isDestroyed()) {
+      win2.webContents.send("media-pause", payload || {});
+    }
+    return;
+  }
+  if (command === "resume") {
+    const win2 = projectionWindows.get(deviceId);
+    if (win2 && !win2.isDestroyed()) {
+      win2.webContents.send("media-resume", payload || {});
     }
     return;
   }

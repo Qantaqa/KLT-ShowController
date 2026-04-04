@@ -750,6 +750,10 @@ ipcMain.handle(
     }
 );
 
+ipcMain.handle('light:fixture-black', (_e: any, { fixture }: { fixture: string }) => {
+    return networkManager.stopLightFixtureBlack(fixture);
+});
+
 ipcMain.handle('wiz:get-pilot', (_e: any, ip: string) => networkManager.sendWizCommand(ip, 'getPilot', {}));
 
 ipcMain.handle('wiz:live-preview', (_e: any, { ip, event }: { ip: string; event: any }) => {
@@ -964,6 +968,10 @@ ipcMain.on('media-status-update', (_e: any, { deviceId, status }: any) => {
             dbManager.updateDeviceMediaState(deviceId, currentState);
         } catch (err) { /* ignore */ }
     }
+
+    if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('media-playback-status', { deviceId, ...status });
+    }
 });
 
 // Projection Configuration & Calibration
@@ -1033,6 +1041,22 @@ ipcMain.on('media-command', (_e: any, { deviceId, command, payload }: any) => {
         const win = projectionWindows.get(deviceId);
         if (win && !win.isDestroyed()) {
             win.webContents.send('projection-config', payload);
+        }
+        return;
+    }
+
+    if (command === 'pause') {
+        const win = projectionWindows.get(deviceId);
+        if (win && !win.isDestroyed()) {
+            win.webContents.send('media-pause', payload || {});
+        }
+        return;
+    }
+
+    if (command === 'resume') {
+        const win = projectionWindows.get(deviceId);
+        if (win && !win.isDestroyed()) {
+            win.webContents.send('media-resume', payload || {});
         }
         return;
     }

@@ -165,9 +165,17 @@ const ProjectionWindow: React.FC = () => {
             }
 
             const handlePause = () => {
-                setPlayerA(prev => ({ ...prev, playing: false }));
-                setPlayerB(prev => ({ ...prev, playing: false }));
+                const ap = activePlayerRef.current
+                if (ap === 'A') setPlayerA(prev => ({ ...prev, playing: false }))
+                else setPlayerB(prev => ({ ...prev, playing: false }))
                 setDebugInfo('Paused')
+            }
+
+            const handleResume = () => {
+                const ap = activePlayerRef.current
+                if (ap === 'A') setPlayerA(prev => ({ ...prev, playing: true }))
+                else setPlayerB(prev => ({ ...prev, playing: true }))
+                setDebugInfo('Resumed')
             }
 
             const handleVolume = (_: any, { volume, mute }: { volume: number, mute: boolean }) => {
@@ -213,6 +221,7 @@ const ProjectionWindow: React.FC = () => {
             ipcRenderer.on('media-play', handlePlay)
             ipcRenderer.on('media-stop', handleStop)
             ipcRenderer.on('media-pause', handlePause)
+            ipcRenderer.on('media-resume', handleResume)
             ipcRenderer.on('media-volume', handleVolume)
             ipcRenderer.on('media-update', handleUpdate)
             ipcRenderer.on('projection-config', handleConfig)
@@ -222,28 +231,30 @@ const ProjectionWindow: React.FC = () => {
                 const targetId = deviceId || (window as any).projectionDeviceId;
                 const activeRef = activePlayerRef.current === 'A' ? videoRefA : videoRefB;
                 if (activeRef.current && targetId) {
+                    const el = activeRef.current
                     ipcRenderer.send('media-status-update', {
                         deviceId: targetId,
                         status: {
-                            playing: !activeRef.current.paused,
-                            currentTime: activeRef.current.currentTime,
-                            duration: activeRef.current.duration,
-                            volume: activeRef.current.volume,
-                            muted: activeRef.current.muted,
-                            loop: activeRef.current.loop,
-                            playbackRate: activeRef.current.playbackRate,
+                            playing: !el.paused && !el.ended && !!el.src,
+                            paused: el.paused,
+                            currentTime: el.currentTime,
+                            duration: el.duration,
+                            volume: el.volume,
+                            muted: el.muted,
+                            loop: el.loop,
+                            playbackRate: el.playbackRate,
                             lastUpdated: Date.now()
                         }
                     });
                 } else if (targetId) {
                     ipcRenderer.send('media-status-update', {
                         deviceId: targetId,
-                        status: { playing: false, lastUpdated: Date.now() }
+                        status: { playing: false, paused: false, lastUpdated: Date.now() }
                     });
                 }
             };
 
-            const statusInterval = setInterval(sendStatusUpdate, 5000);
+            const statusInterval = setInterval(sendStatusUpdate, 800);
 
             ipcRenderer.on('set-mode', (_: any, { developer }: { developer: boolean }) => {
                 setIsDeveloperMode(developer)
@@ -256,6 +267,7 @@ const ProjectionWindow: React.FC = () => {
                 ipcRenderer.removeListener('media-play', handlePlay)
                 ipcRenderer.removeListener('media-stop', handleStop)
                 ipcRenderer.removeListener('media-pause', handlePause)
+                ipcRenderer.removeListener('media-resume', handleResume)
                 ipcRenderer.removeListener('media-volume', handleVolume)
                 ipcRenderer.removeListener('media-update', handleUpdate)
                 ipcRenderer.removeListener('projection-config', handleConfig)

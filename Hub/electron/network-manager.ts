@@ -352,6 +352,70 @@ class NetworkManager {
     }
 
     /**
+     * Alle WLED-segmenten effen zwart (lage helderheid), voor show-modus “stop”.
+     */
+    async stopWledAllSegmentsBlack(ip: string, deviceId?: string) {
+        const blackSeg = {
+            on: true,
+            bri: 1,
+            fx: 0,
+            pal: 0,
+            col: [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0]
+            ] as any,
+            sx: 128,
+            ix: 128
+        }
+        try {
+            const finalData = await this.getWledInfo(ip)
+            const segs = this.normalizeWledStateSegments(finalData?.state?.seg)
+            let segPayload: any[]
+            if (segs.length > 0) {
+                segPayload = segs.map((s: any) => ({
+                    id: typeof s.id === 'number' ? s.id : parseInt(String(s.id), 10) || 0,
+                    ...blackSeg
+                }))
+            } else if (deviceId) {
+                const stored = dbManager.getWledSegments(deviceId)
+                if (stored && Array.isArray(stored) && stored.length > 0) {
+                    segPayload = stored.map((s: any) => ({
+                        id: typeof s.id === 'number' ? s.id : parseInt(String(s.id), 10) || 0,
+                        ...blackSeg
+                    }))
+                } else {
+                    segPayload = [{ id: 0, ...blackSeg }]
+                }
+            } else {
+                segPayload = [{ id: 0, ...blackSeg }]
+            }
+            await this.sendWledCommand({ ip, on: true, bri: 1, seg: segPayload })
+        } catch (e: any) {
+            console.error(`[NetworkManager] WLED black-out failed for ${ip}:`, e?.message || e)
+            await this.sendWledCommand({ ip, on: true, bri: 1, seg: [{ id: 0, ...blackSeg }] })
+        }
+    }
+
+    /** WLED of WiZ op zwart; alleen lamp-types. */
+    async stopLightFixtureBlack(fixtureName: string) {
+        const name = (fixtureName || '').trim()
+        if (!name) return { ok: false as const, error: 'Geen fixture' }
+        const devices = dbManager.getDevices('GLOBAL') || []
+        const device = devices.find((d: any) => d.name === name)
+        if (!device?.ip) return { ok: false as const, error: 'Apparaat niet gevonden' }
+        if (device.type === 'wiz') {
+            await this.sendWizCommand(device.ip, 'setPilot', { r: 0, g: 0, b: 0, dimming: 1 })
+            return { ok: true as const }
+        }
+        if (device.type === 'wled') {
+            await this.stopWledAllSegmentsBlack(device.ip, device.id)
+            return { ok: true as const }
+        }
+        return { ok: false as const, error: 'Geen lamp' }
+    }
+
+    /**
      * Executes a visual test sequence on a device (Red -> Green -> Blue).
      * Used for identifying physical fixtures during setup.
      * @param device The device object to test.

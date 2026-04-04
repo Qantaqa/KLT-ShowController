@@ -194,7 +194,26 @@ const WledStripPreviewBody: React.FC<WledStripPreviewBodyProps> = ({
   )
 
   if (layout === 'showRow' && !stripPreviewEnabled) {
-    return null
+    return (
+      <div className={cn('flex w-full min-w-0 items-center gap-2', className)}>
+        <span
+          className={cn(
+            LIGHT_STRIP_SHOW_ROW_TITLE_COL_CLASS,
+            'font-medium tabular-nums text-white/90',
+            isMicro ? 'text-[10px]' : 'text-xs'
+          )}
+          title={showRowName}
+        >
+          {showRowName}
+        </span>
+        <div
+          className={cn(
+            'relative min-w-0 flex-1 overflow-hidden rounded border border-white/10 bg-black',
+            isMicro ? 'h-1' : 'h-1.5'
+          )}
+        />
+      </div>
+    )
   }
 
   if (layout === 'showRow') {

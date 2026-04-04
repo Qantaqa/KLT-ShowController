@@ -465,6 +465,18 @@ export const PauseMediaPlayer = (target: Device) => {
     }
 };
 
+/** Hervatten na pauze (alleen lokaal monitor: projection window). */
+export const ResumeMediaPlayer = (target: Device) => {
+    if (target.type !== 'local_monitor') return;
+    const ipc = getIpc();
+    if (!ipc) return;
+    ipc.send('media-command', {
+        deviceId: target.id,
+        command: 'resume',
+        payload: {}
+    });
+};
+
 export const StartProjection = async (device: Device, monitorIndex: number) => {
     const ipc = getIpc();
     if (!ipc) return;

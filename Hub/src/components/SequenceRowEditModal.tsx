@@ -680,6 +680,12 @@ const SequenceRowEditModal: React.FC<SequenceRowEditModalProps> = ({ rowIndex, o
   const type = event?.type?.toLowerCase() || ''
 
   const [editActionCue, setEditActionCue] = useState('')
+  const [editActionCueMoment, setEditActionCueMoment] = useState('')
+  const [editActionAssignee, setEditActionAssignee] = useState('')
+  const [editActionPg, setEditActionPg] = useState('')
+  const [editActionDuration, setEditActionDuration] = useState('')
+  const [editMarkerXPct, setEditMarkerXPct] = useState('')
+  const [editMarkerYPct, setEditMarkerYPct] = useState('')
   const [editTitleCue, setEditTitleCue] = useState('')
   const [editTitlePg, setEditTitlePg] = useState('')
   const [editComment, setEditComment] = useState('')
@@ -688,7 +694,21 @@ const SequenceRowEditModal: React.FC<SequenceRowEditModalProps> = ({ rowIndex, o
     if (rowIndex === null || rowIndex < 0 || !events[rowIndex]) return
     const ev = events[rowIndex]
     const t = ev.type?.toLowerCase() || ''
-    if (t === 'action') setEditActionCue(ev.cue || '')
+    if (t === 'action') {
+      setEditActionCue(ev.cue || '')
+      setEditActionCueMoment(ev.actionCueMoment || '')
+      setEditActionAssignee(ev.actionAssignee || '')
+      setEditActionPg(ev.scriptPg !== undefined && ev.scriptPg > 0 ? String(ev.scriptPg) : '')
+      setEditActionDuration(ev.duration !== undefined && ev.duration > 0 ? String(ev.duration) : '')
+      const mn = ev.scriptMarkerNorm
+      if (mn && typeof mn.x === 'number' && typeof mn.y === 'number' && Number.isFinite(mn.x) && Number.isFinite(mn.y)) {
+        setEditMarkerXPct(String(Math.round(mn.x * 100)))
+        setEditMarkerYPct(String(Math.round(mn.y * 100)))
+      } else {
+        setEditMarkerXPct('')
+        setEditMarkerYPct('')
+      }
+    }
     if (t === 'title') {
       setEditTitleCue(ev.cue || '')
       setEditTitlePg(ev.scriptPg !== undefined && ev.scriptPg > 0 ? String(ev.scriptPg) : '')
@@ -732,7 +752,35 @@ const SequenceRowEditModal: React.FC<SequenceRowEditModalProps> = ({ rowIndex, o
 
   const handleSave = () => {
     if (type === 'action') {
-      updateEvent(rowIndex, { cue: editActionCue.trim() })
+      const rawPg = editActionPg.trim()
+      const nPg = rawPg === '' ? 0 : parseInt(rawPg, 10)
+      const scriptPg = Number.isFinite(nPg) && nPg > 0 ? nPg : 0
+      const rawDur = editActionDuration.trim()
+      const nDur = rawDur === '' ? NaN : parseInt(rawDur, 10)
+      const duration = Number.isFinite(nDur) && nDur > 0 ? nDur : undefined
+      const xRaw = editMarkerXPct.trim()
+      const yRaw = editMarkerYPct.trim()
+      let scriptMarkerNorm: { x: number; y: number } | undefined
+      if (xRaw !== '' && yRaw !== '') {
+        const x = parseFloat(xRaw.replace(',', '.'))
+        const y = parseFloat(yRaw.replace(',', '.'))
+        if (Number.isFinite(x) && Number.isFinite(y)) {
+          scriptMarkerNorm = {
+            x: Math.min(1, Math.max(0, x / 100)),
+            y: Math.min(1, Math.max(0, y / 100))
+          }
+        }
+      } else {
+        scriptMarkerNorm = undefined
+      }
+      updateEvent(rowIndex, {
+        cue: editActionCue.trim(),
+        actionCueMoment: editActionCueMoment.trim() || undefined,
+        actionAssignee: editActionAssignee.trim() || undefined,
+        scriptPg,
+        duration,
+        scriptMarkerNorm
+      })
     } else if (type === 'title') {
       const raw = editTitlePg.trim()
       const n = raw === '' ? 0 : parseInt(raw, 10)
@@ -799,9 +847,11 @@ const SequenceRowEditModal: React.FC<SequenceRowEditModalProps> = ({ rowIndex, o
           'w-full max-h-[90vh] min-h-0 flex flex-col rounded-xl border border-white/15 bg-[#1e1e24] shadow-2xl p-5',
           type === 'media' || type === 'light'
             ? 'max-w-5xl w-[min(1080px,calc(100vw-24px))]'
-            : wide
+            :             wide
               ? 'max-w-2xl w-[min(720px,calc(100vw-32px))]'
-              : 'max-w-md'
+              : type === 'action'
+                ? 'max-w-lg w-[min(560px,calc(100vw-32px))]'
+                : 'max-w-md'
         )}
         onClick={e => e.stopPropagation()}
         role="dialog"
@@ -853,14 +903,86 @@ const SequenceRowEditModal: React.FC<SequenceRowEditModalProps> = ({ rowIndex, o
 
           {type === 'action' && (
             <>
-              <label className={labelCls}>Cue / omschrijving</label>
+              <label className={labelCls}>Cue-moment</label>
+              <input
+                value={editActionCueMoment}
+                onChange={e => setEditActionCueMoment(e.target.value)}
+                className={inputCls}
+                placeholder="Bijv. na refrein, T+2 min…"
+              />
+              <label className={labelCls}>Omschrijving (cue)</label>
               <input
                 value={editActionCue}
                 onChange={e => setEditActionCue(e.target.value)}
                 className={inputCls}
-                placeholder="Cue / omschrijving"
+                placeholder="Wat moet er gebeuren?"
                 autoFocus
               />
+              <label className={labelCls}>Wie</label>
+              <input
+                value={editActionAssignee}
+                onChange={e => setEditActionAssignee(e.target.value)}
+                className={inputCls}
+                placeholder="Naam of rol"
+              />
+              <label className={labelCls}>Scriptpagina (PDF)</label>
+              <input
+                type="number"
+                min={1}
+                value={editActionPg}
+                onChange={e => setEditActionPg(e.target.value)}
+                className={inputCls}
+                placeholder="Geen koppeling"
+              />
+              <label className={labelCls}>Tijd (seconden)</label>
+              <input
+                type="number"
+                min={1}
+                value={editActionDuration}
+                onChange={e => setEditActionDuration(e.target.value)}
+                className={inputCls}
+                placeholder="Optioneel tijdsbudget"
+              />
+              <div className="flex flex-col gap-2">
+                <label className={labelCls}>Marker op pagina (X / Y %)</label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={editMarkerXPct}
+                    onChange={e => setEditMarkerXPct(e.target.value)}
+                    className={inputCls}
+                    placeholder="X 0–100"
+                    title="Horizontaal 0–100%"
+                  />
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={editMarkerYPct}
+                    onChange={e => setEditMarkerYPct(e.target.value)}
+                    className={inputCls}
+                    placeholder="Y 0–100"
+                    title="Verticaal 0–100%"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditMarkerXPct('')
+                      setEditMarkerYPct('')
+                    }}
+                    className={modalBtnSecondary('px-2 shrink-0 text-[10px]')}
+                    title="PDF-marker verwijderen"
+                  >
+                    Wis marker
+                  </button>
+                </div>
+                <p className="text-[10px] text-white/40 leading-relaxed">
+                  Vul beide percentages of laat beide leeg. Op de host: selecteer deze regel en klik op de
+                  PDF om pagina + positie te zetten (alleen buiten show-modus).
+                </p>
+              </div>
             </>
           )}
 

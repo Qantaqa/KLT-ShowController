@@ -11,6 +11,7 @@ export type ShowCheckType =
   | 'missing_trigger'
   | 'timed_trigger_invalid'
   | 'script_page_invalid'
+  | 'action_marker_inconsistent'
   | 'duplicates_in_event'
 
 export type ShowCheckIssue = {
@@ -303,6 +304,29 @@ export function runShowChecks(args: {
       if (t === 'action') {
         const fixture = (e.fixture || '').trim()
         if (fixture) fixturesInGroup.push({ fixture, idx, type: 'action' })
+
+        const mn = e.scriptMarkerNorm
+        const hasMarker =
+          !!mn &&
+          typeof mn.x === 'number' &&
+          typeof mn.y === 'number' &&
+          Number.isFinite(mn.x) &&
+          Number.isFinite(mn.y)
+        const pg = toNumberOrUndef(e.scriptPg)
+        if (hasMarker && (!pg || pg <= 0)) {
+          issues.push({
+            id: makeId('action_marker_inconsistent', idx, key),
+            severity: 'warning',
+            type: 'action_marker_inconsistent',
+            title: 'Actie-marker zonder scriptpagina',
+            description:
+              'Deze actie heeft een positie-marker op de PDF maar geen geldige scriptpagina. Stel scriptpagina in of wis de marker.',
+            originalIndex: idx,
+            act,
+            sceneId,
+            eventId
+          })
+        }
       }
 
       // StopAt validation:
