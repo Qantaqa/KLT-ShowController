@@ -12,7 +12,8 @@
     "dev:web": "vite --config vite.web.config.ts --host",
     "electron:dev": "vite --host",
     "electron:build": "npm run build",
-    "rebuild": "electron-rebuild -f -w better-sqlite3"
+    "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "generate:wled-catalog": "node scripts/generate-wled-catalog.mjs"
   },
   "build": {
     "appId": "com.ledshow.app",

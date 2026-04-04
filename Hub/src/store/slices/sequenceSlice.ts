@@ -4,6 +4,75 @@ import type { ShowEvent, ClipboardItem } from '../../types/show';
 import { networkService } from '../../services/network-service';
 import { transitionKeyFromGroupEvent } from '../../utils/transitionTiming';
 
+function buildIndexRemap(oldEvents: ShowEvent[], newEvents: ShowEvent[]): Map<number, number> {
+    const map = new Map<number, number>();
+    for (let ni = 0; ni < newEvents.length; ni++) {
+        const oi = oldEvents.indexOf(newEvents[ni]);
+        if (oi !== -1) map.set(oi, ni);
+    }
+    return map;
+}
+
+function remapOptionalIndex(i: number, m: Map<number, number>): number {
+    if (i < 0) return i;
+    return m.has(i) ? m.get(i)! : i;
+}
+
+type ActInteriorSeg =
+    | { kind: 'orphan'; rows: ShowEvent[] }
+    | { kind: 'scene'; sceneId: number; rows: ShowEvent[] }
+    | { kind: 'other'; rows: ShowEvent[] };
+
+function parseActRowsToSegments(rows: ShowEvent[]): ActInteriorSeg[] {
+    const segments: ActInteriorSeg[] = [];
+    let i = 0;
+    while (i < rows.length) {
+        const e = rows[i];
+        const t = (e.type || '').toLowerCase();
+        if (e.sceneId === undefined && e.eventId === undefined && t !== 'scene') {
+            let j = i + 1;
+            while (j < rows.length) {
+                const e2 = rows[j];
+                const t2 = (e2.type || '').toLowerCase();
+                if (!(e2.sceneId === undefined && e2.eventId === undefined && t2 !== 'scene')) break;
+                j++;
+            }
+            segments.push({ kind: 'orphan', rows: rows.slice(i, j) });
+            i = j;
+            continue;
+        }
+        if (e.sceneId !== undefined) {
+            const sid = e.sceneId;
+            const act = e.act;
+            let j = i;
+            while (j < rows.length && rows[j].act === act && rows[j].sceneId === sid) j++;
+            segments.push({ kind: 'scene', sceneId: sid, rows: rows.slice(i, j) });
+            i = j;
+            continue;
+        }
+        segments.push({ kind: 'other', rows: rows.slice(i, i + 1) });
+        i++;
+    }
+    return segments;
+}
+
+function reorderSceneSegmentsInPlace(segments: ActInteriorSeg[], draggedId: number, targetId: number): ActInteriorSeg[] {
+    const sceneSegs = segments.filter((s): s is Extract<ActInteriorSeg, { kind: 'scene' }> => s.kind === 'scene');
+    if (!sceneSegs.length) return segments;
+    const ids = sceneSegs.map(s => s.sceneId);
+    const di = ids.indexOf(draggedId);
+    const ti = ids.indexOf(targetId);
+    if (di === -1 || ti === -1 || di === ti) return segments;
+    const newIds = [...ids];
+    newIds.splice(di, 1);
+    const nti = newIds.indexOf(targetId);
+    newIds.splice(nti, 0, draggedId);
+    const byId = new Map(sceneSegs.map(s => [s.sceneId, s] as const));
+    const newSceneList = newIds.map(id => byId.get(id)!);
+    let si = 0;
+    return segments.map(seg => (seg.kind === 'scene' ? newSceneList[si++] : seg));
+}
+
 export interface SequenceSlice {
     events: ShowEvent[];
     activeEventIndex: number;
@@ -66,6 +135,16 @@ export interface SequenceSlice {
     moveAct: (actName: string, direction: 'up' | 'down') => void;
     moveScene: (actName: string, sceneId: number, direction: 'up' | 'down') => void;
     moveEvent: (index: number, direction: 'up' | 'down') => void;
+    /** Sleep: hele act-blok direct vóór een andere act. */
+    reorderActBefore: (draggedActName: string, targetActName: string) => void;
+    /** Sleep: scene (met events) binnen dezelfde act vóór een andere scene. */
+    reorderSceneBefore: (actName: string, draggedSceneId: number, targetSceneId: number) => void;
+    /** Sleep: event-groep binnen dezelfde scene vóór de groep die op beforeTargetIndex begint. */
+    moveEventGroupBefore: (fromGroupStartIndex: number, beforeTargetIndex: number) => void;
+    /** Sleep: event-groep direct ná de groep die op afterTargetGroupStartIndex begint. */
+    moveEventGroupAfter: (fromGroupStartIndex: number, afterTargetGroupStartIndex: number) => void;
+    /** Sleep: één action-regel binnen dezelfde event-groep vóór of ná een andere action-regel. */
+    moveActionRowWithinGroup: (fromIndex: number, toIndex: number, edge: 'before' | 'after') => void;
     deleteEvent: (index: number) => void;
     deleteGroup: (act: string, sceneId: number, eventId: number) => void;
     deleteAct: (act: string) => void;
@@ -768,6 +847,21 @@ export const createSequenceSlice: StateCreator<
 
     insertAct: (index, position) => {
         const { events, setEvents, reindexEvents, saveCurrentShow } = get()
+        const newRows: ShowEvent[] = [
+            { act: 'Nieuwe Act', sceneId: 1, eventId: 1, type: 'Act', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent,
+            { act: 'Nieuwe Act', sceneId: 1, eventId: 1, type: 'Scene', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent,
+            { act: 'Nieuwe Act', sceneId: 1, eventId: 1, type: 'Title', cue: 'Nieuw Event', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent,
+            { act: 'Nieuwe Act', sceneId: 1, eventId: 1, type: 'Comment', cue: 'Nieuw commentaar', fixture: '', effect: '', palette: '', color1: '#ffffff', color2: '#ffffff', color3: '#ffffff', brightness: 0, speed: 0, intensity: 0, transition: 0, sound: false } as ShowEvent,
+            { act: 'Nieuwe Act', sceneId: 1, eventId: 1, type: 'Trigger', cue: 'Handmatige overgang', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent
+        ]
+
+        if (!events.length) {
+            setEvents([...newRows])
+            reindexEvents()
+            saveCurrentShow()
+            return
+        }
+
         const targetAct = events[index].act
         let insertAt = index
         if (position === 'after') {
@@ -782,13 +876,6 @@ export const createSequenceSlice: StateCreator<
             }
         }
         const newEvents = [...events]
-        const newRows: ShowEvent[] = [
-            { act: 'Nieuwe Act', sceneId: 1, eventId: 1, type: 'Act', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent,
-            { act: 'Nieuwe Act', sceneId: 1, eventId: 1, type: 'Scene', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent,
-            { act: 'Nieuwe Act', sceneId: 1, eventId: 1, type: 'Title', cue: 'Nieuw Event', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent,
-            { act: 'Nieuwe Act', sceneId: 1, eventId: 1, type: 'Comment', cue: 'Nieuw commentaar', fixture: '', effect: '', palette: '', color1: '#ffffff', color2: '#ffffff', color3: '#ffffff', brightness: 0, speed: 0, intensity: 0, transition: 0, sound: false } as ShowEvent,
-            { act: 'Nieuwe Act', sceneId: 1, eventId: 1, type: 'Trigger', cue: 'Handmatige overgang', fixture: '', effect: '', palette: '', color1: '#000000', color2: '#000000', color3: '#000000', brightness: 100, speed: 100, intensity: 100, transition: 0, sound: true } as ShowEvent
-        ]
         newEvents.splice(insertAt, 0, ...newRows)
         setEvents(newEvents)
         reindexEvents()
@@ -1033,6 +1120,211 @@ export const createSequenceSlice: StateCreator<
             saveCurrentShow()
             return
         }
+    },
+
+    reorderActBefore: (draggedActName, targetActName) => {
+        if (draggedActName === targetActName) return
+        const { events, setEvents, reindexEvents, saveCurrentShow, activeEventIndex, selectedEventIndex } = get()
+        const names: string[] = []
+        for (let i = 0; i < events.length; ) {
+            const act = events[i].act
+            names.push(act)
+            while (i < events.length && events[i].act === act) i++
+        }
+        const di = names.indexOf(draggedActName)
+        const ti = names.indexOf(targetActName)
+        if (di === -1 || ti === -1) return
+        const newNames = [...names]
+        newNames.splice(di, 1)
+        const newTi = newNames.indexOf(targetActName)
+        newNames.splice(newTi, 0, draggedActName)
+        const blockByAct = new Map<string, ShowEvent[]>()
+        for (let i = 0; i < events.length; ) {
+            const act = events[i].act
+            const s = i
+            while (i < events.length && events[i].act === act) i++
+            blockByAct.set(act, events.slice(s, i))
+        }
+        const newEvents = newNames.flatMap(n => blockByAct.get(n) || [])
+        const map = buildIndexRemap(events, newEvents)
+        setEvents(newEvents)
+        set({
+            activeEventIndex: remapOptionalIndex(activeEventIndex, map),
+            selectedEventIndex: remapOptionalIndex(selectedEventIndex, map),
+        })
+        reindexEvents()
+        saveCurrentShow()
+    },
+
+    reorderSceneBefore: (actName, draggedSceneId, targetSceneId) => {
+        if (draggedSceneId === targetSceneId) return
+        const { events, setEvents, reindexEvents, saveCurrentShow, activeEventIndex, selectedEventIndex } = get()
+        let actStart = -1
+        let actEnd = -1
+        for (let i = 0; i < events.length; i++) {
+            if (events[i].act === actName) {
+                if (actStart === -1) actStart = i
+                actEnd = i
+            }
+        }
+        if (actStart === -1) return
+        const actRows = events.slice(actStart, actEnd + 1)
+        const segments = parseActRowsToSegments(actRows)
+        const newSegs = reorderSceneSegmentsInPlace(segments, draggedSceneId, targetSceneId)
+        if (newSegs === segments) return
+        const newRows = newSegs.flatMap(s => s.rows)
+        const newEvents = [...events.slice(0, actStart), ...newRows, ...events.slice(actEnd + 1)]
+        const map = buildIndexRemap(events, newEvents)
+        setEvents(newEvents)
+        set({
+            activeEventIndex: remapOptionalIndex(activeEventIndex, map),
+            selectedEventIndex: remapOptionalIndex(selectedEventIndex, map),
+        })
+        reindexEvents()
+        saveCurrentShow()
+    },
+
+    moveEventGroupBefore: (fromGroupStartIndex, beforeTargetIndex) => {
+        const { events, setEvents, reindexEvents, saveCurrentShow, activeEventIndex, selectedEventIndex } = get()
+        if (
+            fromGroupStartIndex < 0 ||
+            beforeTargetIndex < 0 ||
+            fromGroupStartIndex >= events.length ||
+            beforeTargetIndex >= events.length
+        )
+            return
+
+        const isSameEventGroup = (a: ShowEvent | undefined, b: ShowEvent | undefined) =>
+            !!a &&
+            !!b &&
+            a.act === b.act &&
+            a.sceneId === b.sceneId &&
+            a.eventId === b.eventId
+
+        const key = events[fromGroupStartIndex]
+        const act = key.act
+        const sceneId = key.sceneId
+        const eventId = key.eventId
+        if (!act || sceneId === undefined || eventId === undefined) return
+
+        let fs = fromGroupStartIndex
+        let fe = fromGroupStartIndex
+        while (fs > 0 && isSameEventGroup(events[fs - 1], key)) fs--
+        while (fe < events.length - 1 && isSameEventGroup(events[fe + 1], key)) fe++
+
+        let bs = beforeTargetIndex
+        while (bs > 0 && isSameEventGroup(events[bs - 1], events[beforeTargetIndex])) bs--
+
+        if (bs >= fs && bs <= fe) return
+
+        const tgt = events[bs]
+        if (!tgt || tgt.act !== act || tgt.sceneId !== sceneId) return
+
+        const block = events.slice(fs, fe + 1)
+        const without = [...events.slice(0, fs), ...events.slice(fe + 1)]
+        let insertAt = bs
+        if (fe < bs) insertAt = bs - block.length
+        const newEvents = [...without.slice(0, insertAt), ...block, ...without.slice(insertAt)]
+        const map = buildIndexRemap(events, newEvents)
+        setEvents(newEvents)
+        set({
+            activeEventIndex: remapOptionalIndex(activeEventIndex, map),
+            selectedEventIndex: remapOptionalIndex(selectedEventIndex, map),
+        })
+        reindexEvents()
+        saveCurrentShow()
+    },
+
+    moveEventGroupAfter: (fromGroupStartIndex, afterTargetGroupStartIndex) => {
+        const { events, setEvents, reindexEvents, saveCurrentShow, activeEventIndex, selectedEventIndex } = get()
+        if (
+            fromGroupStartIndex < 0 ||
+            afterTargetGroupStartIndex < 0 ||
+            fromGroupStartIndex >= events.length ||
+            afterTargetGroupStartIndex >= events.length
+        )
+            return
+
+        const isSameEventGroup = (a: ShowEvent | undefined, b: ShowEvent | undefined) =>
+            !!a &&
+            !!b &&
+            a.act === b.act &&
+            a.sceneId === b.sceneId &&
+            a.eventId === b.eventId
+
+        const key = events[fromGroupStartIndex]
+        const act = key.act
+        const sceneId = key.sceneId
+        const eventId = key.eventId
+        if (!act || sceneId === undefined || eventId === undefined) return
+
+        let fs = fromGroupStartIndex
+        let fe = fromGroupStartIndex
+        while (fs > 0 && isSameEventGroup(events[fs - 1], key)) fs--
+        while (fe < events.length - 1 && isSameEventGroup(events[fe + 1], key)) fe++
+
+        const tKey = events[afterTargetGroupStartIndex]
+        if (!tKey || tKey.act !== act || tKey.sceneId !== sceneId) return
+
+        let ta = afterTargetGroupStartIndex
+        let te = afterTargetGroupStartIndex
+        while (ta > 0 && isSameEventGroup(events[ta - 1], tKey)) ta--
+        while (te < events.length - 1 && isSameEventGroup(events[te + 1], tKey)) te++
+
+        if (fs <= te && fe >= ta) return
+
+        const block = events.slice(fs, fe + 1)
+        let insertAt = te + 1
+        const without = [...events.slice(0, fs), ...events.slice(fe + 1)]
+        if (fe < insertAt) insertAt -= block.length
+
+        const newEvents = [...without.slice(0, insertAt), ...block, ...without.slice(insertAt)]
+        const map = buildIndexRemap(events, newEvents)
+        setEvents(newEvents)
+        set({
+            activeEventIndex: remapOptionalIndex(activeEventIndex, map),
+            selectedEventIndex: remapOptionalIndex(selectedEventIndex, map),
+        })
+        reindexEvents()
+        saveCurrentShow()
+    },
+
+    moveActionRowWithinGroup: (fromIndex, toIndex, edge) => {
+        const { events, setEvents, reindexEvents, saveCurrentShow, activeEventIndex, selectedEventIndex } = get()
+        if (fromIndex < 0 || toIndex < 0 || fromIndex >= events.length || toIndex >= events.length) return
+        if (fromIndex === toIndex) return
+
+        const row = events[fromIndex]
+        const tgt = events[toIndex]
+        if (!row || !tgt) return
+        if (row.type?.toLowerCase() !== 'action' || tgt.type?.toLowerCase() !== 'action') return
+        if (row.act !== tgt.act || row.sceneId !== tgt.sceneId || row.eventId !== tgt.eventId) return
+
+        const isSameEventGroup = (a: ShowEvent | undefined, b: ShowEvent | undefined) =>
+            !!a && !!b && a.act === b.act && a.sceneId === b.sceneId && a.eventId === b.eventId
+
+        let start = fromIndex
+        while (start > 0 && isSameEventGroup(events[start - 1], row)) start--
+        let end = fromIndex
+        while (end < events.length - 1 && isSameEventGroup(events[end + 1], row)) end++
+        if (toIndex < start || toIndex > end) return
+
+        const rawInsert = edge === 'after' ? toIndex + 1 : toIndex
+        let insertAt = rawInsert
+        if (fromIndex < rawInsert) insertAt = rawInsert - 1
+
+        const newEvents = [...events]
+        const [moved] = newEvents.splice(fromIndex, 1)
+        newEvents.splice(insertAt, 0, moved)
+
+        const map = buildIndexRemap(events, newEvents)
+        setEvents(newEvents)
+        set({
+            activeEventIndex: remapOptionalIndex(activeEventIndex, map),
+            selectedEventIndex: remapOptionalIndex(selectedEventIndex, map),
+        })
+        reindexEvents()
+        saveCurrentShow()
     },
 
     deleteEvent: (index) => {

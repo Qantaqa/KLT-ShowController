@@ -40,6 +40,101 @@ class NetworkManager {
     }
 
     /**
+     * WLED /json/state `seg` is usually an array; some builds expose an object map — normalize to an array.
+     */
+    private normalizeWledStateSegments(raw: any): any[] {
+        if (!raw) return []
+        if (Array.isArray(raw)) return raw
+        if (typeof raw === 'object') return Object.values(raw)
+        return []
+    }
+
+    /**
+     * Push current cue WLED state while editing (effect/colors/etc.), without restoring stored segments.
+     * Mirrors show playback segment rules: one segment vs all segments.
+     * `segmentId >= 0` = single segment; omitted, null, or &lt; 0 (e.g. -1 “alle segmenten”) = apply to every segment.
+     */
+    async sendWledLivePreview(ip: string, event: ShowEvent, deviceId?: string) {
+        const segUpdate = {
+            fx: event.effectId !== undefined ? event.effectId : 0,
+            pal: event.paletteId !== undefined ? event.paletteId : 0,
+            col: [
+                this.hexToRgb(event.color1 || '#ffffff'),
+                this.hexToRgb(event.color2 || '#000000'),
+                this.hexToRgb(event.color3 || '#888888')
+            ],
+            sx: event.speed !== undefined ? event.speed : 128,
+            ix: event.intensity !== undefined ? event.intensity : 128
+        }
+
+        const payload: any = {
+            on: true,
+            bri: event.brightness !== undefined ? event.brightness : 255,
+            seg: []
+        }
+
+        const rawSid = event.segmentId as any
+        const sidNum =
+            rawSid === undefined || rawSid === null || rawSid === ''
+                ? NaN
+                : typeof rawSid === 'number'
+                  ? rawSid
+                  : parseInt(String(rawSid), 10)
+        const singleSegment = Number.isFinite(sidNum) && sidNum >= 0
+
+        try {
+            if (singleSegment) {
+                payload.seg.push({ id: sidNum, ...segUpdate })
+                await this.sendWledCommand({ ip, ...payload })
+                return
+            }
+
+            const finalData = await this.getWledInfo(ip)
+            const list = this.normalizeWledStateSegments(finalData?.state?.seg)
+
+            if (list.length > 0) {
+                payload.seg = list.map((s: any) => ({
+                    id: typeof s.id === 'number' ? s.id : parseInt(String(s.id), 10) || 0,
+                    ...segUpdate
+                }))
+            } else if (deviceId) {
+                const stored = dbManager.getWledSegments(deviceId)
+                if (stored && Array.isArray(stored) && stored.length > 0) {
+                    payload.seg = stored.map((s: any) => ({
+                        id: typeof s.id === 'number' ? s.id : parseInt(String(s.id), 10) || 0,
+                        ...segUpdate
+                    }))
+                } else {
+                    payload.seg.push({ id: 0, ...segUpdate })
+                }
+            } else {
+                payload.seg.push({ id: 0, ...segUpdate })
+            }
+            await this.sendWledCommand({ ip, ...payload })
+        } catch (e: any) {
+            console.error(`[NetworkManager] WLED live preview failed for ${ip}:`, e?.message || e)
+        }
+    }
+
+    /** Push WiZ color/brightness while editing. */
+    async sendWizLivePreview(ip: string, event: ShowEvent) {
+        const [r, g, b] = this.hexToRgb(event.color1 || '#ffffff')
+        try {
+            await this.sendWizCommand(ip, 'setPilot', {
+                r,
+                g,
+                b,
+                dimming:
+                    event.brightness !== undefined
+                        ? Math.min(100, Math.max(1, Math.round(event.brightness / 2.55)))
+                        : 100
+            })
+        } catch (e: any) {
+            console.error(`[NetworkManager] WiZ live preview failed for ${ip}:`, e?.message || e)
+        }
+    }
+
+    /**
      * Sends a command to a WiZ light using the WiZ UDP protocol.
      * @param ip The IP address of the WiZ device.
      * @param method The WiZ method to call (e.g., 'setPilot', 'getPilot').
@@ -199,7 +294,7 @@ class NetworkManager {
                             const currentData = await this.getWledInfo(ip);
 
                             if (storedSegments && currentData && currentData.state) {
-                                const currentSegments = currentData.state.seg || [];
+                                const currentSegments = this.normalizeWledStateSegments(currentData.state.seg);
 
                                 // Simplified check: compare number of segments and their boundaries (start/stop)
                                 // More complex attributes could be checked but boundaries are critical for "configuration presence"
@@ -216,14 +311,26 @@ class NetworkManager {
                             }
 
                             // Proceed with the actual command
-                            if (event.segmentId !== undefined && event.segmentId >= 0) {
-                                payload.seg.push({ id: event.segmentId, ...segUpdate });
+                            const rawEvSeg = event.segmentId as any;
+                            const evSegNum =
+                                rawEvSeg === undefined || rawEvSeg === null || rawEvSeg === ''
+                                    ? NaN
+                                    : typeof rawEvSeg === 'number'
+                                      ? rawEvSeg
+                                      : parseInt(String(rawEvSeg), 10);
+                            const singleSeg = Number.isFinite(evSegNum) && evSegNum >= 0;
+
+                            if (singleSeg) {
+                                payload.seg.push({ id: evSegNum, ...segUpdate });
                                 this.sendWledCommand({ ip, ...payload });
                             } else {
-                                // If no specific segment, update all current segments
                                 const finalData = await this.getWledInfo(ip);
-                                if (finalData && finalData.state && finalData.state.seg) {
-                                    payload.seg = finalData.state.seg.map((s: any) => ({ id: s.id, ...segUpdate }));
+                                const segs = this.normalizeWledStateSegments(finalData?.state?.seg);
+                                if (segs.length > 0) {
+                                    payload.seg = segs.map((s: any) => ({
+                                        id: typeof s.id === 'number' ? s.id : parseInt(String(s.id), 10) || 0,
+                                        ...segUpdate
+                                    }));
                                     this.sendWledCommand({ ip, ...payload });
                                 } else {
                                     payload.seg.push({ id: 0, ...segUpdate });

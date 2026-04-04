@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { CheckCircle, Upload, AlertCircle, Loader2, X, WifiOff } from 'lucide-react'
+import { CheckCircle, Upload, AlertCircle, Loader2, X, WifiOff, RefreshCw } from 'lucide-react'
 import { videoWallAgentService } from '../services/videowall-agent-service'
 import type { VideoWallAgentDevice } from '../types/devices'
 import type { ShowEvent } from '../types/show'
+import { modalBtnIconClass, modalBtnPrimary, modalBtnSecondary } from '../lib/utils'
 
 interface PreflightItem {
     agentId: string
@@ -282,24 +283,22 @@ const MediaPreflightModal: React.FC<MediaPreflightModalProps> = ({ agents, event
 
                 {/* Footer: always show skip + cancel; error state shows extra retry option */}
                 {phase !== 'done' && (
-                    <div className="flex gap-3 px-6 py-4 border-t border-white/5">
-                        <button
-                            onClick={onCancel}
-                            className="py-2.5 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-black uppercase tracking-wider transition-all"
-                        >
+                    <div className="flex flex-wrap gap-2 sm:gap-3 px-6 py-4 border-t border-white/5">
+                        <button type="button" onClick={onCancel} className={modalBtnSecondary('py-2.5')}>
+                            <X className={modalBtnIconClass} />
                             Annuleren
                         </button>
                         <button
+                            type="button"
                             onClick={onComplete}
-                            className="flex-1 py-2.5 bg-primary/80 hover:bg-primary text-black rounded-xl text-xs font-black uppercase tracking-wider transition-all"
+                            className={modalBtnPrimary('flex-1 min-w-[12rem] justify-center py-2.5')}
                         >
+                            <CheckCircle className="h-4 w-4 shrink-0 text-white" />
                             Overslaan – Toch Starten
                         </button>
                         {phase === 'error' && (
-                            <button
-                                onClick={run}
-                                className="py-2.5 px-4 bg-orange-500 hover:bg-orange-400 text-black rounded-xl text-xs font-black uppercase tracking-wider transition-all"
-                            >
+                            <button type="button" onClick={run} className={modalBtnSecondary('py-2.5 border-amber-500/40 hover:border-amber-500/55')}>
+                                <RefreshCw className={modalBtnIconClass} />
                                 Opnieuw
                             </button>
                         )}

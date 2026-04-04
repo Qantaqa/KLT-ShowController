@@ -3,7 +3,7 @@ import { X, Upload, Save, Shield, Globe, Code, Monitor, Laptop, Settings2, Check
 import { useSequencerStore } from '../store/useSequencerStore'
 import DevicesSettings from './DevicesSettings'
 import KeyboardSettings from './KeyboardSettings'
-import { cn } from '../lib/utils'
+import { cn, modalBtnIconClass, modalBtnPrimary, modalBtnSecondary, modalHeaderCloseBtn } from '../lib/utils'
 
 interface AppSettingsProps {
     isOpen: boolean
@@ -14,11 +14,12 @@ interface AppSettingsProps {
 }
 
 const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperMode, setIsDeveloperMode, serverIp }) => {
-    const { appSettings, updateAppSettings, addToast, openModal } = useSequencerStore()
+    const { appSettings, updateAppSettings, addToast, openModal, appSettingsLaunch, consumeAppSettingsLaunch } = useSequencerStore()
     const [localSettings, setLocalSettings] = useState(appSettings)
     const [isSaving, setIsSaving] = useState(false)
     const [displayList, setDisplayList] = useState<{ id: number; index: number; isPrimary: boolean; label: string }[]>([])
     const [activeTab, setActiveTab] = useState<'general' | 'devices' | 'workstations' | 'keyboard'>('general')
+    const [devicesFocusDeviceId, setDevicesFocusDeviceId] = useState<string | null>(null)
     const logoInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
@@ -28,8 +29,17 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                 const { ipcRenderer } = (window as any).require('electron')
                 ipcRenderer.invoke('get-displays').then(setDisplayList)
             }
+        } else {
+            setDevicesFocusDeviceId(null)
         }
     }, [isOpen, appSettings])
+
+    useEffect(() => {
+        if (!isOpen || !appSettingsLaunch) return
+        if (appSettingsLaunch.tab) setActiveTab(appSettingsLaunch.tab)
+        if (appSettingsLaunch.deviceId) setDevicesFocusDeviceId(appSettingsLaunch.deviceId)
+        consumeAppSettingsLaunch()
+    }, [isOpen, appSettingsLaunch, consumeAppSettingsLaunch])
 
     if (!isOpen) return null
 
@@ -93,12 +103,8 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                         </div>
                         <h2 className="text-lg font-bold tracking-tight">App Instellingen</h2>
                     </div>
-                    <button
-                        onClick={onClose}
-                        title="Sluiten"
-                        className="p-2 hover:bg-white/10 rounded-full transition-colors"
-                    >
-                        <X className="w-5 h-5 opacity-60" />
+                    <button type="button" onClick={onClose} title="Sluiten" className={modalHeaderCloseBtn('p-2.5')}>
+                        <X className="h-5 w-5" />
                     </button>
                 </div>
 
@@ -338,6 +344,8 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                             <DevicesSettings
                                 devices={localSettings.devices || []}
                                 onChange={(devices) => setLocalSettings(prev => ({ ...prev, devices }))}
+                                focusDeviceId={devicesFocusDeviceId}
+                                onConsumedFocusDevice={() => setDevicesFocusDeviceId(null)}
                             />
                         </div>
                     )}
@@ -358,10 +366,10 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                                     <div className="p-8 text-center bg-white/5 rounded-xl border border-dashed border-white/10">
                                         <p className="text-xs opacity-40">Geen stations geregistreerd</p>
                                     </div>
-                                ) : useSequencerStore.getState().connectedClients.map((client) => {
+                                ) : useSequencerStore.getState().connectedClients.map((client, wsIdx) => {
                                     const isHostClient = client.type === 'HOST'
                                     const clientUuid = client.uuid || null
-                                    const clientKey = clientUuid || client.id
+                                    const clientKey = `${clientUuid || client.id || 'ws'}-${wsIdx}`
                                     return (
                                         <div key={clientKey} className="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group">
                                             <div className="flex items-center gap-4">
@@ -463,27 +471,29 @@ const AppSettings: React.FC<AppSettingsProps> = ({ isOpen, onClose, isDeveloperM
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 bg-white/[0.02] border-t border-white/10 flex items-center justify-between">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 rounded-lg hover:bg-white/10 text-xs font-bold uppercase transition-all text-white/60 hover:text-white"
-                    >
+                <div className="px-6 py-4 bg-white/[0.02] border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+                    <button type="button" onClick={onClose} className={modalBtnSecondary()}>
+                        <X className={modalBtnIconClass} />
                         Annuleren
                     </button>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
                         <button
+                            type="button"
                             onClick={() => handleSave(false)}
                             disabled={isSaving}
-                            className="px-6 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold uppercase transition-all flex items-center gap-2 disabled:opacity-50"
+                            className={modalBtnSecondary()}
                         >
-                            <Save className="w-4 h-4 opacity-60" /> {isSaving ? 'Opslaan...' : 'Opslaan'}
+                            <Save className={modalBtnIconClass} />
+                            {isSaving ? 'Opslaan...' : 'Opslaan'}
                         </button>
                         <button
+                            type="button"
                             onClick={() => handleSave(true)}
                             disabled={isSaving}
-                            className="px-6 py-2 rounded-lg bg-primary hover:bg-primary/80 text-white text-xs font-bold uppercase shadow-lg shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                            className={modalBtnPrimary()}
                         >
-                            <Check className="w-4 h-4" /> {isSaving ? 'Opslaan...' : 'Opslaan & Sluiten'}
+                            <Check className="h-4 w-4 shrink-0 text-white" />
+                            {isSaving ? 'Opslaan...' : 'Opslaan & Sluiten'}
                         </button>
                     </div>
                 </div>

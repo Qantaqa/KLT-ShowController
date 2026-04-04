@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { AlertCircle, Check } from 'lucide-react'
+import { AlertCircle, Check, X } from 'lucide-react'
+import { modalBtnPrimary, modalBtnSecondary } from '../lib/utils'
 
 interface SimpleModalProps {
     isOpen: boolean
@@ -72,18 +73,18 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 border-t border-white/5 flex items-center justify-between gap-3 bg-white/5">
-                    <button
-                        onClick={() => onCancel?.()}
-                        className="px-4 py-2 rounded-lg hover:bg-white/10 text-[10px] font-bold uppercase tracking-widest transition-all text-white/60 hover:text-white"
-                    >
+                <div className="px-6 py-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-3 bg-white/5">
+                    <button type="button" onClick={() => onCancel?.()} className={modalBtnSecondary('text-[10px] tracking-widest')}>
+                        <X className="h-3.5 w-3.5 shrink-0 text-primary" />
                         {cancelLabel}
                     </button>
                     <button
+                        type="button"
                         onClick={() => onConfirm(type === 'prompt' ? inputValue : undefined)}
-                        className="px-6 py-2 rounded-lg bg-primary hover:bg-primary/80 text-white text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
+                        className={modalBtnPrimary('px-6 text-[10px] tracking-widest')}
                     >
-                        <Check className="w-3.5 h-3.5" /> {confirmLabel}
+                        <Check className="h-3.5 w-3.5 shrink-0 text-white" />
+                        {confirmLabel}
                     </button>
                 </div>
             </div>

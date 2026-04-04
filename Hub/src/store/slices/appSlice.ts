@@ -1,6 +1,7 @@
 import { type StateCreator } from 'zustand';
 import { type ShowState } from '../types';
 import type { ShowProfile, AppSettingsProfile, KeyboardBinding } from '../../types/show';
+import { isLightStripPreviewEnabled } from '../../lib/light-strip-preview';
 import { networkService } from '../../services/network-service';
 import { XmlService } from '../../services/xml-service';
 import { showInitService } from '../../services/show-init-service';
@@ -34,6 +35,9 @@ export interface AppSlice {
     isSynced: boolean;
     clientUUID: string;
     clientFriendlyName: string;
+    /** App-instellingen popup (zie openAppSettings / closeAppSettings) */
+    appSettingsModalOpen: boolean;
+    appSettingsLaunch: { tab?: 'general' | 'devices' | 'workstations' | 'keyboard'; deviceId?: string } | null;
 
     addToast: (message: string, type?: 'info' | 'warning' | 'error', durationMs?: number) => void;
     removeToast: (id: string) => void;
@@ -66,6 +70,9 @@ export interface AppSlice {
     keyboardBindings: KeyboardBinding[];
     updateKeyboardBindings: (bindings: KeyboardBinding[]) => Promise<void>;
     initializeKeyboardBindings: () => Promise<void>;
+    openAppSettings: (launch?: { tab?: 'general' | 'devices' | 'workstations' | 'keyboard'; deviceId?: string }) => void;
+    closeAppSettings: () => void;
+    consumeAppSettingsLaunch: () => void;
 }
 
 export const createAppSlice: StateCreator<
@@ -111,6 +118,8 @@ export const createAppSlice: StateCreator<
     })(),
     clientFriendlyName: '',
     eventPage: null,
+    appSettingsModalOpen: false,
+    appSettingsLaunch: null,
 
     addToast: (message, type = 'info', durationMs = 5000) => {
         const id = Math.random().toString(36).substring(7)
@@ -142,6 +151,15 @@ export const createAppSlice: StateCreator<
 
     closeModal: () => set(state => ({ modalConfig: { ...state.modalConfig, isOpen: false } })),
 
+    openAppSettings: (launch) =>
+        set({
+            appSettingsModalOpen: true,
+            appSettingsLaunch: launch ?? null
+        }),
+
+    closeAppSettings: () => set({ appSettingsModalOpen: false, appSettingsLaunch: null }),
+
+    consumeAppSettingsLaunch: () => set({ appSettingsLaunch: null }),
 
     setActiveShow: async (show) => {
         if (show && (window as any).require) {
@@ -372,7 +390,13 @@ export const createAppSlice: StateCreator<
                             activeEventIndex: -1,
                             timingRunStartedAt: null,
                             stopButtonFlashRequest: false,
-                            appSettings: { ...appSettings, devices: globalDevices || [] },
+                            appSettings: {
+                                ...appSettings,
+                                devices: globalDevices || [],
+                                lightStripPreviewEnabled: isLightStripPreviewEnabled(
+                                    appSettings?.lightStripPreviewEnabled
+                                )
+                            },
                             showsLoading: false,
                             showsLoadError: null
                         })

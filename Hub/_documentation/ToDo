@@ -13,3 +13,9 @@ In edit-mode voeg op een event en een action een button tot om commentaar toe te
 Als in edit-mode een commentaar is toegevoegd, maak dan ook een popup menu met optie om het commentaar te verwijderen.
 Een WLED of WIZ kunnen we kopieren naar een buffer.  Er kunnen meerdere buffers aanwezig zijn, voor het plakken van het butter is een dropdown met meer informatie of voorbeeld wel handig  om  te zien.
 Maak in de database twee tabellen. 1 voor beschikbare wled effecten en 1 voor beschikbare wled palettes. Via App settings kunnen deze tabellen gevuld worden zodra een wled online komt. In principe hoeft dit maar 1 keer gedaan te worden. De grid moet dan de beschikbare effecten en palettes uit de database halen.
+
+
+
+
+Zet op de Show Regel in de sequence tree een button, om een (eerste) act te maken direct, als er al een act is, dan komt die dus voor de bestaande act. De button is een van de twee plusjes die je ook zie op een act regel, maar dan alleen de onderste plusje. 
+Maak de show regel in de sequece tree de hoogste regel in de tree. Deze show regel kunnen we uit en inklappen, waardoor de knoppen open en dicht overbodig zijn en weg kunnen.

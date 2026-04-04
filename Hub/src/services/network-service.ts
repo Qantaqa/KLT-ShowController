@@ -37,8 +37,9 @@ class NetworkService {
 
         // Event: Generic execution message from server or other clients
         this.socket.on('execute', (data: any) => {
-            // Noise reduction: Test if the message is a high-frequency camera frame; if not, log it
-            if (data.type !== 'CAMERA_FRAME') {
+            // Noise reduction: skip high-frequency / bulk payloads in the generic execute log
+            const quietTypes = new Set(['CAMERA_FRAME', 'DEVICE_STATUS_UPDATE'])
+            if (!quietTypes.has(data.type)) {
                 console.log('Remote execution command:', data.type, data)
             }
 
@@ -222,7 +223,6 @@ class NetworkService {
             }
             // --- Logic Branch: Device Availability Update ---
             else if (data.type === 'DEVICE_STATUS_UPDATE') {
-                console.log('--- NETWORK: Received DEVICE_STATUS_UPDATE for IDs:', Object.keys(data.statuses).join(', '));
                 useSequencerStore.getState().setDeviceAvailability(data.statuses)
             }
             // --- Logic Branch: Client Registration Feedback ---

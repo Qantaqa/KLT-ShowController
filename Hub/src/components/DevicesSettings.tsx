@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Plus, Trash2, Settings2, Monitor, Wifi, Tv, ChevronDown, Radar, RefreshCw, Play, X, StopCircle, Save, Upload, ExternalLink, CheckCircle2 } from 'lucide-react'
-import { cn } from '../lib/utils'
+import { createPortal } from 'react-dom'
+import { Plus, Trash2, Settings2, Monitor, Wifi, Tv, Radar, RefreshCw, Play, X, StopCircle, Save, Upload, ExternalLink, CheckCircle2 } from 'lucide-react'
+import { cn, modalBtnDanger, modalHeaderCloseBtn } from '../lib/utils'
 import { useSequencerStore } from '../store/useSequencerStore'
 import type { Device, DeviceType, RemoteVideoWallDevice, WiZDevice, VideoWallAgentDevice, WLEDDevice, LocalMonitorDevice } from '../types/devices'
 import { StartMediaPlayer, StopMediaPlayer, SetVolumeMediaPlayer } from '../services/media-player-service'
@@ -13,9 +14,17 @@ const LAYOUTS_9 = ['1x1', '1x2', '1x3', '1x4', '2x1', '2x2', '2x3', '2x4', '3x1'
 interface DevicesSettingsProps {
     devices: Device[]
     onChange: (devices: Device[]) => void
+    /** Vanuit deep link (bijv. media-editor): open bewerk-popup voor dit apparaat. */
+    focusDeviceId?: string | null
+    onConsumedFocusDevice?: () => void
 }
 
-const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) => {
+const DevicesSettings: React.FC<DevicesSettingsProps> = ({
+    devices,
+    onChange,
+    focusDeviceId = null,
+    onConsumedFocusDevice
+}) => {
     const { openModal, addToast, deviceAvailability, activeTransfers } = useSequencerStore()
 
     const updateDevice = (id: string, partial: Partial<Device>) => {
@@ -26,7 +35,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
         onChange(devices.filter(d => d.id !== id))
     }
 
-    const [expandedDevice, setExpandedDevice] = useState<string | null>(null)
+    const [editDeviceId, setEditDeviceId] = useState<string | null>(null)
     const [isScanning, setIsScanning] = useState(false)
     const [scanResults, setScanResults] = useState<any[]>([])
     const [scanProgress, setScanProgress] = useState<{ status: string, progress: number, found: number } | null>(null)
@@ -39,6 +48,19 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
     const [isReadingConfig, setIsReadingConfig] = useState<string | null>(null)
     const [activeTests, setActiveTests] = useState<Record<string, any>>({})
 
+    React.useEffect(() => {
+        if (!focusDeviceId) return
+        if (devices.some(d => d.id === focusDeviceId)) {
+            setEditDeviceId(focusDeviceId)
+            onConsumedFocusDevice?.()
+        }
+    }, [focusDeviceId, devices, onConsumedFocusDevice])
+
+    React.useEffect(() => {
+        if (editDeviceId && !devices.some(d => d.id === editDeviceId)) {
+            setEditDeviceId(null)
+        }
+    }, [devices, editDeviceId])
 
     // Cleanup active tests on unmount
     React.useEffect(() => {
@@ -317,7 +339,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
         }
 
         onChange([...devices, newDevice])
-        setExpandedDevice(id)
+        setEditDeviceId(id)
     }
 
     const handleTestDevice = async (device: Device) => {
@@ -595,8 +617,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                     </div>
                 ) : (
                     devices.map(device => {
-                        const isUnreachable = unreachableDevices.has(device.id);
-                        const isExpanded = expandedDevice === device.id;
+                        const isUnreachable = unreachableDevices.has(device.id)
 
                         return (
                             <div key={device.id} className={cn(
@@ -609,7 +630,7 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                     <span className="text-[9px] font-black opacity-20 uppercase px-1.5 py-0.5 bg-white/10 rounded pointer-events-none">{device.type}</span>
                                 </div>
 
-                                <div className="p-4 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => setExpandedDevice(isExpanded ? null : device.id)}>
+                                <div className="p-4 cursor-pointer hover:bg-white/5 transition-colors" onClick={() => setEditDeviceId(device.id)}>
                                     <div className="flex items-center gap-4">
                                         <div className={`w - 8 h - 8 rounded - lg flex items - center justify - center ${device.enabled ? 'bg-primary/20 text-primary' : 'bg-white/5 opacity-40'} `}>{renderDeviceIcon(device.type)}</div>
                                         <div className="flex-1 pr-4">
@@ -663,14 +684,45 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                     );
                                 })()}
 
-                                {!isExpanded && (
-                                    <div className="h-6 w-full flex items-center justify-center bg-black/20 hover:bg-black/40 cursor-pointer border-t border-white/5 group" onClick={() => setExpandedDevice(device.id)}>
-                                        <ChevronDown className="w-4 h-4 opacity-30 group-hover:opacity-100 transition-opacity" />
-                                    </div>
-                                )}
-
-                                {isExpanded && (
-                                    <div className="px-4 pb-4 border-t border-white/5 pt-4 space-y-4">
+                                {editDeviceId === device.id &&
+                                    createPortal(
+                                        <div
+                                            className="fixed inset-0 z-[220] flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-[2px]"
+                                            onClick={() => setEditDeviceId(null)}
+                                            role="presentation"
+                                        >
+                                            <div
+                                                className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-white/12 bg-[#1a1a1f] shadow-2xl flex flex-col"
+                                                onClick={e => e.stopPropagation()}
+                                                role="dialog"
+                                                aria-modal="true"
+                                                aria-labelledby={`device-edit-${device.id}`}
+                                            >
+                                                <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 shrink-0 gap-3">
+                                                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                                                        <div className="p-2 rounded-lg bg-primary/15 text-primary shrink-0">
+                                                            {renderDeviceIcon(device.type)}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <h3
+                                                                id={`device-edit-${device.id}`}
+                                                                className="text-sm font-black uppercase tracking-wider text-primary truncate"
+                                                            >
+                                                                {device.name}
+                                                            </h3>
+                                                            <p className="text-[10px] text-white/45 font-mono uppercase truncate">{device.type}</p>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        title="Sluiten"
+                                                        className={modalHeaderCloseBtn('shrink-0 p-2.5')}
+                                                        onClick={() => setEditDeviceId(null)}
+                                                    >
+                                                        <X className="h-5 w-5" />
+                                                    </button>
+                                                </div>
+                                                <div className="px-4 pb-4 border-t border-white/5 pt-4 space-y-4">
                                         <div className={cn("grid gap-4", device.type === 'videowall_agent' ? "grid-cols-3" : "grid-cols-2")}>
                                             <div className="space-y-1.5">
                                                 <label className="text-[11px] font-bold text-muted-foreground uppercase ml-1">Naam</label>
@@ -1213,17 +1265,17 @@ const DevicesSettings: React.FC<DevicesSettingsProps> = ({ devices, onChange }) 
                                                         onConfirm: () => deleteDevice(device.id)
                                                     })
                                                 }}
-                                                className="px-3 py-1.5 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center gap-2"
+                                                className={modalBtnDanger('px-3 py-1.5 text-[10px]')}
                                             >
-                                                <Trash2 className="w-3 h-3" /> Verwijderen
+                                                <Trash2 className="h-3.5 w-3.5 shrink-0 text-red-300" /> Verwijderen
                                             </button>
                                         </div>
                                     </div>
-                                )}
-
-                                <div className="h-4 flex items-center justify-center bg-black/20 hover:bg-black/40 cursor-pointer -mb-4 opacity-50 hover:opacity-100" onClick={() => setExpandedDevice(null)}>
-                                    <ChevronDown className="w-3 h-3 rotate-180" />
                                 </div>
+                            </div>,
+                                        document.body
+                                    )}
+
                             </div>
                         )
                     })

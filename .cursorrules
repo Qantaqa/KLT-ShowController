@@ -103,3 +103,28 @@
   - UI focust op **actieve + volgende** items (auto-collapse mag).
   - “Open/Dicht” is optioneel; als aanwezig: mag de auto-collapse tijdelijk overrulen, maar blijft secundair.
 
+# UI/UX DESIGN GUIDELINES 
+
+## 1. Visual Hierarchy & Layout
+- **Hierarchy:** Gebruik grootte, positie en kleur om de belangrijkste elementen bovenaan te plaatsen. Belangrijke acties (zoals prijzen of CTA's) moeten opvallen door kleurcontrast of uitlijning .
+- **Spacing (4pt Grid):** Gebruik een consistent 4-pixel grid systeem (marges/padding in veelvouden van 4 of 8). Dit zorgt voor deelbaarheid en visuele consistentie .
+- **Whitespace:** Geef elementen de ruimte om te "ademen". Groepeer gerelateerde items (zoals een titel en subtekst) nauwer op elkaar dan niet-gerelateerde secties.
+
+## 2. Typography
+- **Font Selection:** Gebruik maximaal één goed leesbaar sans-serif font voor het hele ontwerp .
+- **Tightening:** Voor grote koppen: verlaag de `letter-spacing` met -2% tot -3% en zet de `line-height` op 110-120% voor een "pro" look .
+- **Scalability:** Beperk het aantal font-groottes (max 6). Voor dashboards: houd de tekst compact (max 24px) om informatiedichtheid te behouden .
+
+## 3. Color & Signifiers
+- **Semantic Colors:** Gebruik kleur met een doel: Blauw voor vertrouwen/links, Rood voor fouten/gevaar, Geel voor waarschuwingen, Groen voor succes .
+- **Signifiers:** Elke interactie moet een visuele aanwijzing hebben. Knoppen moeten minimaal 4 states hebben: default, hover, active (pressed), en disabled .
+- **Feedback:** Geef altijd een reactie op gebruikersacties via micro-interacties, zoals een subtiele slide-up notificatie bij een "copy to clipboard" actie .
+
+## 4. Dark Mode & Depth
+- **Elevation:** In Dark Mode gebruik je geen schaduwen voor diepte, maar maak je de kaart/container iets lichter dan de achtergrond om verhoging te simuleren .
+- **Shadows (Light Mode):** Gebruik zachte schaduwen met lage dekking (opacity) en een hoge blur. Als de schaduw het eerste is wat opvalt, is hij te sterk .
+
+## 5. Components & Icons
+- **Icons:** Maak iconen even groot als de `line-height` van de tekst (bijv. 24px) voor perfecte uitlijning .
+- **Buttons:** Gebruik "ghost buttons" (geen achtergrond, alleen tekst/icoon) voor secundaire acties. Een goede vuistregel voor padding: de breedte is het dubbele van de hoogte .
+- **Overlays:** Bij tekst op afbeeldingen: gebruik een lineair verloop (gradient) of een "progressive blur" om de tekst leesbaar te houden zonder de afbeelding volledig te bedekken .

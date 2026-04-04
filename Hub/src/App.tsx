@@ -125,7 +125,10 @@ export default function App() {
     verifyHostPin,
     completeRegistration,
     verifyClientPin,
-    setAppLocked
+    setAppLocked,
+    appSettingsModalOpen,
+    openAppSettings,
+    closeAppSettings
   } = useSequencerStore()
 
   const showTimingDurationsByKey = useSequencerStore(s => s.showTimingDurationsByKey)
@@ -216,7 +219,6 @@ export default function App() {
   const [isStatusOpen, setIsStatusOpen] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-  const [isAppSettingsOpen, setIsAppSettingsOpen] = useState(false)
   const [isDbManagerOpen, setIsDbManagerOpen] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -229,6 +231,15 @@ export default function App() {
   const [isWizardScanning, setIsWizardScanning] = useState(false)
   const [showPreflight, setShowPreflight] = useState(false)
   const [showStartupShowSelect, setShowStartupShowSelect] = useState(false)
+
+  const requestToggleShowEditMode = useCallback(() => {
+    if (!activeShow || !isHost) return
+    if (!isLocked) {
+      setShowPreflight(true)
+    } else {
+      void setLocked(false)
+    }
+  }, [activeShow, isHost, isLocked, setLocked])
 
   // Clear PIN input when switching between auth screens
   useEffect(() => {
@@ -483,6 +494,30 @@ export default function App() {
     window.addEventListener('hub:open-project-settings' as any, handler as any)
     return () => window.removeEventListener('hub:open-project-settings' as any, handler as any)
   }, [isLocked])
+
+  // Export / import show from SequenceGrid ⋮ menu (same handlers as app menu)
+  useEffect(() => {
+    const onExport = () => {
+      void handleExportShow()
+    }
+    const onImport = () => {
+      void handleImportShow()
+    }
+    window.addEventListener('hub:export-show' as any, onExport as any)
+    window.addEventListener('hub:import-show' as any, onImport as any)
+    return () => {
+      window.removeEventListener('hub:export-show' as any, onExport as any)
+      window.removeEventListener('hub:import-show' as any, onImport as any)
+    }
+  }, [handleExportShow, handleImportShow])
+
+  useEffect(() => {
+    const handler = () => {
+      requestToggleShowEditMode()
+    }
+    window.addEventListener('hub:toggle-show-edit-mode' as any, handler as any)
+    return () => window.removeEventListener('hub:toggle-show-edit-mode' as any, handler as any)
+  }, [requestToggleShowEditMode])
 
   useEffect(() => {
     const port = appSettings.serverPort || 3001
@@ -933,35 +968,6 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-4 flex-1 justify-end">
-          {activeShow && isHost && (
-            <button
-              onClick={() => {
-                if (!isLocked) {
-                  // Transitioning edit → show: run pre-flight check first
-                  setShowPreflight(true)
-                } else {
-                  // Transitioning show → edit: unlock immediately
-                  setLocked(false)
-                }
-              }}
-              className={cn(
-                "h-10 px-4 rounded-xl flex items-center gap-3 transition-all font-bold text-xs uppercase tracking-widest border border-white/10",
-                isLocked
-                  ? "bg-black/20 text-white/90 hover:bg-white/5"
-                  : "bg-orange-500 shadow-[0_0_20px_rgba(249,115,22,0.4)] text-black"
-              )}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className={cn("w-3.5 h-3.5", isLocked ? "text-primary" : "text-black")} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                {isLocked ? (
-                  <><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></>
-                ) : (
-                  <><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 9.9-1" /></>
-                )}
-              </svg>
-              {isLocked ? "In Show" : "Edit mode"}
-            </button>
-          )}
-
           {isHost && (
             <div className="relative group/menu">
               <button
@@ -1134,7 +1140,7 @@ export default function App() {
                             <button onClick={() => { setIsSettingsOpen(true); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-left text-white" title="Pas show-specifieke instellingen aan"><Settings className="w-3.5 h-3.5 text-purple-500" /> Show instellingen</button>
                           )}
 
-                          <button onClick={() => { setIsAppSettingsOpen(true); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-left text-white" title="Pas algemene applicatie instellingen aan"><Settings2 className="w-3.5 h-3.5 text-purple-500" /> App instellingen</button>
+                          <button onClick={() => { openAppSettings(); setIsMenuOpen(false); }} className="w-full px-4 py-2 text-left text-xs flex items-center gap-3 hover:bg-white/10 rounded-lg transition-colors font-bold text-left text-white" title="Pas algemene applicatie instellingen aan"><Settings2 className="w-3.5 h-3.5 text-purple-500" /> App instellingen</button>
                         </>
                       )}
                     </div>
@@ -1296,14 +1302,7 @@ export default function App() {
                 </p>
               </div>
             )}
-            <div className="p-3 border-b border-white/5 flex items-center justify-between bg-black/20">
-              <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 px-2">Sequence</span>
-              <div className="flex items-center gap-2 text-[10px] font-mono opacity-40 border-l border-white/5 pl-4">
-                {activeEventIndex + 1} / {events.length}
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-auto p-2 custom-scrollbar">
+            <div className="flex-1 overflow-auto p-2 custom-scrollbar min-h-0">
               <SequenceGrid />
             </div>
           </section>
@@ -1663,9 +1662,10 @@ export default function App() {
                         const isSelf = clientUUID === myUUID
                         const isHostClient = idx === 0
                         const isSelected = selectedCameraClients.includes(clientUUID)
+                        const clientListKey = `${clientUUID || clientId || 'client'}-${idx}`
 
                         return (
-                          <div key={clientUUID || clientId} className={cn(
+                          <div key={clientListKey} className={cn(
                             "flex items-center justify-between text-[10px] p-2 rounded-lg border transition-all",
                             isSelf ? "bg-primary/5 border-primary/20" : "bg-white/2 border-white/5 hover:bg-white/5"
                           )}>
@@ -1934,8 +1934,8 @@ export default function App() {
       />
 
       <AppSettings
-        isOpen={isAppSettingsOpen}
-        onClose={() => setIsAppSettingsOpen(false)}
+        isOpen={appSettingsModalOpen}
+        onClose={closeAppSettings}
         isDeveloperMode={isDeveloperMode}
         setIsDeveloperMode={setIsDeveloperMode}
         serverIp={serverIp}
@@ -1979,9 +1979,9 @@ export default function App() {
                   <div className="space-y-4">
                     <p className="text-[10px] font-black uppercase tracking-widest text-primary/60 text-center mb-6">Selecteer uw station</p>
                     <div className="grid gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-                      {registrationData?.existingClients?.map((client: { id: string, friendlyName: string }) => (
+                      {registrationData?.existingClients?.map((client: { id: string, friendlyName: string }, regIdx: number) => (
                         <button
-                          key={client.id}
+                          key={`${client.id}-${regIdx}`}
                           onClick={() => {
                             localStorage.setItem('ledshow_client_uuid', client.id)
                             useSequencerStore.setState({
@@ -2337,7 +2337,7 @@ export default function App() {
                     onClick={() => {
                       setSetupWizardStep(null);
                       setIsWizardScanning(false);
-                      setIsAppSettingsOpen(true);
+                      openAppSettings({ tab: 'devices' });
                       // Wait a bit for settings to open then search? 
                       // For now just opening is enough.
                     }}

@@ -56,6 +56,10 @@ export interface ShowProfile {
         collapsedGroups?: Record<string, boolean> // Saved collapse/expand states for Edit Mode
         currentScriptPage?: number                // Last viewed page
         sceneNames?: Record<string, string>       // Custom labels for scene groups
+        /** `${actId}-${sceneId}` → PDF/script pagina voor deze scene (los van event-Pg). */
+        sceneScriptPages?: Record<string, number>
+        /** Edit-modus: toon sleepgrepen i.p.v. ⋮-menu op boom en rijen. */
+        sequenceReorderMode?: boolean
     }
     devices?: Device[]          // Show-specific device overrides
 }
@@ -81,6 +85,8 @@ export interface AppSettingsProfile {
         selectedCameraClients?: string[]
         lastSeen?: number
     }>
+    /** WLED peek live strip + WiZ kleurstrook in sequence grid en licht-editor (standaard aan). */
+    lightStripPreviewEnabled?: boolean
 }
 
 export interface KeyboardBinding {

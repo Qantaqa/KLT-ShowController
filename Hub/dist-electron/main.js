@@ -19,6 +19,2674 @@ import { EventEmitter } from "events";
 import dgram from "node:dgram";
 import os$1 from "node:os";
 import fs$1 from "node:fs";
+const WLED_EFFECTS_SEED = [
+  {
+    "id": 0,
+    "name": "Solid",
+    "metadata": "Solid",
+    "parameters": [],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 1,
+    "name": "Blink",
+    "metadata": "Blink@!,Duty cycle;!,!;!;01",
+    "parameters": [
+      "Effect speed",
+      "Duty cycle"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 2,
+    "name": "Breathe",
+    "metadata": "Breathe@!;!,!;!;01",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 3,
+    "name": "Wipe",
+    "metadata": "Wipe@!,!;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 4,
+    "name": "Wipe Random",
+    "metadata": "Wipe Random@!;;!",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 5,
+    "name": "Random Colors",
+    "metadata": "Random Colors@!,Fade time;;!;01",
+    "parameters": [
+      "Effect speed",
+      "Fade time"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 6,
+    "name": "Sweep",
+    "metadata": "Sweep@!,!;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 7,
+    "name": "Dynamic",
+    "metadata": "Dynamic@!,!,,,,Smooth;;!",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity",
+      "Smooth"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 8,
+    "name": "Colorloop",
+    "metadata": "Colorloop@!,Saturation;;!;01",
+    "parameters": [
+      "Effect speed",
+      "Saturation"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 9,
+    "name": "Rainbow",
+    "metadata": "Rainbow@!,Size;;!",
+    "parameters": [
+      "Effect speed",
+      "Size"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 10,
+    "name": "Scan",
+    "metadata": "Scan@!,# of dots,,,,,Overlay;!,!,!;!",
+    "parameters": [
+      "Effect speed",
+      "# of dots",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 11,
+    "name": "Scan Dual",
+    "metadata": "Scan Dual@!,# of dots,,,,,Overlay;!,!,!;!",
+    "parameters": [
+      "Effect speed",
+      "# of dots",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 12,
+    "name": "Fade",
+    "metadata": "Fade@!;!,!;!;01",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 13,
+    "name": "Theater",
+    "metadata": "Theater@!,Gap size;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Gap size"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 14,
+    "name": "Theater Rainbow",
+    "metadata": "Theater Rainbow@!,Gap size;,!;!",
+    "parameters": [
+      "Effect speed",
+      "Gap size"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 15,
+    "name": "Running",
+    "metadata": "Running@!,Wave width;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Wave width"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 16,
+    "name": "Saw",
+    "metadata": "Saw@!,Width;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Width"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 17,
+    "name": "Twinkle",
+    "metadata": "Twinkle@!,!;!,!;!;;m12=0",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 18,
+    "name": "Dissolve",
+    "metadata": "Dissolve@Repeat speed,Dissolve speed,,,,Random,Complete;!,!;!",
+    "parameters": [
+      "Repeat speed",
+      "Dissolve speed",
+      "Random",
+      "Complete"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 19,
+    "name": "Dissolve Rnd",
+    "metadata": "Dissolve Rnd@Repeat speed,Dissolve speed;,!;!",
+    "parameters": [
+      "Repeat speed",
+      "Dissolve speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 20,
+    "name": "Sparkle",
+    "metadata": "Sparkle@!,,,,,,Overlay;!,!;!;;m12=0",
+    "parameters": [
+      "Effect speed",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 21,
+    "name": "Sparkle Dark",
+    "metadata": "Sparkle Dark@!,!,,,,,Overlay;Bg,Fx;!;;m12=0",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 22,
+    "name": "Sparkle+",
+    "metadata": "Sparkle+@!,!,,,,,Overlay;Bg,Fx;!;;m12=0",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 23,
+    "name": "Strobe",
+    "metadata": "Strobe@!;!,!;!;01",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 24,
+    "name": "Strobe Rainbow",
+    "metadata": "Strobe Rainbow@!;,!;!;01",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 25,
+    "name": "Strobe Mega",
+    "metadata": "Strobe Mega@!,!;!,!;!;01",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 26,
+    "name": "Blink Rainbow",
+    "metadata": "Blink Rainbow@Frequency,Blink duration;!,!;!;01",
+    "parameters": [
+      "Frequency",
+      "Blink duration"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 27,
+    "name": "Android",
+    "metadata": "Android@!,Width;!,!;!;;m12=1",
+    "parameters": [
+      "Effect speed",
+      "Width"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 28,
+    "name": "Chase",
+    "metadata": "Chase@!,Width;!,!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Width"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 29,
+    "name": "Chase Random",
+    "metadata": "Chase Random@!,Width;!,,!;!",
+    "parameters": [
+      "Effect speed",
+      "Width"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 30,
+    "name": "Chase Rainbow",
+    "metadata": "Chase Rainbow@!,Width;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Width"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 31,
+    "name": "Chase Flash",
+    "metadata": "Chase Flash@!;Bg,Fx;!",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 32,
+    "name": "Chase Flash Rnd",
+    "metadata": "Chase Flash Rnd@!;!,!;!",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 33,
+    "name": "Rainbow Runner",
+    "metadata": "Rainbow Runner@!,Size;Bg;!",
+    "parameters": [
+      "Effect speed",
+      "Size"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 34,
+    "name": "Colorful",
+    "metadata": "Colorful@!,Saturation;1,2,3;!",
+    "parameters": [
+      "Effect speed",
+      "Saturation"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 35,
+    "name": "Traffic Light",
+    "metadata": "Traffic Light@!,US style;,!;!",
+    "parameters": [
+      "Effect speed",
+      "US style"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 36,
+    "name": "Sweep Random",
+    "metadata": "Sweep Random@!;;!",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 37,
+    "name": "Chase 2",
+    "metadata": "Chase 2@!,Width;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Width"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 38,
+    "name": "Aurora",
+    "metadata": "Aurora@!,!;1,2,3;!;;sx=24,pal=50",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 39,
+    "name": "Stream",
+    "metadata": "Stream@!,Zone size;;!",
+    "parameters": [
+      "Effect speed",
+      "Zone size"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 40,
+    "name": "Scanner",
+    "metadata": "Scanner@!,Trail,Delay,,,Dual,Bi-delay;!,!,!;!;;m12=0,c1=0",
+    "parameters": [
+      "Effect speed",
+      "Trail",
+      "Delay",
+      "Dual",
+      "Bi-delay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 41,
+    "name": "Lighthouse",
+    "metadata": "Lighthouse@!,Fade rate;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Fade rate"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 42,
+    "name": "Fireworks",
+    "metadata": "Fireworks@,Frequency;!,!;!;12;ix=192,pal=11",
+    "parameters": [
+      "Frequency"
+    ],
+    "dimension": "2d",
+    "flags": "12",
+    "audioReactive": null
+  },
+  {
+    "id": 43,
+    "name": "Rain",
+    "metadata": "Rain@!,Spawning rate;!,!;!;12;ix=128,pal=0",
+    "parameters": [
+      "Effect speed",
+      "Spawning rate"
+    ],
+    "dimension": "2d",
+    "flags": "12",
+    "audioReactive": null
+  },
+  {
+    "id": 44,
+    "name": "Tetrix",
+    "metadata": "Tetrix@!,Width,,,,One color;!,!;!;;sx=0,ix=0,pal=11,m12=1",
+    "parameters": [
+      "Effect speed",
+      "Width",
+      "One color"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 45,
+    "name": "Fire Flicker",
+    "metadata": "Fire Flicker@!,!;!;!;01",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 46,
+    "name": "Gradient",
+    "metadata": "Gradient@!,Spread;!,!;!;;ix=16",
+    "parameters": [
+      "Effect speed",
+      "Spread"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 47,
+    "name": "Loading",
+    "metadata": "Loading@!,Fade;!,!;!;;ix=16",
+    "parameters": [
+      "Effect speed",
+      "Fade"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 48,
+    "name": "Rolling Balls",
+    "metadata": "Rolling Balls@!,# of balls,,,,Collide,Overlay,Trails;!,!,!;!;1;m12=1",
+    "parameters": [
+      "Effect speed",
+      "# of balls",
+      "Collide",
+      "Overlay",
+      "Trails"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 49,
+    "name": "Fairy",
+    "metadata": "Fairy@!,# of flashers;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "# of flashers"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 50,
+    "name": "Two Dots",
+    "metadata": "Two Dots@!,Dot size,,,,,Overlay;1,2,Bg;!",
+    "parameters": [
+      "Effect speed",
+      "Dot size",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 51,
+    "name": "Fairytwinkle",
+    "metadata": "Fairytwinkle@!,!;!,!;!;;m12=0",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 52,
+    "name": "Running Dual",
+    "metadata": "Running Dual@!,Wave width;L,!,R;!",
+    "parameters": [
+      "Effect speed",
+      "Wave width"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 53,
+    "name": "Image",
+    "metadata": "Image@!,Blur,;;;12;sx=128,ix=0",
+    "parameters": [
+      "Effect speed",
+      "Blur"
+    ],
+    "dimension": "2d",
+    "flags": "12",
+    "audioReactive": null
+  },
+  {
+    "id": 54,
+    "name": "Chase 3",
+    "metadata": "Chase 3@!,Size;1,2,3;!",
+    "parameters": [
+      "Effect speed",
+      "Size"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 55,
+    "name": "Tri Wipe",
+    "metadata": "Tri Wipe@!;1,2,3;!",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 56,
+    "name": "Tri Fade",
+    "metadata": "Tri Fade@!;1,2,3;!",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 57,
+    "name": "Lightning",
+    "metadata": "Lightning@!,!,,,,,Overlay;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 58,
+    "name": "ICU",
+    "metadata": "ICU@!,!,,,,,Overlay;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 59,
+    "name": "Multi Comet",
+    "metadata": "Multi Comet@!,Fade;!,!;!;1",
+    "parameters": [
+      "Effect speed",
+      "Fade"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 60,
+    "name": "Scanner Dual",
+    "metadata": "Scanner Dual@!,Trail,Delay,,,Dual,Bi-delay;!,!,!;!;;m12=0,c1=0",
+    "parameters": [
+      "Effect speed",
+      "Trail",
+      "Delay",
+      "Dual",
+      "Bi-delay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 61,
+    "name": "Stream 2",
+    "metadata": "Stream 2@!;;",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 62,
+    "name": "Oscillate",
+    "metadata": "Oscillate",
+    "parameters": [],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 63,
+    "name": "Pride 2015",
+    "metadata": "Pride 2015@!;;",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 64,
+    "name": "Juggle",
+    "metadata": "Juggle@!,Trail;;!;;sx=64,ix=128",
+    "parameters": [
+      "Effect speed",
+      "Trail"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 65,
+    "name": "Palette",
+    "metadata": "Palette@Shift,Size,Rotation,,,Animate Shift,Animate Rotation,Anamorphic;;!;12;ix=112,c1=0,o1=1,o2=0,o3=1",
+    "parameters": [
+      "Shift",
+      "Size",
+      "Rotation",
+      "Animate Shift",
+      "Animate Rotation",
+      "Anamorphic"
+    ],
+    "dimension": "2d",
+    "flags": "12",
+    "audioReactive": null
+  },
+  {
+    "id": 66,
+    "name": "Fire 2012",
+    "metadata": "Fire 2012@Cooling,Spark rate,,2D Blur,Boost;;!;1;pal=35,sx=64,ix=160,m12=1,c2=128",
+    "parameters": [
+      "Cooling",
+      "Spark rate",
+      "2D Blur",
+      "Boost"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 67,
+    "name": "Colorwaves",
+    "metadata": "Colorwaves@!,Hue;!;!;;pal=26",
+    "parameters": [
+      "Effect speed",
+      "Hue"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 68,
+    "name": "Bpm",
+    "metadata": "Bpm@!;!;!;;sx=64",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 69,
+    "name": "Fill Noise",
+    "metadata": "Fill Noise@!;!;!",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 70,
+    "name": "Noise 1",
+    "metadata": "Noise 1@!;!;!;;pal=20",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 71,
+    "name": "Noise 2",
+    "metadata": "Noise 2@!;!;!;;pal=43",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 72,
+    "name": "Noise 3",
+    "metadata": "Noise 3@!;!;!;;pal=35",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 73,
+    "name": "Noise 4",
+    "metadata": "Noise 4@!;!;!;;pal=26",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 74,
+    "name": "Colortwinkles",
+    "metadata": "Colortwinkles@Fade speed,Spawn speed;;!;;m12=0",
+    "parameters": [
+      "Fade speed",
+      "Spawn speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 75,
+    "name": "Lake",
+    "metadata": "Lake@!;Fx;!",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 76,
+    "name": "Meteor",
+    "metadata": "Meteor@!,Trail,,,,Gradient,,Smooth;;!;1",
+    "parameters": [
+      "Effect speed",
+      "Trail",
+      "Gradient",
+      "Smooth"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 77,
+    "name": "Copy Segment",
+    "metadata": "Copy Segment@,Color shift,Lighten,Brighten,ID,Axis(2D),FullStack(last frame);;;12;ix=0,c1=0,c2=0,c3=0",
+    "parameters": [
+      "Color shift",
+      "Lighten",
+      "Brighten",
+      "ID",
+      "Axis(2D)",
+      "FullStack(last frame)"
+    ],
+    "dimension": "2d",
+    "flags": "12",
+    "audioReactive": null
+  },
+  {
+    "id": 78,
+    "name": "Railway",
+    "metadata": "Railway@!,Smoothness;1,2;!;;pal=3",
+    "parameters": [
+      "Effect speed",
+      "Smoothness"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 79,
+    "name": "Ripple",
+    "metadata": "Ripple@!,Wave #,Blur,,,,Overlay;,!;!;12;c1=0",
+    "parameters": [
+      "Effect speed",
+      "Wave #",
+      "Blur",
+      "Overlay"
+    ],
+    "dimension": "2d",
+    "flags": "12",
+    "audioReactive": null
+  },
+  {
+    "id": 80,
+    "name": "Twinklefox",
+    "metadata": "Twinklefox@!,Twinkle rate,,,,Cool;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Twinkle rate",
+      "Cool"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 81,
+    "name": "Twinklecat",
+    "metadata": "Twinklecat@!,Twinkle rate,,,,Cool,Reverse;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Twinkle rate",
+      "Cool",
+      "Reverse"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 82,
+    "name": "Halloween Eyes",
+    "metadata": "Halloween Eyes@Eye off time,Eye on time,,,,,Overlay;!,!;!;12",
+    "parameters": [
+      "Eye off time",
+      "Eye on time",
+      "Overlay"
+    ],
+    "dimension": "2d",
+    "flags": "12",
+    "audioReactive": null
+  },
+  {
+    "id": 83,
+    "name": "Solid Pattern",
+    "metadata": "Solid Pattern@Fg size,Bg size;Fg,!;!;;pal=0",
+    "parameters": [
+      "Fg size",
+      "Bg size"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 84,
+    "name": "Solid Pattern Tri",
+    "metadata": "Solid Pattern Tri@,Size;1,2,3;;;pal=0",
+    "parameters": [
+      "Size"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 85,
+    "name": "Spots",
+    "metadata": "Spots@Spread,Width,,,,,Overlay;!,!;!",
+    "parameters": [
+      "Spread",
+      "Width",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 86,
+    "name": "Spots Fade",
+    "metadata": "Spots Fade@Spread,Width,,,,,Overlay;!,!;!",
+    "parameters": [
+      "Spread",
+      "Width",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 87,
+    "name": "Glitter",
+    "metadata": "Glitter@!,!,,,,,Overlay;,,Glitter color;!;;pal=11,m12=0",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 88,
+    "name": "Candle",
+    "metadata": "Candle@!,!;!,!;!;01;sx=96,ix=224,pal=0",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 89,
+    "name": "Fireworks Starburst",
+    "metadata": "Fireworks Starburst@Chance,Fragments,,,,,Overlay;,!;!;;pal=11,m12=0",
+    "parameters": [
+      "Chance",
+      "Fragments",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 90,
+    "name": "Fireworks 1D",
+    "metadata": "Fireworks 1D@Gravity,Firing side;!,!;!;12;pal=11,ix=128",
+    "parameters": [
+      "Gravity",
+      "Firing side"
+    ],
+    "dimension": "2d",
+    "flags": "12",
+    "audioReactive": null
+  },
+  {
+    "id": 91,
+    "name": "Bouncing Balls",
+    "metadata": "Bouncing Balls@Gravity,# of balls,,,,,Overlay;!,!,!;!;1;m12=1",
+    "parameters": [
+      "Gravity",
+      "# of balls",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 92,
+    "name": "Sinelon",
+    "metadata": "Sinelon@!,Trail;!,!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Trail"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 93,
+    "name": "Sinelon Dual",
+    "metadata": "Sinelon Dual@!,Trail;!,!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Trail"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 94,
+    "name": "Sinelon Rainbow",
+    "metadata": "Sinelon Rainbow@!,Trail;,,!;!",
+    "parameters": [
+      "Effect speed",
+      "Trail"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 95,
+    "name": "Popcorn",
+    "metadata": "Popcorn@!,!,,,,,Overlay;!,!,!;!;;m12=1",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 96,
+    "name": "Drip",
+    "metadata": "Drip@Gravity,# of drips,,,,,Overlay;!,!;!;;m12=1",
+    "parameters": [
+      "Gravity",
+      "# of drips",
+      "Overlay"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 97,
+    "name": "Plasma",
+    "metadata": "Plasma@Phase,!;!;!",
+    "parameters": [
+      "Phase",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 98,
+    "name": "Percent",
+    "metadata": "Percent@!,% of fill,,,,One color;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "% of fill",
+      "One color"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 99,
+    "name": "Ripple Rainbow",
+    "metadata": "Ripple Rainbow@!,Wave #;;!;12",
+    "parameters": [
+      "Effect speed",
+      "Wave #"
+    ],
+    "dimension": "2d",
+    "flags": "12",
+    "audioReactive": null
+  },
+  {
+    "id": 100,
+    "name": "Heartbeat",
+    "metadata": "Heartbeat@!,!;!,!;!;01;m12=1",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 101,
+    "name": "Pacifica",
+    "metadata": "Pacifica@!,Angle;;!;;pal=51",
+    "parameters": [
+      "Effect speed",
+      "Angle"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 102,
+    "name": "Candle Multi",
+    "metadata": "Candle Multi@!,!;!,!;!;;sx=96,ix=224,pal=0",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 103,
+    "name": "Solid Glitter",
+    "metadata": "Solid Glitter@,!;Bg,,Glitter color;;;m12=0",
+    "parameters": [
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 104,
+    "name": "Sunrise",
+    "metadata": "Sunrise@Time [min],Width;;!;;pal=35,sx=60",
+    "parameters": [
+      "Time [min]",
+      "Width"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 105,
+    "name": "Phased",
+    "metadata": "Phased@!,!;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 106,
+    "name": "Twinkleup",
+    "metadata": "Twinkleup@!,Intensity;!,!;!;;m12=0",
+    "parameters": [
+      "Effect speed",
+      "Intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 107,
+    "name": "Noise Pal",
+    "metadata": "Noise Pal@!,Scale;;!",
+    "parameters": [
+      "Effect speed",
+      "Scale"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 108,
+    "name": "Sine",
+    "metadata": "Sine@!,Scale;;!",
+    "parameters": [
+      "Effect speed",
+      "Scale"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 109,
+    "name": "Phased Noise",
+    "metadata": "Phased Noise@!,!;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 110,
+    "name": "Flow",
+    "metadata": "Flow@!,Zones;;!;;m12=1",
+    "parameters": [
+      "Effect speed",
+      "Zones"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 111,
+    "name": "Chunchun",
+    "metadata": "Chunchun@!,Gap size;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "Gap size"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 112,
+    "name": "Dancing Shadows",
+    "metadata": "Dancing Shadows@!,# of shadows;!;!",
+    "parameters": [
+      "Effect speed",
+      "# of shadows"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 113,
+    "name": "Washing Machine",
+    "metadata": "Washing Machine@!,!;;!",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 114,
+    "name": "Rotozoomer",
+    "metadata": "Rotozoomer@!,Scale,,,,Alt;;!;2;pal=54",
+    "parameters": [
+      "Effect speed",
+      "Scale",
+      "Alt"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 115,
+    "name": "Blends",
+    "metadata": "Blends@Shift speed,Blend speed;;!",
+    "parameters": [
+      "Shift speed",
+      "Blend speed"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 116,
+    "name": "TV Simulator",
+    "metadata": "TV Simulator@!,!;;!;01",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "01",
+    "audioReactive": null
+  },
+  {
+    "id": 117,
+    "name": "Dynamic Smooth",
+    "metadata": "Dynamic Smooth@!,!;;!",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 118,
+    "name": "Spaceships",
+    "metadata": "Spaceships@!,Blur,,,,Smear;;!;2",
+    "parameters": [
+      "Effect speed",
+      "Blur",
+      "Smear"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 119,
+    "name": "Crazy Bees",
+    "metadata": "Crazy Bees@!,Blur,,,,Smear;;!;2;pal=11,ix=0",
+    "parameters": [
+      "Effect speed",
+      "Blur",
+      "Smear"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 120,
+    "name": "Ghost Rider",
+    "metadata": "Ghost Rider@Fade rate,Blur;;!;2",
+    "parameters": [
+      "Fade rate",
+      "Blur"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 121,
+    "name": "Blobs",
+    "metadata": "Blobs@!,# blobs,Blur,Trail;!;!;2;c1=8",
+    "parameters": [
+      "Effect speed",
+      "# blobs",
+      "Blur",
+      "Trail"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 122,
+    "name": "Scrolling Text",
+    "metadata": "Scrolling Text@!,Y Offset,Trail,Font size,Rotate,Gradient,Custom Font,Reverse;!,!,Gradient;!;2;ix=128,c1=0,rev=0,mi=0,rY=0,mY=0",
+    "parameters": [
+      "Effect speed",
+      "Y Offset",
+      "Trail",
+      "Font size",
+      "Rotate",
+      "Gradient",
+      "Custom Font",
+      "Reverse"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 123,
+    "name": "Drift Rose",
+    "metadata": "Drift Rose@Fade,Blur,,,,Smear;;!;2;pal=11",
+    "parameters": [
+      "Fade",
+      "Blur",
+      "Smear"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 124,
+    "name": "Distortion Waves",
+    "metadata": "Distortion Waves@!,Scale,,,,Fill,Zoom,Alt;;!;2;pal=0",
+    "parameters": [
+      "Effect speed",
+      "Scale",
+      "Fill",
+      "Zoom",
+      "Alt"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 125,
+    "name": "Soap",
+    "metadata": "Soap@!,Smoothness,Density;;!;2;pal=11",
+    "parameters": [
+      "Effect speed",
+      "Smoothness",
+      "Density"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 126,
+    "name": "Octopus",
+    "metadata": "Octopus@!,,Offset X,Offset Y,Legs,fasttan;;!;2;",
+    "parameters": [
+      "Effect speed",
+      "Offset X",
+      "Offset Y",
+      "Legs",
+      "fasttan"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 127,
+    "name": "Waving Cell",
+    "metadata": "Waving Cell@!,Blur,Amplitude 1,Amplitude 2,Amplitude 3,,Flow;;!;2;ix=0",
+    "parameters": [
+      "Effect speed",
+      "Blur",
+      "Amplitude 1",
+      "Amplitude 2",
+      "Amplitude 3",
+      "Flow"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 128,
+    "name": "Pixels",
+    "metadata": "Pixels@Fade rate,# of pixels;!,!;!;1v;m12=0,si=0",
+    "parameters": [
+      "Fade rate",
+      "# of pixels"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 129,
+    "name": "Pixelwave",
+    "metadata": "Pixelwave@!,Sensitivity;!,!;!;1v;ix=64,m12=2,si=0",
+    "parameters": [
+      "Effect speed",
+      "Sensitivity"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 130,
+    "name": "Juggles",
+    "metadata": "Juggles@!,# of balls;!,!;!;01v;m12=0,si=0",
+    "parameters": [
+      "Effect speed",
+      "# of balls"
+    ],
+    "dimension": "3d",
+    "flags": "01v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 131,
+    "name": "Matripix",
+    "metadata": "Matripix@!,Brightness;!,!;!;1v;ix=64,m12=2,si=1",
+    "parameters": [
+      "Effect speed",
+      "Brightness"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 132,
+    "name": "Gravimeter",
+    "metadata": "Gravimeter@Rate of fall,Sensitivity;!,!;!;1v;ix=128,m12=2,si=0",
+    "parameters": [
+      "Rate of fall",
+      "Sensitivity"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 133,
+    "name": "Plasmoid",
+    "metadata": "Plasmoid@Phase,# of pixels;!,!;!;01v;sx=128,ix=128,m12=0,si=0",
+    "parameters": [
+      "Phase",
+      "# of pixels"
+    ],
+    "dimension": "3d",
+    "flags": "01v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 134,
+    "name": "Puddles",
+    "metadata": "Puddles@Fade rate,Puddle size;!,!;!;1v;m12=0,si=0",
+    "parameters": [
+      "Fade rate",
+      "Puddle size"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 135,
+    "name": "Midnoise",
+    "metadata": "Midnoise@Fade rate,Max. length;!,!;!;1v;ix=128,m12=1,si=0",
+    "parameters": [
+      "Fade rate",
+      "Max. length"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 136,
+    "name": "Noisemeter",
+    "metadata": "Noisemeter@Fade rate,Width;!,!;!;1v;ix=128,m12=2,si=0",
+    "parameters": [
+      "Fade rate",
+      "Width"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 137,
+    "name": "Freqwave",
+    "metadata": "Freqwave@Speed,Sound effect,Low bin,High bin,Pre-amp;;;01f;m12=2,si=0",
+    "parameters": [
+      "Speed",
+      "Sound effect",
+      "Low bin",
+      "High bin",
+      "Pre-amp"
+    ],
+    "dimension": "3d",
+    "flags": "01f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 138,
+    "name": "Freqmatrix",
+    "metadata": "Freqmatrix@Speed,Sound effect,Low bin,High bin,Sensitivity;;;01f;m12=3,si=0",
+    "parameters": [
+      "Speed",
+      "Sound effect",
+      "Low bin",
+      "High bin",
+      "Sensitivity"
+    ],
+    "dimension": "3d",
+    "flags": "01f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 139,
+    "name": "GEQ",
+    "metadata": "GEQ@Fade speed,Ripple decay,# of bands,,Bin,Color bars;!,,Peaks;!;2f;c1=255,c2=64,pal=11,si=0,c3=0",
+    "parameters": [
+      "Fade speed",
+      "Ripple decay",
+      "# of bands",
+      "Bin",
+      "Color bars"
+    ],
+    "dimension": "2d",
+    "flags": "2f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 140,
+    "name": "Waterfall",
+    "metadata": "Waterfall@!,Adjust color,Select bin,Volume (min);!,!;!;01f;c2=0,m12=2,si=0",
+    "parameters": [
+      "Effect speed",
+      "Adjust color",
+      "Select bin",
+      "Volume (min)"
+    ],
+    "dimension": "3d",
+    "flags": "01f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 141,
+    "name": "Freqpixels",
+    "metadata": "Freqpixels@Fade rate,Starting color and # of pixels;!,!,;!;1f;m12=0,si=0",
+    "parameters": [
+      "Fade rate",
+      "Starting color and # of pixels"
+    ],
+    "dimension": "3d",
+    "flags": "1f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 143,
+    "name": "Noisefire",
+    "metadata": "Noisefire@!,!;;;01v;m12=2,si=0",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity"
+    ],
+    "dimension": "3d",
+    "flags": "01v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 144,
+    "name": "Puddlepeak",
+    "metadata": "Puddlepeak@Fade rate,Puddle size,Select bin,Volume (min);!,!;!;1v;c2=0,m12=0,si=0",
+    "parameters": [
+      "Fade rate",
+      "Puddle size",
+      "Select bin",
+      "Volume (min)"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 145,
+    "name": "Noisemove",
+    "metadata": "Noisemove@Move speed,Fade rate;!,!;!;01f;m12=0,si=0",
+    "parameters": [
+      "Move speed",
+      "Fade rate"
+    ],
+    "dimension": "3d",
+    "flags": "01f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 146,
+    "name": "Noise2D",
+    "metadata": "Noise2D@!,Scale;;!;2",
+    "parameters": [
+      "Effect speed",
+      "Scale"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 147,
+    "name": "Perlin Move",
+    "metadata": "Perlin Move@!,# of pixels,Fade rate;!,!;!",
+    "parameters": [
+      "Effect speed",
+      "# of pixels",
+      "Fade rate"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 148,
+    "name": "Ripple Peak",
+    "metadata": "Ripple Peak@Fade rate,Max # of ripples,Select bin,Volume (min);!,!;!;1v;c2=0,m12=0,si=0",
+    "parameters": [
+      "Fade rate",
+      "Max # of ripples",
+      "Select bin",
+      "Volume (min)"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 149,
+    "name": "Firenoise",
+    "metadata": "Firenoise@X scale,Y scale,,,,Palette;;!;2;pal=66",
+    "parameters": [
+      "X scale",
+      "Y scale",
+      "Palette"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 150,
+    "name": "Squared Swirl",
+    "metadata": "Squared Swirl@,Fade,,,Blur;;!;2",
+    "parameters": [
+      "Fade",
+      "Blur"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 151,
+    "name": "PacMan",
+    "metadata": "PacMan@Speed,# of PowerDots,Blink distance,Blur,# of Ghosts,Dots,Smear,Compact;;!;1;m12=0,sx=192,ix=64,c1=64,c2=0,c3=12,o1=1,o2=0",
+    "parameters": [
+      "Speed",
+      "# of PowerDots",
+      "Blink distance",
+      "Blur",
+      "# of Ghosts",
+      "Dots",
+      "Smear",
+      "Compact"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 152,
+    "name": "DNA",
+    "metadata": "DNA@Scroll speed,Blur,,,,Smear;;!;2;ix=0",
+    "parameters": [
+      "Scroll speed",
+      "Blur",
+      "Smear"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 153,
+    "name": "Matrix",
+    "metadata": "Matrix@!,Spawning rate,Trail,,,Custom color;Spawn,Trail;;2",
+    "parameters": [
+      "Effect speed",
+      "Spawning rate",
+      "Trail",
+      "Custom color"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 154,
+    "name": "Metaballs",
+    "metadata": "Metaballs@!;;!;2",
+    "parameters": [
+      "Effect speed"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 155,
+    "name": "Freqmap",
+    "metadata": "Freqmap@Fade rate,Starting color;!,!;!;1f;m12=0,si=0",
+    "parameters": [
+      "Fade rate",
+      "Starting color"
+    ],
+    "dimension": "3d",
+    "flags": "1f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 156,
+    "name": "Gravcenter",
+    "metadata": "Gravcenter@Rate of fall,Sensitivity;!,!;!;1v;ix=128,m12=2,si=0",
+    "parameters": [
+      "Rate of fall",
+      "Sensitivity"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 157,
+    "name": "Gravcentric",
+    "metadata": "Gravcentric@Rate of fall,Sensitivity;!,!;!;1v;ix=128,m12=3,si=0",
+    "parameters": [
+      "Rate of fall",
+      "Sensitivity"
+    ],
+    "dimension": "3d",
+    "flags": "1v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 158,
+    "name": "Gravfreq",
+    "metadata": "Gravfreq@Rate of fall,Sensitivity;!,!;!;1f;ix=128,m12=0,si=0",
+    "parameters": [
+      "Rate of fall",
+      "Sensitivity"
+    ],
+    "dimension": "3d",
+    "flags": "1f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 159,
+    "name": "DJ Light",
+    "metadata": "DJ Light@Speed;;;01f;m12=2,si=0",
+    "parameters": [
+      "Speed"
+    ],
+    "dimension": "3d",
+    "flags": "01f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 160,
+    "name": "Funky Plank",
+    "metadata": "Funky Plank@Scroll speed,,# of bands;;;2f;si=0",
+    "parameters": [
+      "Scroll speed",
+      "# of bands"
+    ],
+    "dimension": "2d",
+    "flags": "2f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 161,
+    "name": "Shimmer",
+    "metadata": "Shimmer@Speed,Interval,Size,Granular,Flow,Zebra,Reverse,Sporadic;Fx,Bg,Cx;!;1;pal=15,sx=220,ix=10,c2=0,c3=0",
+    "parameters": [
+      "Speed",
+      "Interval",
+      "Size",
+      "Granular",
+      "Flow",
+      "Zebra",
+      "Reverse",
+      "Sporadic"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 162,
+    "name": "Pulser",
+    "metadata": "Pulser@!,Blur;;!;2",
+    "parameters": [
+      "Effect speed",
+      "Blur"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 163,
+    "name": "Blurz",
+    "metadata": "Blurz@Fade rate,Blur;!,Color mix;!;1f;m12=0,si=0",
+    "parameters": [
+      "Fade rate",
+      "Blur"
+    ],
+    "dimension": "3d",
+    "flags": "1f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 164,
+    "name": "Drift",
+    "metadata": "Drift@Rotation speed,Blur,,,,Twin,Smear;;!;2;ix=0",
+    "parameters": [
+      "Rotation speed",
+      "Blur",
+      "Twin",
+      "Smear"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 165,
+    "name": "Waverly",
+    "metadata": "Waverly@Amplification,Sensitivity,,,,,Blur;;!;2v;ix=64,si=0",
+    "parameters": [
+      "Amplification",
+      "Sensitivity",
+      "Blur"
+    ],
+    "dimension": "2d",
+    "flags": "2v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 166,
+    "name": "Sun Radiation",
+    "metadata": "Sun Radiation@Variance,Brightness;;;2",
+    "parameters": [
+      "Variance",
+      "Brightness"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 167,
+    "name": "Colored Bursts",
+    "metadata": "Colored Bursts@Speed,# of lines,,,Blur,Gradient,Smear,Dots;;!;2;c3=16",
+    "parameters": [
+      "Speed",
+      "# of lines",
+      "Blur",
+      "Gradient",
+      "Smear",
+      "Dots"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 168,
+    "name": "Julia",
+    "metadata": "Julia@,Max iterations per pixel,X center,Y center,Area size, Blur;!;!;2;ix=24,c1=128,c2=128,c3=16",
+    "parameters": [
+      "Max iterations per pixel",
+      "X center",
+      "Y center",
+      "Area size",
+      "Blur"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 172,
+    "name": "Game Of Life",
+    "metadata": "Game Of Life@!,,Blur,,,,,Mutation;!,!;!;2;pal=11,sx=128",
+    "parameters": [
+      "Effect speed",
+      "Blur",
+      "Mutation"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 173,
+    "name": "Tartan",
+    "metadata": "Tartan@X scale,Y scale,,,Sharpness;;!;2",
+    "parameters": [
+      "X scale",
+      "Y scale",
+      "Sharpness"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 174,
+    "name": "Polar Lights",
+    "metadata": "Polar Lights@!,Scale,,,,Flip Palette;;!;2;pal=71",
+    "parameters": [
+      "Effect speed",
+      "Scale",
+      "Flip Palette"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 175,
+    "name": "Swirl",
+    "metadata": "Swirl@!,Sensitivity,Blur;,Bg Swirl;!;2v;ix=64,si=0",
+    "parameters": [
+      "Effect speed",
+      "Sensitivity",
+      "Blur"
+    ],
+    "dimension": "2d",
+    "flags": "2v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 176,
+    "name": "Lissajous",
+    "metadata": "Lissajous@X frequency,Fade rate,Blur,,Speed,Smear;!;!;2;c1=0",
+    "parameters": [
+      "X frequency",
+      "Fade rate",
+      "Blur",
+      "Speed",
+      "Smear"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 177,
+    "name": "Frizzles",
+    "metadata": "Frizzles@X frequency,Y frequency,Blur,,,Smear;;!;2",
+    "parameters": [
+      "X frequency",
+      "Y frequency",
+      "Blur",
+      "Smear"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 178,
+    "name": "Plasma Ball",
+    "metadata": "Plasma Ball@Speed,,Fade,Blur;;!;2",
+    "parameters": [
+      "Speed",
+      "Fade",
+      "Blur"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 179,
+    "name": "Flow Stripe",
+    "metadata": "Flow Stripe@Hue speed,Effect speed;;!;pal=11",
+    "parameters": [
+      "Hue speed",
+      "Effect speed"
+    ],
+    "dimension": "3d",
+    "flags": "pal=11",
+    "audioReactive": null
+  },
+  {
+    "id": 180,
+    "name": "Hiphotic",
+    "metadata": "Hiphotic@X scale,Y scale,,,Speed;!;!;2",
+    "parameters": [
+      "X scale",
+      "Y scale",
+      "Speed"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 181,
+    "name": "Sindots",
+    "metadata": "Sindots@!,Dot distance,Fade rate,Blur,,Smear;;!;2;",
+    "parameters": [
+      "Effect speed",
+      "Dot distance",
+      "Fade rate",
+      "Blur",
+      "Smear"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 182,
+    "name": "DNA Spiral",
+    "metadata": "DNA Spiral@Scroll speed,Y frequency,Blur,,,Smear;;!;2;c1=0",
+    "parameters": [
+      "Scroll speed",
+      "Y frequency",
+      "Blur",
+      "Smear"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 183,
+    "name": "Black Hole",
+    "metadata": "Black Hole@Fade rate,Outer Y freq.,Outer X freq.,Inner X freq.,Inner Y freq.,Solid,,Blur;!;!;2;pal=11",
+    "parameters": [
+      "Fade rate",
+      "Outer Y freq.",
+      "Outer X freq.",
+      "Inner X freq.",
+      "Inner Y freq.",
+      "Solid",
+      "Blur"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 184,
+    "name": "Wavesins",
+    "metadata": "Wavesins@!,Brightness variation,Starting color,Range of colors,Color variation;!;!",
+    "parameters": [
+      "Effect speed",
+      "Brightness variation",
+      "Starting color",
+      "Range of colors",
+      "Color variation"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 185,
+    "name": "Rocktaves",
+    "metadata": "Rocktaves@;!,!;!;01f;m12=1,si=0",
+    "parameters": [],
+    "dimension": "3d",
+    "flags": "01f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 186,
+    "name": "Akemi",
+    "metadata": "Akemi@Color speed,Dance;Head palette,Arms & Legs,Eyes & Mouth;Face palette;2f;si=0",
+    "parameters": [
+      "Color speed",
+      "Dance"
+    ],
+    "dimension": "2d",
+    "flags": "2f",
+    "audioReactive": "fft"
+  },
+  {
+    "id": 187,
+    "name": "PS Volcano",
+    "metadata": "PS Volcano@Speed,Intensity,Move,Bounce,Spread,AgeColor,Walls,Collide;;!;2;pal=35,sx=100,ix=190,c1=0,c2=160,c3=6,o1=1",
+    "parameters": [
+      "Speed",
+      "Intensity",
+      "Move",
+      "Bounce",
+      "Spread",
+      "AgeColor",
+      "Walls",
+      "Collide"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 188,
+    "name": "PS Fire",
+    "metadata": "PS Fire@Speed,Intensity,Flame Height,Wind,Spread,Smooth,Cylinder,Turbulence;;!;2;pal=35,sx=110,c1=110,c2=50,c3=31,o1=1",
+    "parameters": [
+      "Speed",
+      "Intensity",
+      "Flame Height",
+      "Wind",
+      "Spread",
+      "Smooth",
+      "Cylinder",
+      "Turbulence"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 189,
+    "name": "PS Fireworks",
+    "metadata": "PS Fireworks@Launches,Explosion Size,Fuse,Blur,Gravity,Cylinder,Ground,Fast;;!;2;pal=11,ix=50,c1=40,c2=0,c3=12",
+    "parameters": [
+      "Launches",
+      "Explosion Size",
+      "Fuse",
+      "Blur",
+      "Gravity",
+      "Cylinder",
+      "Ground",
+      "Fast"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 190,
+    "name": "PS Vortex",
+    "metadata": "PS Vortex@Rotation Speed,Particle Speed,Arms,Flip,Nozzle,Smear,Direction,Random Flip;;!;2;pal=27,c1=200,c2=0,c3=0",
+    "parameters": [
+      "Rotation Speed",
+      "Particle Speed",
+      "Arms",
+      "Flip",
+      "Nozzle",
+      "Smear",
+      "Direction",
+      "Random Flip"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 191,
+    "name": "PS Fuzzy Noise",
+    "metadata": "PS Fuzzy Noise@Speed,Particles,Bounce,Friction,Scale,Cylinder,Smear,Collide;;!;2;pal=64,sx=50,ix=200,c1=130,c2=30,c3=5,o3=1",
+    "parameters": [
+      "Speed",
+      "Particles",
+      "Bounce",
+      "Friction",
+      "Scale",
+      "Cylinder",
+      "Smear",
+      "Collide"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 192,
+    "name": "PS Ballpit",
+    "metadata": "PS Ballpit@Speed,Intensity,Size,Hardness,Saturation,Cylinder,Walls,Ground;;!;2;pal=11,sx=100,ix=220,c1=70,c2=180,c3=31,o3=1",
+    "parameters": [
+      "Speed",
+      "Intensity",
+      "Size",
+      "Hardness",
+      "Saturation",
+      "Cylinder",
+      "Walls",
+      "Ground"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 193,
+    "name": "PS Box",
+    "metadata": "PS Box@!,Particles,Tilt,Hardness,Size,Random,Washing Machine,Sloshing;;!;2;pal=53,ix=50,c3=1,o1=1",
+    "parameters": [
+      "Effect speed",
+      "Particles",
+      "Tilt",
+      "Hardness",
+      "Size",
+      "Random",
+      "Washing Machine",
+      "Sloshing"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 194,
+    "name": "PS Attractor",
+    "metadata": "PS Attractor@Mass,Particles,Size,Collide,Friction,AgeColor,Move,Swallow;;!;2;pal=9,sx=100,ix=82,c1=2,c2=0",
+    "parameters": [
+      "Mass",
+      "Particles",
+      "Size",
+      "Collide",
+      "Friction",
+      "AgeColor",
+      "Move",
+      "Swallow"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 195,
+    "name": "PS Impact",
+    "metadata": "PS Impact@Launches,!,Force,Hardness,Blur,Cylinder,Walls,Collide;;!;2;pal=0,sx=32,ix=85,c1=70,c2=130,c3=0,o3=1",
+    "parameters": [
+      "Launches",
+      "Effect intensity",
+      "Force",
+      "Hardness",
+      "Blur",
+      "Cylinder",
+      "Walls",
+      "Collide"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 196,
+    "name": "PS Waterfall",
+    "metadata": "PS Waterfall@Speed,Intensity,Variation,Collide,Position,Cylinder,Walls,Ground;;!;2;pal=9,sx=15,ix=200,c1=32,c2=160,o3=1",
+    "parameters": [
+      "Speed",
+      "Intensity",
+      "Variation",
+      "Collide",
+      "Position",
+      "Cylinder",
+      "Walls",
+      "Ground"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 197,
+    "name": "PS Spray",
+    "metadata": "PS Spray@Speed,!,Left/Right,Up/Down,Angle,Gravity,Cylinder/Square,Collide;;!;2v;pal=0,sx=150,ix=150,c1=220,c2=30,c3=21",
+    "parameters": [
+      "Speed",
+      "Effect intensity",
+      "Left/Right",
+      "Up/Down",
+      "Angle",
+      "Gravity",
+      "Cylinder/Square",
+      "Collide"
+    ],
+    "dimension": "2d",
+    "flags": "2v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 200,
+    "name": "PS Ghost Rider",
+    "metadata": "PS Ghost Rider@Speed,Spiral,Blur,Color Cycle,Spread,AgeColor,Walls;;!;2;pal=1,sx=70,ix=0,c1=220,c2=30,c3=21,o1=1",
+    "parameters": [
+      "Speed",
+      "Spiral",
+      "Blur",
+      "Color Cycle",
+      "Spread",
+      "AgeColor",
+      "Walls"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 201,
+    "name": "PS Blobs",
+    "metadata": "PS Blobs@Speed,Blobs,Size,Life,Blur,Wobble,Collide,Pulsate;;!;2v;sx=30,ix=64,c1=200,c2=130,c3=0,o3=1",
+    "parameters": [
+      "Speed",
+      "Blobs",
+      "Size",
+      "Life",
+      "Blur",
+      "Wobble",
+      "Collide",
+      "Pulsate"
+    ],
+    "dimension": "2d",
+    "flags": "2v",
+    "audioReactive": "volume"
+  },
+  {
+    "id": 203,
+    "name": "PS Pinball",
+    "metadata": "PS Pinball@Speed,!,Size,Blur,Gravity,Collide,Rolling,Position Color;,!;!;1;pal=0,ix=220,c2=0,c3=8,o1=1",
+    "parameters": [
+      "Speed",
+      "Effect intensity",
+      "Size",
+      "Blur",
+      "Gravity",
+      "Collide",
+      "Rolling",
+      "Position Color"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 217,
+    "name": "PS Galaxy",
+    "metadata": "PS Galaxy@!,!,Size,,Color,,Starfield,Trace;;!;2;pal=59,sx=80,c1=1,c3=4",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity",
+      "Size",
+      "Color",
+      "Starfield",
+      "Trace"
+    ],
+    "dimension": "2d",
+    "flags": "2",
+    "audioReactive": null
+  },
+  {
+    "id": 218,
+    "name": "Color Clouds",
+    "metadata": "Color Clouds@!,!,Clouds,Colors,Distance,,,Cozy;;!;;sx=24,ix=32,c1=48,c2=64,c3=12,pal=0",
+    "parameters": [
+      "Effect speed",
+      "Effect intensity",
+      "Clouds",
+      "Colors",
+      "Distance",
+      "Cozy"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  },
+  {
+    "id": 219,
+    "name": "Slow Transition",
+    "metadata": "Slow Transition@Time (min),,,,,,Sweep;!;!;1;pal=2,sx=0,ix=0",
+    "parameters": [
+      "Time (min)",
+      "Sweep"
+    ],
+    "dimension": "3d",
+    "flags": "1",
+    "audioReactive": null
+  }
+];
+const WLED_PALETTES_SEED = [
+  { id: 0, name: "Default", description: "The palette is automatically selected depending on the effect." },
+  { id: 1, name: "Random Cycle", description: "The palette changes to a random one every few seconds." },
+  { id: 2, name: "Color 1", description: "A palette consisting only of the primary color." },
+  { id: 3, name: "Colors 1&2", description: "Consists of the primary and secondary color." },
+  { id: 4, name: "Color Gradient", description: "A palette which is a mixture of all segment colors." },
+  { id: 5, name: "Colors Only", description: "Contains primary, secondary and tertiary colors." },
+  { id: 6, name: "Party", description: "Rainbow without green hues." },
+  { id: 7, name: "Cloud", description: "Gray-blueish colors." },
+  { id: 8, name: "Lava", description: "Dark red, yellow and bright white." },
+  { id: 9, name: "Ocean", description: "Blue, teal and white colors." },
+  { id: 10, name: "Forest", description: "Yellow and green hues." },
+  { id: 11, name: "Rainbow", description: "Every hue." },
+  { id: 12, name: "Rainbow Bands", description: "Rainbow colors with black spots in-between." },
+  { id: 13, name: "Sunset", description: "Dark blue with purple, red and yellow hues." },
+  { id: 14, name: "Rivendell", description: "Desaturated greens." },
+  { id: 15, name: "Breeze", description: "Teal colors with varying brightness." },
+  { id: 16, name: "Red & Blue", description: "Red running on blue." },
+  { id: 17, name: "Yellowout", description: "Yellow, fading out." },
+  { id: 18, name: "Analogous", description: "Red running on blue." },
+  { id: 19, name: "Splash", description: "Vibrant pink and magenta." },
+  { id: 20, name: "Pastel", description: "Different hues with very little saturation." },
+  { id: 21, name: "Sunset 2", description: "Yellow and white running on dim blue." },
+  { id: 22, name: "Beach", description: "Different shades of light blue." },
+  { id: 23, name: "Vintage", description: "Warm white running on very dim red." },
+  { id: 24, name: "Departure", description: "Greens and white fading out." },
+  { id: 25, name: "Landscape", description: "Blue, white and green gradient." },
+  { id: 26, name: "Beech", description: "Teal and yellow gradient fading out." },
+  { id: 27, name: "Sherbet", description: "Bright white, pink and mint colors." },
+  { id: 28, name: "Hult", description: "White, magenta and teal." },
+  { id: 29, name: "Hult 64", description: "Teal and yellow hues." },
+  { id: 30, name: "Drywet", description: "Blue and yellow gradient." },
+  { id: 31, name: "Jul", description: "Pastel green and red." },
+  { id: 32, name: "Grintage", description: "Yellow fading out." },
+  { id: 33, name: "Rewhi", description: "Bright orange on desaturated purple." },
+  { id: 34, name: "Tertiary", description: "Red, green and blue gradient." },
+  { id: 35, name: "Fire", description: "White, yellow and fading red gradient." },
+  { id: 36, name: "Icefire", description: "Same as Fire, but with blue colors." },
+  { id: 37, name: "Cyane", description: "Desaturated pastel colors." },
+  { id: 38, name: "Light Pink", description: "Desaturated purple hues." },
+  { id: 39, name: "Autumn", description: "Three white fields surrounded by yellow and dim red." },
+  { id: 40, name: "Magenta", description: "White with magenta and blue." },
+  { id: 41, name: "Magred", description: "Magenta and red hues." },
+  { id: 42, name: "Yelmag", description: "Magenta and red hues with a yellow." },
+  { id: 43, name: "Yelblu", description: "Blue with a little yellow." },
+  { id: 44, name: "Orange & Teal", description: "An Orange - Gray - Teal gradient." },
+  { id: 45, name: "Tiamat", description: "A bright meteor with blue, teal and magenta hues." },
+  { id: 46, name: "April Night", description: "Dark blue background with colorful snowflakes." },
+  { id: 47, name: "Orangery", description: "Orange and yellow tones." },
+  { id: 48, name: "C9", description: "Christmas lights palette. Red - amber - green - blue." },
+  { id: 49, name: "Sakura", description: "Pink and rose tones." },
+  { id: 50, name: "Aurora", description: "Greens on dark blue." },
+  { id: 51, name: "Atlantica", description: "Greens & Blues of the ocean." },
+  { id: 52, name: "C9 2", description: "C9 plus yellow." },
+  { id: 53, name: "C9 New", description: "C9, but brighter and with a less purple blue." },
+  { id: 54, name: "Temperature", description: "Temperature mapping." },
+  { id: 55, name: "Aurora 2", description: "Aurora with some pinks & blue." },
+  { id: 56, name: "Retro Clown", description: "Yellow to purple gradient." },
+  { id: 57, name: "Candy", description: "Vivid yellows, magenta, salmon and blues." },
+  { id: 58, name: "Toxy Reaf", description: "Vivid aqua to purple gradient." },
+  { id: 59, name: "Fairy Reaf", description: "Bright aqua to purple gradient." },
+  { id: 60, name: "Semi Blue", description: "Dark blues with a bright blue burst." },
+  { id: 61, name: "Pink Candy", description: "White, pinks and purple." },
+  { id: 62, name: "Red Reaf", description: "Blue, aqua and red gradient." },
+  { id: 63, name: "Aqua Flash", description: "Aqua gradient with a flash of yellow and white." },
+  { id: 64, name: "Yelblu Hot", description: "Yellow, red, blue spectrum." },
+  { id: 65, name: "Lite Light", description: "Faint white and purple." },
+  { id: 66, name: "Red Flash", description: "Red gradient with burst of white in the center." },
+  { id: 67, name: "Blink Red", description: "Dark blue to dark red gradient with burst of purple." },
+  { id: 68, name: "Red Shift", description: "Vibrant yellow to blue gradient with magenta, purple and red." },
+  { id: 69, name: "Red Tide", description: "Waves of yellow, orange and red." },
+  { id: 70, name: "Candy2", description: "Faded gradient of yellow, salmon and blue." }
+].sort((a, b) => a.id - b.id);
 const require$2 = createRequire(import.meta.url);
 const Database = require$2("better-sqlite3");
 class DbManager {
@@ -57,6 +2725,10 @@ class DbManager {
     }
     try {
       this.db.exec("ALTER TABLE app_settings ADD COLUMN controllerMonitorIndex INTEGER DEFAULT 0");
+    } catch (e) {
+    }
+    try {
+      this.db.exec("ALTER TABLE app_settings ADD COLUMN lightStripPreviewEnabled INTEGER DEFAULT 1");
     } catch (e) {
     }
     try {
@@ -200,6 +2872,28 @@ class DbManager {
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         `);
+    this.db.exec(`
+            CREATE TABLE IF NOT EXISTS wled_effects (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT,
+                metadata TEXT,
+                parameters_json TEXT NOT NULL,
+                dimension TEXT NOT NULL,
+                flags TEXT,
+                audio_reactive TEXT,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+    this.db.exec(`
+            CREATE TABLE IF NOT EXISTS wled_palettes (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+    this.seedWledCatalogFromBuiltin();
     const wledColumns = this.db.pragma("table_info(wled_segments)").map((c) => c.name);
     if (wledColumns.includes("deviceId") && !wledColumns.includes("id")) {
       this.db.exec("ALTER TABLE wled_segments RENAME COLUMN deviceId TO id");
@@ -258,6 +2952,48 @@ class DbManager {
             )
         `);
     this.migrateLegacySequenceProjectionMasksToVideoMaskers();
+  }
+  /**
+   * Fills wled_effects / wled_palettes once when empty (builtin snapshot).
+   * Refresh: re-run Hub/scripts/generate-wled-catalog.mjs, bump app, or DELETE FROM … and restart.
+   * Live devices can still expose a different fxcount via /json; this table is offline reference.
+   */
+  seedWledCatalogFromBuiltin() {
+    const fxEmpty = this.db.prepare("SELECT COUNT(*) as c FROM wled_effects").get().c === 0;
+    if (fxEmpty) {
+      const ins = this.db.prepare(`
+                INSERT INTO wled_effects (id, name, description, metadata, parameters_json, dimension, flags, audio_reactive)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+      const tx = this.db.transaction(() => {
+        for (const r of WLED_EFFECTS_SEED) {
+          ins.run(
+            r.id,
+            r.name,
+            null,
+            r.metadata,
+            JSON.stringify(r.parameters),
+            r.dimension,
+            r.flags,
+            r.audioReactive
+          );
+        }
+      });
+      tx();
+    }
+    const palEmpty = this.db.prepare("SELECT COUNT(*) as c FROM wled_palettes").get().c === 0;
+    if (palEmpty) {
+      const ins = this.db.prepare(`
+                INSERT INTO wled_palettes (id, name, description)
+                VALUES (?, ?, ?)
+            `);
+      const tx = this.db.transaction(() => {
+        for (const p of WLED_PALETTES_SEED) {
+          ins.run(p.id, p.name, p.description);
+        }
+      });
+      tx();
+    }
   }
   /**
    * One-time migration: copy masks from sequences.projectionMasks into show_videomaskers.
@@ -371,11 +3107,12 @@ class DbManager {
       serverPort: next.serverPort
     });
     const monitorIdx = typeof next.controllerMonitorIndex === "number" && Number.isFinite(next.controllerMonitorIndex) ? Math.max(0, Math.floor(next.controllerMonitorIndex)) : current?.controllerMonitorIndex ?? 0;
+    const peekInt = next.lightStripPreviewEnabled === false || next.lightStripPreviewEnabled === 0 ? 0 : 1;
     return this.db.prepare(`
             UPDATE app_settings 
-            SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?, geminiApiKey = ?, controllerMonitorIndex = ?
+            SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?, geminiApiKey = ?, controllerMonitorIndex = ?, lightStripPreviewEnabled = ?
             WHERE id = 1
-        `).run(next.defaultLogo, next.accessPin, next.serverPort, next.testVideoPath || "", next.geminiApiKey || "", monitorIdx);
+        `).run(next.defaultLogo, next.accessPin, next.serverPort, next.testVideoPath || "", next.geminiApiKey || "", monitorIdx, peekInt);
   }
   /**
    * Retrieves all shows, excluding the system 'GLOBAL' entry.
@@ -9793,6 +12530,85 @@ class NetworkManager {
     }
   }
   /**
+   * WLED /json/state `seg` is usually an array; some builds expose an object map — normalize to an array.
+   */
+  normalizeWledStateSegments(raw) {
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw;
+    if (typeof raw === "object") return Object.values(raw);
+    return [];
+  }
+  /**
+   * Push current cue WLED state while editing (effect/colors/etc.), without restoring stored segments.
+   * Mirrors show playback segment rules: one segment vs all segments.
+   * `segmentId >= 0` = single segment; omitted, null, or &lt; 0 (e.g. -1 “alle segmenten”) = apply to every segment.
+   */
+  async sendWledLivePreview(ip, event, deviceId) {
+    const segUpdate = {
+      fx: event.effectId !== void 0 ? event.effectId : 0,
+      pal: event.paletteId !== void 0 ? event.paletteId : 0,
+      col: [
+        this.hexToRgb(event.color1 || "#ffffff"),
+        this.hexToRgb(event.color2 || "#000000"),
+        this.hexToRgb(event.color3 || "#888888")
+      ],
+      sx: event.speed !== void 0 ? event.speed : 128,
+      ix: event.intensity !== void 0 ? event.intensity : 128
+    };
+    const payload = {
+      on: true,
+      bri: event.brightness !== void 0 ? event.brightness : 255,
+      seg: []
+    };
+    const rawSid = event.segmentId;
+    const sidNum = rawSid === void 0 || rawSid === null || rawSid === "" ? NaN : typeof rawSid === "number" ? rawSid : parseInt(String(rawSid), 10);
+    const singleSegment = Number.isFinite(sidNum) && sidNum >= 0;
+    try {
+      if (singleSegment) {
+        payload.seg.push({ id: sidNum, ...segUpdate });
+        await this.sendWledCommand({ ip, ...payload });
+        return;
+      }
+      const finalData = await this.getWledInfo(ip);
+      const list = this.normalizeWledStateSegments(finalData?.state?.seg);
+      if (list.length > 0) {
+        payload.seg = list.map((s) => ({
+          id: typeof s.id === "number" ? s.id : parseInt(String(s.id), 10) || 0,
+          ...segUpdate
+        }));
+      } else if (deviceId) {
+        const stored = dbManager.getWledSegments(deviceId);
+        if (stored && Array.isArray(stored) && stored.length > 0) {
+          payload.seg = stored.map((s) => ({
+            id: typeof s.id === "number" ? s.id : parseInt(String(s.id), 10) || 0,
+            ...segUpdate
+          }));
+        } else {
+          payload.seg.push({ id: 0, ...segUpdate });
+        }
+      } else {
+        payload.seg.push({ id: 0, ...segUpdate });
+      }
+      await this.sendWledCommand({ ip, ...payload });
+    } catch (e) {
+      console.error(`[NetworkManager] WLED live preview failed for ${ip}:`, e?.message || e);
+    }
+  }
+  /** Push WiZ color/brightness while editing. */
+  async sendWizLivePreview(ip, event) {
+    const [r, g, b] = this.hexToRgb(event.color1 || "#ffffff");
+    try {
+      await this.sendWizCommand(ip, "setPilot", {
+        r,
+        g,
+        b,
+        dimming: event.brightness !== void 0 ? Math.min(100, Math.max(1, Math.round(event.brightness / 2.55))) : 100
+      });
+    } catch (e) {
+      console.error(`[NetworkManager] WiZ live preview failed for ${ip}:`, e?.message || e);
+    }
+  }
+  /**
    * Sends a command to a WiZ light using the WiZ UDP protocol.
    * @param ip The IP address of the WiZ device.
    * @param method The WiZ method to call (e.g., 'setPilot', 'getPilot').
@@ -9922,7 +12738,7 @@ class NetworkManager {
               const storedSegments = device?.id ? dbManager.getWledSegments(device.id) : null;
               const currentData = await this.getWledInfo(ip);
               if (storedSegments && currentData && currentData.state) {
-                const currentSegments = currentData.state.seg || [];
+                const currentSegments = this.normalizeWledStateSegments(currentData.state.seg);
                 const needsRestore = currentSegments.length !== storedSegments.length || storedSegments.some((ss, i) => {
                   const cs = currentSegments[i];
                   return !cs || cs.start !== ss.start || cs.stop !== ss.stop;
@@ -9932,13 +12748,20 @@ class NetworkManager {
                   await this.sendWledCommand({ ip, seg: storedSegments });
                 }
               }
-              if (event.segmentId !== void 0 && event.segmentId >= 0) {
-                payload.seg.push({ id: event.segmentId, ...segUpdate });
+              const rawEvSeg = event.segmentId;
+              const evSegNum = rawEvSeg === void 0 || rawEvSeg === null || rawEvSeg === "" ? NaN : typeof rawEvSeg === "number" ? rawEvSeg : parseInt(String(rawEvSeg), 10);
+              const singleSeg = Number.isFinite(evSegNum) && evSegNum >= 0;
+              if (singleSeg) {
+                payload.seg.push({ id: evSegNum, ...segUpdate });
                 this.sendWledCommand({ ip, ...payload });
               } else {
                 const finalData = await this.getWledInfo(ip);
-                if (finalData && finalData.state && finalData.state.seg) {
-                  payload.seg = finalData.state.seg.map((s) => ({ id: s.id, ...segUpdate }));
+                const segs = this.normalizeWledStateSegments(finalData?.state?.seg);
+                if (segs.length > 0) {
+                  payload.seg = segs.map((s) => ({
+                    id: typeof s.id === "number" ? s.id : parseInt(String(s.id), 10) || 0,
+                    ...segUpdate
+                  }));
                   this.sendWledCommand({ ip, ...payload });
                 } else {
                   payload.seg.push({ id: 0, ...segUpdate });
@@ -10455,7 +13278,7 @@ class DeviceStatusManager {
   }
 }
 const require$1 = createRequire(import.meta.url);
-const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net, globalShortcut } = require$1("electron");
+const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net, globalShortcut, shell } = require$1("electron");
 const http = require$1("http");
 const { Server } = require$1("socket.io");
 const fs = require$1("node:fs");
@@ -10465,6 +13288,7 @@ const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
 const _initSettings = dbManager.getAppSettings();
 const SOCKET_PORT = _initSettings?.serverPort || 3001;
 const FILE_PORT = SOCKET_PORT + 1;
+const WLED_UTILS_GIF_BASE = "https://raw.githubusercontent.com/scottrbailey/WLED-Utils/master/gifs";
 const server = http.createServer((req, res) => {
   if (!req.url) {
     res.writeHead(400);
@@ -10604,6 +13428,18 @@ const fileServer = http.createServer((req, res) => {
         fs.createReadStream(foundPath).pipe(res);
         return;
       }
+      const remoteFx = `FX_${String(parseInt(effectId, 10) || 0).padStart(3, "0")}.gif`;
+      const remoteUrl = `${WLED_UTILS_GIF_BASE}/${remoteFx}`;
+      axios.get(remoteUrl, { responseType: "stream", timeout: 12e3, maxRedirects: 3 }).then((r) => {
+        res.writeHead(200, { "Content-Type": "image/gif", "Access-Control-Allow-Origin": "*" });
+        r.data.pipe(res);
+      }).catch(() => {
+        if (!res.headersSent) {
+          res.writeHead(404);
+          res.end("Effect preview not found");
+        }
+      });
+      return;
     }
     res.writeHead(404);
     res.end("Effect preview not found");
@@ -10624,6 +13460,32 @@ const fileServer = http.createServer((req, res) => {
         fs.createReadStream(foundPath).pipe(res);
         return;
       }
+      const n = parseInt(paletteId, 10);
+      if (!Number.isFinite(n) || n < 0) {
+        res.writeHead(404);
+        res.end("Palette preview not found");
+        return;
+      }
+      const tryUrls = [
+        `${WLED_UTILS_GIF_BASE}/PAL_${String(n).padStart(2, "0")}.gif`,
+        `${WLED_UTILS_GIF_BASE}/PAL_${String(n).padStart(3, "0")}.gif`
+      ];
+      const tryNext = (idx) => {
+        if (idx >= tryUrls.length) {
+          if (!res.headersSent) {
+            res.writeHead(404);
+            res.end("Palette preview not found");
+          }
+          return;
+        }
+        const remoteUrl = tryUrls[idx];
+        axios.get(remoteUrl, { responseType: "stream", timeout: 12e3, maxRedirects: 3 }).then((r) => {
+          res.writeHead(200, { "Content-Type": "image/gif", "Access-Control-Allow-Origin": "*" });
+          r.data.pipe(res);
+        }).catch(() => tryNext(idx + 1));
+      };
+      tryNext(0);
+      return;
     }
     res.writeHead(404);
     res.end("Palette preview not found");
@@ -10872,6 +13734,23 @@ function applyControllerMonitorIndex(index) {
     mainWindow.webContents.send("controller-monitor-changed", idx);
   }
 }
+ipcMain.handle("shell:open-external", async (_e, url) => {
+  try {
+    if (typeof url !== "string" || url.length > 2048) {
+      return { ok: false, error: "invalid" };
+    }
+    const trimmed = url.trim();
+    if (!/^https?:\/\//i.test(trimmed)) {
+      return { ok: false, error: "invalid scheme" };
+    }
+    await shell.openExternal(trimmed);
+    return { ok: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[Main] shell:open-external", err);
+    return { ok: false, error: msg };
+  }
+});
 ipcMain.handle("db:get-app-settings", () => dbManager.getAppSettings());
 ipcMain.handle("db:update-app-settings", (_e, settings) => {
   dbManager.updateAppSettings(settings);
@@ -11004,7 +13883,16 @@ ipcMain.handle("wled:get-stored-config", (_e, deviceId) => {
 ipcMain.handle("wled:send-command", (_e, { ip, payload }) => {
   return networkManager.sendWledCommand({ ip, ...payload });
 });
+ipcMain.handle(
+  "wled:live-preview",
+  (_e, { ip, event, deviceId }) => {
+    return networkManager.sendWledLivePreview(ip, event, deviceId);
+  }
+);
 ipcMain.handle("wiz:get-pilot", (_e, ip) => networkManager.sendWizCommand(ip, "getPilot", {}));
+ipcMain.handle("wiz:live-preview", (_e, { ip, event }) => {
+  return networkManager.sendWizLivePreview(ip, event);
+});
 ipcMain.handle("db:get-clipboard", () => dbManager.getClipboard());
 ipcMain.handle("db:add-to-clipboard", (_e, { type: type2, data }) => dbManager.addToClipboard(type2, data));
 ipcMain.handle("db:remove-from-clipboard", (_e, id) => dbManager.removeFromClipboard(id));

@@ -9,7 +9,7 @@ import { parsePdfScript } from './script-parser';
 import { DeviceStatusManager } from './device-status-manager';
 
 const require = createRequire(import.meta.url);
-const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net, globalShortcut } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, protocol, screen, net, globalShortcut, shell } = require('electron');
 const http = require('http');
 const { Server } = require('socket.io');
 const fs = require('node:fs');
@@ -22,6 +22,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const _initSettings = dbManager.getAppSettings();
 const SOCKET_PORT: number = _initSettings?.serverPort || 3001;
 const FILE_PORT: number = SOCKET_PORT + 1; // Separate port for file serving (logo, PDFs)
+
+/** Public GIFs matching WLED docs (kno.wled.ge); used when `database/Effects|Palettes` has no local copy. */
+const WLED_UTILS_GIF_BASE = 'https://raw.githubusercontent.com/scottrbailey/WLED-Utils/master/gifs';
 
 // Socket.io Server Setup — also handles HTTP file requests on the same port
 // so remote clients don't need a second firewall port open
@@ -173,6 +176,21 @@ const fileServer = http.createServer((req: any, res: any) => {
                 fs.createReadStream(foundPath).pipe(res);
                 return;
             }
+            const remoteFx = `FX_${String(parseInt(effectId, 10) || 0).padStart(3, '0')}.gif`;
+            const remoteUrl = `${WLED_UTILS_GIF_BASE}/${remoteFx}`;
+            axios
+                .get(remoteUrl, { responseType: 'stream', timeout: 12000, maxRedirects: 3 })
+                .then((r: { data: NodeJS.ReadableStream }) => {
+                    res.writeHead(200, { 'Content-Type': 'image/gif', 'Access-Control-Allow-Origin': '*' });
+                    r.data.pipe(res);
+                })
+                .catch(() => {
+                    if (!res.headersSent) {
+                        res.writeHead(404);
+                        res.end('Effect preview not found');
+                    }
+                });
+            return;
         }
         res.writeHead(404); res.end('Effect preview not found');
         return;
@@ -195,6 +213,35 @@ const fileServer = http.createServer((req: any, res: any) => {
                 fs.createReadStream(foundPath).pipe(res);
                 return;
             }
+            const n = parseInt(paletteId, 10);
+            if (!Number.isFinite(n) || n < 0) {
+                res.writeHead(404);
+                res.end('Palette preview not found');
+                return;
+            }
+            const tryUrls = [
+                `${WLED_UTILS_GIF_BASE}/PAL_${String(n).padStart(2, '0')}.gif`,
+                `${WLED_UTILS_GIF_BASE}/PAL_${String(n).padStart(3, '0')}.gif`
+            ];
+            const tryNext = (idx: number) => {
+                if (idx >= tryUrls.length) {
+                    if (!res.headersSent) {
+                        res.writeHead(404);
+                        res.end('Palette preview not found');
+                    }
+                    return;
+                }
+                const remoteUrl = tryUrls[idx]!;
+                axios
+                    .get(remoteUrl, { responseType: 'stream', timeout: 12000, maxRedirects: 3 })
+                    .then((r: { data: NodeJS.ReadableStream }) => {
+                        res.writeHead(200, { 'Content-Type': 'image/gif', 'Access-Control-Allow-Origin': '*' });
+                        r.data.pipe(res);
+                    })
+                    .catch(() => tryNext(idx + 1));
+            };
+            tryNext(0);
+            return;
         }
         res.writeHead(404); res.end('Palette preview not found');
         return;
@@ -508,6 +555,25 @@ function applyControllerMonitorIndex(index: number) {
     }
 }
 
+/** Open http(s) URL in the system default browser (e.g. WLED web UI). */
+ipcMain.handle('shell:open-external', async (_e: unknown, url: string) => {
+    try {
+        if (typeof url !== 'string' || url.length > 2048) {
+            return { ok: false, error: 'invalid' };
+        }
+        const trimmed = url.trim();
+        if (!/^https?:\/\//i.test(trimmed)) {
+            return { ok: false, error: 'invalid scheme' };
+        }
+        await shell.openExternal(trimmed);
+        return { ok: true };
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.error('[Main] shell:open-external', err);
+        return { ok: false, error: msg };
+    }
+});
+
 // Database IPC Handlers
 ipcMain.handle('db:get-app-settings', () => dbManager.getAppSettings());
 ipcMain.handle('db:update-app-settings', (_e: any, settings: any) => {
@@ -677,7 +743,18 @@ ipcMain.handle('wled:send-command', (_e: any, { ip, payload }: { ip: string, pay
     return networkManager.sendWledCommand({ ip, ...payload });
 });
 
+ipcMain.handle(
+    'wled:live-preview',
+    (_e: any, { ip, event, deviceId }: { ip: string; event: any; deviceId?: string }) => {
+        return networkManager.sendWledLivePreview(ip, event, deviceId);
+    }
+);
+
 ipcMain.handle('wiz:get-pilot', (_e: any, ip: string) => networkManager.sendWizCommand(ip, 'getPilot', {}));
+
+ipcMain.handle('wiz:live-preview', (_e: any, { ip, event }: { ip: string; event: any }) => {
+    return networkManager.sendWizLivePreview(ip, event);
+});
 
 // Clipboard Handlers
 ipcMain.handle('db:get-clipboard', () => dbManager.getClipboard());

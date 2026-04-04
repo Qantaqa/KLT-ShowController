@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { X, Database, Table as TableIcon, Search, RefreshCw, Layers, Save, Trash2 } from 'lucide-react'
-import { cn } from '../lib/utils'
+import { cn, modalBtnDanger, modalBtnIconClass, modalBtnPrimary, modalBtnSecondary } from '../lib/utils'
 import { useSequencerStore } from '../store/useSequencerStore'
 
 interface DatabaseManagerProps {
@@ -312,26 +312,20 @@ export const DatabaseManager: React.FC<DatabaseManagerProps> = ({ isOpen, onClos
                                     </div>
                                 ))}
                             </div>
-                            <div className="p-4 border-t border-white/10 flex items-center justify-between bg-white/5">
-                                <div className="flex items-center gap-3">
-                                    <button
-                                        onClick={() => setEditingRow(null)}
-                                        className="px-4 py-2 rounded-lg hover:bg-white/10 text-xs font-bold uppercase transition-all text-white/60 hover:text-white"
-                                    >
+                            <div className="p-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 bg-white/5">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <button type="button" onClick={() => setEditingRow(null)} className={modalBtnSecondary()}>
+                                        <X className={modalBtnIconClass} />
                                         Annuleren
                                     </button>
-                                    <button
-                                        onClick={handleDelete}
-                                        className="px-4 py-2 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-lg text-xs font-bold uppercase tracking-wider transition-colors"
-                                    >
+                                    <button type="button" onClick={handleDelete} className={modalBtnDanger()}>
+                                        <Trash2 className="h-4 w-4 shrink-0 text-red-300" />
                                         Verwijderen
                                     </button>
                                 </div>
-                                <button
-                                    onClick={handleSave}
-                                    className="px-6 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 flex items-center gap-2"
-                                >
-                                    <Save className="w-4 h-4" /> Opslaan
+                                <button type="button" onClick={handleSave} className={modalBtnPrimary()}>
+                                    <Save className="h-4 w-4 shrink-0 text-white" />
+                                    Opslaan
                                 </button>
                             </div>
                         </div>

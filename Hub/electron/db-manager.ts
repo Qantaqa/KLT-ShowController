@@ -2,6 +2,9 @@ import path from 'node:path';
 import { app } from 'electron';
 import { createRequire } from 'node:module';
 
+import { WLED_EFFECTS_SEED } from './wled-effects-seed.generated';
+import { WLED_PALETTES_SEED } from './wled-palettes-seed';
+
 const require = createRequire(import.meta.url);
 const Database = require('better-sqlite3');
 
@@ -63,6 +66,12 @@ class DbManager {
         // Migration: Which display the Hub main window uses (0 = first in screen.getAllDisplays())
         try {
             this.db.exec('ALTER TABLE app_settings ADD COLUMN controllerMonitorIndex INTEGER DEFAULT 0');
+        } catch (e) {
+            /* ignore if exists */
+        }
+
+        try {
+            this.db.exec('ALTER TABLE app_settings ADD COLUMN lightStripPreviewEnabled INTEGER DEFAULT 1');
         } catch (e) {
             /* ignore if exists */
         }
@@ -248,6 +257,34 @@ class DbManager {
             )
         `);
 
+        // Reference catalog: WLED effect modes (IDs match device /json/si.fx list index).
+        // dimension: '2d' = matrix-capable (metadata flag 2), '3d' = strip-first / no 2D preview in Hub.
+        this.db.exec(`
+            CREATE TABLE IF NOT EXISTS wled_effects (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT,
+                metadata TEXT,
+                parameters_json TEXT NOT NULL,
+                dimension TEXT NOT NULL,
+                flags TEXT,
+                audio_reactive TEXT,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Reference catalog: built-in gradient palette IDs (custom palettes ~ Custom 0–9 are device-specific).
+        this.db.exec(`
+            CREATE TABLE IF NOT EXISTS wled_palettes (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        this.seedWledCatalogFromBuiltin();
+
         // Migration: Rename 'deviceId' to 'id' if needed
         const wledColumns = this.db.pragma('table_info(wled_segments)').map((c: any) => c.name);
         if (wledColumns.includes('deviceId') && !wledColumns.includes('id')) {
@@ -315,6 +352,52 @@ class DbManager {
         `);
 
         this.migrateLegacySequenceProjectionMasksToVideoMaskers();
+    }
+
+    /**
+     * Fills wled_effects / wled_palettes once when empty (builtin snapshot).
+     * Refresh: re-run Hub/scripts/generate-wled-catalog.mjs, bump app, or DELETE FROM … and restart.
+     * Live devices can still expose a different fxcount via /json; this table is offline reference.
+     */
+    private seedWledCatalogFromBuiltin() {
+        const fxEmpty =
+            (this.db.prepare('SELECT COUNT(*) as c FROM wled_effects').get() as { c: number }).c === 0;
+        if (fxEmpty) {
+            const ins = this.db.prepare(`
+                INSERT INTO wled_effects (id, name, description, metadata, parameters_json, dimension, flags, audio_reactive)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `);
+            const tx = this.db.transaction(() => {
+                for (const r of WLED_EFFECTS_SEED) {
+                    ins.run(
+                        r.id,
+                        r.name,
+                        null,
+                        r.metadata,
+                        JSON.stringify(r.parameters),
+                        r.dimension,
+                        r.flags,
+                        r.audioReactive
+                    );
+                }
+            });
+            tx();
+        }
+
+        const palEmpty =
+            (this.db.prepare('SELECT COUNT(*) as c FROM wled_palettes').get() as { c: number }).c === 0;
+        if (palEmpty) {
+            const ins = this.db.prepare(`
+                INSERT INTO wled_palettes (id, name, description)
+                VALUES (?, ?, ?)
+            `);
+            const tx = this.db.transaction(() => {
+                for (const p of WLED_PALETTES_SEED) {
+                    ins.run(p.id, p.name, p.description);
+                }
+            });
+            tx();
+        }
     }
 
     /**
@@ -442,11 +525,14 @@ class DbManager {
             ? Math.max(0, Math.floor(next.controllerMonitorIndex))
             : (current?.controllerMonitorIndex ?? 0)
 
+        const peekInt =
+            next.lightStripPreviewEnabled === false || next.lightStripPreviewEnabled === 0 ? 0 : 1
+
         return this.db.prepare(`
             UPDATE app_settings 
-            SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?, geminiApiKey = ?, controllerMonitorIndex = ?
+            SET defaultLogo = ?, accessPin = ?, serverPort = ?, testVideoPath = ?, geminiApiKey = ?, controllerMonitorIndex = ?, lightStripPreviewEnabled = ?
             WHERE id = 1
-        `).run(next.defaultLogo, next.accessPin, next.serverPort, next.testVideoPath || '', next.geminiApiKey || '', monitorIdx);
+        `).run(next.defaultLogo, next.accessPin, next.serverPort, next.testVideoPath || '', next.geminiApiKey || '', monitorIdx, peekInt);
     }
 
     /**
