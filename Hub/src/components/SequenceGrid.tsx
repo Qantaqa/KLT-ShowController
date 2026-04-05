@@ -1116,7 +1116,7 @@ const RowItem: React.FC<{
                     isLocked && isActiveGroup && !isRowActive && "border-l-green-500/30",
                     isLocked && isNextGroup && !isRowActive && "border-l-orange-500/30",
                     type === 'comment' && "opacity-60 italic text-[11px]",
-                    type === 'action' && "border-l-yellow-500 text-yellow-100",
+                    type === 'action' && 'border-l-yellow-500 text-yellow-100',
                     type === 'light' && "border-l-purple-500/50",
                     type === 'media' && "border-l-blue-500/40",
                     type === 'trigger' && "opacity-40 text-[10px] font-mono",
@@ -3698,9 +3698,9 @@ const SequenceGrid: React.FC = () => {
                                                                                                     )}
                                                                                                 </span>
                                                                                             ) : (
-                                                                                                <span className="min-w-0 flex-1 truncate text-sm font-bold text-orange-300">
+                                                                                                <span className="min-w-0 flex-1 truncate text-sm font-bold text-orange-400">
                                                                                                     {titleRow.event.cue || (
-                                                                                                        <span className="text-xs italic text-orange-300/45">Naamloos event</span>
+                                                                                                        <span className="text-xs italic text-orange-400/45">Naamloos event</span>
                                                                                                     )}
                                                                                                 </span>
                                                                                             )

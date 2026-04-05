@@ -1,0 +1,9 @@
+{
+  "name": "show-controller-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Root launcher voor Hub en VideoWall Agent",
+  "scripts": {
+    "start": "node start.js"
+  }
+}
