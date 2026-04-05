@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import type { ShowEvent, PdfScriptNote } from '../types/show'
-import { ChevronLeft, ChevronRight, Link as LinkIcon, Sun, Moon, ZoomIn, ZoomOut, MessageSquarePlus } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Sun, Moon, ZoomIn, ZoomOut, MessageSquarePlus } from 'lucide-react'
 import { useSequencerStore } from '../store/useSequencerStore'
 import { cn } from '../lib/utils'
 import * as pdfjsLib from 'pdfjs-dist'
@@ -37,7 +37,7 @@ function clamp(n: number, min: number, max: number) {
     return Math.min(max, Math.max(min, n))
 }
 
-/** Stagehand (action) markers on the PDF: label + right-pointing triangle; right-click for menu. */
+/** Stagehand (action) markers on the PDF: label + right-pointing triangle; right-click for menu. Edit mode: sleep verplaatsen. */
 function PdfActionMarkersOverlay({
     events,
     pageNumber
@@ -48,8 +48,11 @@ function PdfActionMarkersOverlay({
     const updateEvent = useSequencerStore(s => s.updateEvent)
     const requestRowEditFromPdfMarker = useSequencerStore(s => s.requestRowEditFromPdfMarker)
     const setSelectedEvent = useSequencerStore(s => s.setSelectedEvent)
+    const isLocked = useSequencerStore(s => s.isLocked)
     const [ctx, setCtx] = useState<null | { x: number; y: number; rowIndex: number }>(null)
+    const [draggingRowIndex, setDraggingRowIndex] = useState<number | null>(null)
     const menuRef = useRef<HTMLDivElement>(null)
+    const overlayRef = useRef<HTMLDivElement>(null)
 
     const items = useMemo(() => {
         const out: { key: number; event: ShowEvent; x: number; y: number; done: boolean; label: string }[] = []
@@ -83,23 +86,54 @@ function PdfActionMarkersOverlay({
         }
     }, [ctx])
 
+    useEffect(() => {
+        if (draggingRowIndex === null) return
+        const onMove = (e: MouseEvent) => {
+            const el = overlayRef.current
+            if (!el) return
+            const r = el.getBoundingClientRect()
+            if (r.width <= 0 || r.height <= 0) return
+            const nx = clamp((e.clientX - r.left) / r.width, 0, 1)
+            const ny = clamp((e.clientY - r.top) / r.height, 0, 1)
+            updateEvent(draggingRowIndex, { scriptMarkerNorm: { x: nx, y: ny } })
+        }
+        const onUp = () => setDraggingRowIndex(null)
+        window.addEventListener('mousemove', onMove)
+        window.addEventListener('mouseup', onUp)
+        return () => {
+            window.removeEventListener('mousemove', onMove)
+            window.removeEventListener('mouseup', onUp)
+        }
+    }, [draggingRowIndex, updateEvent])
+
     if (items.length === 0 && !ctx) return null
 
     const triFill = (done: boolean) => (done ? '#eab308' : '#ef4444')
 
     return (
         <>
-            <div className="absolute inset-0 z-20 pointer-events-none overflow-visible">
+            <div ref={overlayRef} className="absolute inset-0 z-20 pointer-events-none overflow-visible">
                 {items.map(({ key, x, y, done, label }) => (
                     <div
                         key={key}
-                        className="absolute z-20 flex flex-row items-center gap-0 pointer-events-auto cursor-context-menu"
+                        className={cn(
+                            'pdf-action-marker-wrap absolute z-20 flex flex-row items-center gap-0 pointer-events-auto',
+                            isLocked ? 'cursor-context-menu' : 'cursor-grab active:cursor-grabbing'
+                        )}
                         style={{
                             left: `${x * 100}%`,
                             top: `${y * 100}%`,
                             transform: 'translate(-50%, -50%)'
                         }}
                         onClick={e => e.stopPropagation()}
+                        onMouseDown={e => {
+                            if (isLocked) return
+                            if (e.button !== 0) return
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setCtx(null)
+                            setDraggingRowIndex(key)
+                        }}
                         onContextMenu={e => {
                             e.preventDefault()
                             e.stopPropagation()
@@ -590,7 +624,6 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ webcamStripVisible = false }) => 
     const setCurrentScriptPage = useSequencerStore((state) => state.setCurrentScriptPage)
     const isLocked = useSequencerStore((state) => state.isLocked)
     const selectedEventIndex = useSequencerStore((state) => state.selectedEventIndex)
-    const activeEventIndex = useSequencerStore((state) => state.activeEventIndex)
     const events = useSequencerStore((state) => state.events)
     const updateEvent = useSequencerStore((state) => state.updateEvent)
     const addToast = useSequencerStore((state) => state.addToast)
@@ -942,54 +975,6 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ webcamStripVisible = false }) => 
         setJumpInput('')
     }
 
-    const handleBindToCue = () => {
-        if (selectedEventIndex < 0) {
-            addToast('Selecteer eerst een cue in het grid', 'warning')
-            return
-        }
-        const sel = events[selectedEventIndex]
-        if (!sel) return
-        const titleIdx = events.findIndex(
-            e =>
-                e.act === sel.act &&
-                (e.sceneId ?? 0) === (sel.sceneId ?? 0) &&
-                (e.eventId ?? 0) === (sel.eventId ?? 0) &&
-                (e.type || '').toLowerCase() === 'title'
-        )
-        if (titleIdx < 0) {
-            addToast('Geen event-titel in deze groep: voeg een titel toe of gebruik Event bewerken.', 'warning')
-            return
-        }
-        updateEvent(titleIdx, { scriptPg: pageNumber })
-        addToast(`Pagina ${pageNumber} gekoppeld aan event (titel)`, 'info')
-    }
-
-    const handleBindToActiveEvent = () => {
-        if (activeEventIndex < 0) {
-            addToast('Geen actief event om te koppelen', 'warning')
-            return
-        }
-
-        const active = events[activeEventIndex]
-        if (!active) {
-            addToast('Geen actief event om te koppelen', 'warning')
-            return
-        }
-
-        // Prefer binding to the Title row of the active event group (so it shows in the event header),
-        // fallback to the active row if no title row exists.
-        const titleIdx = events.findIndex(e =>
-            e.act === active.act &&
-            e.sceneId === active.sceneId &&
-            e.eventId === active.eventId &&
-            e.type?.toLowerCase() === 'title'
-        )
-
-        const idxToUpdate = titleIdx !== -1 ? titleIdx : activeEventIndex
-        updateEvent(idxToUpdate, { scriptPg: pageNumber })
-        addToast(`Pagina ${pageNumber} gekoppeld aan actief event`, 'info')
-    }
-
     const canPlaceActionMarker =
         !isLocked &&
         selectedEventIndex >= 0 &&
@@ -1306,30 +1291,6 @@ const PdfViewer: React.FC<PdfViewerProps> = ({ webcamStripVisible = false }) => 
                     {shouldInvert ? <Moon className="w-3.5 h-3.5" strokeWidth={2} /> : <Sun className="w-3.5 h-3.5" strokeWidth={2} />}
                 </button>
 
-                {!isLocked && (
-                    <>
-                        <button
-                            type="button"
-                            onClick={handleBindToCue}
-                            disabled={selectedEventIndex === -1}
-                            title="Koppel aan geselecteerde cue"
-                            className="flex items-center gap-1 h-7 px-2 bg-black/20 hover:bg-white/5 border border-white/10 rounded-md transition-all group disabled:opacity-20 disabled:grayscale text-white/40 shrink-0"
-                        >
-                            <LinkIcon className="w-3 h-3 text-primary group-hover:scale-110 transition-transform shrink-0" />
-                            <span className="text-[9px] font-black uppercase tracking-tight leading-none">Cue</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleBindToActiveEvent}
-                            disabled={activeEventIndex === -1}
-                            title="Koppel aan actief event"
-                            className="flex items-center gap-1 h-7 px-2 bg-black/20 hover:bg-white/5 border border-white/10 rounded-md transition-all group disabled:opacity-20 disabled:grayscale text-white/40 shrink-0"
-                        >
-                            <LinkIcon className="w-3 h-3 text-primary group-hover:scale-110 transition-transform shrink-0" />
-                            <span className="text-[9px] font-black uppercase tracking-tight leading-none">Actief</span>
-                        </button>
-                    </>
-                )}
             </div>
         </div>
     )

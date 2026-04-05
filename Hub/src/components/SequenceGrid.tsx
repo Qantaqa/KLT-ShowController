@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown, ChevronRight, Play, Pause, Square, Volume2, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, AlertTriangle, Type, User, MousePointer2, Lightbulb, Layers, ListOrdered, ClipboardCheck, Settings, FileText, Download, Lock, LockOpen, GripVertical, X, Save, MessageSquare } from 'lucide-react'
+import { ChevronDown, ChevronRight, Play, Pause, Square, Volume2, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, AlertTriangle, Type, User, MousePointer2, Lightbulb, Layers, ListOrdered, ClipboardCheck, Settings, FileText, Download, Lock, LockOpen, GripVertical, X, Save, MessageSquare, Crosshair } from 'lucide-react'
 import { useSequencerStore } from '../store/useSequencerStore'
 import type { Device } from '../types/devices'
 import type { ShowEvent, ClipboardItem } from '../types/show'
@@ -1186,6 +1186,20 @@ const RowItem: React.FC<{
             }
         }
 
+        const placeActionScriptMarker = (rowIndex: number) => {
+            const st = useSequencerStore.getState()
+            const pdfPath = st.activeShow?.pdfPath
+            if (!pdfPath || pdfPath === '/') {
+                st.addToast('Geen PDF geladen. Kies eerst een script bij Project.', 'warning')
+                return
+            }
+            const page = Math.max(1, st.activeShow?.viewState?.currentScriptPage ?? 1)
+            st.updateEvent(rowIndex, {
+                scriptPg: page,
+                scriptMarkerNorm: { x: 0.08, y: 0.45 },
+            })
+            st.addToast(`Markering op pagina ${page} geplaatst (links). Sleep in het PDF-paneel om te verplaatsen.`, 'info')
+        }
 
         const handleDelete = (originalIndex: number, event: ShowEvent) => {
             if (isLocked) return
@@ -1872,7 +1886,8 @@ const RowItem: React.FC<{
                                                     resendEvent, renameAct, renameScene,
                                                     insertAct, insertScene, insertEvent, addEventAbove, addEventBelow, addCommentToEvent, handleDelete,
                                                     restartMedia, pauseMedia, stopMedia, toggleAudio, toggleRepeat, copyToClipboard, loadClipboard,
-                                                    pasteFromClipboard
+                                                    pasteFromClipboard,
+                                                    placeActionScriptMarker
                                                 }}
                                                 clipboard={clipboard}
                                             />
@@ -2065,6 +2080,7 @@ const ContextMenu: React.FC<{
         copyToClipboard: (event: ShowEvent) => Promise<void>
         loadClipboard: () => Promise<void>
         pasteFromClipboard: (item: ClipboardItem, targetEvent: ShowEvent) => void
+        placeActionScriptMarker: (rowIndex: number) => void
     }
     clipboard: ClipboardItem[]
 }> = ({ index, event, type, isLocked, onClose, anchorRect, handlers, clipboard }) => {
@@ -2104,7 +2120,7 @@ const ContextMenu: React.FC<{
                 "fixed w-52 glass border border-white/10 rounded-lg shadow-2xl py-1 z-[9999] overflow-visible context-menu-container",
             )}
         >
-            {!isLocked && (
+            {!isLocked && type !== 'action' && (
                 <button onClick={() => { handlers.openRowEdit(index); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2">
                     <Edit2 className="w-3 h-3" /> Bewerken
                 </button>
@@ -2161,7 +2177,21 @@ const ContextMenu: React.FC<{
                 </div>
             )}
 
-            {(type === 'light' || type === 'media' || type === 'action') && (
+            {!isLocked && type === 'action' && (
+                <button
+                    type="button"
+                    onClick={e => {
+                        e.stopPropagation()
+                        handlers.placeActionScriptMarker(index)
+                        onClose()
+                    }}
+                    className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2 text-sky-300/95"
+                >
+                    <Crosshair className="w-3 h-3 shrink-0" /> Plaats markering
+                </button>
+            )}
+
+            {(type === 'light' || type === 'media') && (
                 <button onClick={(e) => { e.stopPropagation(); handlers.resendEvent(index); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2 text-blue-400">
                     <Send className="w-3 h-3" /> Herzenden
                 </button>
@@ -2170,7 +2200,7 @@ const ContextMenu: React.FC<{
 
             {!isLocked && (
                 <>
-                    <div className="h-px bg-white/5 my-1" />
+                    {type !== 'action' && <div className="h-px bg-white/5 my-1" />}
 
                     {/* Event Level Actions */}
                     {type === 'title' && (
@@ -2182,40 +2212,42 @@ const ContextMenu: React.FC<{
                         </>
                     )}
 
-                    <div className="relative group/sub">
-                        <button
-                            onMouseEnter={() => setSubMenu('construct')}
-                            className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center justify-between"
-                        >
-                            <div className="flex items-center gap-2">
-                                <Zap className="w-3 h-3 text-yellow-400" /> Actie toevoegen...
-                            </div>
-                            <ChevronRight className="w-2.5 h-2.5 opacity-30" />
-                        </button>
-                        {subMenu === 'construct' && (
-                            <div className={cn(
-                                "absolute right-full w-40 glass border border-white/10 rounded-lg shadow-2xl py-1 mr-1",
-                                isFlipped ? "bottom-0" : "top-0"
-                            )}>
-                                <button onClick={(e) => { e.stopPropagation(); handlers.addEventBelow(index, 'Action', 'Aktie'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><User className="w-3 h-3 text-blue-400" /> Aktie </button>
-                                <button onClick={(e) => {
-                                    e.stopPropagation();
-                                    handlers.addEventBelow(index, 'Light', 'Licht');
-                                    useSequencerStore.getState().addToast('Licht toegevoegd. Vouw het event uit of gebruik Bewerken om details te wijzigen.', 'info');
-                                    onClose();
-                                }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><Lightbulb className="w-3 h-3 text-yellow-400" /> Licht </button>
-                                <button onClick={(e) => {
-                                    e.stopPropagation();
-                                    handlers.addEventBelow(index, 'Media', 'Media');
-                                    useSequencerStore.getState().addToast('Media toegevoegd. Vouw het event uit of gebruik Bewerken om details te wijzigen.', 'info');
-                                    onClose();
-                                }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><Layers className="w-3 h-3 text-purple-400" /> Media </button>
-                                {!useSequencerStore.getState().events.some(e => e.act === event.act && e.sceneId === event.sceneId && e.eventId === event.eventId && e.type?.toLowerCase() === 'trigger') && (
-                                    <button onClick={(e) => { e.stopPropagation(); handlers.addEventBelow(index, 'Trigger', 'Handmatige overgang'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><MousePointer2 className="w-3 h-3 text-primary" /> Trigger </button>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                    {type !== 'action' && (
+                        <div className="relative group/sub">
+                            <button
+                                onMouseEnter={() => setSubMenu('construct')}
+                                className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center justify-between"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Zap className="w-3 h-3 text-yellow-400" /> Actie toevoegen...
+                                </div>
+                                <ChevronRight className="w-2.5 h-2.5 opacity-30" />
+                            </button>
+                            {subMenu === 'construct' && (
+                                <div className={cn(
+                                    "absolute right-full w-40 glass border border-white/10 rounded-lg shadow-2xl py-1 mr-1",
+                                    isFlipped ? "bottom-0" : "top-0"
+                                )}>
+                                    <button onClick={(e) => { e.stopPropagation(); handlers.addEventBelow(index, 'Action', 'Aktie'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><User className="w-3 h-3 text-blue-400" /> Aktie </button>
+                                    <button onClick={(e) => {
+                                        e.stopPropagation();
+                                        handlers.addEventBelow(index, 'Light', 'Licht');
+                                        useSequencerStore.getState().addToast('Licht toegevoegd. Vouw het event uit of gebruik Bewerken om details te wijzigen.', 'info');
+                                        onClose();
+                                    }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><Lightbulb className="w-3 h-3 text-yellow-400" /> Licht </button>
+                                    <button onClick={(e) => {
+                                        e.stopPropagation();
+                                        handlers.addEventBelow(index, 'Media', 'Media');
+                                        useSequencerStore.getState().addToast('Media toegevoegd. Vouw het event uit of gebruik Bewerken om details te wijzigen.', 'info');
+                                        onClose();
+                                    }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><Layers className="w-3 h-3 text-purple-400" /> Media </button>
+                                    {!useSequencerStore.getState().events.some(e => e.act === event.act && e.sceneId === event.sceneId && e.eventId === event.eventId && e.type?.toLowerCase() === 'trigger') && (
+                                        <button onClick={(e) => { e.stopPropagation(); handlers.addEventBelow(index, 'Trigger', 'Handmatige overgang'); onClose(); }} className="w-full px-3 py-1.5 text-left text-[11px] hover:bg-white/5 flex items-center gap-2"><MousePointer2 className="w-3 h-3 text-primary" /> Trigger </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     <div className="h-px bg-white/5 my-1" />
 
