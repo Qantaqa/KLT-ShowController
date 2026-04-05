@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown, ChevronRight, Play, Pause, Square, Volume2, VolumeX, Repeat, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, Type, User, MousePointer2, Lightbulb, Layers, ListOrdered, ClipboardCheck, Settings, FileText, Download, Lock, LockOpen, GripVertical, X, Save } from 'lucide-react'
+import { ChevronDown, ChevronRight, Play, Pause, Square, Volume2, Sun, MoreVertical, Edit2, Copy, ClipboardPaste, Send, Plus, Trash2, PlusSquare, Info, Clock, SkipForward, Zap, Monitor, Loader2, Check, AlertCircle, AlertTriangle, Type, User, MousePointer2, Lightbulb, Layers, ListOrdered, ClipboardCheck, Settings, FileText, Download, Lock, LockOpen, GripVertical, X, Save, MessageSquare } from 'lucide-react'
 import { useSequencerStore } from '../store/useSequencerStore'
 import type { Device } from '../types/devices'
 import type { ShowEvent, ClipboardItem } from '../types/show'
@@ -16,7 +16,24 @@ import EventEditModal from './EventEditModal'
 import LightFixtureStripPreview from './LightFixtureStripPreview'
 import ShowCollapsedTechRow, { isCollapsedShowProjectionMediaRow } from './ShowCollapsedTechRow'
 import { isLightStripPreviewEnabled } from '../lib/light-strip-preview'
-import LightStripPreviewSwitch from './LightStripPreviewSwitch'
+import { networkService } from '../services/network-service'
+import { stableSceneMetaKey } from '../lib/sequenceStableIds'
+import { RepeatToggleGlyph, SpeakerMutedGlyph } from '../lib/media-ui-glyphs'
+
+/** Korte Nederlandse label voor media-uitvoer (scherm vs agent). */
+function mediaOutputKindLabel(device: Device | undefined): string | null {
+    if (!device) return null
+    switch (device.type) {
+        case 'videowall_agent':
+            return 'VideoWall-agent'
+        case 'local_monitor':
+            return 'Lokaal scherm'
+        case 'remote_VideoWall':
+            return 'Remote scherm'
+        default:
+            return null
+    }
+}
 
 /** Show mode: videowall_agent rows use a slim summary; local_monitor keeps full preview + controls. */
 function isProjectionStyleMediaRow(event: ShowEvent, devices: Device[]): boolean {
@@ -39,8 +56,8 @@ const showModePastClass = 'opacity-[0.38] saturate-[0.65] contrast-[0.92]'
 const SEQUENCE_DND_MIME = 'application/x-showcontroller-sequence'
 
 type SequenceDragPayload =
-    | { kind: 'act'; actName: string }
-    | { kind: 'scene'; actName: string; sceneId: number }
+    | { kind: 'act'; actUid: string }
+    | { kind: 'scene'; actUid: string; sceneId: number }
     | { kind: 'event'; groupStartIndex: number }
     | { kind: 'actionRow'; fromIndex: number }
 
@@ -176,8 +193,13 @@ function buildEventTreeMenuContent(
 const SequenceTreeShowMenuToggles: React.FC = () => {
     const activeShow = useSequencerStore(s => s.activeShow)
     const sequenceReorderMode = !!activeShow?.viewState?.sequenceReorderMode
+    const showSequenceCommentsOn = activeShow?.viewState?.showSequenceComments !== false
     const isTimeTracking = useSequencerStore(s => s.isTimeTracking)
     const autoFollowScript = useSequencerStore(s => s.autoFollowScript)
+    const lightStripPreviewRaw = useSequencerStore(s => s.appSettings.lightStripPreviewEnabled)
+    const stripPreviewOn = isLightStripPreviewEnabled(lightStripPreviewRaw)
+    const updateAppSettings = useSequencerStore(s => s.updateAppSettings)
+    const broadcastState = useSequencerStore(s => s.broadcastState)
     const toggleTimeTracking = useSequencerStore(s => s.toggleTimeTracking)
     const toggleAutoFollowScript = useSequencerStore(s => s.toggleAutoFollowScript)
     return (
@@ -287,6 +309,85 @@ const SequenceTreeShowMenuToggles: React.FC = () => {
                     />
                 </button>
             </div>
+            <div className="w-full px-3 py-2 flex items-center justify-between hover:bg-white/5 transition-colors border-t border-white/5">
+                <div className="flex items-center gap-2 min-w-0 pr-2 text-left">
+                    <MessageSquare
+                        className={cn('w-3.5 h-3.5 text-primary shrink-0', !showSequenceCommentsOn && 'opacity-40')}
+                    />
+                    <div className="flex flex-col min-w-0">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-white">Opmerkingen</span>
+                        <span className="text-[8px] opacity-40 uppercase font-bold text-white">
+                            {showSequenceCommentsOn ? 'Zichtbaar' : 'Verborgen'}
+                        </span>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    onClick={e => {
+                        e.stopPropagation()
+                        const s = useSequencerStore.getState()
+                        const show = s.activeShow
+                        if (!show) return
+                        const next = !(show.viewState?.showSequenceComments !== false)
+                        void s.updateActiveShow({
+                            viewState: { ...show.viewState, showSequenceComments: next },
+                        })
+                    }}
+                    className={cn(
+                        'w-10 h-5 shrink-0 rounded-full relative transition-all duration-500 p-1 border border-white/10',
+                        showSequenceCommentsOn
+                            ? 'bg-primary/20 shadow-[inset_0_0_10px_rgba(250,204,21,0.12)]'
+                            : 'bg-white/5 shadow-inner'
+                    )}
+                    title="Scene- en event-opmerkingen in de sequentieboom tonen of verbergen"
+                >
+                    <div
+                        className={cn(
+                            'w-2.5 h-2.5 rounded-full transition-all duration-500 shadow-lg',
+                            showSequenceCommentsOn
+                                ? 'ml-auto bg-primary shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                                : 'mr-auto bg-white/20'
+                        )}
+                    />
+                </button>
+            </div>
+            <div className="w-full px-3 py-2 flex items-center justify-between hover:bg-white/5 transition-colors border-t border-white/5">
+                <div className="flex items-center gap-2 min-w-0 pr-2 text-left">
+                    <Lightbulb
+                        className={cn('w-3.5 h-3.5 text-primary shrink-0', !stripPreviewOn && 'opacity-40')}
+                    />
+                    <div className="flex flex-col min-w-0">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-white">Live peek</span>
+                        <span className="text-[8px] opacity-40 uppercase font-bold text-white">
+                            {stripPreviewOn ? 'Aan' : 'Uit'}
+                        </span>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    onClick={async e => {
+                        e.stopPropagation()
+                        await updateAppSettings({ lightStripPreviewEnabled: !stripPreviewOn })
+                        broadcastState()
+                    }}
+                    className={cn(
+                        'w-10 h-5 shrink-0 rounded-full relative transition-all duration-500 p-1 border border-white/10',
+                        stripPreviewOn
+                            ? 'bg-primary/20 shadow-[inset_0_0_10px_rgba(250,204,21,0.12)]'
+                            : 'bg-white/5 shadow-inner'
+                    )}
+                    title="WLED live peek en WiZ-kleurenstrook in het sequence-grid"
+                >
+                    <div
+                        className={cn(
+                            'w-2.5 h-2.5 rounded-full transition-all duration-500 shadow-lg',
+                            stripPreviewOn
+                                ? 'ml-auto bg-primary shadow-[0_0_8px_rgba(250,204,21,0.5)]'
+                                : 'mr-auto bg-white/20'
+                        )}
+                    />
+                </button>
+            </div>
         </>
     )
 }
@@ -330,7 +431,8 @@ const EventTransitionTimingFooter: React.FC<{
 
     let referenceSec = 0
     if (triggerType === 'timed') referenceSec = triggerEvent.duration || 0
-    else if ((triggerType === 'manual' || triggerType === 'media') && gemAvg) referenceSec = gemAvg
+    else if ((triggerType === 'manual' || triggerType === 'media' || triggerType === 'actions_complete') && gemAvg)
+        referenceSec = gemAvg
 
     const hasRef = referenceSec > 0 && !!lastTransitionTime
     const toGo =
@@ -523,6 +625,34 @@ const EventTransition: React.FC<{
         )
     }
 
+    if (triggerType === 'actions_complete') {
+        const label = cueText.trim() || 'Als alle acties voltooid zijn'
+        return (
+            <div
+                className={rowOuter}
+                onClick={canEdit ? (e) => { e.stopPropagation(); onEditTrigger?.(triggerIndex) } : undefined}
+            >
+                <div className={cn('flex-1 border-t border-dashed', lineYellowDash)} />
+                <div className={yellowPanelDashed}>
+                    <div className={cn('flex items-center gap-2 min-w-0 text-yellow-200', labelWeight)}>
+                        <ClipboardCheck className={cn(iconSm, 'text-green-400 shrink-0')} />
+                        <span className="truncate">{label}</span>
+                    </div>
+                    {showTimingFooter && (
+                        <EventTransitionTimingFooter
+                            triggerEvent={triggerEvent}
+                            triggerType="actions_complete"
+                            precedingGroupActive={precedingGroupActive}
+                            isPast={isPast}
+                            accent="yellow"
+                        />
+                    )}
+                </div>
+                <div className={cn('flex-1 border-t border-dashed', lineYellowDash)} />
+            </div>
+        )
+    }
+
     return (
         <div
             className={rowOuter}
@@ -615,9 +745,12 @@ const TransitionEditModal: React.FC<{
         const m = parseInt(parts[0], 10) || 0
         const s = parseInt(parts[1], 10) || 0
         const durationSec = m * 60 + s
+        const cueTrim = editCue.trim()
+        const cueStored =
+            eff === 'actions_complete' && !cueTrim ? 'Als alle acties voltooid zijn' : cueTrim
         updateEvent(triggerIndex, {
             effect: eff,
-            cue: editCue.trim(),
+            cue: cueStored,
             duration: eff === 'timed' ? durationSec : 0,
             mediaTriggerId: eff === 'media' ? (editMediaTriggerId || undefined) : undefined
         })
@@ -666,19 +799,29 @@ const TransitionEditModal: React.FC<{
                             <option value="manual">Handmatige overgang</option>
                             <option value="timed">Timed (auto-trigger)</option>
                             <option value="media">Media afgerond</option>
+                            <option value="actions_complete">Als alle acties voltooid zijn</option>
                         </select>
                     </div>
 
-                    {editEffect === 'manual' && (
+                    {(editEffect === 'manual' || editEffect === 'actions_complete') && (
                         <div>
-                            <label className={labelCls}>Cue / omschrijving</label>
+                            <label className={labelCls}>Cue / omschrijving (optioneel)</label>
                             <input
                                 autoFocus
                                 value={editCue}
                                 onChange={(e) => setEditCue(e.target.value)}
                                 className={inputCls}
-                                placeholder="Trigger of korte omschriving…"
+                                placeholder={
+                                    editEffect === 'actions_complete'
+                                        ? 'Leeg = “Als alle acties voltooid zijn”'
+                                        : 'Trigger of korte omschriving…'
+                                }
                             />
+                            {editEffect === 'actions_complete' && (
+                                <p className="text-[10px] text-white/40 mt-1 leading-relaxed">
+                                    Zodra elke stagehand-actie in dit event is afgevinkt, gaat de show automatisch verder (alleen op de actieve cue).
+                                </p>
+                            )}
                         </div>
                     )}
 
@@ -865,6 +1008,54 @@ function isFirstLightRowForFixtureInEvent(
     return same[0].originalIndex === thisOriginalIndex
 }
 
+/** Show-modus, alleen event-titelregel: scriptpagina van de titel of van de laatste Act/Scene-kop erboven. */
+function resolvedScriptPageForTitleRow(events: ShowEvent[], titleRowIndex: number): number | undefined {
+    const ev = events[titleRowIndex]
+    if (!ev) return undefined
+    if (ev.scriptPg !== undefined && ev.scriptPg > 0) return ev.scriptPg
+    for (let i = titleRowIndex; i >= 0; i--) {
+        const e = events[i]
+        if (!e) continue
+        const t = e.type
+        if (t === 'Act' || t === 'Scene') {
+            const pg = e.scriptPg
+            if (pg !== undefined && pg > 0) return pg
+            break
+        }
+    }
+    return undefined
+}
+
+function renderEventScriptPageBadge(
+    pg: number | undefined,
+    setEventPage: (p: number) => void
+): React.ReactNode {
+    if (pg === undefined) return null
+    const isElectron = !!(typeof window !== 'undefined' && (window as any).require)
+    const baseCls =
+        'text-[10px] font-mono opacity-50 bg-white/5 px-1.5 py-0.5 rounded flex items-center justify-center min-w-[28px] shrink-0 tabular-nums border border-white/10'
+    if (isElectron) {
+        return (
+            <button
+                type="button"
+                className={cn(baseCls, 'hover:opacity-85 hover:bg-white/10 cursor-pointer')}
+                title="Spring naar scriptpagina (PDF)"
+                onClick={e => {
+                    e.stopPropagation()
+                    setEventPage(pg)
+                }}
+            >
+                Pg {pg}
+            </button>
+        )
+    }
+    return (
+        <span className={baseCls} title="Scriptpagina">
+            Pg {pg}
+        </span>
+    )
+}
+
 /** Show-modus: alleen de eerste WLED-regel per fixture in het actieve event krijgt live peek. */
 function wledPeekPlaceholderForRow(
     isLocked: boolean,
@@ -1022,6 +1213,15 @@ const RowItem: React.FC<{
 
         const isRowActive = originalIndex === activeEventIndex
         const type = event.type?.toLowerCase() || ''
+        const allEvents = useSequencerStore(s => s.events)
+        const setEventPage = useSequencerStore(s => s.setEventPage)
+        const showModeScriptPage = useMemo(
+            () => resolvedScriptPageForTitleRow(allEvents, originalIndex),
+            [allEvents, originalIndex]
+        )
+        const showScriptPageIndicator =
+            type === 'title' && showModeScriptPage !== undefined
+        const isElectronHost = !!(typeof window !== 'undefined' && (window as any).require)
         const status = eventStatuses[originalIndex]
         const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -1039,6 +1239,7 @@ const RowItem: React.FC<{
         const getDevices = useCallback(() => appSettings.devices || [], [appSettings.devices])
 
         const playingMedia = useSequencerStore(s => s.playingMedia)
+        const mediaPlaybackByDevice = useSequencerStore(s => s.mediaPlaybackByDevice)
         const isActuallyPlaying = useMemo(() => {
             if (type !== 'media' || !event.filename) return false;
             if (isRowActive) return true; // Sequence active is always "live"
@@ -1053,6 +1254,19 @@ const RowItem: React.FC<{
             }
             return false;
         }, [type, event.filename, event.fixture, isRowActive, playingMedia, getDevices]);
+
+        const mediaTransportPaused = useMemo(() => {
+            if (type !== 'media' || !event.filename) return false
+            const d = event.fixture ? getDevices().find(x => x.name === event.fixture) : null
+            if (!d) return false
+            const id = String(d.id)
+            const snap = mediaPlaybackByDevice[id]
+            const liveHere = playingMedia[id]?.filename === event.filename
+            if (d.type === 'local_monitor') return !!(snap?.paused && !snap?.playing)
+            if (d.type === 'videowall_agent' || d.type === 'remote_VideoWall')
+                return !!(liveHere && snap?.paused)
+            return false
+        }, [type, event.filename, event.fixture, getDevices, mediaPlaybackByDevice, playingMedia])
 
         const [videoTimes, setVideoTimes] = useState({ current: 0, total: 0 });
         const [isCommentExpanded, setIsCommentExpanded] = useState(false);
@@ -1146,7 +1360,7 @@ const RowItem: React.FC<{
                 )}
                 <div className="w-10 flex-shrink-0 flex items-center justify-center">
                     {type === 'title' && <Type className="w-3.5 h-3.5 opacity-60" />}
-                    {type === 'comment' && <Info className="w-3.5 h-3.5 opacity-60" />}
+                    {type === 'comment' && null}
                     {type === 'action' && <User className="w-3.5 h-3.5 text-yellow-500" />}
                     {type === 'trigger' && <MousePointer2 className="w-3.5 h-3.5 text-primary" />}
                     {type === 'light' && <Lightbulb className="w-3.5 h-3.5 opacity-40 text-purple-400" />}
@@ -1159,6 +1373,8 @@ const RowItem: React.FC<{
                                     compact
                                     showModeStrip={isLocked}
                                     wledPeekPlaceholder={wledPeekPlaceholder}
+                                    showActiveLightControls={isLocked && isRowActive}
+                                    eventRowIndex={originalIndex}
                                 />
                             )}
                             <div className="flex items-center justify-between gap-4">
@@ -1197,6 +1413,11 @@ const RowItem: React.FC<{
                                                         return <span>Overgang als "{name}" is afgerond</span>;
                                                     })()}
                                                 </div>
+                                            ) : event.effect?.toLowerCase() === 'actions_complete' ? (
+                                                <div className="flex items-center gap-1.5 text-green-400">
+                                                    <ClipboardCheck className="w-3.5 h-3.5" />
+                                                    <span>{event.cue?.trim() || 'Als alle acties voltooid zijn'}</span>
+                                                </div>
                                             ) : (
                                                 <div className="flex items-center gap-1.5 text-primary">
                                                     <Zap className="w-3.5 h-3.5 shrink-0" />
@@ -1212,7 +1433,20 @@ const RowItem: React.FC<{
                                                         type="button"
                                                         onClick={(e) => {
                                                             e.stopPropagation()
-                                                            updateEvent(originalIndex, { actionCompleted: !event.actionCompleted })
+                                                            const next = !event.actionCompleted
+                                                            const isElectronHost = !!(
+                                                                typeof window !== 'undefined' && (window as any).require
+                                                            )
+                                                            if (isElectronHost) {
+                                                                updateEvent(originalIndex, { actionCompleted: next })
+                                                            } else {
+                                                                networkService.sendCommand({
+                                                                    type: 'REMOTE_CONTROL',
+                                                                    action: 'updateActionCompleted',
+                                                                    index: originalIndex,
+                                                                    actionCompleted: next
+                                                                })
+                                                            }
                                                         }}
                                                         title={event.actionCompleted ? 'Markeren als niet gedaan' : 'Afvinken'}
                                                         className="mt-0.5 shrink-0 rounded border border-white/20 p-0.5 hover:bg-white/10 text-green-400"
@@ -1235,8 +1469,7 @@ const RowItem: React.FC<{
                                                     </span>
                                                     {(event.actionCueMoment ||
                                                         event.actionAssignee ||
-                                                        event.duration ||
-                                                        event.scriptPg) && (
+                                                        event.duration) && (
                                                         <div className="mt-1 flex flex-wrap gap-x-2 gap-y-0.5 text-[10px] font-normal normal-case opacity-70">
                                                             {event.actionCueMoment ? (
                                                                 <span title="Moment">Moment: {event.actionCueMoment}</span>
@@ -1247,9 +1480,6 @@ const RowItem: React.FC<{
                                                             {(event.duration || 0) > 0 ? (
                                                                 <span title="Tijdsbudget">Tijd: {formatTime(event.duration || 0)}</span>
                                                             ) : null}
-                                                            {event.scriptPg ? (
-                                                                <span title="Script">Pg {event.scriptPg}</span>
-                                                            ) : null}
                                                         </div>
                                                     )}
                                                 </div>
@@ -1258,8 +1488,42 @@ const RowItem: React.FC<{
                                     ) : (
                                         event.cue
                                     )}
-                                    {type === 'media' && event.filename && !showModeMediaCompact && (
-                                        <span className="text-[9px] opacity-40 font-mono bg-white/5 px-1 rounded truncate max-w-[300px]" title={event.filename}>{event.filename}</span>
+                                    {type === 'media' && !showModeMediaCompact && (
+                                        <>
+                                            {!isLocked && (() => {
+                                                const d = event.fixture ? getDevices().find(x => x.name === event.fixture) : undefined
+                                                const kind = mediaOutputKindLabel(d)
+                                                const line = event.fixture
+                                                    ? (kind ? `${event.fixture} · ${kind}` : event.fixture)
+                                                    : 'Geen scherm / agent'
+                                                return (
+                                                    <span
+                                                        className={cn(
+                                                            'text-[9px] font-medium px-1.5 py-0.5 rounded border shrink-0 max-w-[min(340px,45vw)] truncate',
+                                                            event.fixture
+                                                                ? 'opacity-75 bg-blue-500/12 text-blue-100/90 border-blue-500/25'
+                                                                : 'bg-amber-500/15 text-amber-200/90 border-amber-500/35'
+                                                        )}
+                                                        title={line}
+                                                    >
+                                                        {line}
+                                                    </span>
+                                                )
+                                            })()}
+                                            {event.filename ? (
+                                                <span className="text-[9px] opacity-40 font-mono bg-white/5 px-1 rounded truncate max-w-[300px]" title={event.filename}>
+                                                    {event.filename}
+                                                </span>
+                                            ) : !isLocked ? (
+                                                <span
+                                                    className="flex items-center gap-1 text-amber-400 shrink-0"
+                                                    title="Geen mediabestand opgegeven"
+                                                >
+                                                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" aria-hidden />
+                                                    <span className="text-[9px] font-semibold uppercase tracking-wide">Geen bestand</span>
+                                                </span>
+                                            ) : null}
+                                        </>
                                     )}
                                     {type === 'light' && (
                                         <div className="flex gap-2 items-center">
@@ -1291,7 +1555,10 @@ const RowItem: React.FC<{
                                 <div className="flex items-center gap-2">
                                     {!isLocked && (
                                         type === 'trigger'
-                                            ? (isTimeTracking || getTransitionTimingSamples(event, showTimingDurationsByKey).length > 0 || (event.effect?.toLowerCase() === 'timed' && (event.duration || 0) > 0))
+                                            ? (isTimeTracking ||
+                                                  getTransitionTimingSamples(event, showTimingDurationsByKey).length > 0 ||
+                                                  (event.effect?.toLowerCase() === 'timed' && (event.duration || 0) > 0) ||
+                                                  event.effect?.toLowerCase() === 'actions_complete')
                                             : (isTimeTracking || (event.duration && event.duration > 0))
                                     ) && (
                                         <div className={cn(
@@ -1340,7 +1607,27 @@ const RowItem: React.FC<{
                                             )}
                                         </div>
                                     )}
-                                    {type === 'title' && event.scriptPg !== undefined && event.scriptPg > 0 && <div className="text-[10px] font-mono opacity-40 bg-white/5 px-1.5 rounded flex items-center justify-center min-w-[32px]">Pg {event.scriptPg}</div>}
+                                    {showScriptPageIndicator &&
+                                        (isElectronHost ? (
+                                            <button
+                                                type="button"
+                                                onClick={e => {
+                                                    e.stopPropagation()
+                                                    if (showModeScriptPage) setEventPage(showModeScriptPage)
+                                                }}
+                                                className="text-[10px] font-mono opacity-50 bg-white/5 px-1.5 py-0.5 rounded flex items-center justify-center min-w-[32px] shrink-0 tabular-nums border border-white/10 hover:opacity-85 hover:bg-white/10 cursor-pointer"
+                                                title="Spring naar scriptpagina (PDF)"
+                                            >
+                                                Pg {showModeScriptPage}
+                                            </button>
+                                        ) : (
+                                            <div
+                                                className="text-[10px] font-mono opacity-50 bg-white/5 px-1.5 py-0.5 rounded flex items-center justify-center min-w-[32px] shrink-0 tabular-nums border border-white/10"
+                                                title="Scriptpagina"
+                                            >
+                                                Pg {showModeScriptPage}
+                                            </div>
+                                        ))}
                                 </div>
                             </div>
                             {(type !== 'media' && type !== 'action' && type !== 'light' && event.fixture) &&
@@ -1404,10 +1691,10 @@ const RowItem: React.FC<{
                                 <div className="text-[9px] text-white/45 truncate font-mono">{event.filename ? event.filename.split(/[\\/]/).pop() : '—'}</div>
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
-                                <button onClick={(e) => { e.stopPropagation(); restartMedia(originalIndex); }} className="p-1.5 bg-green-500 text-black rounded-full hover:bg-green-400 transition-colors" title="Start / Play"><Play className="w-3 h-3 fill-black" /></button>
+                                <button onClick={(e) => { e.stopPropagation(); restartMedia(originalIndex); }} className="p-1.5 bg-green-500 text-black rounded-full hover:bg-green-400 transition-colors" title="Start / Play"><Play className={cn('w-3 h-3 fill-black', mediaTransportPaused && 'motion-safe:animate-pulse')} /></button>
                                 <button onClick={(e) => { e.stopPropagation(); pauseMedia(originalIndex); }} className="p-1.5 bg-white/10 hover:bg-amber-500/80 hover:text-white rounded-full transition-colors" title="Pauze"><Pause className="w-3 h-3 fill-current" /></button>
                                 <button onClick={(e) => { e.stopPropagation(); stopMedia(originalIndex); }} className="p-1.5 bg-white/10 hover:bg-red-500 hover:text-white rounded-full transition-colors" title="Stop"><Square className="w-3 h-3 fill-current" /></button>
-                                <button onClick={(e) => { e.stopPropagation(); toggleAudio(originalIndex) }} className={cn('p-1 rounded transition-colors', event.sound ? 'bg-white/10 text-white' : 'bg-red-500/15 text-red-400')} title="Mute/Unmute">{!event.sound ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}</button>
+                                <button onClick={(e) => { e.stopPropagation(); toggleAudio(originalIndex) }} className="p-1.5 bg-white/10 text-white/80 hover:bg-white/20 hover:text-white rounded-full transition-colors" title="Mute/Unmute">{!event.sound ? <SpeakerMutedGlyph sizeClassName="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}</button>
                                 {(() => {
                                     const targetDev = event.fixture ? getDevices().find(d => d.name === event.fixture) : null
                                     if (!targetDev) return null
@@ -1429,11 +1716,11 @@ const RowItem: React.FC<{
                                 <div className="flex items-center gap-1"><Monitor className="w-3 h-3" /> {event.fixture || 'Alle'}</div>
                             </div>
                             <div className="flex items-center gap-2 flex-1 justify-center">
-                                <button onClick={(e) => { e.stopPropagation(); restartMedia(originalIndex); }} className="p-2 bg-green-500 text-black rounded-full hover:bg-green-400 transition-colors shadow-[0_0_10px_rgba(34,197,94,0.3)]" title="Start / Play"><Play className="w-3 h-3 fill-black" /></button>
+                                <button onClick={(e) => { e.stopPropagation(); restartMedia(originalIndex); }} className="p-2 bg-green-500 text-black rounded-full hover:bg-green-400 transition-colors shadow-[0_0_10px_rgba(34,197,94,0.3)]" title="Start / Play"><Play className={cn('w-3 h-3 fill-black', mediaTransportPaused && 'motion-safe:animate-pulse')} /></button>
                                 <button onClick={(e) => { e.stopPropagation(); pauseMedia(originalIndex); }} className="p-2 bg-white/10 hover:bg-amber-500/80 hover:text-white rounded-full transition-colors" title="Pauze"><Pause className="w-3 h-3 fill-current" /></button>
                                 <button onClick={(e) => { e.stopPropagation(); stopMedia(originalIndex); }} className="p-2 bg-white/10 hover:bg-red-500 hover:text-white rounded-full transition-colors" title="Stop"><Square className="w-3 h-3 fill-current" /></button>
                                 <div className="w-px h-6 bg-white/10 mx-2" />
-                                <button onClick={(e) => { e.stopPropagation(); toggleAudio(originalIndex) }} className={cn("p-1.5 rounded transition-colors", event.sound ? "bg-white/10 hover:bg-white/20 text-white" : "bg-red-500/20 text-red-500")} title="Mute/Unmute">{!event.sound ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}</button>
+                                <button onClick={(e) => { e.stopPropagation(); toggleAudio(originalIndex) }} className="p-1.5 bg-white/10 text-white/80 hover:bg-white/20 hover:text-white rounded-full transition-colors" title="Mute/Unmute">{!event.sound ? <SpeakerMutedGlyph sizeClassName="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}</button>
                                 <div className="flex items-center gap-0.5 bg-white/5 rounded p-0.5">
                                     <button onClick={(e) => { e.stopPropagation(); setMediaVolume(originalIndex, Math.max(0, (event.intensity !== undefined ? event.intensity : 100) - 10)); }} className="p-1 hover:bg-white/10 rounded w-5 h-5 flex items-center justify-center text-white/60 hover:text-white">-</button>
                                     <span className="text-[10px] w-6 text-center tabular-nums font-mono opacity-60">{event.intensity !== undefined ? event.intensity : 100}%</span>
@@ -1458,7 +1745,7 @@ const RowItem: React.FC<{
                                         </>
                                     );
                                 })()}
-                                <button onClick={(e) => { e.stopPropagation(); toggleRepeat(originalIndex) }} className={cn("p-1.5 rounded transition-colors", event.effect === 'repeat' ? "bg-green-500/20 text-green-500" : "bg-white/10 text-white/40")} title="Repeat"><Repeat className="w-3.5 h-3.5" /></button>
+                                <button onClick={(e) => { e.stopPropagation(); toggleRepeat(originalIndex) }} className="p-1.5 bg-white/10 text-white/80 hover:bg-white/20 hover:text-white rounded-full transition-colors" title="Herhalen"><RepeatToggleGlyph repeatOn={event.effect === 'repeat'} sizeClassName="w-3.5 h-3.5" /></button>
                                 {/* Transfer Progress (Sync) */}
                                 {(() => {
                                     const activeTransfers = useSequencerStore.getState().activeTransfers;
@@ -1551,7 +1838,7 @@ const RowItem: React.FC<{
                 <div className="flex-shrink-0 flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
                     {isShadow ? null : (
                         <>
-                            {!isLocked && (type === 'comment' || type === 'title') && (
+                            {!isLocked && type === 'title' && (
                                 <button
                                     type="button"
                                     onClick={(e) => { e.stopPropagation(); onRequestEditRow(originalIndex) }}
@@ -1562,7 +1849,7 @@ const RowItem: React.FC<{
                                 </button>
                             )}
                             <div className="relative flex items-center">
-                                {!sequenceReorderMode && (!isLocked || type === 'light' || type === 'media') ? (
+                                {!sequenceReorderMode && (!isLocked || type === 'light' || type === 'media') && type !== 'comment' ? (
                                     <>
                                         <button
                                             ref={menuButtonRef}
@@ -1761,7 +2048,7 @@ const ContextMenu: React.FC<{
     handlers: {
         openRowEdit: (i: number) => void
         resendEvent: (i: number) => void
-        renameAct: (oldName: string, newName: string) => void
+        renameAct: (oldName: string, newName: string) => Promise<boolean>
         renameScene: (actName: string, sceneId: number, newDescription: string) => void
         insertAct: (i: number, p: 'before' | 'after') => void
         insertScene: (i: number, p: 'before' | 'after') => void
@@ -1966,6 +2253,7 @@ const SequenceGrid: React.FC = () => {
 
     const selectedEventIndex = useSequencerStore(s => s.selectedEventIndex)
     const setSelectedEvent = useSequencerStore(s => s.setSelectedEvent)
+    const setEventPage = useSequencerStore(s => s.setEventPage)
     const selectedEvent = events[selectedEventIndex] || null;
 
     const lastTransitionTime = useSequencerStore(s => s.lastTransitionTime)
@@ -2069,6 +2357,8 @@ const SequenceGrid: React.FC = () => {
     /** Alleen in edit-modus; in show-modus staat de vlag uit (en wordt bij lock gereset). */
     const sequenceReorderMode = !!(activeShow?.viewState?.sequenceReorderMode && !isLocked)
 
+    const showSequenceComments = activeShow?.viewState?.showSequenceComments !== false
+
     const buildActionRowDnD = useCallback(
         (originalIndex: number, ev: ShowEvent): ActionRowDnDProps | undefined => {
             if (!sequenceReorderMode || isLocked) return undefined
@@ -2105,7 +2395,13 @@ const SequenceGrid: React.FC = () => {
                     const toEv = events[originalIndex]
                     if (!fromEv || !toEv) return
                     if (fromEv.type?.toLowerCase() !== 'action' || toEv.type?.toLowerCase() !== 'action') return
-                    if (fromEv.act !== toEv.act || fromEv.sceneId !== toEv.sceneId || fromEv.eventId !== toEv.eventId) return
+                    const sameGroup =
+                        fromEv.eventUid && toEv.eventUid
+                            ? fromEv.eventUid === toEv.eventUid
+                            : fromEv.act === toEv.act &&
+                              fromEv.sceneId === toEv.sceneId &&
+                              fromEv.eventId === toEv.eventId
+                    if (!sameGroup) return
                     e.preventDefault()
                     e.dataTransfer.dropEffect = 'move'
                     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
@@ -2136,7 +2432,13 @@ const SequenceGrid: React.FC = () => {
                     const toEv = events[originalIndex]
                     if (!fromEv || !toEv) return
                     if (fromEv.type?.toLowerCase() !== 'action' || toEv.type?.toLowerCase() !== 'action') return
-                    if (fromEv.act !== toEv.act || fromEv.sceneId !== toEv.sceneId || fromEv.eventId !== toEv.eventId) return
+                    const sameGroupDrop =
+                        fromEv.eventUid && toEv.eventUid
+                            ? fromEv.eventUid === toEv.eventUid
+                            : fromEv.act === toEv.act &&
+                              fromEv.sceneId === toEv.sceneId &&
+                              fromEv.eventId === toEv.eventId
+                    if (!sameGroupDrop) return
                     if (p.fromIndex === originalIndex) return
                     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
                     const after = e.clientY > rect.top + rect.height * 0.55
@@ -2221,19 +2523,30 @@ const SequenceGrid: React.FC = () => {
 
     interface SceneNode {
         id: number | undefined // sceneId
+        /** Stabiele scene-container (los van weergave en sceneId). */
+        sceneUid?: string
         events: EventNode[]
+        /** Commentaar bij scene (eventId 0 / ontbrekend): niet als event-kaart. */
+        sceneCommentRows?: EventRow[]
         isActive: boolean
         isPast?: boolean
     }
 
     interface ActNode {
-        id: string // "Act 1"
+        id: string // zichtbare titel (denormalized)
+        actUid: string
         scenes: SceneNode[]
         /** Rijen zonder sceneId/eventId (o.a. act-comment na reindex) — niet in Scene 0 / Event 0-0 tonen. */
         actLevelRows?: { event: ShowEvent; originalIndex: number; id: number }[]
         isActive: boolean
         isPast?: boolean
     }
+
+    const storageActKey = (a: ActNode) => (a.actUid ? `act-${a.actUid}` : `act-${a.id}`)
+    const storageSceneKey = (a: ActNode, s: SceneNode) =>
+        a.actUid && s.sceneUid ? `scene-${a.actUid}::${s.sceneUid}` : `scene-${a.id}-${s.id ?? 0}`
+    const sceneMetaLookupKey = (a: ActNode, s: SceneNode) =>
+        a.actUid && s.sceneUid ? stableSceneMetaKey({ act: a.id, actUid: a.actUid, sceneId: s.id, sceneUid: s.sceneUid }) : `${a.id}-${s.id ?? 0}`
 
     const firstAnchoredOriginalIndex = (act: ActNode): number => {
         const a0 = act.actLevelRows?.[0]?.originalIndex
@@ -2254,55 +2567,88 @@ const SequenceGrid: React.FC = () => {
 
         // 1. Build Hierarchy
         events.forEach((event: ShowEvent, index: number) => {
-            // Act Node Vinden/Maken
-            let act = acts.find(a => a.id === event.act)
+            const typeLower = (event.type || '').toLowerCase()
+
+            let act = acts.find(a => (event.actUid ? a.actUid === event.actUid : a.id === event.act))
             if (!act) {
-                act = { id: event.act, scenes: [], isActive: false, actLevelRows: [] }
+                act = {
+                    id: event.act,
+                    actUid: event.actUid || `legacy-${acts.length}`,
+                    scenes: [],
+                    isActive: false,
+                    actLevelRows: [],
+                }
                 acts.push(act)
+            } else {
+                act.actUid = event.actUid || act.actUid
+                if (typeLower === 'act') act.id = event.act
             }
             if (!act.actLevelRows) act.actLevelRows = []
 
-            // Act/Scene header rows are structural; they should not create "Event 0" groups.
-            // They are rendered by the Act/Scene headers in the grid, not as event cards.
-            const typeLower = (event.type || '').toLowerCase()
             if (typeLower === 'act') return
 
             let targetSceneId = event.sceneId
             let targetEventId = event.eventId
 
-            // Scene header row: ensure scene exists but do not attach to an event node
             if (typeLower === 'scene') {
                 const sceneId = targetSceneId ?? 0
-                let scene = act.scenes.find(s => s.id === sceneId)
+                let scene = act.scenes.find(s =>
+                    event.sceneUid ? s.sceneUid === event.sceneUid : s.id === sceneId
+                )
                 if (!scene) {
-                    scene = { id: sceneId, events: [], isActive: false }
+                    scene = { id: sceneId, sceneUid: event.sceneUid, events: [], isActive: false }
                     act.scenes.push(scene)
-                }
+                } else if (event.sceneUid) scene.sceneUid = event.sceneUid
                 return
             }
 
-            // Act-orphan rijen (reindex wist sceneId/eventId voor commentaar vóór de eerste Scene):
-            // niet onder Scene 0 / Event 0-0 stoppen.
             if (event.sceneId === undefined && event.eventId === undefined) {
                 act.actLevelRows!.push({ event, originalIndex: index, id: index })
                 return
             }
 
-            if (targetSceneId === undefined) targetSceneId = 0 // Dummy ID for Act-level items (no scene)
-            // Only use eventId=0 as dummy when there is no real eventId (Act-level items).
-            // For real scenes, rows without an eventId are structural and are skipped above.
-            if (targetEventId === undefined) targetEventId = 0 // Dummy ID for Act-level items
-
-            let scene = act.scenes.find(s => s.id === targetSceneId)
-            if (!scene) {
-                scene = { id: targetSceneId, events: [], isActive: false }
-                act.scenes.push(scene)
+            if (typeLower === 'comment') {
+                const evId = event.eventId
+                const sid = event.sceneId
+                if (sid !== undefined && (evId === undefined || evId === 0)) {
+                    let sceneRef = act.scenes.find(s =>
+                        event.sceneUid ? s.sceneUid === event.sceneUid : s.id === sid
+                    )
+                    if (!sceneRef) {
+                        sceneRef = { id: sid, sceneUid: event.sceneUid, events: [], isActive: false }
+                        act.scenes.push(sceneRef)
+                    } else if (event.sceneUid) sceneRef.sceneUid = event.sceneUid
+                    if (!sceneRef.sceneCommentRows) sceneRef.sceneCommentRows = []
+                    sceneRef.sceneCommentRows.push({ event, originalIndex: index, id: index })
+                    return
+                }
             }
 
-            const uniqueId = `${event.act}-${targetSceneId}-${targetEventId}`
+            if (targetSceneId === undefined) targetSceneId = 0
+            if (targetEventId === undefined) targetEventId = 0
+
+            let scene = act.scenes.find(s =>
+                event.sceneUid ? s.sceneUid === event.sceneUid : s.id === targetSceneId
+            )
+            if (!scene) {
+                scene = { id: targetSceneId, sceneUid: event.sceneUid, events: [], isActive: false }
+                act.scenes.push(scene)
+            } else if (event.sceneUid) scene.sceneUid = event.sceneUid
+
+            const uniqueId =
+                event.eventUid || `${event.act}-${targetSceneId}-${targetEventId}`
             let eventNode = scene.events.find(e => e.uniqueId === uniqueId)
             if (!eventNode) {
-                eventNode = { id: targetEventId, uniqueId, rows: [], isActive: false, isNext: false, duration: 0, activeDuration: 0, isMinimal: false }
+                eventNode = {
+                    id: targetEventId,
+                    uniqueId,
+                    rows: [],
+                    isActive: false,
+                    isNext: false,
+                    duration: 0,
+                    activeDuration: 0,
+                    isMinimal: false,
+                }
                 scene.events.push(eventNode)
             }
 
@@ -2315,16 +2661,21 @@ const SequenceGrid: React.FC = () => {
             act.actLevelRows?.sort((a, b) => a.originalIndex - b.originalIndex)
             act.scenes.forEach(scene => {
                 scene.events = scene.events.filter(en => en.rows.length > 0)
+                if (scene.sceneCommentRows?.length) {
+                    scene.sceneCommentRows.sort((a, b) => a.originalIndex - b.originalIndex)
+                }
             })
             act.scenes = act.scenes.filter(
                 scene =>
                     scene.events.length > 0 ||
-                    events.some(
-                        (e: ShowEvent) =>
-                            e.act === act.id &&
+                    events.some((e: ShowEvent) => {
+                        const sameAct = e.actUid ? e.actUid === act.actUid : e.act === act.id
+                        return (
+                            sameAct &&
                             (e.type || '').toLowerCase() === 'scene' &&
-                            (e.sceneId ?? 0) === (scene.id ?? 0)
-                    )
+                            (e.sceneUid ? e.sceneUid === scene.sceneUid : (e.sceneId ?? 0) === (scene.id ?? 0))
+                        )
+                    })
             )
         })
 
@@ -2345,6 +2696,19 @@ const SequenceGrid: React.FC = () => {
             activeNodeIdx = allEventNodes.findIndex(({ eventNode }) =>
                 eventNode.rows.some(r => r.originalIndex === activeEventIndex)
             )
+            if (activeNodeIdx < 0) {
+                outerActive: for (const act of acts) {
+                    for (const scene of act.scenes) {
+                        if (!scene.sceneCommentRows?.some(r => r.originalIndex === activeEventIndex)) continue
+                        const firstEn = scene.events[0]
+                        if (!firstEn) break outerActive
+                        activeNodeIdx = allEventNodes.findIndex(
+                            ({ act: a, scene: s, eventNode: en }) => a === act && s === scene && en === firstEn
+                        )
+                        break outerActive
+                    }
+                }
+            }
         }
 
         // Mark active (act + scene + event)
@@ -2416,7 +2780,20 @@ const SequenceGrid: React.FC = () => {
                     const stopUniqueId = `${evt.stopAct}-${evt.stopSceneId}-${evt.stopEventId}`
                     let endNodeIdx = -1
                     for (let i = nodeIdx + 1; i < allEventNodes.length; i++) {
-                        if (allEventNodes[i].eventNode.uniqueId === stopUniqueId) {
+                        const cand = allEventNodes[i].eventNode
+                        if (cand.uniqueId === stopUniqueId) {
+                            endNodeIdx = i
+                            break
+                        }
+                        const hit = cand.rows.some(r => {
+                            const er = r.event
+                            return (
+                                er.act === evt.stopAct &&
+                                (er.sceneId ?? 0) === (evt.stopSceneId ?? 0) &&
+                                (er.eventId ?? 0) === (evt.stopEventId ?? 0)
+                            )
+                        })
+                        if (hit) {
                             endNodeIdx = i
                             break
                         }
@@ -2726,11 +3103,6 @@ const SequenceGrid: React.FC = () => {
                                 <span className="shrink-0 text-[10px] font-mono tabular-nums text-white/40">
                                     {events.length ? `${activeEventIndex + 1} / ${events.length}` : '0 / 0'}
                                 </span>
-                                <LightStripPreviewSwitch
-                                    compact
-                                    className="border-white/20"
-                                    title="Licht preview-balk (WLED peek / WiZ kleur) aan of uit"
-                                />
                                 {activeShow && isElectronHost && (
                                     <div className="flex w-[4.25rem] shrink-0 justify-end">
                                         <button
@@ -2860,33 +3232,33 @@ const SequenceGrid: React.FC = () => {
 
             {!showTreeCollapsed && hierarchy.map((act, actIndex) => {
                 // Dynamic Collapse: everything collapsed except active and next group during playback
-                const actCollapsed = collapsedGroups[`act-${act.id}`]
+                const actCollapsed = collapsedGroups[storageActKey(act)]
 
                 return (
-                    <div key={act.id} className="relative group/act text-sm mb-6">
+                    <div key={act.actUid} className="relative group/act text-sm mb-6">
                         {/* ACT Header */}
                         <div
                             className={cn(
                                 'relative z-20 mb-2 flex min-w-0 items-center gap-2 border-l-4 border-primary bg-[#111] px-3 py-2 shadow-lg transition-[colors,opacity] group-hover/act:bg-[#1a1a1a] sm:px-4 sticky top-0',
                                 isLocked && act.isPast && showModePastClass,
                                 !isLocked && 'cursor-pointer',
-                                seqDndSourceKey === `act-${act.id}` && 'opacity-45'
+                                seqDndSourceKey === storageActKey(act) && 'opacity-45'
                             )}
                             onClick={(e) => {
                                 if (isLocked) return
                                 const t = e.target as HTMLElement
                                 if (t.closest('button') || t.closest('[data-seq-dnd-grip]')) return
                                 setTreeMenu(null)
-                                setActEditActId(act.id)
+                                setActEditActId(act.actUid)
                             }}
                             onDragOver={
                                 !isLocked
                                     ? (e) => {
                                           const p = sequenceTreeDragRef.current
-                                          if (p?.kind === 'act' && p.actName !== act.id) {
+                                          if (p?.kind === 'act' && p.actUid !== act.actUid) {
                                               e.preventDefault()
                                               e.dataTransfer.dropEffect = 'move'
-                                              setSeqDndHover({ targetKey: `act-${act.id}`, edge: 'before' })
+                                              setSeqDndHover({ targetKey: storageActKey(act), edge: 'before' })
                                           }
                                       }
                                     : undefined
@@ -2894,7 +3266,7 @@ const SequenceGrid: React.FC = () => {
                             onDragLeave={
                                 !isLocked
                                     ? (e) => {
-                                          if (seqDndHover?.targetKey !== `act-${act.id}`) return
+                                          if (seqDndHover?.targetKey !== storageActKey(act)) return
                                           const rel = e.relatedTarget as Node | null
                                           if (!rel || !e.currentTarget.contains(rel)) setSeqDndHover(null)
                                       }
@@ -2915,14 +3287,14 @@ const SequenceGrid: React.FC = () => {
                                               }
                                           }
                                           sequenceTreeDragRef.current = null
-                                          if (p?.kind === 'act' && p.actName !== act.id) {
-                                              reorderActBefore(p.actName, act.id)
+                                          if (p?.kind === 'act' && p.actUid !== act.actUid) {
+                                              reorderActBefore(p.actUid, act.actUid)
                                           }
                                       }
                                     : undefined
                             }
                         >
-                            {seqDndHover?.targetKey === `act-${act.id}` && seqDndHover.edge === 'before' && (
+                            {seqDndHover?.targetKey === storageActKey(act) && seqDndHover.edge === 'before' && (
                                 <div className={cn(TREE_DROP_LINE, 'top-0')} aria-hidden />
                             )}
                             <div className={TREE_CHEVRON_COL}>
@@ -2930,7 +3302,7 @@ const SequenceGrid: React.FC = () => {
                                     type="button"
                                     onClick={(e) => {
                                         e.stopPropagation()
-                                        toggleCollapse(`act-${act.id}`)
+                                        toggleCollapse(storageActKey(act))
                                     }}
                                     className="rounded p-0.5 hover:bg-white/10"
                                     title={actCollapsed ? 'Uitklappen' : 'Inklappen'}
@@ -3009,7 +3381,7 @@ const SequenceGrid: React.FC = () => {
                                                                         title: 'Act verwijderen',
                                                                         message: `Weet je zeker dat je act "${act.id}" en alle inhoud wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`,
                                                                         type: 'confirm',
-                                                                        onConfirm: () => deleteAct(act.id)
+                                                                        onConfirm: () => deleteAct(act.actUid)
                                                                     })
                                                                 }}
                                                             >
@@ -3035,8 +3407,8 @@ const SequenceGrid: React.FC = () => {
                                                 onKeyDown={(e) => e.stopPropagation()}
                                                 onDragStart={(e) => {
                                                     e.stopPropagation()
-                                                    setSeqDndSourceKey(`act-${act.id}`)
-                                                    const payload: SequenceDragPayload = { kind: 'act', actName: act.id }
+                                                    setSeqDndSourceKey(storageActKey(act))
+                                                    const payload: SequenceDragPayload = { kind: 'act', actUid: act.actUid }
                                                     sequenceTreeDragRef.current = payload
                                                     e.dataTransfer.setData(SEQUENCE_DND_MIME, JSON.stringify(payload))
                                                     e.dataTransfer.effectAllowed = 'move'
@@ -3084,22 +3456,43 @@ const SequenceGrid: React.FC = () => {
                                     </div>
                                 )}
                                 {act.scenes.map((scene, sceneIndex) => {
-                                    const sceneDesc = activeShow?.viewState?.sceneNames?.[`${act.id}-${scene.id}`] ?? ''
+                                    const metaKey = sceneMetaLookupKey(act, scene)
+                                    const sceneDesc =
+                                        activeShow?.viewState?.sceneNames?.[metaKey] ??
+                                        activeShow?.viewState?.sceneNames?.[`${act.id}-${scene.id}`] ??
+                                        ''
 
                                     // Dynamic Collapse
-                                    const sceneCollapsed = collapsedGroups[`scene-${act.id}-${scene.id}`]
+                                    const sceneCollapsed = collapsedGroups[storageSceneKey(act, scene)]
+
+                                    const visibleSceneCommentRows = (scene.sceneCommentRows || []).filter(row => {
+                                        const isDefaultSceneComment =
+                                            (row.event.type || '').toLowerCase() === 'comment' &&
+                                            (!row.event.cue ||
+                                                row.event.cue === 'Nieuw commentaar' ||
+                                                row.event.cue === 'Nieuw scene commentaar' ||
+                                                row.event.cue === 'Opmerkingen' ||
+                                                row.event.cue === 'Opmerking')
+                                        return !(isDefaultSceneComment && isLocked)
+                                    })
 
                                     return (
-                                        <div key={scene.id} className="relative group/scene">
-                                            {/* SCENE Header */}
+                                        <div key={scene.sceneUid || `sc-${act.actUid}-${scene.id}`} className="relative group/scene">
                                             <div
                                                 className={cn(
-                                                    'relative mb-2 flex min-w-0 items-center gap-2 border-l-4 py-2 pl-2 pr-3 transition-opacity sm:pl-3 sm:pr-4',
-                                                    isLocked && scene.isActive ? 'border-green-500/60' : 'border-white/10',
-                                                    isLocked && scene.isPast && showModePastClass,
-                                                    seqDndSourceKey === `scene-${act.id}-${scene.id ?? 0}` && 'opacity-45',
-                                                    !isLocked && 'cursor-pointer'
+                                                    'mb-2 overflow-hidden rounded-lg border border-white/10 bg-black/20',
+                                                    isLocked && scene.isPast && showModePastClass
                                                 )}
+                                            >
+                                                {/* SCENE Header */}
+                                                <div
+                                                    className={cn(
+                                                        'relative flex min-w-0 items-center gap-2 border-l-4 py-2 pl-2 pr-3 transition-opacity sm:pl-3 sm:pr-4',
+                                                        isLocked && scene.isActive ? 'border-green-500/60' : 'border-white/10',
+                                                        isLocked && scene.isPast && showModePastClass,
+                                                        seqDndSourceKey === storageSceneKey(act, scene) && 'opacity-45',
+                                                        !isLocked && 'cursor-pointer'
+                                                    )}
                                                 onDoubleClick={(e) => {
                                                     if (!isLocked) return
                                                     const t = e.target as HTMLElement
@@ -3117,7 +3510,7 @@ const SequenceGrid: React.FC = () => {
                                                     const t = e.target as HTMLElement
                                                     if (t.closest('button') || t.closest('[data-seq-dnd-grip]')) return
                                                     setTreeMenu(null)
-                                                    setSceneEdit({ actId: act.id, sceneId: scene.id ?? 0 })
+                                                    setSceneEdit({ actId: act.actUid, sceneId: scene.id ?? 0 })
                                                 }}
                                                 onDragOver={
                                                     !isLocked
@@ -3126,12 +3519,15 @@ const SequenceGrid: React.FC = () => {
                                                               const sid = scene.id ?? 0
                                                               if (
                                                                   p?.kind === 'scene' &&
-                                                                  p.actName === act.id &&
+                                                                  p.actUid === act.actUid &&
                                                                   p.sceneId !== sid
                                                               ) {
                                                                   e.preventDefault()
                                                                   e.dataTransfer.dropEffect = 'move'
-                                                                  setSeqDndHover({ targetKey: `scene-${act.id}-${sid}`, edge: 'before' })
+                                                                  setSeqDndHover({
+                                                                      targetKey: storageSceneKey(act, scene),
+                                                                      edge: 'before',
+                                                                  })
                                                               }
                                                           }
                                                         : undefined
@@ -3139,8 +3535,7 @@ const SequenceGrid: React.FC = () => {
                                                 onDragLeave={
                                                     !isLocked
                                                         ? (e) => {
-                                                              const sid = scene.id ?? 0
-                                                              const key = `scene-${act.id}-${sid}`
+                                                              const key = storageSceneKey(act, scene)
                                                               if (seqDndHover?.targetKey !== key) return
                                                               const rel = e.relatedTarget as Node | null
                                                               if (!rel || !e.currentTarget.contains(rel)) setSeqDndHover(null)
@@ -3163,21 +3558,21 @@ const SequenceGrid: React.FC = () => {
                                                               }
                                                               sequenceTreeDragRef.current = null
                                                               const sid = scene.id ?? 0
-                                                              if (p?.kind === 'scene' && p.actName === act.id && p.sceneId !== sid) {
-                                                                  reorderSceneBefore(act.id, p.sceneId, sid)
+                                                              if (p?.kind === 'scene' && p.actUid === act.actUid && p.sceneId !== sid) {
+                                                                  reorderSceneBefore(act.actUid, p.sceneId, sid)
                                                               }
                                                           }
                                                         : undefined
                                                 }
                                             >
-                                                {seqDndHover?.targetKey === `scene-${act.id}-${scene.id ?? 0}` &&
+                                                {seqDndHover?.targetKey === storageSceneKey(act, scene) &&
                                                     seqDndHover.edge === 'before' && <div className={cn(TREE_DROP_LINE, 'top-0')} aria-hidden />}
                                                 <div className={TREE_CHEVRON_COL}>
                                                     <button
                                                         type="button"
                                                         onClick={(e) => {
                                                             e.stopPropagation()
-                                                            toggleCollapse(`scene-${act.id}-${scene.id}`)
+                                                            toggleCollapse(storageSceneKey(act, scene))
                                                         }}
                                                         className="rounded p-0.5 hover:bg-white/10"
                                                         title={sceneCollapsed ? 'Uitklappen' : 'Inklappen'}
@@ -3185,10 +3580,10 @@ const SequenceGrid: React.FC = () => {
                                                         {sceneCollapsed ? <ChevronRight className="h-3 w-3 opacity-60" /> : <ChevronDown className="h-3 w-3 opacity-60" />}
                                                     </button>
                                                 </div>
-                                                <div className="flex min-w-0 flex-1 items-center gap-2">
+                                                <div className="flex min-w-0 flex-1 items-center gap-1.5">
                                                     <span
                                                         className={cn(
-                                                            'min-w-0 flex-1 truncate text-sm font-bold',
+                                                            'min-w-0 truncate text-sm font-bold',
                                                             !isLocked && 'text-white/90',
                                                             isLocked && (scene.isActive ? 'text-green-300' : 'text-white/80')
                                                         )}
@@ -3274,7 +3669,7 @@ const SequenceGrid: React.FC = () => {
                                                                                             title: 'Scene Verwijderen',
                                                                                             message: `Weet je zeker dat je Scene "SCENE ${scene.id}" en alle inhoud wilt verwijderen?`,
                                                                                             type: 'confirm',
-                                                                                            onConfirm: () => deleteScene(act.id, scene.id || 0)
+                                                                                            onConfirm: () => deleteScene(act.actUid, scene.id || 0)
                                                                                         })
                                                                                     }}
                                                                                 >
@@ -3299,10 +3694,10 @@ const SequenceGrid: React.FC = () => {
                                                                     onKeyDown={(e) => e.stopPropagation()}
                                                                     onDragStart={(e) => {
                                                                         e.stopPropagation()
-                                                                        setSeqDndSourceKey(`scene-${act.id}-${scene.id ?? 0}`)
+                                                                        setSeqDndSourceKey(storageSceneKey(act, scene))
                                                                         const payload: SequenceDragPayload = {
                                                                             kind: 'scene',
-                                                                            actName: act.id,
+                                                                            actUid: act.actUid,
                                                                             sceneId: scene.id ?? 0,
                                                                         }
                                                                         sequenceTreeDragRef.current = payload
@@ -3319,6 +3714,31 @@ const SequenceGrid: React.FC = () => {
                                                         </>
                                                     )}
                                                 </div>
+                                            </div>
+                                                {!sceneCollapsed &&
+                                                    showSequenceComments &&
+                                                    visibleSceneCommentRows.length > 0 && (
+                                                        <div
+                                                            className={cn(
+                                                                'border-t border-white/5 bg-black/30 px-2 py-1.5 sm:px-3',
+                                                                !isLocked && 'cursor-pointer hover:bg-white/[0.06]'
+                                                            )}
+                                                            onClick={(e) => {
+                                                                if (isLocked) return
+                                                                const t = e.target as HTMLElement
+                                                                if (t.closest('button') || t.closest('[data-seq-dnd-grip]')) return
+                                                                setTreeMenu(null)
+                                                                setSceneEdit({ actId: act.actUid, sceneId: scene.id ?? 0 })
+                                                            }}
+                                                        >
+                                                            <div className="flex min-w-0 gap-2">
+                                                                <div className={TREE_CHEVRON_COL} aria-hidden />
+                                                                <div className="min-w-0 flex-1 text-[11px] leading-relaxed text-white/65 whitespace-pre-wrap">
+                                                                    {visibleSceneCommentRows.map(r => r.event.cue).join('\n\n')}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                             </div>
 
                                             {!sceneCollapsed && (() => {
@@ -3358,19 +3778,33 @@ const SequenceGrid: React.FC = () => {
                                                             const eventCollapsed = collapsedGroups[eventNode.uniqueId] ?? isLocked
 
                                                             const titleRow = eventNode.rows.find(r => r.event.type?.toLowerCase() === 'title')
+                                                            const eventTitleScriptPg = titleRow
+                                                                ? resolvedScriptPageForTitleRow(events, titleRow.originalIndex)
+                                                                : undefined
                                                             // Rows inside card: exclude title, trigger, act, scene headers
                                                             const allContentRows = eventNode.rows.filter(r => {
                                                                 const type = r.event.type?.toLowerCase()
                                                                 return type !== 'title' && type !== 'act' && type !== 'scene' && type !== 'trigger'
                                                             })
 
-                                                            // Actions and Comments are functional and should always be visible (even when collapsed)
-                                                            const alwaysVisibleRows = allContentRows.filter(r => {
+                                                            const isVisibleEventSubtitleComment = (r: (typeof allContentRows)[0]) => {
                                                                 const type = r.event.type?.toLowerCase()
-                                                                if (type === 'action') return true
                                                                 if (type !== 'comment') return false
                                                                 const cue = (r.event.cue || '').trim()
-                                                                return cue !== '' && cue !== 'Nieuw commentaar' && cue !== 'Opmerkingen' && cue !== 'Opmerking'
+                                                                return (
+                                                                    cue !== '' &&
+                                                                    cue !== 'Nieuw commentaar' &&
+                                                                    cue !== 'Opmerkingen' &&
+                                                                    cue !== 'Opmerking'
+                                                                )
+                                                            }
+
+                                                            const eventSubtitleCommentRows = allContentRows.filter(isVisibleEventSubtitleComment)
+
+                                                            // Actions stay as normal rows; remarks render as subtitle under the event header.
+                                                            const alwaysVisibleRows = allContentRows.filter(r => {
+                                                                const type = r.event.type?.toLowerCase()
+                                                                return type === 'action'
                                                             })
 
                                                             // Light and Media are technical details and can be collapsed
@@ -3387,20 +3821,41 @@ const SequenceGrid: React.FC = () => {
                                                                 ? collapsibleRows.filter(r => isProjectionStyleMediaRow(r.event, gridDevices))
                                                                 : []
 
-                                                            // If an event has no underlying rows, don't show the collapse toggle.
-                                                            const hasUnderlyingRows = (alwaysVisibleRows.length + collapsibleRows.length) > 0
+                                                            const collapsedShowTechPeek =
+                                                                isLocked &&
+                                                                collapsibleRows.some(r => {
+                                                                    const t = r.event.type?.toLowerCase()
+                                                                    if (t === 'light') {
+                                                                        const d = gridDevices.find(x => x.name === r.event.fixture)
+                                                                        return d?.type === 'wled' || d?.type === 'wiz'
+                                                                    }
+                                                                    if (t === 'media')
+                                                                        return isCollapsedShowProjectionMediaRow(r.event, gridDevices)
+                                                                    return false
+                                                                })
 
-                                                            // Calculate summary for header tags
+                                                            const hasEventCommentSubtitle =
+                                                                showSequenceComments && eventSubtitleCommentRows.length > 0
+
+                                                            // If an event has no underlying rows, don't show the collapse toggle.
+                                                            const hasUnderlyingRows =
+                                                                alwaysVisibleRows.length + collapsibleRows.length > 0 ||
+                                                                hasEventCommentSubtitle
+
+                                                            // Calculate summary for header tags (comments = subtitle, not badge)
                                                             const summaryCounts = eventNode.rows.reduce((acc, r) => {
                                                                 const t = r.event.type?.toLowerCase() || 'unknown'
-                                                                if (t === 'title' || t === 'trigger') return acc
-                                                                if (t === 'comment') {
-                                                                    const cue = (r.event.cue || '').trim()
-                                                                    if (!cue || cue === 'Nieuw commentaar' || cue === 'Opmerkingen' || cue === 'Opmerking') return acc
-                                                                }
+                                                                if (t === 'title' || t === 'trigger' || t === 'comment') return acc
                                                                 acc[t] = (acc[t] || 0) + 1
                                                                 return acc
                                                             }, {} as Record<string, number>)
+
+                                                            const eventSubtitleHasBodyBelow =
+                                                                alwaysVisibleRows.length > 0 ||
+                                                                (!eventCollapsed &&
+                                                                    (detailCollapsibleRows.length > 0 ||
+                                                                        compactProjectionMediaRows.length > 0)) ||
+                                                                (!!isLocked && !!eventCollapsed && collapsedShowTechPeek)
 
                                                             // Check if the active event's timing has elapsed (for blinking "Next")
                                                             let activeTimeElapsed = false
@@ -3565,16 +4020,12 @@ const SequenceGrid: React.FC = () => {
                                                                                                 <Play className="h-3 w-3" /> {summaryCounts['media']}
                                                                                             </div>
                                                                                         )}
-                                                                                        {summaryCounts['comment'] > 0 && (
-                                                                                            <div className="flex shrink-0 items-center gap-0.5 rounded border border-white/10 bg-white/5 px-1 py-0.5 text-[9px] opacity-60">
-                                                                                                <Info className="h-3 w-3" /> {summaryCounts['comment']}
-                                                                                            </div>
-                                                                                        )}
                                                                                         {summaryCounts['action'] > 0 && (
                                                                                             <div className="flex shrink-0 items-center gap-0.5 rounded border border-yellow-500/30 bg-yellow-500/10 px-1 py-0.5 text-[9px] text-yellow-300">
                                                                                                 <User className="h-3 w-3" /> {summaryCounts['action']}
                                                                                             </div>
                                                                                         )}
+                                                                                        {renderEventScriptPageBadge(eventTitleScriptPg, setEventPage)}
                                                                                     </div>
                                                                                     {!sequenceReorderMode && (
                                                                                         <button
@@ -3636,7 +4087,7 @@ const SequenceGrid: React.FC = () => {
                                                                             </div>
                                                                         )}
                                                                         {(() => {
-                                                                            if (hideCompactEventHeader) return null
+                                                                            if (hideCompactEventHeader && !isLocked) return null
                                                                             return (
                                                                                 <div
                                                                                     className={cn(
@@ -3686,11 +4137,11 @@ const SequenceGrid: React.FC = () => {
                                                                                     ) : (
                                                                                         <div className={TREE_CHEVRON_COL} aria-hidden />
                                                                                     )}
-                                                                                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                                                                                    <div className="flex min-w-0 flex-1 items-center gap-1.5">
                                                                                         {titleRow ? (
                                                                                             !isLocked ? (
                                                                                                 <span
-                                                                                                    className="min-w-0 flex-1 truncate text-sm font-bold text-orange-400"
+                                                                                                    className="min-w-0 truncate text-sm font-bold text-orange-400"
                                                                                                     title="Klik om event te bewerken"
                                                                                                 >
                                                                                                     {titleRow.event.cue || (
@@ -3698,14 +4149,14 @@ const SequenceGrid: React.FC = () => {
                                                                                                     )}
                                                                                                 </span>
                                                                                             ) : (
-                                                                                                <span className="min-w-0 flex-1 truncate text-sm font-bold text-orange-400">
+                                                                                                <span className="min-w-0 truncate text-sm font-bold text-orange-400">
                                                                                                     {titleRow.event.cue || (
                                                                                                         <span className="text-xs italic text-orange-400/45">Naamloos event</span>
                                                                                                     )}
                                                                                                 </span>
                                                                                             )
                                                                                         ) : (
-                                                                                            <span className="min-w-0 flex-1 truncate text-sm font-semibold italic text-orange-400/40">Event</span>
+                                                                                            <span className="min-w-0 truncate text-sm font-semibold italic text-orange-400/40">Event</span>
                                                                                         )}
                                                                                         {isLocked && eventNode.isActive && (
                                                                                             <span className="shrink-0 text-[9px] font-black uppercase text-green-400 animate-bright-pulse rounded px-1.5 py-0.5">
@@ -3740,16 +4191,12 @@ const SequenceGrid: React.FC = () => {
                                                                                                     <Play className="h-3 w-3" /> {summaryCounts['media']}
                                                                                                 </div>
                                                                                             )}
-                                                                                            {summaryCounts['comment'] > 0 && (
-                                                                                                <div className="flex shrink-0 items-center gap-0.5 rounded border border-white/10 bg-white/5 px-1 py-0.5 text-[9px] opacity-60">
-                                                                                                    <Info className="h-3 w-3" /> {summaryCounts['comment']}
-                                                                                                </div>
-                                                                                            )}
                                                                                             {summaryCounts['action'] > 0 && (
                                                                                                 <div className="flex shrink-0 items-center gap-0.5 rounded border border-yellow-500/30 bg-yellow-500/10 px-1 py-0.5 text-[9px] text-yellow-300">
                                                                                                     <User className="h-3 w-3" /> {summaryCounts['action']}
                                                                                                 </div>
                                                                                             )}
+                                                                                            {renderEventScriptPageBadge(eventTitleScriptPg, setEventPage)}
                                                                                         </div>
                                                                                         {!isLocked && (
                                                                                             <>
@@ -3816,7 +4263,39 @@ const SequenceGrid: React.FC = () => {
                                                                             )
                                                                         })()}
 
-                                                                        {/* ═══ ALWAYS VISIBLE ROWS (Comments, Actions) ═══ */}
+                                                                        {hasEventCommentSubtitle && (() => {
+                                                                            const titleEditIdx =
+                                                                                titleRow?.originalIndex ?? eventNode.rows[0]?.originalIndex
+                                                                            return (
+                                                                                <div
+                                                                                    className={cn(
+                                                                                        'border-t border-white/5 bg-black/25 px-3 py-1.5',
+                                                                                        !eventSubtitleHasBodyBelow && 'rounded-b-lg',
+                                                                                        !isLocked &&
+                                                                                            titleEditIdx !== undefined &&
+                                                                                            'cursor-pointer hover:bg-white/[0.06]'
+                                                                                    )}
+                                                                                    onClick={(e) => {
+                                                                                        if (isLocked || titleEditIdx === undefined) return
+                                                                                        const t = e.target as HTMLElement
+                                                                                        if (t.closest('button') || t.closest('[data-seq-dnd-grip]')) return
+                                                                                        setTreeMenu(null)
+                                                                                        setEventEdit({ titleOriginalIndex: titleEditIdx })
+                                                                                    }}
+                                                                                >
+                                                                                    <div className="flex min-w-0 items-start gap-2">
+                                                                                        <div className={TREE_CHEVRON_COL} aria-hidden />
+                                                                                        <div className="min-w-0 flex-1 text-[11px] leading-relaxed text-white/65 whitespace-pre-wrap">
+                                                                                            {eventSubtitleCommentRows
+                                                                                                .map(r => r.event.cue)
+                                                                                                .join('\n\n')}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            )
+                                                                        })()}
+
+                                                                        {/* ═══ ALWAYS VISIBLE ROWS (Actions) ═══ */}
                                                                         {alwaysVisibleRows.length > 0 && (
                                                                             <div className="flex flex-col divide-y divide-white/5 border-t border-white/5">
                                                                                 {alwaysVisibleRows.map((item, idx) => (

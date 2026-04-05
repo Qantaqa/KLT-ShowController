@@ -10,7 +10,6 @@ import {
   Pause,
   Square,
   Volume2,
-  VolumeX,
   Sun,
   Repeat,
   Monitor,
@@ -22,6 +21,7 @@ import {
 import { useSequencerStore } from '../store/useSequencerStore'
 import type { ShowEvent } from '../types/show'
 import type { LocalMonitorDevice, Device, WLEDDevice } from '../types/devices'
+import { SpeakerMutedGlyph } from '../lib/media-ui-glyphs'
 import {
   cn,
   modalBtnIconClass,
@@ -557,13 +557,10 @@ const MediaEditModalSection: React.FC<{ rowIndex: number }> = ({ rowIndex }) => 
           <button
             type="button"
             onClick={() => toggleAudio(rowIndex)}
-            className={cn(
-              'p-2 rounded-lg transition-colors border border-white/12',
-              event.sound ? 'bg-white/10 text-white' : 'bg-red-500/18 text-red-300'
-            )}
+            className="p-2 rounded-lg transition-colors border border-white/12 bg-white/10 text-white/80 hover:bg-white/15 hover:text-white"
             title={event.sound ? 'Geluid aan' : 'Dempen'}
           >
-            {!event.sound ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            {!event.sound ? <SpeakerMutedGlyph sizeClassName="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </button>
           <div className="flex items-center gap-1 bg-[#13131a] rounded-lg border border-white/12 px-1 py-1">
             <button
@@ -682,7 +679,6 @@ const SequenceRowEditModal: React.FC<SequenceRowEditModalProps> = ({ rowIndex, o
   const [editActionCue, setEditActionCue] = useState('')
   const [editActionCueMoment, setEditActionCueMoment] = useState('')
   const [editActionAssignee, setEditActionAssignee] = useState('')
-  const [editActionPg, setEditActionPg] = useState('')
   const [editActionDuration, setEditActionDuration] = useState('')
   const [editMarkerXPct, setEditMarkerXPct] = useState('')
   const [editMarkerYPct, setEditMarkerYPct] = useState('')
@@ -698,7 +694,6 @@ const SequenceRowEditModal: React.FC<SequenceRowEditModalProps> = ({ rowIndex, o
       setEditActionCue(ev.cue || '')
       setEditActionCueMoment(ev.actionCueMoment || '')
       setEditActionAssignee(ev.actionAssignee || '')
-      setEditActionPg(ev.scriptPg !== undefined && ev.scriptPg > 0 ? String(ev.scriptPg) : '')
       setEditActionDuration(ev.duration !== undefined && ev.duration > 0 ? String(ev.duration) : '')
       const mn = ev.scriptMarkerNorm
       if (mn && typeof mn.x === 'number' && typeof mn.y === 'number' && Number.isFinite(mn.x) && Number.isFinite(mn.y)) {
@@ -752,9 +747,6 @@ const SequenceRowEditModal: React.FC<SequenceRowEditModalProps> = ({ rowIndex, o
 
   const handleSave = () => {
     if (type === 'action') {
-      const rawPg = editActionPg.trim()
-      const nPg = rawPg === '' ? 0 : parseInt(rawPg, 10)
-      const scriptPg = Number.isFinite(nPg) && nPg > 0 ? nPg : 0
       const rawDur = editActionDuration.trim()
       const nDur = rawDur === '' ? NaN : parseInt(rawDur, 10)
       const duration = Number.isFinite(nDur) && nDur > 0 ? nDur : undefined
@@ -777,7 +769,6 @@ const SequenceRowEditModal: React.FC<SequenceRowEditModalProps> = ({ rowIndex, o
         cue: editActionCue.trim(),
         actionCueMoment: editActionCueMoment.trim() || undefined,
         actionAssignee: editActionAssignee.trim() || undefined,
-        scriptPg,
         duration,
         scriptMarkerNorm
       })
@@ -924,15 +915,6 @@ const SequenceRowEditModal: React.FC<SequenceRowEditModalProps> = ({ rowIndex, o
                 onChange={e => setEditActionAssignee(e.target.value)}
                 className={inputCls}
                 placeholder="Naam of rol"
-              />
-              <label className={labelCls}>Scriptpagina (PDF)</label>
-              <input
-                type="number"
-                min={1}
-                value={editActionPg}
-                onChange={e => setEditActionPg(e.target.value)}
-                className={inputCls}
-                placeholder="Geen koppeling"
               />
               <label className={labelCls}>Tijd (seconden)</label>
               <input

@@ -2853,6 +2853,18 @@ class DbManager {
     if (!columns.includes("actionId")) {
       this.db.exec("ALTER TABLE sequences ADD COLUMN actionId INTEGER DEFAULT 0");
     }
+    if (!columns.includes("scriptMarkerNorm")) {
+      this.db.exec("ALTER TABLE sequences ADD COLUMN scriptMarkerNorm TEXT");
+    }
+    if (!columns.includes("actionCompleted")) {
+      this.db.exec("ALTER TABLE sequences ADD COLUMN actionCompleted INTEGER DEFAULT 0");
+    }
+    if (!columns.includes("actionCueMoment")) {
+      this.db.exec("ALTER TABLE sequences ADD COLUMN actionCueMoment TEXT");
+    }
+    if (!columns.includes("actionAssignee")) {
+      this.db.exec("ALTER TABLE sequences ADD COLUMN actionAssignee TEXT");
+    }
     this.db.exec(`
             CREATE TABLE IF NOT EXISTS clipboard (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -3338,6 +3350,17 @@ class DbManager {
           legacyMasks = void 0;
         }
       }
+      let scriptMarkerNorm;
+      if (s.scriptMarkerNorm && typeof s.scriptMarkerNorm === "string") {
+        try {
+          const parsed = JSON.parse(s.scriptMarkerNorm);
+          if (parsed && typeof parsed.x === "number" && typeof parsed.y === "number") {
+            scriptMarkerNorm = { x: parsed.x, y: parsed.y };
+          }
+        } catch {
+          scriptMarkerNorm = void 0;
+        }
+      }
       const { projectionMasks: _pm, ...rest } = s;
       const key = DbManager.videoMaskKey(s);
       const fromTable = maskMap.get(key);
@@ -3345,7 +3368,9 @@ class DbManager {
       return {
         ...rest,
         sound: !!s.sound,
-        projectionMasks
+        projectionMasks,
+        scriptMarkerNorm,
+        actionCompleted: !!s.actionCompleted
       };
     });
   }
@@ -3359,12 +3384,13 @@ class DbManager {
     const deleteStmt = this.db.prepare("DELETE FROM sequences WHERE showId = ?");
     const insertStmt = this.db.prepare(`
             INSERT INTO sequences 
-            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId, stopAct, stopSceneId, stopEventId, actionId)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId, stopAct, stopSceneId, stopEventId, actionId, scriptMarkerNorm, actionCompleted, actionCueMoment, actionAssignee)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
     const transaction = this.db.transaction((showId2, events2) => {
       deleteStmt.run(showId2);
       for (const e of events2) {
+        const markerJson = e.scriptMarkerNorm && typeof e.scriptMarkerNorm.x === "number" && typeof e.scriptMarkerNorm.y === "number" ? JSON.stringify({ x: e.scriptMarkerNorm.x, y: e.scriptMarkerNorm.y }) : null;
         insertStmt.run(
           showId2,
           e.act,
@@ -3394,7 +3420,11 @@ class DbManager {
           e.stopAct || null,
           e.stopSceneId !== void 0 ? e.stopSceneId : null,
           e.stopEventId !== void 0 ? e.stopEventId : null,
-          e.actionId !== void 0 && e.actionId !== null ? e.actionId : 0
+          e.actionId !== void 0 && e.actionId !== null ? e.actionId : 0,
+          markerJson,
+          e.actionCompleted ? 1 : 0,
+          e.actionCueMoment ?? null,
+          e.actionAssignee ?? null
         );
       }
       this.replaceShowVideoMasks(showId2, events2);
@@ -3437,6 +3467,32 @@ class DbManager {
     return this.db.prepare(
       "DELETE FROM show_timing WHERE showId = ? AND transitionKey = ?"
     ).run(showId, transitionKey);
+  }
+  /**
+   * Renames transition keys in show_timing (e.g. after act rename / reindex).
+   * Rows that would collide on (showId, runAt, toKey) drop the source row.
+   */
+  remapShowTimingTransitionKeys(showId, pairs) {
+    const select = this.db.prepare(
+      "SELECT rowid, runAt FROM show_timing WHERE showId = ? AND transitionKey = ?"
+    );
+    const updateKey = this.db.prepare("UPDATE show_timing SET transitionKey = ? WHERE rowid = ?");
+    const deleteRow = this.db.prepare("DELETE FROM show_timing WHERE rowid = ?");
+    const hasTarget = this.db.prepare(
+      "SELECT 1 AS ok FROM show_timing WHERE showId = ? AND runAt = ? AND transitionKey = ? LIMIT 1"
+    );
+    for (const { fromKey, toKey } of pairs) {
+      if (!fromKey || !toKey || fromKey === toKey) continue;
+      const rows = select.all(showId, fromKey);
+      for (const r of rows) {
+        const clash = hasTarget.get(showId, r.runAt, toKey);
+        if (clash) {
+          deleteRow.run(r.rowid);
+        } else {
+          updateKey.run(toKey, r.rowid);
+        }
+      }
+    }
   }
   /**
    * Retrieves all registered remote clients (e.g. tablet controllers).
@@ -13847,6 +13903,10 @@ ipcMain.handle("db:get-show-timings", (_e, { showId, runAt }) => dbManager.getSh
 ipcMain.handle(
   "db:delete-show-timing-for-transition",
   (_e, { showId, transitionKey }) => dbManager.deleteShowTimingForTransition(showId, transitionKey)
+);
+ipcMain.handle(
+  "db:remap-show-timing-keys",
+  (_e, { showId, pairs }) => dbManager.remapShowTimingTransitionKeys(showId, pairs || [])
 );
 ipcMain.handle("db:get-remote-clients", () => dbManager.getRemoteClients());
 ipcMain.handle("db:get-remote-client", (_e, id) => dbManager.getRemoteClient(id));

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Send, Square, Pause, Play, Repeat } from 'lucide-react'
+import { Send, Square, Pause, Play, Volume2 } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { LIGHT_STRIP_SHOW_ROW_TITLE_COL_CLASS } from '../lib/light-strip-preview'
 import type { ShowEvent } from '../types/show'
@@ -7,6 +7,7 @@ import type { Device } from '../types/devices'
 import LightFixtureStripPreview from './LightFixtureStripPreview'
 import { useSequencerStore } from '../store/useSequencerStore'
 import { ResumeMediaPlayer } from '../services/media-player-service'
+import { RepeatToggleGlyph, SpeakerMutedGlyph } from '../lib/media-ui-glyphs'
 
 export function isCollapsedShowProjectionMediaRow(event: ShowEvent, devices: Device[]): boolean {
     if ((event.type || '').toLowerCase() !== 'media') return false
@@ -46,6 +47,7 @@ const ShowCollapsedTechRow: React.FC<{
     const stopMedia = useSequencerStore(s => s.stopMedia)
     const restartMedia = useSequencerStore(s => s.restartMedia)
     const toggleRepeat = useSequencerStore(s => s.toggleRepeat)
+    const toggleAudio = useSequencerStore(s => s.toggleAudio)
     const playingMedia = useSequencerStore(s => s.playingMedia)
     const mediaPlaybackByDevice = useSequencerStore(s => s.mediaPlaybackByDevice)
 
@@ -179,6 +181,9 @@ const ShowCollapsedTechRow: React.FC<{
     const hasTimeline = (snap?.duration ?? 0) > 0.25 && (snap?.currentTime ?? 0) > 0.2
     const isLive = !!(playingEntry && playingEntry.filename === event.filename)
 
+    /** Transport actief: pauze/stop tonen; anders alleen start (plus herhalen + mute). */
+    const mediaStarted = isLocal ? playing || paused : isLive
+
     const onPauseResume = (e: React.MouseEvent) => {
         e.stopPropagation()
         if (isLocal) {
@@ -193,10 +198,14 @@ const ShowCollapsedTechRow: React.FC<{
         }
     }
 
-    const onPlayStop = (e: React.MouseEvent) => {
+    const onStart = (e: React.MouseEvent) => {
         e.stopPropagation()
-        if (isLive || playing) stopMedia(originalIndex)
-        else restartMedia(originalIndex)
+        restartMedia(originalIndex)
+    }
+
+    const onStop = (e: React.MouseEvent) => {
+        e.stopPropagation()
+        stopMedia(originalIndex)
     }
 
     const onRepeat = (e: React.MouseEvent) => {
@@ -204,31 +213,35 @@ const ShowCollapsedTechRow: React.FC<{
         toggleRepeat(originalIndex)
     }
 
-    const pauseResumeIcon =
-        isLocal
-            ? playing
-                ? Pause
-                : Play
-            : isLive
+    const onMute = (e: React.MouseEvent) => {
+        e.stopPropagation()
+        toggleAudio(originalIndex)
+    }
+
+    const repeatOn = event.effect === 'repeat'
+
+    const isTransportPaused =
+        (isLocal && !!paused && !playing) || (!isLocal && isLive && !!snap?.paused)
+
+    const pauseResumeIcon = isTransportPaused
+        ? Play
+        : isLocal
+          ? playing
               ? Pause
               : Play
+          : Pause
 
-    const pauseResumeTitle = isLocal
-        ? playing
-            ? 'Pauze'
-            : paused || hasTimeline
-              ? 'Hervatten'
-              : 'Afspelen'
-        : isLive
-          ? 'Pauze'
-          : 'Afspelen'
-
-    const showStop = isLive || playing
-    const playStopIcon = showStop ? Square : Play
-    const playStopTitle = showStop ? 'Stop' : 'Play'
+    const pauseResumeTitle = isTransportPaused
+        ? 'Hervatten'
+        : isLocal
+          ? playing
+              ? 'Pauze'
+              : paused || hasTimeline
+                ? 'Hervatten'
+                : 'Starten'
+          : 'Pauze'
 
     const PrIcon = pauseResumeIcon
-    const PsIcon = playStopIcon
 
     return (
         <div className="flex w-full min-w-0 items-center gap-1.5">
@@ -255,21 +268,37 @@ const ShowCollapsedTechRow: React.FC<{
                 )}
             </div>
             {showActions && (
-                <div className="flex shrink-0 gap-0.5">
-                    <button type="button" className={iconBtn} title={pauseResumeTitle} onClick={onPauseResume}>
-                        <PrIcon className="h-3 w-3 fill-current" />
-                    </button>
-                    <button type="button" className={iconBtn} title={playStopTitle} onClick={onPlayStop}>
-                        <PsIcon className="h-3 w-3 fill-current" />
-                    </button>
+                <div className="flex shrink-0 items-center gap-0.5">
                     <button
                         type="button"
-                        className={cn(iconBtn, event.effect === 'repeat' && 'border-emerald-500/40 text-emerald-300')}
-                        title="Repeat aan/uit"
+                        className={iconBtn}
+                        title={repeatOn ? 'Herhalen uit' : 'Herhalen aan'}
                         onClick={onRepeat}
                     >
-                        <Repeat className="h-3 w-3" />
+                        <RepeatToggleGlyph repeatOn={repeatOn} />
                     </button>
+                    <button type="button" className={iconBtn} title={event.sound ? 'Dempen' : 'Geluid aan'} onClick={onMute}>
+                        {!event.sound ? <SpeakerMutedGlyph /> : <Volume2 className="h-3 w-3" />}
+                    </button>
+                    {mediaStarted ? (
+                        <>
+                            <button type="button" className={iconBtn} title={pauseResumeTitle} onClick={onPauseResume}>
+                                <PrIcon
+                                    className={cn(
+                                        'h-3 w-3 fill-current',
+                                        isTransportPaused && 'motion-safe:animate-pulse'
+                                    )}
+                                />
+                            </button>
+                            <button type="button" className={iconBtn} title="Stoppen" onClick={onStop}>
+                                <Square className="h-3 w-3 fill-current" />
+                            </button>
+                        </>
+                    ) : (
+                        <button type="button" className={iconBtn} title="Starten" onClick={onStart}>
+                            <Play className="h-3 w-3 fill-current" />
+                        </button>
+                    )}
                 </div>
             )}
             <style>{`

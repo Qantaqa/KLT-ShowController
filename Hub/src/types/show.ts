@@ -1,7 +1,27 @@
 import type { Device, ProjectionMask } from './devices';
 
+/** Vaste PDF-notitie op het script (alleen Hub/Electron UI); opgeslagen in show.viewState. */
+export interface PdfScriptNote {
+    id: string
+    page: number
+    /** 0–1 t.o.v. gerenderde pagina (zelfde als scriptMarkerNorm). */
+    x: number
+    y: number
+    text: string
+}
+
 export interface ShowEvent {
     act: string
+    /** Unieke rij-id (SequenceGrid, persist); los van titel en hiërarchie-nummers. */
+    uid?: string
+    /** Stabiele container-id van de act (gedeeld door alle rijen in het act-blok). */
+    actUid?: string
+    /** Stabiele scene-container. */
+    sceneUid?: string
+    /** Stabiele event-groep (Title + comment/trigger/actions onder één kaart). */
+    eventUid?: string
+    /** Vaste volgorde-index (0..n-1), gelijk aan positie in de array na reindex. */
+    sortOrder?: number
     sceneId?: number
     eventId?: number
     actionId?: number
@@ -68,6 +88,10 @@ export interface ShowProfile {
         sceneScriptPages?: Record<string, number>
         /** Edit-modus: toon sleepgrepen i.p.v. ⋮-menu op boom en rijen. */
         sequenceReorderMode?: boolean
+        /** Electron: annotaties op het PDF-script (tekstballon). */
+        pdfScriptNotes?: PdfScriptNote[]
+        /** Of scene/event-opmerkingen in de sequentieboom zichtbaar zijn (default true). */
+        showSequenceComments?: boolean
     }
     devices?: Device[]          // Show-specific device overrides
 }

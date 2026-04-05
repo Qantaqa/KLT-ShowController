@@ -163,6 +163,19 @@ class NetworkService {
                     else if (data.action === 'stop' || data.action === 'setActiveEvent') {
                         store.setActiveEvent(data.index !== undefined ? data.index : -1)
                     }
+                    else if (data.action === 'updateActionCompleted' && typeof data.index === 'number') {
+                        store.updateEvent(data.index, { actionCompleted: !!data.actionCompleted })
+                    }
+                    else if (data.action === 'lightFixtureBlack' && typeof data.fixture === 'string') {
+                        const w = window as any
+                        if (!w.require) return
+                        try {
+                            const { ipcRenderer } = w.require('electron')
+                            void ipcRenderer.invoke('light:fixture-black', { fixture: data.fixture.trim() })
+                        } catch (e) {
+                            console.error('lightFixtureBlack IPC failed', e)
+                        }
+                    }
                 }
             }
             // --- Logic Branch: Remote workstation requests host media controls ---

@@ -616,6 +616,11 @@ ipcMain.handle(
     (_e: any, { showId, transitionKey }: { showId: string; transitionKey: string }) =>
         dbManager.deleteShowTimingForTransition(showId, transitionKey)
 );
+ipcMain.handle(
+    'db:remap-show-timing-keys',
+    (_e: any, { showId, pairs }: { showId: string; pairs: { fromKey: string; toKey: string }[] }) =>
+        dbManager.remapShowTimingTransitionKeys(showId, pairs || [])
+);
 
 ipcMain.handle('db:get-remote-clients', () => dbManager.getRemoteClients());
 ipcMain.handle('db:get-remote-client', (_e: any, id: string) => dbManager.getRemoteClient(id));

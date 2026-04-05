@@ -229,6 +229,19 @@ class DbManager {
             this.db.exec('ALTER TABLE sequences ADD COLUMN actionId INTEGER DEFAULT 0');
         }
 
+        if (!columns.includes('scriptMarkerNorm')) {
+            this.db.exec('ALTER TABLE sequences ADD COLUMN scriptMarkerNorm TEXT');
+        }
+        if (!columns.includes('actionCompleted')) {
+            this.db.exec('ALTER TABLE sequences ADD COLUMN actionCompleted INTEGER DEFAULT 0');
+        }
+        if (!columns.includes('actionCueMoment')) {
+            this.db.exec('ALTER TABLE sequences ADD COLUMN actionCueMoment TEXT');
+        }
+        if (!columns.includes('actionAssignee')) {
+            this.db.exec('ALTER TABLE sequences ADD COLUMN actionAssignee TEXT');
+        }
+
         // Create the clipboard table for copy/paste functionality between shows/events
         this.db.exec(`
             CREATE TABLE IF NOT EXISTS clipboard (
@@ -819,6 +832,17 @@ class DbManager {
                     legacyMasks = undefined;
                 }
             }
+            let scriptMarkerNorm: { x: number; y: number } | undefined;
+            if (s.scriptMarkerNorm && typeof s.scriptMarkerNorm === 'string') {
+                try {
+                    const parsed = JSON.parse(s.scriptMarkerNorm);
+                    if (parsed && typeof parsed.x === 'number' && typeof parsed.y === 'number') {
+                        scriptMarkerNorm = { x: parsed.x, y: parsed.y }
+                    }
+                } catch {
+                    scriptMarkerNorm = undefined;
+                }
+            }
             const { projectionMasks: _pm, ...rest } = s;
             const key = DbManager.videoMaskKey(s);
             const fromTable = maskMap.get(key);
@@ -826,7 +850,9 @@ class DbManager {
             return {
                 ...rest,
                 sound: !!s.sound,
-                projectionMasks
+                projectionMasks,
+                scriptMarkerNorm,
+                actionCompleted: !!s.actionCompleted
             };
         });
     }
@@ -841,8 +867,8 @@ class DbManager {
         const deleteStmt = this.db.prepare('DELETE FROM sequences WHERE showId = ?');
         const insertStmt = this.db.prepare(`
             INSERT INTO sequences 
-            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId, stopAct, stopSceneId, stopEventId, actionId)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (showId, act, sceneId, eventId, type, cue, fixture, effect, palette, color1, color2, color3, brightness, speed, intensity, transition, sound, scriptPg, duration, filename, segmentId, effectId, paletteId, stopAct, stopSceneId, stopEventId, actionId, scriptMarkerNorm, actionCompleted, actionCueMoment, actionAssignee)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
 
         // Perform the save as an atomic transaction to prevent partial show data
@@ -852,6 +878,12 @@ class DbManager {
 
             // Insert each event in the new list
             for (const e of events) {
+                const markerJson =
+                    e.scriptMarkerNorm &&
+                    typeof e.scriptMarkerNorm.x === 'number' &&
+                    typeof e.scriptMarkerNorm.y === 'number'
+                        ? JSON.stringify({ x: e.scriptMarkerNorm.x, y: e.scriptMarkerNorm.y })
+                        : null;
                 insertStmt.run(
                     showId, e.act, e.sceneId, e.eventId, e.type, e.cue,
                     e.fixture || '', e.effect || '', e.palette || '',
@@ -867,7 +899,11 @@ class DbManager {
                     e.stopAct || null,
                     e.stopSceneId !== undefined ? e.stopSceneId : null,
                     e.stopEventId !== undefined ? e.stopEventId : null,
-                    e.actionId !== undefined && e.actionId !== null ? e.actionId : 0
+                    e.actionId !== undefined && e.actionId !== null ? e.actionId : 0,
+                    markerJson,
+                    e.actionCompleted ? 1 : 0,
+                    e.actionCueMoment ?? null,
+                    e.actionAssignee ?? null
                 );
             }
 
@@ -916,6 +952,34 @@ class DbManager {
         return this.db.prepare(
             'DELETE FROM show_timing WHERE showId = ? AND transitionKey = ?'
         ).run(showId, transitionKey);
+    }
+
+    /**
+     * Renames transition keys in show_timing (e.g. after act rename / reindex).
+     * Rows that would collide on (showId, runAt, toKey) drop the source row.
+     */
+    remapShowTimingTransitionKeys(showId: string, pairs: { fromKey: string; toKey: string }[]) {
+        const select = this.db.prepare(
+            'SELECT rowid, runAt FROM show_timing WHERE showId = ? AND transitionKey = ?'
+        );
+        const updateKey = this.db.prepare('UPDATE show_timing SET transitionKey = ? WHERE rowid = ?');
+        const deleteRow = this.db.prepare('DELETE FROM show_timing WHERE rowid = ?');
+        const hasTarget = this.db.prepare(
+            'SELECT 1 AS ok FROM show_timing WHERE showId = ? AND runAt = ? AND transitionKey = ? LIMIT 1'
+        );
+
+        for (const { fromKey, toKey } of pairs) {
+            if (!fromKey || !toKey || fromKey === toKey) continue;
+            const rows = select.all(showId, fromKey) as { rowid: number; runAt: string }[];
+            for (const r of rows) {
+                const clash = hasTarget.get(showId, r.runAt, toKey) as { ok: number } | undefined;
+                if (clash) {
+                    deleteRow.run(r.rowid);
+                } else {
+                    updateKey.run(toKey, r.rowid);
+                }
+            }
+        }
     }
 
     /**

@@ -29,7 +29,8 @@ import {
   Minimize,
   Layers,
   Download,
-  Radar
+  Radar,
+  Lightbulb
 } from 'lucide-react'
 import { useSequencerStore } from './store/useSequencerStore'
 import SequenceGrid from './components/SequenceGrid'
@@ -46,6 +47,7 @@ import type { ShowEvent } from './types/show'
 import { getTransitionTimingSamples } from './utils/transitionTiming'
 
 import { cn } from './lib/utils'
+import { isLightStripPreviewEnabled } from './lib/light-strip-preview'
 
 const formatTime = (seconds: number) => {
   const m = Math.floor(seconds / 60)
@@ -128,7 +130,9 @@ export default function App() {
     setAppLocked,
     appSettingsModalOpen,
     openAppSettings,
-    closeAppSettings
+    closeAppSettings,
+    updateAppSettings,
+    broadcastState
   } = useSequencerStore()
 
   const showTimingDurationsByKey = useSequencerStore(s => s.showTimingDurationsByKey)
@@ -137,6 +141,7 @@ export default function App() {
 
   /** Host: vorige aantal geautoriseerde remote werkstations — voorkomt dat elke CLIENTS-update de camera opnieuw forceert. */
   const prevAuthorizedRemoteCountRef = useRef<number | null>(null)
+  const pageUpdateDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Start keyboard shortcut listener (remote keyboard)
   useRemoteKeyboard()
@@ -652,13 +657,20 @@ export default function App() {
     }
   }, [activeEventIndex, events, autoFollowScript, isLocked, setEventPage])
 
-  // Sync back to extension when page changes locally
+  // Sync back to extension when page changes locally (debounced: smooth PDF scroll updates currentScriptPage often)
   useEffect(() => {
-    networkService.sendCommand({
-      type: 'PAGE_UPDATE',
-      page: currentScriptPage,
-      showId: activeShow?.id
-    })
+    if (pageUpdateDebounceRef.current) clearTimeout(pageUpdateDebounceRef.current)
+    pageUpdateDebounceRef.current = setTimeout(() => {
+      pageUpdateDebounceRef.current = null
+      networkService.sendCommand({
+        type: 'PAGE_UPDATE',
+        page: currentScriptPage,
+        showId: activeShow?.id
+      })
+    }, 220)
+    return () => {
+      if (pageUpdateDebounceRef.current) clearTimeout(pageUpdateDebounceRef.current)
+    }
   }, [currentScriptPage, activeShow?.id])
 
   // Broadcast full state when show or index changes (for remote notebooks)
@@ -1138,6 +1150,42 @@ export default function App() {
                             </div>
                             <button onClick={(e) => { e.stopPropagation(); toggleAutoFollowScript(); }} className={cn("w-10 h-5 rounded-full relative transition-all duration-500 p-1 border border-white/10", autoFollowScript ? "bg-purple-500/20 shadow-[inset_0_0_10px_rgba(168,85,247,0.1)]" : "bg-white/5 shadow-inner")} title="Schakel script automatisch volgen in/uit"><div className={cn("w-2.5 h-2.5 rounded-full transition-all duration-500 shadow-lg", autoFollowScript ? "ml-auto bg-purple-500 shadow-[0_0_8px_#a855f7]" : "mr-auto bg-white/20")} /></button>
                           </div>
+                          <div className="w-full px-4 py-2 flex items-center justify-between hover:bg-white/5 transition-colors border-t border-white/5">
+                            <div className="flex items-center gap-3 text-left">
+                              <Lightbulb className={cn('w-3.5 h-3.5 text-purple-500', !isLightStripPreviewEnabled(appSettings.lightStripPreviewEnabled) && 'opacity-40')} />
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-white">Live peek</span>
+                                <span className="text-[8px] opacity-40 uppercase font-bold text-left text-white">
+                                  {isLightStripPreviewEnabled(appSettings.lightStripPreviewEnabled) ? 'Aan' : 'Uit'}
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={async (e) => {
+                                e.stopPropagation()
+                                const on = isLightStripPreviewEnabled(appSettings.lightStripPreviewEnabled)
+                                await updateAppSettings({ lightStripPreviewEnabled: !on })
+                                broadcastState()
+                              }}
+                              className={cn(
+                                'w-10 h-5 rounded-full relative transition-all duration-500 p-1 border border-white/10',
+                                isLightStripPreviewEnabled(appSettings.lightStripPreviewEnabled)
+                                  ? 'bg-purple-500/20 shadow-[inset_0_0_10px_rgba(168,85,247,0.1)]'
+                                  : 'bg-white/5 shadow-inner'
+                              )}
+                              title="WLED live peek en WiZ-kleurenstrook in het sequence-grid"
+                            >
+                              <div
+                                className={cn(
+                                  'w-2.5 h-2.5 rounded-full transition-all duration-500 shadow-lg',
+                                  isLightStripPreviewEnabled(appSettings.lightStripPreviewEnabled)
+                                    ? 'ml-auto bg-purple-500 shadow-[0_0_8px_#a855f7]'
+                                    : 'mr-auto bg-white/20'
+                                )}
+                              />
+                            </button>
+                          </div>
 
                           <button onClick={() => {
                             setSetupWizardStep(1);
@@ -1234,7 +1282,7 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex overflow-hidden relative" >
+      <main className="flex-1 flex min-h-0 overflow-hidden relative" >
         {!activeShow && (
           <div className="absolute inset-0 z-[60] bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-6">
             <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 animate-pulse">
@@ -1304,7 +1352,7 @@ export default function App() {
           </div>
         )}
 
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex min-h-0 overflow-hidden">
           {/* Main Content Area */}
           <section className="flex-1 flex flex-col border-r border-white/5 min-w-[400px] relative min-h-0">
             {!isLocked && !isHost && (
@@ -1336,10 +1384,10 @@ export default function App() {
           </div>
 
           <section
-            className="sidebar-resizable flex flex-col bg-black/40 shrink-0 min-w-[300px] max-w-[min(100%,96vw)]"
+            className="sidebar-resizable flex min-h-0 flex-col bg-black/40 shrink-0 min-w-[300px] max-w-[min(100%,96vw)]"
             style={{ width: activeShow?.sidebarWidth ?? 500 }}
           >
-            <div className="flex flex-col flex-1">
+            <div className="flex min-h-0 flex-col flex-1">
               {/* Camera Viewing Boxes */}
               {selectedCameraClients.length > 0 && (
                 <>
@@ -1398,7 +1446,7 @@ export default function App() {
                 </>
               )}
 
-              <div className="flex-1 p-0 overflow-hidden relative">
+              <div className="min-h-0 flex-1 flex flex-col p-0 overflow-hidden relative">
                 <PdfViewer
                   webcamStripVisible={selectedCameraClients.length > 0 && isWebcamExpanded}
                 />
@@ -1910,7 +1958,7 @@ export default function App() {
           <CameraStreamer />
           <div className="flex flex-col items-end justify-center gap-0.5">
             <span
-              className={cn("cursor-default select-none transition-colors flex items-center gap-2", isDeveloperMode ? "text-purple-500/60" : "text-muted-foreground/30")}
+              className={cn("cursor-default select-none transition-colors flex items-center gap-2", isDeveloperMode ? "text-purple-400/90" : "text-zinc-400")}
               onClick={() => {
                 const newCount = versionClickCount + 1
                 if (versionClickTimer) clearTimeout(versionClickTimer)
@@ -1938,7 +1986,7 @@ export default function App() {
               )}
               V0.1.0{isDeveloperMode ? ' 🛠' : ''}
             </span>
-            <span>{serverIp}:5173</span>
+            <span className="text-zinc-400">{serverIp}:5173</span>
           </div>
         </div>
       </footer >

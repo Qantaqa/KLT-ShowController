@@ -16,6 +16,9 @@ const LightFixtureStripPreview: React.FC<{
   showModeStrip?: boolean
   /** WLED: geen live peek, zwarte balk (tweede+ regel of niet-actief event). */
   wledPeekPlaceholder?: boolean
+  /** Show-modus actieve cue: Stop + Herzend na de peek-balk (WLED/WiZ). */
+  showActiveLightControls?: boolean
+  eventRowIndex?: number
 }> = ({
   event,
   compact = false,
@@ -23,6 +26,8 @@ const LightFixtureStripPreview: React.FC<{
   variant = 'default',
   showModeStrip = false,
   wledPeekPlaceholder = false,
+  showActiveLightControls = false,
+  eventRowIndex,
 }) => {
   const devices = useSequencerStore(s => s.appSettings.devices || [])
   const device = event.fixture ? devices.find(d => d.name === event.fixture) : undefined
@@ -35,6 +40,8 @@ const LightFixtureStripPreview: React.FC<{
         variant={variant}
         layout={showModeStrip ? 'showRow' : 'default'}
         peekPlaceholder={wledPeekPlaceholder}
+        showActiveLightControls={showActiveLightControls}
+        eventRowIndex={eventRowIndex}
       />
     )
   }
@@ -46,6 +53,8 @@ const LightFixtureStripPreview: React.FC<{
         className={className}
         variant={variant}
         layout={showModeStrip ? 'showRow' : 'default'}
+        showActiveLightControls={showActiveLightControls}
+        eventRowIndex={eventRowIndex}
       />
     )
   }

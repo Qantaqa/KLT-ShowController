@@ -3,6 +3,7 @@ import { useSequencerStore } from '../store/useSequencerStore'
 import type { ShowEvent } from '../types/show'
 import { cn } from '../lib/utils'
 import { isLightStripPreviewEnabled, LIGHT_STRIP_SHOW_ROW_TITLE_COL_CLASS } from '../lib/light-strip-preview'
+import ShowModeLightControls from './ShowModeLightControls'
 
 /**
  * Statische voorvertoning voor WiZ: cue-kleur × helderheid (geen live device-feedback).
@@ -13,7 +14,17 @@ const WizStripPreview: React.FC<{
   className?: string
   variant?: 'default' | 'micro'
   layout?: 'default' | 'showRow'
-}> = ({ event, compact = false, className, variant = 'default', layout = 'default' }) => {
+  showActiveLightControls?: boolean
+  eventRowIndex?: number
+}> = ({
+  event,
+  compact = false,
+  className,
+  variant = 'default',
+  layout = 'default',
+  showActiveLightControls = false,
+  eventRowIndex
+}) => {
   const appSettings = useSequencerStore(s => s.appSettings)
   const stripOn = useSequencerStore(s => isLightStripPreviewEnabled(s.appSettings.lightStripPreviewEnabled))
   const device = (appSettings.devices || []).find(d => d.name === event.fixture)
@@ -48,6 +59,9 @@ const WizStripPreview: React.FC<{
             isMicro ? 'h-1' : 'h-1.5'
           )}
         />
+        {showActiveLightControls && eventRowIndex !== undefined && event.fixture ? (
+          <ShowModeLightControls fixture={event.fixture} rowIndex={eventRowIndex} />
+        ) : null}
       </div>
     )
   }
@@ -81,6 +95,9 @@ const WizStripPreview: React.FC<{
             }}
           />
         </div>
+        {showActiveLightControls && eventRowIndex !== undefined && event.fixture ? (
+          <ShowModeLightControls fixture={event.fixture} rowIndex={eventRowIndex} />
+        ) : null}
       </div>
     )
   }

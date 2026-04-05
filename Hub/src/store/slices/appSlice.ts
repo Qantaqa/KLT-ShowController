@@ -5,6 +5,7 @@ import { isLightStripPreviewEnabled } from '../../lib/light-strip-preview';
 import { networkService } from '../../services/network-service';
 import { XmlService } from '../../services/xml-service';
 import { showInitService } from '../../services/show-init-service';
+import { migrateShowViewStateForStableIds } from '../../lib/sequenceStableIds';
 
 export interface AppSlice {
     activeShow: ShowProfile | null;
@@ -186,7 +187,12 @@ export const createAppSlice: StateCreator<
                 }
             }
 
-            set({ events, activeShow: show, isLocked: true, timingRunStartedAt: null, stopButtonFlashRequest: false })
+            get().setEvents(events)
+            const ensured = get().events
+            const migratedViewState = migrateShowViewStateForStableIds(ensured, show.viewState) ?? show.viewState
+            const activeShow = { ...show, viewState: migratedViewState }
+
+            set({ activeShow, isLocked: true, timingRunStartedAt: null, stopButtonFlashRequest: false })
             void get().refreshShowTimingFromDb()
             get().broadcastState()
             localStorage.setItem('ledshow_last_show_id', show.id)
@@ -235,10 +241,10 @@ export const createAppSlice: StateCreator<
                 await ipcRenderer.invoke('db:save-sequences', { showId: newId, events: initialEvents })
             }
 
+            get().setEvents(initialEvents)
             set(state => ({
                 availableShows: [...state.availableShows, newShow],
                 activeShow: newShow,
-                events: initialEvents,
                 activeEventIndex: -1,
                 timingRunStartedAt: null,
                 stopButtonFlashRequest: false,

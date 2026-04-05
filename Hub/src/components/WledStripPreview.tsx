@@ -6,6 +6,7 @@ import { cn } from '../lib/utils'
 import { isLightStripPreviewEnabled, LIGHT_STRIP_SHOW_ROW_TITLE_COL_CLASS } from '../lib/light-strip-preview'
 import { wledEffectPreviewUrl, wledPalettePreviewUrl, WLED_PREVIEW_IMG_FALLBACK } from '../lib/wled-preview-urls'
 import { drawWledLiveFrame, parseWledLiveMessage, type WledLiveFrame } from '../lib/wled-live-peek'
+import ShowModeLightControls from './ShowModeLightControls'
 
 const LIVE_STALE_MS = 4000
 
@@ -32,6 +33,8 @@ type WledStripPreviewBodyProps = {
   layout?: 'default' | 'showRow'
   /** Geen WebSocket / GIF: alleen zwarte balk (tweede cue per WLED of niet-actief event). */
   peekPlaceholder?: boolean
+  showActiveLightControls?: boolean
+  eventRowIndex?: number
 }
 
 /**
@@ -48,7 +51,9 @@ const WledStripPreviewBody: React.FC<WledStripPreviewBodyProps> = ({
   stripPreviewEnabled,
   variant = 'default',
   layout = 'default',
-  peekPlaceholder = false
+  peekPlaceholder = false,
+  showActiveLightControls = false,
+  eventRowIndex
 }) => {
   const isMicro = variant === 'micro'
   const deviceTitle = useMemo(
@@ -212,6 +217,9 @@ const WledStripPreviewBody: React.FC<WledStripPreviewBodyProps> = ({
             isMicro ? 'h-1' : 'h-1.5'
           )}
         />
+        {showActiveLightControls && eventRowIndex !== undefined && event.fixture ? (
+          <ShowModeLightControls fixture={event.fixture} rowIndex={eventRowIndex} />
+        ) : null}
       </div>
     )
   }
@@ -297,6 +305,9 @@ const WledStripPreviewBody: React.FC<WledStripPreviewBodyProps> = ({
             100% { background-position: 100% 50%; }
           }
         `}</style>
+        {showActiveLightControls && eventRowIndex !== undefined && event.fixture ? (
+          <ShowModeLightControls fixture={event.fixture} rowIndex={eventRowIndex} />
+        ) : null}
       </div>
     )
   }
@@ -405,13 +416,17 @@ const WledStripPreview: React.FC<{
   variant?: 'default' | 'micro'
   layout?: 'default' | 'showRow'
   peekPlaceholder?: boolean
+  showActiveLightControls?: boolean
+  eventRowIndex?: number
 }> = ({
   event,
   compact = false,
   className,
   variant = 'default',
   layout = 'default',
-  peekPlaceholder = false
+  peekPlaceholder = false,
+  showActiveLightControls = false,
+  eventRowIndex
 }) => {
   const appSettings = useSequencerStore(s => s.appSettings)
   const stripPreviewEnabled = useSequencerStore(s => isLightStripPreviewEnabled(s.appSettings.lightStripPreviewEnabled))
@@ -434,6 +449,8 @@ const WledStripPreview: React.FC<{
       variant={variant}
       layout={layout}
       peekPlaceholder={peekPlaceholder}
+      showActiveLightControls={showActiveLightControls}
+      eventRowIndex={eventRowIndex}
     />
   )
 }

@@ -6,9 +6,9 @@ import type { ShowEvent } from '../types/show'
 import { modalBtnIconClass, modalBtnPrimary, modalBtnSecondary, modalHeaderCloseBtn } from '../lib/utils'
 
 /** Act-niveau commentaar (pre-of post-reindex: geen echte scene/event). */
-function findActLevelCommentIndex(events: ShowEvent[], actName: string): number {
+function findActLevelCommentIndex(events: ShowEvent[], actUid: string): number {
     return events.findIndex(e => {
-        if (e.act !== actName) return false
+        if (e.actUid !== actUid) return false
         if ((e.type || '').toLowerCase() !== 'comment') return false
         const s = e.sceneId
         const ev = e.eventId
@@ -16,6 +16,7 @@ function findActLevelCommentIndex(events: ShowEvent[], actName: string): number 
     })
 }
 
+/** `actId` is de stabiele actUid. */
 const ActEditModal: React.FC<{ actId: string | null; onClose: () => void }> = ({ actId, onClose }) => {
     const events = useSequencerStore(s => s.events)
     const renameAct = useSequencerStore(s => s.renameAct)
@@ -25,10 +26,15 @@ const ActEditModal: React.FC<{ actId: string | null; onClose: () => void }> = ({
     const [title, setTitle] = useState('')
     const [note, setNote] = useState('')
 
+    const displayActName =
+        (actId && (events.find(e => e.actUid === actId && (e.type || '').toLowerCase() === 'act') || events.find(e => e.actUid === actId))?.act) ||
+        actId ||
+        ''
+
     useEffect(() => {
         if (!actId) return
-        setTitle(actId)
-    }, [actId])
+        setTitle(displayActName)
+    }, [actId, displayActName])
 
     useEffect(() => {
         if (!actId) return
@@ -47,27 +53,27 @@ const ActEditModal: React.FC<{ actId: string | null; onClose: () => void }> = ({
 
     if (!actId) return null
 
-    const handleSave = () => {
-        const newTitle = title.trim() || actId
-        if (newTitle !== actId) {
-            renameAct(actId, newTitle)
+    const handleSave = async () => {
+        const newTitle = title.trim() || displayActName
+        if (newTitle !== displayActName) {
+            const ok = await renameAct(actId!, newTitle)
+            if (!ok) return
         }
         const store = useSequencerStore.getState()
-        const name = newTitle
         const cue = note.trim()
-        let idx = findActLevelCommentIndex(store.events, name)
+        let idx = findActLevelCommentIndex(store.events, actId!)
         if (idx >= 0) {
             if (cue !== (store.events[idx].cue || '')) {
                 store.updateEvent(idx, { cue })
             }
         } else if (cue.length > 0) {
-            addActComment(name)
-            idx = findActLevelCommentIndex(useSequencerStore.getState().events, name)
+            addActComment(actId!)
+            idx = findActLevelCommentIndex(useSequencerStore.getState().events, actId!)
             if (idx >= 0) {
                 useSequencerStore.getState().updateEvent(idx, { cue })
             }
         }
-        saveCurrentShow()
+        await saveCurrentShow()
         onClose()
     }
 
